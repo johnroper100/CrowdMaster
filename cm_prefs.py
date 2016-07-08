@@ -45,22 +45,37 @@ class CMPreferences(bpy.types.AddonPreferences):
       description = "Choose your mysql password",
       subtype='PASSWORD'
       )
+    
+    prefs_tab_items = [
+        ("MYSQL", "MySQL Settings", "MySQL general settings"),
+        ("DBSETUP", "Database Setup", "MySQL database setup"),
+        ("SETTINGS", "Simulation Settings", "General simulation settings") ]
+
+    prefs_tab = bpy.props.EnumProperty(name="Options Set", items=prefs_tab_items)
 
     def draw(self, context):
         layout = self.layout
         preferences = context.user_preferences.addons[__package__].preferences
 
         row = layout.row()
-        row.prop(preferences, 'databaseName')
+        row.prop(preferences, "prefs_tab", expand = True)
         
-        row = layout.row()
-        row.prop(preferences, 'databaseHost')
+        if preferences.prefs_tab == "MYSQL":
+            row = layout.row()
+            row.prop(preferences, 'databaseName')
+
+            row = layout.row()
+            row.prop(preferences, 'databaseHost')
+
+            row = layout.row()
+            row.prop(preferences, 'databaseUsername')
+
+            row = layout.row()
+            row.prop(preferences, 'databasePassword')
         
-        row = layout.row()
-        row.prop(preferences, 'databaseUsername')
-        
-        row = layout.row()
-        row.prop(preferences, 'databasePassword')
+        if preferences.prefs_tab == "DBSETUP":
+            row = layout.row()
+            row.operator("scene.cm_init_database")
         
         row = layout.row()
         row.scale_y = 1.25
