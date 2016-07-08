@@ -1,5 +1,5 @@
 # CrowdMaster
-Blender Crowd Simulation Addon
+Blender crowd simulation addon inspired by the BlenderPeople script. To install, follow the steps below to install the required python modules and then run the add-on like you would with any other add-on in Blender.
 
 ## Installing required modules
 1. Make sure you are using Python 3.5 or greater
