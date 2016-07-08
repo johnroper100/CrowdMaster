@@ -17,19 +17,19 @@ sys.path.append('C:\Python35\Lib\site-packages')
 sys.path.append('C:\Python35\DLLs')
 import pymysql
 
-from blenderpeople import cm_prefs
-from blenderpeople import mysql_general
+from CrowdMaster import cm_prefs
+from CrowdMaster import mysql_general as cmDB
 
-class InitDatabase(bpy.types.Operator):
+class CMInitDatabase(bpy.types.Operator):
     """Init the CrowdMaster mysql database"""
-    bl_idname = "scene.init_database"
+    bl_idname = "scene.cm_init_database"
     bl_label = "Init Database"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
 
-        conn, cursor = mysql_general.dbConnect(preferences.databaseName, preferences.databaseHost, preferences.databaseUsername, preferences.databasePassword)
+        conn, cursor = cmDB.dbConnect(preferences.databaseName, preferences.databaseHost, preferences.databaseUsername, preferences.databasePassword)
         
         # Sample SQL to make sure everything works
         cursor.execute("DROP TABLE IF EXISTS ACTORS")
@@ -41,7 +41,7 @@ class InitDatabase(bpy.types.Operator):
          INCOME FLOAT )"""
         cursor.execute(actorSql)
         
-        mysql_general.dbClose(conn, cursor)
+        cmDB.dbClose(conn, cursor)
 
         return {'FINISHED'}
 
@@ -49,8 +49,8 @@ class CMPanelMain(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_context = "objectmode"
-    bl_category = "Tools"
-    bl_label = "CrowdMaster"
+    bl_category = "CrowdMaster"
+    bl_label = "Main"
     def draw(self, context):
         layout = self.layout
         preferences = context.user_preferences.addons[__package__].preferences
@@ -59,7 +59,7 @@ class CMPanelMain(bpy.types.Panel):
             layout.enabled = False
         
         row = layout.row()
-        row.operator("scene.init_database")
+        row.operator("scene.cm_init_database")
 
 ################
 # Registration #
