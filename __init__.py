@@ -31,6 +31,8 @@ class CMInitDatabase(bpy.types.Operator):
 
         conn, cursor = cmDB.dbConnect(preferences.databaseName, preferences.databaseHost, preferences.databaseUsername, preferences.databasePassword)
         
+        cmDB.dbVersion(conn, cursor)
+        
         # Sample SQL to make sure everything works
         cursor.execute("DROP TABLE IF EXISTS ACTORS")
         actorSql = """CREATE TABLE ACTORS (

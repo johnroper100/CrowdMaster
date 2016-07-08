@@ -75,6 +75,8 @@ class CMPreferences(bpy.types.AddonPreferences):
         
         if preferences.prefs_tab == "DBSETUP":
             row = layout.row()
+            if (preferences.databaseName == "") or (preferences.databaseHost == "") or (preferences.databaseUsername == "") or (preferences.databasePassword == ""):
+                row.enabled = False
             row.operator("scene.cm_init_database")
         
         row = layout.row()

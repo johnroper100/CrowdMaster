@@ -13,3 +13,8 @@ def dbConnect(databaseName, databaseHost, databaseUsername, databasePassword):
 def dbClose(conn, cursor):
     cursor.close()
     conn.close()
+
+def dbVersion(conn, cursor):
+    cursor.execute("SELECT VERSION()")
+    data = cursor.fetchone()
+    print ("Database version : %s " % data)
