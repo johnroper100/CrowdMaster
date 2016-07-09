@@ -1,24 +1,19 @@
 import os
 import bpy
-import bpy.utils.previews
 
-# global variable to store icons in
-cm_custom_icons = None
+ICONS = '3_agents 2_agents 1_agent'.split(' ')
+icon_collection = {}
 
-def register():
-    global cm_custom_icons
-    cm_custom_icons = bpy.utils.previews.new()
-    script_path = bpy.context.space_data.text.filepath
-    icons_dir = os.path.join(os.path.dirname(script_path), "icons")
-    cm_custom_icons.load("3_agents", os.path.join(icons_dir, "3_agents.png"), 'IMAGE')
-    cm_custom_icons.load("2_agents", os.path.join(icons_dir, "2_agents.png"), 'IMAGE')
-    cm_custom_icons.load("1_agent", os.path.join(icons_dir, "1_agent.png"), 'IMAGE')
-    bpy.utils.register_module(__name__)
+def register_icons():
+    import bpy.utils.previews
+    pcoll = bpy.utils.previews.new()
+    icons_dir = os.path.join(os.path.dirname(__file__), "icons")
+    for icon_name in ICONS:
+        pcoll.load(icon_name, os.path.join(icons_dir, icon_name + '.png'), 'IMAGE')
 
-def unregister():
-    global cm_custom_icons
-    bpy.utils.previews.remove(cm_custom_icons)
-    bpy.utils.unregister_module(__name__)
+    icon_collection["main"] = pcoll
 
-if __name__ == "__main__":
-    register()
+def unregister_icons():
+    for pcoll in icon_collection.values():
+        bpy.utils.previews.remove(pcoll)
+    icon_collection.clear()
