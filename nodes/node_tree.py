@@ -7,12 +7,29 @@ class CMNodeTree(NodeTree):
     '''The CrowdMaster node tree'''
     bl_idname = 'CMNodeTree'
     bl_label = 'CrowdMaster'
-    bl_icon = cicon('node_tree_logo')
+    #bl_icon = cicon('node_tree_logo')
+    bl_icon = 'NODETREE'
 
-class CMNodeTreeNode:
+class CMNode:
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'CMNodeTree'
+
+    import nodeitems_utils
+from nodeitems_utils import NodeCategory, NodeItem
+
+class CMNodeCategory(NodeCategory):
+    @classmethod
+    def poll(cls, context):
+        return context.space_data.tree_type == 'CMNodeTree'
+
+node_categories = [
+    # identifier, label, items list
+    CMNodeCategory("SOMENODES", "Some Nodes", items=[
+        # our basic node
+        NodeItem("CMTimeInfoNode"),
+        ]),CMNodeCategory
+    ]
 
 def register():
     nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)

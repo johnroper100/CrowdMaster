@@ -19,10 +19,15 @@ import pymysql
 
 from . import cm_prefs
 from . import mysql
-from . import nodes
 from . mysql import mysql_general as cmDB
 from . nodes import node_tree as nTree
 from . icon_load import register_icons, unregister_icons
+
+if bpy.app.version < (2, 76, 0):
+    message = ("\n\n"
+        "CrowdMaster requires at least Blender 2.77.\n"
+        "Please download the latest official release.")
+    raise Exception(message)
 
 class CMInitDatabase(bpy.types.Operator):
     """Init the CrowdMaster mysql database"""
