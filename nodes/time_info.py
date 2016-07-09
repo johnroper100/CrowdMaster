@@ -1,8 +1,8 @@
 import bpy
-from node_tree import .
+from . node_tree import CrowdNode
 
-class CMTimeInfoNode(bpy.types.Node, CMNode):
-    bl_idname = "CMTimeInfoNode"
+class CMTimeInfoNode(bpy.types.Node, CrowdNode):
+    bl_idname = "cm_TimeInfoNode"
     bl_label = "Time Info"
     searchTags = ["Frame"]
 
@@ -32,9 +32,3 @@ class CMTimeInfoNode(bpy.types.Node, CMNode):
         if isLinked["frameRate"]:  yield "    frameRate = scene.render.fps"
         yield "else:"
         yield "    frame, startFrame, endFrame, frameRate = 0, 0, 0, 0"
-
-def register():
-    bpy.utils.register_module(__name__)
-
-def unregister():
-    bpy.utils.unregister_module(__name__)
