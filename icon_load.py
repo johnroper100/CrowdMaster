@@ -2,6 +2,8 @@ import os
 import bpy
 
 ICONS = '3_agents 2_agents 1_agent'.split(' ')
+global icon_collection
+
 icon_collection = {}
 
 def register_icons():

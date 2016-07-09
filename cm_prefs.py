@@ -1,5 +1,6 @@
 import bpy
 import os
+from . import icon_load
 
 class CMSavePrefs(bpy.types.Operator):
     """Save the CrowdMaster preferences """
@@ -56,6 +57,8 @@ class CMPreferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
         preferences = context.user_preferences.addons[__package__].preferences
+        
+        global icon_collection
         
         pcoll = icon_collection["main"]
         def cicon(name):
