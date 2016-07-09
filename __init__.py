@@ -17,8 +17,11 @@ sys.path.append('C:\Python35\Lib\site-packages')
 sys.path.append('C:\Python35\DLLs')
 import pymysql
 
-from CrowdMaster import cm_prefs
-from CrowdMaster import mysql_general as cmDB
+from . import cm_prefs
+from . import mysql
+from . import nodes
+from . mysql import mysql_general as cmDB
+from . nodes import node_tree as nTree
 
 class CMInitDatabase(bpy.types.Operator):
     """Init the CrowdMaster mysql database"""
