@@ -9,6 +9,11 @@ class CMNodeTree(NodeTree):
     bl_label = 'CrowdMaster'
     bl_icon = cicon('node_tree_logo')
 
+class CMNodeTreeNode:
+    @classmethod
+    def poll(cls, ntree):
+        return ntree.bl_idname == 'CMNodeTree'
+
 def register():
     nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)
 
