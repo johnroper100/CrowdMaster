@@ -1,5 +1,5 @@
 # CrowdMaster
-*Please note: This is nowhere near to being usable. Development started 7/1/16 and as of yet there is nothing that is functional yet.*
+__Please note: This is nowhere near to being usable. Development started 7/1/16 and as of yet there is nothing that is functional yet.__
 
 __If you are a python coder and want to help, send me an email [here] (mailto:johnroper100@gmail.com) and tell me what you can do.__
 
