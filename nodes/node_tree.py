@@ -1,7 +1,7 @@
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from .. import icon_load
-from .. icon_load import cicon
+#from .. icon_load import cicon
 
 class CMNodeTree(NodeTree):
     '''The CrowdMaster node tree'''
