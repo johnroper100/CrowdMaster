@@ -1,6 +1,6 @@
 import bpy
 import os
-from . import icon_load
+from . icons import get_icon_id
 
 class CMSavePrefs(bpy.types.Operator):
     """Save the CrowdMaster preferences """
@@ -57,12 +57,6 @@ class CMPreferences(bpy.types.AddonPreferences):
     def draw(self, context):
         layout = self.layout
         preferences = context.user_preferences.addons[__package__].preferences
-        
-        global icon_collection
-        
-        pcoll = icon_collection["main"]
-        def cicon(name):
-            return pcoll[name].icon_id
 
         row = layout.row()
         row.prop(preferences, "prefs_tab", expand = True)
@@ -84,7 +78,7 @@ class CMPreferences(bpy.types.AddonPreferences):
             row = layout.row()
             if (preferences.databaseName == "") or (preferences.databaseHost == "") or (preferences.databaseUsername == "") or (preferences.databasePassword == ""):
                 row.enabled = False
-            row.operator("scene.cm_init_database", icon_value=cicon('3_agents'))
+            row.operator("scene.cm_init_database", icon_value=get_icon_id("3_agents"))
         
         row = layout.row()
         row.scale_y = 1.25

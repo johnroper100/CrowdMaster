@@ -22,7 +22,7 @@ from . import mysql
 from . import nodes
 from . mysql import mysql_general as cmDB
 from . nodes import node_tree as nTree
-from . icon_load import register_icons, unregister_icons
+from . import icons
 
 class CMInitDatabase(bpy.types.Operator):
     """Init the CrowdMaster mysql database"""
@@ -71,11 +71,9 @@ class CMPanelMain(bpy.types.Panel):
 # Registration #
 ################
 def register():
-    register_icons()
     bpy.utils.register_module(__name__)
 
 def unregister():
-    unregister_icons()
     bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
