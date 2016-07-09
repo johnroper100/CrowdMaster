@@ -1,14 +1,12 @@
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from .. import icon_load
-from .. icon_load import cicon
 
 class CMNodeTree(NodeTree):
     '''The CrowdMaster node tree'''
     bl_idname = 'CMNodeTree'
     bl_label = 'CrowdMaster'
-    #bl_icon = cicon('node_tree_logo')
-    bl_icon = 'NODETREE'
+    bl_icon = 'MOD_REMESH'
 
 class CMNode:
     @classmethod
