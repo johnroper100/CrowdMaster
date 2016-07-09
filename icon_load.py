@@ -1,7 +1,7 @@
 import os
 import bpy
 
-ICONS = '3_agents 2_agents 1_agent'.split(' ')
+ICONS = '3_agents 2_agents 1_agent node_tree_icon setup_plug'.split(' ')
 icon_collection = {}
 
 def register_icons():
@@ -17,3 +17,7 @@ def unregister_icons():
     for pcoll in icon_collection.values():
         bpy.utils.previews.remove(pcoll)
     icon_collection.clear()
+
+def cicon(name):
+    pcoll = icon_collection["main"]
+    return pcoll[name].icon_id

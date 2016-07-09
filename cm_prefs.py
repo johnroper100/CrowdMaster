@@ -82,7 +82,7 @@ class CMPreferences(bpy.types.AddonPreferences):
             row = layout.row()
             if (preferences.databaseName == "") or (preferences.databaseHost == "") or (preferences.databaseUsername == "") or (preferences.databasePassword == ""):
                 row.enabled = False
-            row.operator("scene.cm_init_database", icon_value=cicon('3_agents'))
+            row.operator("scene.cm_init_database", icon_value=cicon('setup_plug'))
         
         row = layout.row()
         row.scale_y = 1.25
