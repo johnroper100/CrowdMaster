@@ -51,22 +51,6 @@ class CMInitDatabase(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class CMPanelMain(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    bl_context = "objectmode"
-    bl_category = "CrowdMaster"
-    bl_label = "Main"
-    def draw(self, context):
-        layout = self.layout
-        preferences = context.user_preferences.addons[__package__].preferences
-        
-        if (preferences.databaseName == "") or (preferences.databaseHost == "") or (preferences.databaseUsername == "") or (preferences.databasePassword == ""):
-            layout.enabled = False
-        
-        row = layout.row()
-        row.operator("scene.cm_init_database")
-
 ################
 # Registration #
 ################
