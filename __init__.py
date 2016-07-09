@@ -18,6 +18,7 @@ sys.path.append('C:\Python35\DLLs')
 import pymysql
 
 from . import cm_prefs
+from . import icon_load
 from . import mysql
 from . import nodes
 from . mysql import mysql_general as cmDB
