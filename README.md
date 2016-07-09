@@ -1,4 +1,8 @@
 # CrowdMaster
+*Please note: This is nowhere near to being usable. Development started 7/1/16 and as of yet there is nothing that is functional yet.*
+
+__If you are a python coder and want to help, send me an email [here] (mailto:johnroper100@gmail.com) and tell me what you can do.__
+
 Blender crowd simulation addon inspired by the BlenderPeople script. To install, follow the steps below to install the required python modules and then run the add-on like you would with any other add-on in Blender.
 
 ## Installing required modules
