@@ -5,7 +5,11 @@ sys.path.append('C:\Python35\DLLs')
 import pymysql
 
 def dbConnect(databaseName, databaseHost, databaseUsername, databasePassword):
-    conn = pymysql.connect(host=databaseHost, port=3306, user=databaseUsername, passwd=databasePassword, db=databaseName)
+    try:
+        conn = pymysql.connect(host=databaseHost, port=3306, user=databaseUsername, passwd=databasePassword, db=databaseName)
+    except:
+        self.report({'ERROR'}, "Error with the connection!")
+
     cursor = conn.cursor()
     
     return conn, cursor
