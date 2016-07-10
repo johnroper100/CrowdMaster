@@ -1,11 +1,11 @@
 import bpy
-from . import time_info
+from . import node_tree
+from .sockets.custom import MyCustomSocket
+from . import custom
 
-def register():
-    bpy.utils.register_module(__name__)
+def register_nodes():
+    print("Registered nodes!")
 
-def unregister():
-    bpy.utils.unregister_module(__name__)
-
-if __name__ == "__main__":
-    register()
+def unregister_nodes():
+    print("Unregistered nodes!")
+    
