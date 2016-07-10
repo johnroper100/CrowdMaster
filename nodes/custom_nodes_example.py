@@ -154,7 +154,7 @@ node_categories = [
     ]
 
 
-def register_cnode():
+def register():
     bpy.utils.register_class(MyCustomTree)
     bpy.utils.register_class(MyCustomSocket)
     bpy.utils.register_class(MyCustomNode)
@@ -162,7 +162,7 @@ def register_cnode():
     nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)
 
 
-def unregister_cnode():
+def unregister():
     nodeitems_utils.unregister_node_categories("CUSTOM_NODES")
 
     bpy.utils.unregister_class(MyCustomTree)

@@ -17,6 +17,7 @@ import sys
 from . import cm_prefs
 from . import mysql
 from . mysql import mysql_general as cmDB
+from . nodes import main
 from . icon_load import register_icons, unregister_icons
 
 if bpy.app.version < (2, 76, 0):
