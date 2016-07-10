@@ -1,5 +1,6 @@
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
+from .. icon_load import cicon
 
 class CrowdMasterTree(NodeTree):
     '''The CrowdMaster node tree'''
@@ -147,6 +148,7 @@ class SimulateNode(Node, CrowdMasterTreeNode):
         print("Removing node ", self, ", Goodbye!")
 
     def draw_buttons(self, context, layout):
+        layout.scale_y = 1.5
         layout.operator("scene.cm_init_database", icon_value=cicon('setup_plug'))
 
     def draw_buttons_ext(self, context, layout):
