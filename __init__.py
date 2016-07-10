@@ -17,7 +17,6 @@ import sys
 from . import cm_prefs
 from . import mysql
 from . mysql import mysql_general as cmDB
-from . nodes.node_register import register_nodes, unregister_nodes
 from . icon_load import register_icons, unregister_icons
 
 if bpy.app.version < (2, 76, 0):
@@ -58,12 +57,10 @@ class CMInitDatabase(bpy.types.Operator):
 ################
 def register():
     register_icons()
-    register_nodes()
     bpy.utils.register_module(__name__)
 
 def unregister():
     unregister_icons()
-    unregister_nodes()
     bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
