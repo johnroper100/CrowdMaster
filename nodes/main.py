@@ -34,20 +34,10 @@ class CrowdSocket(NodeSocket):
     '''Crowd socket used for transferring crowd data'''
     bl_idname = 'CrowdSocketType'
     bl_label = 'Crowd'
+    
+    def draw(self, context, layout, node, text):
+        layout.label("Crowd")
 
-    @classmethod
-    def getDefaultValue(cls):
-        return None
-
-    @classmethod
-    def getDefaultValueCode(cls):
-        return "None"
-
-    @classmethod
-    def correctValue(cls, value):
-        return value, 0
-
-    # Socket color
     def draw_color(self, context, node):
         return (0.8, 0.514, 0.0, 1.0)
 
@@ -109,39 +99,61 @@ class MyCustomNode(Node, CrowdMasterTreeNode):
     def draw_label(self):
         return "I am a custom node"
 
-class CrowdOutputNode(Node, CrowdMasterTreeNode):
-    '''The crowd output node'''
-    bl_idname = 'CrowdOutputNode'
-    bl_label = 'Output'
+class CrowdDataOutputNode(Node, CrowdMasterTreeNode):
+    '''The crowd data output node'''
+    bl_idname = 'CrowdDataOutputNode'
+    bl_label = 'Data Output'
     bl_icon = 'SOUND'
-
-    myStringProperty = bpy.props.StringProperty()
-    myFloatProperty = bpy.props.FloatProperty(default=3.1415926)
+    
+    outputPath = bpy.props.StringProperty \
+      (
+      name = "Select The Output File Path",
+      default = "",
+      description = "Define the output path",
+      subtype = 'DIR_PATH'
+      )
 
     def init(self, context):
-        self.inputs.new('CrowdSocketType', "Hello")
+        self.inputs.new('CrowdSocketType', "Crowd")
 
-    # Copy function to initialize a copied node from an existing one.
     def copy(self, node):
         print("Copying from node ", node)
 
-    # Free function to clean up on removal.
     def free(self):
         print("Removing node ", self, ", Goodbye!")
 
-    # Additional buttons displayed on the node.
     def draw_buttons(self, context, layout):
-        layout.label("Node settings")
-        layout.prop(self, "myFloatProperty")
+        layout.prop(self, "outputPath")
 
-    # Detail buttons in the sidebar.
-    # If this function is not defined, the draw_buttons function is used instead
     def draw_buttons_ext(self, context, layout):
-        layout.prop(self, "myFloatProperty")
-        layout.prop(self, "myStringProperty")
+        layout.prop(self, "outputPath")
 
     def draw_label(self):
-        return "Output"
+        return "Data Output"
+
+class SimulateNode(Node, CrowdMasterTreeNode):
+    '''The simulate node'''
+    bl_idname = 'SimulateNode'
+    bl_label = 'Simulate'
+    bl_icon = 'SOUND'
+
+    def init(self, context):
+        self.inputs.new('CrowdSocketType', "Crowd")
+
+    def copy(self, node):
+        print("Copying from node ", node)
+
+    def free(self):
+        print("Removing node ", self, ", Goodbye!")
+
+    def draw_buttons(self, context, layout):
+        layout.operator("scene.cm_init_database")
+
+    def draw_buttons_ext(self, context, layout):
+        layout.operator("scene.cm_init_database")
+
+    def draw_label(self):
+        return "Simulate"
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -157,7 +169,8 @@ node_categories = [
         NodeItem("CustomNodeType"),
         ]),
     CrowdMasterCategory("OUTPUT", "Output", items=[
-        NodeItem("CrowdOutputNode"),
+        NodeItem("CrowdDataOutputNode"),
+        NodeItem("SimulateNode"),
         ]),
     CrowdMasterCategory("OTHERNODES", "Other Nodes", items=[
         NodeItem("CustomNodeType", label="Node A", settings={
@@ -174,21 +187,11 @@ node_categories = [
 
 def register_cnode():
     bpy.utils.register_class(CrowdMasterTree)
-    bpy.utils.register_class(MyCustomSocket)
-    bpy.utils.register_class(CrowdSocket)
-    bpy.utils.register_class(MyCustomNode)
-
     nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)
-
 
 def unregister_cnode():
     nodeitems_utils.unregister_node_categories("CUSTOM_NODES")
-
     bpy.utils.unregister_class(CrowdMasterTree)
-    bpy.utils.unregister_class(MyCustomSocket)
-    bpy.utils.unregister_class(CrowdSocket)
-    bpy.utils.unregister_class(MyCustomNode)
-
 
 if __name__ == "__main__":
     register()
