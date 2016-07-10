@@ -107,7 +107,7 @@ class CrowdDataOutputNode(Node, CrowdMasterTreeNode):
     
     outputPath = bpy.props.StringProperty \
       (
-      name = "Select The Output File Path",
+      name = "Output Path",
       default = "",
       description = "Define the output path",
       subtype = 'DIR_PATH'
@@ -147,10 +147,10 @@ class SimulateNode(Node, CrowdMasterTreeNode):
         print("Removing node ", self, ", Goodbye!")
 
     def draw_buttons(self, context, layout):
-        layout.operator("scene.cm_init_database")
+        layout.operator("scene.cm_init_database", icon_value=cicon('setup_plug'))
 
     def draw_buttons_ext(self, context, layout):
-        layout.operator("scene.cm_init_database")
+        layout.operator("scene.cm_init_database", icon_value=cicon('setup_plug'))
 
     def draw_label(self):
         return "Simulate"
