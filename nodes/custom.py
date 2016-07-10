@@ -1,7 +1,6 @@
 import bpy
 from bpy.props import *
 from bpy.types import NodeTree, Node, NodeSocket
-#from .node_tree import CrowdNode
 
 class MyCustomNode(Node):
     # === Basics ===
