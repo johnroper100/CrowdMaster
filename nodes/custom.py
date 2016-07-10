@@ -1,9 +1,9 @@
 import bpy
 from bpy.props import *
 from bpy.types import NodeTree, Node, NodeSocket
-from .node_tree import CrowdNode
+#from .node_tree import CrowdNode
 
-class MyCustomNode(Node, CrowdNode):
+class MyCustomNode(Node):
     # === Basics ===
     # Description string
     '''A custom node'''
