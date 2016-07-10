@@ -13,9 +13,6 @@ bl_info = {
 
 import bpy
 import sys
-sys.path.append('C:\Python35\Lib\site-packages')
-sys.path.append('C:\Python35\DLLs')
-import pymysql
 
 from . import cm_prefs
 from . import mysql
