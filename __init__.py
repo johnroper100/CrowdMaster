@@ -17,8 +17,8 @@ import sys
 from . import cm_prefs
 from . import mysql
 from . mysql import mysql_general as cmDB
-from . nodes import main
 from . icon_load import register_icons, unregister_icons
+from . nodes.main import register_cnode, unregister_cnode
 
 if bpy.app.version < (2, 76, 0):
     message = ("\n\n"
@@ -58,9 +58,11 @@ class CMInitDatabase(bpy.types.Operator):
 ################
 def register():
     register_icons()
+    register_cnode()
     bpy.utils.register_module(__name__)
 
 def unregister():
+    unregister_cnode()
     unregister_icons()
     bpy.utils.unregister_module(__name__)
 
