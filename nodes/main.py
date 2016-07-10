@@ -17,7 +17,10 @@ class CrowdSocket(NodeSocket):
         layout.label("Crowd")
 
     def draw_color(self, context, node):
-        return (0.8, 0.514, 0.0, 1.0)
+        if self.is_linked:
+            return (0.8, 0.514, 0.0, 1.0)
+        else:
+            return (0.8, 0.514, 0.0, 0.75)
 
 class CrowdMasterTreeNode:
     @classmethod
@@ -72,11 +75,13 @@ class SimulateNode(Node, CrowdMasterTreeNode):
         print("Removing node ", self, ", Goodbye!")
 
     def draw_buttons(self, context, layout):
+        if bpy.context.CrowdSocketType.is_linked == False:
+            layout.enabled = False
         layout.scale_y = 1.5
-        layout.operator("scene.cm_init_database", icon_value=cicon('setup_plug'))
+        layout.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
 
     def draw_buttons_ext(self, context, layout):
-        layout.operator("scene.cm_init_database", icon_value=cicon('setup_plug'))
+        layout.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
 
     def draw_label(self):
         return "Simulate"

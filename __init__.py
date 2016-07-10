@@ -19,6 +19,7 @@ from . import mysql
 from . mysql import mysql_general as cmDB
 from . icon_load import register_icons, unregister_icons
 from . nodes.main import register_cnode, unregister_cnode
+from . simulation import main
 
 if bpy.app.version < (2, 76, 0):
     message = ("\n\n"
