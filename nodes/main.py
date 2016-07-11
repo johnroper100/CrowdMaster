@@ -20,7 +20,7 @@ class CrowdSocket(NodeSocket):
         if self.is_linked:
             return (0.8, 0.514, 0.0, 1.0)
         else:
-            return (0.8, 0.514, 0.0, 0.75)
+            return (0.8, 0.514, 0.0, 0.5)
 
 class CrowdMasterTreeNode:
     @classmethod
@@ -75,7 +75,7 @@ class SimulateNode(Node, CrowdMasterTreeNode):
         print("Removing node ", self, ", Goodbye!")
 
     def draw_buttons(self, context, layout):
-        if bpy.context.CrowdSocketType.is_linked == False:
+        if self.inputs['Crowd'].is_linked == False:
             layout.enabled = False
         layout.scale_y = 1.5
         layout.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
@@ -86,6 +86,32 @@ class SimulateNode(Node, CrowdMasterTreeNode):
     def draw_label(self):
         return "Simulate"
 
+class IntegerNode(Node, CrowdMasterTreeNode):
+    '''The integer node'''
+    bl_idname = 'IntegerNode'
+    bl_label = 'Integer'
+    bl_icon = 'SOUND'
+    
+    Integer = bpy.props.IntProperty(default=3)
+
+    def init(self, context):
+        self.outputs.new('NodeSocketInt', "Integer")
+
+    def copy(self, node):
+        print("Copying from node ", node)
+
+    def free(self):
+        print("Removing node ", self, ", Goodbye!")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "Integer")
+
+    def draw_buttons_ext(self, context, layout):
+        layout.prop(self, "Integer")
+
+    def draw_label(self):
+        return "Integer"
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -95,6 +121,9 @@ class CrowdMasterCategory(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
 node_categories = [
+    CrowdMasterCategory("INPUT", "Input", items=[
+        NodeItem("IntegerNode"),
+        ]),
     CrowdMasterCategory("OUTPUT", "Output", items=[
         NodeItem("CrowdDataOutputNode"),
         NodeItem("SimulateNode"),
