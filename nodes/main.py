@@ -44,12 +44,6 @@ class CrowdDataOutputNode(Node, CrowdMasterTreeNode):
     def init(self, context):
         self.inputs.new('CrowdSocketType', "Crowd")
 
-    def copy(self, node):
-        print("Copying from node ", node)
-
-    def free(self):
-        print("Removing node ", self, ", Goodbye!")
-
     def draw_buttons(self, context, layout):
         layout.prop(self, "outputPath")
 
@@ -67,12 +61,6 @@ class SimulateNode(Node, CrowdMasterTreeNode):
 
     def init(self, context):
         self.inputs.new('CrowdSocketType', "Crowd")
-
-    def copy(self, node):
-        print("Copying from node ", node)
-
-    def free(self):
-        print("Removing node ", self, ", Goodbye!")
 
     def draw_buttons(self, context, layout):
         if self.inputs['Crowd'].is_linked == False:
@@ -97,12 +85,6 @@ class IntegerNode(Node, CrowdMasterTreeNode):
     def init(self, context):
         self.outputs.new('NodeSocketInt', "Integer")
 
-    def copy(self, node):
-        print("Copying from node ", node)
-
-    def free(self):
-        print("Removing node ", self, ", Goodbye!")
-
     def draw_buttons(self, context, layout):
         layout.prop(self, "Integer")
 
@@ -111,6 +93,26 @@ class IntegerNode(Node, CrowdMasterTreeNode):
 
     def draw_label(self):
         return "Integer"
+
+class FloatNode(Node, CrowdMasterTreeNode):
+    '''The float node'''
+    bl_idname = 'FloatNode'
+    bl_label = 'Float'
+    bl_icon = 'SOUND'
+    
+    Float = bpy.props.FloatProperty(default=2.5)
+
+    def init(self, context):
+        self.outputs.new('NodeSocketFloat', "Float")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "Float")
+
+    def draw_buttons_ext(self, context, layout):
+        layout.prop(self, "Float")
+
+    def draw_label(self):
+        return "Float"
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -123,6 +125,7 @@ class CrowdMasterCategory(NodeCategory):
 node_categories = [
     CrowdMasterCategory("INPUT", "Input", items=[
         NodeItem("IntegerNode"),
+        NodeItem("FloatNode"),
         ]),
     CrowdMasterCategory("OUTPUT", "Output", items=[
         NodeItem("CrowdDataOutputNode"),
