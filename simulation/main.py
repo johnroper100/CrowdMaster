@@ -93,7 +93,7 @@ class RunSimulation(bpy.types.Operator):
     def execute(self, context):
         print("Running simulation!")
         
-        #links = bpy.data.node_groups["CrowdMasterTreeType"].links
-        #print(links)
+        links = bpy.data.node_groups["NodeTree"].links
+        print(links)
 
         return {'FINISHED'}
