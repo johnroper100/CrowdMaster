@@ -1,6 +1,7 @@
 import bpy
 import sys
 from . import agents
+from .. icon_load import cicon
 #from ..nodes import main
 
 class ShowPositionGraphics(bpy.types.Operator):
@@ -21,7 +22,11 @@ class RunSimulation(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        scene = context.scene
+        
         print("Running simulation!")
+        print(scene.agentGroup)
+        print(scene.agentNumber)
 
         return {'FINISHED'}
 
@@ -40,3 +45,7 @@ class CrowdMasterUIMain(bpy.types.Panel):
         
         row = layout.row()
         row.prop(scene, "agentNumber")
+        
+        row = layout.row()
+        row.scale_y = 1.2
+        row.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
