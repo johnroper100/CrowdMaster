@@ -63,8 +63,8 @@ def register():
     bpy.utils.register_module(__name__)
 
 def unregister():
-    unregister_cnode()
-    #unregister_icons()
+    #unregister_cnode()
+    unregister_icons()
     bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
