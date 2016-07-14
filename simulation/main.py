@@ -1,8 +1,9 @@
 import bpy
 import sys
-from . import agents
-from .. icon_load import cicon
 #from ..nodes import main
+from .. icon_load import cicon
+from . import agents
+from . import position
 
 class ShowPositionGraphics(bpy.types.Operator):
     """Show the positional graphics"""
@@ -23,10 +24,6 @@ class RunSimulation(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-        
-        print("Running simulation!")
-        print(scene.agentGroup)
-        print(scene.agentNumber)
 
         return {'FINISHED'}
 
@@ -34,7 +31,7 @@ class CrowdMasterUIMain(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
     bl_region_type = "TOOLS"
     bl_context = "objectmode"
-    bl_category = "CrowdMAster"
+    bl_category = "CrowdMaster"
     bl_label = "Main"
     def draw(self, context):
         layout = self.layout
@@ -49,3 +46,16 @@ class CrowdMasterUIMain(bpy.types.Panel):
         row = layout.row()
         row.scale_y = 1.2
         row.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
+
+class CrowdMasterUIPosition(bpy.types.Panel):
+    bl_space_type = "VIEW_3D"
+    bl_region_type = "TOOLS"
+    bl_context = "objectmode"
+    bl_category = "CrowdMaster"
+    bl_label = "Position"
+    def draw(self, context):
+        layout = self.layout
+        scene = context.scene
+        
+        row = layout.row()
+        row.prop(scene, "positionType")
