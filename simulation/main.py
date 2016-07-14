@@ -1,6 +1,7 @@
 import bpy
 import sys
-from ..nodes import main
+from . import agents
+#from ..nodes import main
 
 class ShowPositionGraphics(bpy.types.Operator):
     """Show the positional graphics"""
@@ -32,3 +33,10 @@ class CrowdMasterUIMain(bpy.types.Panel):
     bl_label = "Main"
     def draw(self, context):
         layout = self.layout
+        scene = context.scene
+        
+        row = layout.row()
+        row.prop_search(scene, "agentGroup", bpy.data, "groups")
+        
+        row = layout.row()
+        row.prop(scene, "agentNumber")
