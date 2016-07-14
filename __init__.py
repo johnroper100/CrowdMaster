@@ -3,7 +3,7 @@ bl_info = {
     "author": "John Roper",
     "version": (1, 0),
     "blender": (2, 77, 0),
-    "location": "Node Editor > CrowdMaster",
+    "location": "Tools Panel > CrowdMaster",
     "description": "Blender crowd simulation",
     "warning": "This is still a work in progress and is not functional yet.",
     "wiki_url": "https://github.com/johnroper100/CrowdMaster/wiki",
@@ -18,7 +18,7 @@ from . import cm_prefs
 from . import mysql
 from . mysql import mysql_general as cmDB
 from . icon_load import register_icons, unregister_icons
-from . nodes.main import register_cnode, unregister_cnode
+#from . nodes.main import register_cnode, unregister_cnode
 from . simulation import main
 
 if bpy.app.version < (2, 76, 0):
