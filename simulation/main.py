@@ -58,22 +58,27 @@ class CrowdMasterUIPosition(bpy.types.Panel):
         scene = context.scene
         
         row = layout.row()
-        row.prop(scene, "positionType")
+        row.prop(scene, "positionMode")
+        
+        if scene.positionMode == "vector":
+            row = layout.row()
+            row.prop(scene, "positionVector")
+                
+
+        elif scene.positionMode == "object":
+            row = layout.row()
+            row.prop_search(scene, "positionObject", scene, "objects")
         
         row = layout.row()
         row.separator()
         
-        if scene.positionType == "random":
-            row = layout.row()
-            row.prop(scene, "randomPositionType")
-            
-            if scene.randomPositionType == "vector":
-                row = layout.row()
-                row.prop(scene, "randomPositionVector")
+        row = layout.row()
+        row.prop(scene, "positionType")
 
-            elif scene.randomPositionType == "object":
-                row = layout.row()
-                row.prop_search(scene, "randomPositionObject", scene, "objects")
-            
+        if scene.positionType == "random":   
             row = layout.row()
             row.prop(scene, "randomPositionRadius")
+        
+        if scene.positionType == "formation":
+            row = layout.row()
+            row.prop(scene, "formationPositionType")
