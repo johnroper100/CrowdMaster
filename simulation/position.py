@@ -28,3 +28,6 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         name = "Formation Type",
         description = "Where the spawn location is pulled from.",
         default = "array")
+
+bpy.types.Scene.formationArrayX = FloatProperty(name="Array X", description="The distance between each agent on the X axis.", default = 0)
+bpy.types.Scene.formationArrayY = FloatProperty(name="Array Y", description="The distance between each agent on the Y axis.", default = 0)

@@ -33,6 +33,7 @@ class CrowdMasterUIMain(bpy.types.Panel):
     bl_context = "objectmode"
     bl_category = "CrowdMaster"
     bl_label = "Main"
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -45,6 +46,8 @@ class CrowdMasterUIMain(bpy.types.Panel):
         
         row = layout.row()
         row.scale_y = 1.2
+        if scene.agentGroup == "":
+            row.enabled = False
         row.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
 
 class CrowdMasterUIPosition(bpy.types.Panel):
@@ -53,6 +56,15 @@ class CrowdMasterUIPosition(bpy.types.Panel):
     bl_context = "objectmode"
     bl_category = "CrowdMaster"
     bl_label = "Position"
+    
+    @classmethod
+    def poll(self, context):
+        try:
+            scene = context.scene
+            return (scene.agentGroup)
+        except (AttributeError, KeyError, TypeError):
+            return False
+
     def draw(self, context):
         layout = self.layout
         scene = context.scene
@@ -82,3 +94,10 @@ class CrowdMasterUIPosition(bpy.types.Panel):
         if scene.positionType == "formation":
             row = layout.row()
             row.prop(scene, "formationPositionType")
+            
+            if scene.formationPositionType == "array":
+                row = layout.row()
+                row.prop(scene, "formationArrayX")
+                
+                row = layout.row()
+                row.prop(scene, "formationArrayY")
