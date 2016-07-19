@@ -1,11 +1,13 @@
 import bpy
 import sys
+import random
 from mathutils import Vector
 #from ..nodes import main
 from .. icon_load import cicon
 from . import agents
 from . import position
 from . import ground
+from . import ui
 
 class ShowPositionGraphics(bpy.types.Operator):
     """Show the positional graphics"""
@@ -27,7 +29,7 @@ class RunSimulation(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         groupObjs = bpy.data.groups[scene.agentGroup].objects
-        halfAgents = scene.agentNumber // 2
+        actions = [scene.agentAction1, scene.agentAction2, scene.agentAction3]
 
         for object in groupObjs:
             if scene.groundObject == object.name:
@@ -37,6 +39,7 @@ class RunSimulation(bpy.types.Operator):
         
         if scene.positionType == "formation":
             if scene.formationPositionType == "array":
+                halfAgents = scene.agentNumber // 2
                 for a in range(halfAgents):
                     obj1 = bpy.data.objects[groupObjs[1].name]
                     ground =  bpy.data.objects[scene.groundObject]
@@ -52,82 +55,18 @@ class RunSimulation(bpy.types.Operator):
                     scene.objects.link(obj1)
                     location.x -= offset_x
 
+        if scene.positionType == "random":
+            if scene.randomPositionMode == "rectangle":
+                number = scene.agentNumber
+                group = bpy.data.groups.get(scene.agentGroup)
+                if group is not None:
+                    for g in range(number):
+                        group_objects = [o.copy() for o in bpy.data.groups[scene.agentGroup].objects]
+                        new_group = bpy.data.groups.new("CrowdMaster Agent")
+                        for o in group_objects:
+                            if o.type == 'ARMATURE':
+                                o.animation_data.action = random.choice(actions)
+                            new_group.objects.link(o)
+                            scene.objects.link(o)
+
         return {'FINISHED'}
-
-class CrowdMasterUIMain(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    bl_context = "objectmode"
-    bl_category = "CrowdMaster"
-    bl_label = "Main"
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        
-        row = layout.row()
-        row.prop_search(scene, "agentGroup", bpy.data, "groups")
-        
-        row = layout.row()
-        row.prop_search(scene, "groundObject", scene, "objects")
-        
-        row = layout.row()
-        row.prop(scene, "agentNumber")
-        
-        row = layout.row()
-        row.scale_y = 1.2
-        if (scene.agentGroup == "") or (scene.groundObject == ""):
-            row.enabled = False
-        row.operator("scene.cm_run_simulation", icon_value=cicon('run_sim'))
-
-class CrowdMasterUIPosition(bpy.types.Panel):
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
-    bl_context = "objectmode"
-    bl_category = "CrowdMaster"
-    bl_label = "Position"
-    
-    @classmethod
-    def poll(self, context):
-        try:
-            scene = context.scene
-            return (scene.agentGroup)
-        except (AttributeError, KeyError, TypeError):
-            return False
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        
-        row = layout.row()
-        row.prop(scene, "positionMode")
-        
-        if scene.positionMode == "vector":
-            row = layout.row()
-            row.prop(scene, "positionVector")
-                
-
-        elif scene.positionMode == "object":
-            row = layout.row()
-            row.prop_search(scene, "positionObject", scene, "objects")
-        
-        row = layout.row()
-        row.separator()
-        
-        row = layout.row()
-        row.prop(scene, "positionType")
-
-        if scene.positionType == "random":   
-            row = layout.row()
-            row.prop(scene, "randomPositionRadius")
-        
-        if scene.positionType == "formation":
-            row = layout.row()
-            row.prop(scene, "formationPositionType")
-            
-            if scene.formationPositionType == "array":
-                row = layout.row()
-                row.prop(scene, "formationArrayX")
-                
-                row = layout.row()
-                row.prop(scene, "formationArrayY")
