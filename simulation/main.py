@@ -65,7 +65,7 @@ class RunSimulation(bpy.types.Operator):
                         new_group = bpy.data.groups.new("CrowdMaster Agent")
                         for o in group_objects:
                             if o.type == 'ARMATURE':
-                                o.animation_data.action = random.choice(actions)
+                                o.animation_data.action = bpy.data.actions[random.choice(actions)]
                             new_group.objects.link(o)
                             scene.objects.link(o)
 
