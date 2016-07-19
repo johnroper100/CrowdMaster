@@ -23,7 +23,7 @@ bpy.types.Scene.randomPositionRadius = FloatProperty(name="Spawn Radius", descri
 
 # Formation positioning
 bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
-        items = [('array', 'Array', 'The agents are aligned in an array starting at the .'), 
+        items = [('array', 'Array', 'The agents are aligned in an array starting at the point specified.'), 
                  ('shape', 'Shape', 'The span location is specified as the location of an object.')],
         name = "Formation Type",
         description = "Where the spawn location is pulled from.",

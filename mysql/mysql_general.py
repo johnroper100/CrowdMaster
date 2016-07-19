@@ -1,8 +1,8 @@
 import bpy
 import sys
-sys.path.append('C:\Python35\Lib\site-packages')
-sys.path.append('C:\Python35\DLLs')
-import pymysql
+#sys.path.append('C:\Python35\Lib\site-packages')
+#sys.path.append('C:\Python35\DLLs')
+#import pymysql
 
 def dbConnect(databaseName, databaseHost, databaseUsername, databasePassword):
     try:
