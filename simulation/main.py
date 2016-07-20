@@ -53,9 +53,13 @@ class RunSimulation(bpy.types.Operator):
                     if o.parent in obs:
                         o.parent = group_objects[obs.index(o.parent)]
                     if o.type == 'ARMATURE':
+                        randRot = random.uniform(0, scene.randomPositionMaxRot)
+                        print(randRot)
+
                         o.animation_data.action = bpy.data.actions[random.choice(actions)]
-                        if scene.randomPositionMaxRot != 0:
-                            o.rotation_euler = (0, 0, random.uniform(0, scene.randomPositionMaxRot))
+                        o.rotation_mode = 'XYZ'
+                        o.rotation_euler = (0, 0, randRot)
+                        scene.update()
 
                         if scene.positionType == "random":
                             if scene.randomPositionMode == "rectangle":
