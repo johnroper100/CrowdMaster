@@ -29,8 +29,12 @@ class RunSimulation(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-        groupObjs = bpy.data.groups[scene.agentGroup].objects
+        number = scene.agentNumber
+        group = bpy.data.groups.get(scene.agentGroup)
+        groupObjs = group.objects
         actions = [scene.agentAction1, scene.agentAction2, scene.agentAction3]
+        obs = [o for o in group.objects]
+        ground =  bpy.data.objects[scene.groundObject]
         
         bpy.ops.anim.change_frame(frame = 1)
 
@@ -39,48 +43,27 @@ class RunSimulation(bpy.types.Operator):
                 self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
         
         bpy.context.scene.objects.active.select = False
-        
-        if scene.positionType == "formation":
-            if scene.formationPositionType == "array":
-                halfAgents = scene.agentNumber // 2
-                for a in range(halfAgents):
-                    obj1 = bpy.data.objects[groupObjs[1].name]
-                    ground =  bpy.data.objects[scene.groundObject]
-                    offset_x = (obj1.dimensions.x + scene.formationArrayX)
-                    obj1.select = True
-                    obj1 = obj1.copy()
-                    if scene.positionMode == "vector":
-                        location = Vector((scene.positionVector[0], scene.positionVector[1], ground.location.z))
-                    elif scene.positionMode == "object":
-                        objStart = bpy.data.objects[scene.positionObject]
-                        location = Vector((objStart.location.x, objStart.location.y, ground.location.z))
-                    obj1.location = location
-                    scene.objects.link(obj1)
-                    location.x -= offset_x
 
-        if scene.positionType == "random":
-            if scene.randomPositionMode == "rectangle":
-                number = scene.agentNumber
-                group = bpy.data.groups.get(scene.agentGroup)
-                obs = [o for o in group.objects]
-                ground =  bpy.data.objects[scene.groundObject]
+        if group is not None:
+            for g in range(number):
+                group_objects = [o.copy() for o in obs]
+                new_group = bpy.data.groups.new("CrowdMaster Agent")
 
-                if group is not None:
-                    for g in range(number):
-                        group_objects = [o.copy() for o in obs]
-                        new_group = bpy.data.groups.new("CrowdMaster Agent")
-                        
-                        for o in group_objects:
-                            if o.parent in obs:
-                                o.parent = group_objects[obs.index(o.parent)]
-                            if o.type == 'ARMATURE':
-                                o.animation_data.action = bpy.data.actions[random.choice(actions)]
+                for o in group_objects:
+                    if o.parent in obs:
+                        o.parent = group_objects[obs.index(o.parent)]
+                    if o.type == 'ARMATURE':
+                        o.animation_data.action = bpy.data.actions[random.choice(actions)]
+
+                        if scene.positionType == "random":
+                            if scene.randomPositionMode == "rectangle":
                                 if scene.positionMode == "vector":
                                     o.location = (random.uniform(scene.positionVector[0], scene.randomPositionMaxX), random.uniform(scene.positionVector[1], scene.randomPositionMaxY), ground.location.z)
                                 elif scene.positionMode == "object":
                                     objStart = bpy.data.objects[scene.positionObject]
                                     o.location = (random.uniform(objStart.location.x, scene.randomPositionMaxX), random.uniform(objStart.location.y, scene.randomPositionMaxY), ground.location.z)
-                            new_group.objects.link(o)
-                            scene.objects.link(o)
+
+                    new_group.objects.link(o)
+                    scene.objects.link(o)
 
         return {'FINISHED'}
