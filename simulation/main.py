@@ -1,7 +1,8 @@
 import bpy
 import sys
 import random
-from mathutils import Vector
+import mathutils
+import math
 #from ..nodes import main
 from .. icon_load import cicon
 from . import scene
@@ -53,12 +54,12 @@ class RunSimulation(bpy.types.Operator):
                     if o.parent in obs:
                         o.parent = group_objects[obs.index(o.parent)]
                     if o.type == 'ARMATURE':
-                        randRot = random.uniform(0, scene.randomPositionMaxRot)
-                        print(randRot)
-
                         o.animation_data.action = bpy.data.actions[random.choice(actions)]
-                        o.rotation_mode = 'XYZ'
-                        o.rotation_euler = (0, 0, randRot)
+
+                        randRot = random.uniform(0, scene.randomPositionMaxRot)
+                        eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                        eul.rotate_axis('Z', math.radians(randRot))
+                        
                         scene.update()
 
                         if scene.positionType == "random":
