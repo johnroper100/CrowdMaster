@@ -36,7 +36,7 @@ class RunSimulation(bpy.types.Operator):
         obs = [o for o in group.objects]
         ground =  bpy.data.objects[scene.groundObject]
         
-        bpy.ops.anim.change_frame(frame = 1)
+        bpy.context.scene.frame_current = 1
 
         for object in groupObjs:
             if scene.groundObject == object.name:
