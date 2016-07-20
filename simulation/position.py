@@ -31,6 +31,8 @@ bpy.types.Scene.randomPositionRadius = FloatProperty(name="Spawn Radius", descri
 bpy.types.Scene.randomPositionMaxX = FloatProperty(name="Max X", description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.", default = 10.0)
 bpy.types.Scene.randomPositionMaxY = FloatProperty(name="Max Y", description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.", default = 10.0)
 
+bpy.types.Scene.randomPositionMaxRot = FloatProperty(name="Max Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 0.0)
+
 # Formation positioning
 bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         items = [('array', 'Array', 'The agents are aligned in an array starting at the point specified.'), 
