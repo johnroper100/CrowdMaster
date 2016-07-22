@@ -3,12 +3,15 @@ import sys
 import random
 import mathutils
 import math
+import time
+
 #from ..nodes import main
 from .. icon_load import cicon
 from . import scene
 from . import agents
 from . import position
 from . import ground
+from . import ai
 from . import ui
 
 class ShowPositionGraphics(bpy.types.Operator):
@@ -29,7 +32,11 @@ class RunSimulation(bpy.types.Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        start_time = time.time()
+
         scene = context.scene
+        wm = bpy.context.window_manager
+
         number = scene.agentNumber
         group = bpy.data.groups.get(scene.agentGroup)
         groupObjs = group.objects
@@ -72,5 +79,8 @@ class RunSimulation(bpy.types.Operator):
 
                     new_group.objects.link(o)
                     scene.objects.link(o)
+
+        elapsed_time = time.time() - start_time
+        print("Time taken: " + str(elapsed_time))
 
         return {'FINISHED'}
