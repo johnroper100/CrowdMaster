@@ -379,6 +379,7 @@ class SCENE_PT_CrowdMaster(Panel):
 from . import addon_updater_ops
 
 def register():
+    addon_updater_ops.register(bl_info)
     register_icons()
     bpy.utils.register_module(__name__)
     # I think this registers the SCENE_PT_CrowdMaster class...
@@ -407,8 +408,6 @@ def register():
     action_register()
     event_register()
 
-    addon_updater_ops.register(bl_info)
-
 def initialise():
     sce = bpy.context.scene
 
@@ -421,10 +420,9 @@ def initialise():
     global cm_brains
     cm_brains = bpy.context.scene.cm_brains
 
-
 def unregister():
     unregister_icons()
-    bpy.utils.unregister_module(__name__)
+    
     # ...and this one unregisters the SCENE_PT_CrowdMaster
     action_unregister()
     event_unregister()
@@ -432,6 +430,7 @@ def unregister():
     unregisterAllTypes()
 
     addon_updater_ops.unregister()
+    bpy.utils.unregister_module(__name__)
 
     # cm_bpyNodes.unregister()
 

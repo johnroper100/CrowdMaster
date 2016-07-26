@@ -563,16 +563,14 @@ def update_settings_ui(self, context):
 # Register, should be run in the register module itself
 # -----------------------------------------------------------------------------
 
-
-
 # registering the operators in this module
 def register(bl_info):
 
 	print("Running updater reg")
 
-	updater.user = "johnroper100" # previously "cgcookie"
+	updater.user = "johnroper100"
 	updater.repo = "CrowdMaster"
-	updater.addon =  "CrowdMaster" # optional, default gets from __package__ name
+	updater.addon =  "crowdmaster" # optional, default gets from __package__ name
 	updater.website = "https://github.com/johnroper100/CrowdMaster" # optional
 	updater.use_releases = True # ie use tags instead of releases, default True
 	updater.current_version = bl_info["version"]
@@ -640,4 +638,3 @@ def unregister():
 
 	global ran_background_check
 	ran_background_check = False
-
