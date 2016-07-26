@@ -1,0 +1,5 @@
+('a', 'hires', 12, 0, 'soldier.003')
+('a', 'mediumres', 24, 10, 'soldier')
+('a', 'lowres', 46, 22, 'soldier.002')
+('a', 'proxy', 190, 44, 'soldier.004')
+('a', 'skeleton', 1000, 200, 'soldier.001')
