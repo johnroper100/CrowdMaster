@@ -1,3 +1,4 @@
+print("is this working?")
 import bpy
 from .addon_updater import Updater as updater
 from bpy.app.handlers import persistent
