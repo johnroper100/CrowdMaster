@@ -1,7 +1,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "John Roper",
-    "version": (1, 0),
+    "version": (1, 1),
     "blender": (2, 77, 0),
     "location": "Properties > Scene and Node Editor",
     "description": "Blender crowd simulation",
@@ -379,12 +379,8 @@ class SCENE_PT_CrowdMaster(Panel):
         row.label(text="ALWAYS save before pressing the start button!")
 
 def register():
-    addon_updater_ops.register(bl_info)
     register_icons()
-    bpy.utils.register_module(__name__)
-    # I think this registers the SCENE_PT_CrowdMaster class...
-    # ...or maybe all the classes in the file?
-
+    addon_updater_ops.register(bl_info)
     global action_register
     from .cm_actions import action_register
     global action_unregister
@@ -407,6 +403,7 @@ def register():
     registerTypes()
     action_register()
     event_register()
+    bpy.utils.register_module(__name__)
 
 def initialise():
     sce = bpy.context.scene
@@ -430,9 +427,9 @@ def unregister():
     unregisterAllTypes()
 
     addon_updater_ops.unregister()
-    bpy.utils.unregister_module(__name__)
-
     # cm_bpyNodes.unregister()
+    unregister_icons()
+    bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()
