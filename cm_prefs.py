@@ -63,7 +63,7 @@ class CMPreferences(AddonPreferences):
     show_debug_options = BoolProperty(
         name = "Show Debug Options",
         description = "Chose whether to show the debug options in the interface. This also enables debug mode.",
-        default = False,
+        default = True,
         )
     
     prefs_tab_items = [
