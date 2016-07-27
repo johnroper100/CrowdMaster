@@ -22,6 +22,8 @@ from . import mysql
 from . mysql import mysql_general as cmDB
 from . icon_load import register_icons, unregister_icons
 
+from . import addon_updater_ops
+
 # =============== GROUPS LIST START ===============#
 
 
@@ -375,8 +377,6 @@ class SCENE_PT_CrowdMaster(Panel):
 
         row = layout.row()
         row.label(text="ALWAYS save before pressing the start button!")
-
-from . import addon_updater_ops
 
 def register():
     addon_updater_ops.register(bl_info)

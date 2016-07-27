@@ -1,8 +1,9 @@
-print("is this working?")
 import bpy
 from .addon_updater import Updater as updater
 from bpy.app.handlers import persistent
 import os
+
+addonname = updater.addon.lower()
 
 # -----------------------------------------------------------------------------
 # Example operators utilizing Updater
@@ -12,7 +13,7 @@ import os
 class addon_updater_install_popup(bpy.types.Operator):
 	"""Check and install update if available"""
 	bl_label = "Update {x} addon".format(x=updater.addon)
-	bl_idname = updater.addon+".updater_install_popup"
+	bl_idname = addonname+".updater_install_popup"
 	bl_description = "Popup menu to check and display current updates available"
 
 	def invoke(self, context, event):
@@ -64,7 +65,7 @@ class addon_updater_install_popup(bpy.types.Operator):
 # User preference check-now operator
 class addon_updater_check_now(bpy.types.Operator):
 	bl_label = "Check now for "+updater.addon+" update"
-	bl_idname = updater.addon+".updater_check_now"
+	bl_idname = addonname+".updater_check_now"
 	bl_description = "Check now for an update to the {x} addon".format(
 														x=updater.addon)
 
@@ -93,7 +94,7 @@ class addon_updater_check_now(bpy.types.Operator):
 
 class addon_updater_update_now(bpy.types.Operator):
 	bl_label = "Update "+updater.addon+" addon now"
-	bl_idname = updater.addon+".updater_update_now"
+	bl_idname = addonname+".updater_update_now"
 	bl_description = "Update to the latest verison of the {x} addon".format(
 														x=updater.addon)
 
@@ -129,7 +130,7 @@ class addon_updater_update_now(bpy.types.Operator):
 
 class addon_updater_update_target(bpy.types.Operator):
 	bl_label = updater.addon+" addon version target"
-	bl_idname = updater.addon+".updater_update_target"
+	bl_idname = addonname+".updater_update_target"
 	bl_description = "Install a targeted version of the {x} addon".format(
 														x=updater.addon)
 
@@ -184,7 +185,7 @@ class addon_updater_update_target(bpy.types.Operator):
 class addon_updater_install_manually(bpy.types.Operator):
 	"""As a fallback, direct the user to download the addon manually"""
 	bl_label = "Install update manually"
-	bl_idname = updater.addon+".updater_install_manually"
+	bl_idname = addonname+".updater_install_manually"
 	bl_description = "Proceed to manually install update"
 
 	# not an "okay" to execut, but just oeprators
@@ -230,7 +231,7 @@ class addon_updater_install_manually(bpy.types.Operator):
 class addon_updater_updated_successful(bpy.types.Operator):
 	"""Addon in place, popup telling user it completed"""
 	bl_label = "Success"
-	bl_idname = updater.addon+".updater_update_successful"
+	bl_idname = addonname+".updater_update_successful"
 	bl_description = "Update installation was successful"
 	bl_options = {'REGISTER', 'UNDO'}
 
@@ -269,7 +270,7 @@ class addon_updater_updated_successful(bpy.types.Operator):
 class addon_updater_restore_backup(bpy.types.Operator):
 	"""Restore addon from backup"""
 	bl_label = "Restore backup"
-	bl_idname = updater.addon+".updater_restore_backup"
+	bl_idname = addonname+".updater_restore_backup"
 	bl_description = "Restore addon from backup"
 
 	# not an "okay" to execut, but just oeprators
@@ -288,7 +289,7 @@ class addon_updater_restore_backup(bpy.types.Operator):
 class addon_updater_ignore(bpy.types.Operator):
 	"""Restore addon from backup"""
 	bl_label = "Ignore update"
-	bl_idname = updater.addon+".updater_ignore"
+	bl_idname = addonname+".updater_ignore"
 	bl_description = "Ignore update to prevent future popups"
 
 	# not an "okay" to execut, but just oeprators
@@ -571,7 +572,7 @@ def register(bl_info):
 
 	updater.user = "johnroper100"
 	updater.repo = "CrowdMaster"
-	updater.addon =  "crowdmaster" # optional, default gets from __package__ name
+	updater.addon =  "CrowdMaster" # optional, default gets from __package__ name
 	updater.website = "https://github.com/johnroper100/CrowdMaster" # optional
 	updater.use_releases = True # ie use tags instead of releases, default True
 	updater.current_version = bl_info["version"]
