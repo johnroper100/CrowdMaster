@@ -459,15 +459,19 @@ class MyNodeCategory(NodeCategory):
 
 # all categories in a list
 node_categories = [
+    MyNodeCategory("INPUT", "Input", items=[
+        NodeItem("InputNode")
+        ]),
+    MyNodeCategory("OUTPUT", "Output", items=[
+        NodeItem("OutputNode")
+        ]),
     MyNodeCategory("BASIC", "Basic", items=[
-        NodeItem("InputNode"),
         NodeItem("GraphNode"),
         NodeItem("AndNode"),
         NodeItem("OrNode"),
         NodeItem("StrongNode"),
         NodeItem("WeakNode"),
         NodeItem("MapNode"),
-        NodeItem("OutputNode"),
         NodeItem("PriorityNode")
         ]),
     MyNodeCategory("STATE", "State", items=[

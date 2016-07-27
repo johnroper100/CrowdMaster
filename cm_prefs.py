@@ -56,8 +56,14 @@ class CMPreferences(AddonPreferences):
     
     use_custom_icons = BoolProperty(
         name = "Use Custom Icons",
-        description = "Chose weather to use the custom icons that come with the addon or not.",
+        description = "Chose whether to use the custom icons that come with the addon or not.",
         default = True,
+        )
+    
+    show_debug_options = BoolProperty(
+        name = "Show Debug Options",
+        description = "Chose whether to show the debug options in the interface. This also enables debug mode.",
+        default = False,
         )
     
     prefs_tab_items = [
@@ -80,6 +86,7 @@ class CMPreferences(AddonPreferences):
         if preferences.prefs_tab == "GEN":
             row = layout.row()
             row.prop(preferences, 'use_custom_icons', icon_value=cicon('setup_plug'))
+            row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
         
         if preferences.prefs_tab == "UPDATE":
             row = layout.row()
