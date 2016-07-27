@@ -361,6 +361,9 @@ class LogicPRINT(Neuron):
             for into in inps:
                 for i in into:
                     print(settings["Label"], ">>", i.key, i.val)
+                    if settings["save_to_file"] == True:
+                        with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
+                            output.write(settings["Label"], ">>", i.key, i.val)
         return 0
 
 

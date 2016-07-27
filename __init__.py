@@ -20,6 +20,7 @@ from bpy.types import PropertyGroup, UIList, Panel, Operator
 from . import cm_prefs
 from . import mysql
 from . mysql import mysql_general as cmDB
+from . import icon_load
 from . icon_load import register_icons, unregister_icons
 
 from . import addon_updater_ops
@@ -317,6 +318,10 @@ class SCENE_PT_CrowdMaster(Panel):
             initialise()
         layout = self.layout
         sce = context.scene
+        
+        pcoll = icon_load.icon_collection["main"]
+        def cicon(name):
+            return pcoll[name].icon_id
 
         row = layout.row()
         row.template_list("SCENE_UL_group", "", sce.cm_groups,
@@ -372,7 +377,10 @@ class SCENE_PT_CrowdMaster(Panel):
         row.prop(default, "contType", expand=True)
 
         row = layout.row()
-        row.operator(SCENE_OT_cm_start.bl_idname)
+        row.scale_y = 1.5
+        row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('run_sim'))
+
+        row = layout.row()
         row.operator(SCENE_OT_cm_stop.bl_idname)
 
         row = layout.row()

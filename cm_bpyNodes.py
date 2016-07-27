@@ -37,7 +37,10 @@ class DefaultSocket(NodeSocket):
 
     # Socket color
     def draw_color(self, context, node):
-        return (0.0, 0.0, 0.0, 0.4)
+        if self.is_linked:
+            return (0.0, 0.0, 0.0, 0.7)
+        else:
+            return (0.0, 0.0, 0.0, 0.4)
 
 
 class StateSocket(NodeSocket):
@@ -61,7 +64,7 @@ class DependanceSocket(NodeSocket):
         layout.label(text)
 
     def draw_color(self, context, node):
-        return (0.5, 0.0, 0.0, 1.0)
+        return (0.8, 0.5, 0.0, 0.9)
 
 
 class CrowdMasterNode(Node):
@@ -322,14 +325,32 @@ class PrintNode(LogicNode):
     """CrowdMaster Print Node"""
     bl_label = "Print"
 
-    Label = bpy.props.StringProperty(default="")
+    Label = bpy.props.StringProperty(description = "The label to append to each printed statement.", default="")
+    save_to_file = BoolProperty(
+        name = "Save to file",
+        description = "Save the printed statements to a file for later viewing.",
+        default = False,
+        )
+    
+    output_filepath = bpy.props.StringProperty \
+      (
+      name = "Output Filepath",
+      default = "",
+      description = "Define the output file path.",
+      subtype = 'DIR_PATH'
+      )
     # PrintSelected = bpy.props.BoolProperty(default=True)  # Not implemented
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Label")
+        layout.prop(self, "save_to_file")
+        if self.save_to_file == True:
+            layout.prop(self, "output_filepath")
 
     def getSettings(self, node):
         node.settings["Label"] = self.Label
+        node.settings["save_to_file"] = self.save_to_file
+        node.settings["output_filepath"] = self.output_filepath
 
 
 class PriorityNode(LogicNode):
