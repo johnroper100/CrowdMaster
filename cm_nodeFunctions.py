@@ -364,7 +364,8 @@ class LogicPRINT(Neuron):
                     print(settings["Label"], ">>", i.key, i.val)
                     if settings["save_to_file"] == True:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            output.write(settings["Label"], ">>", i.key, i.val)
+                            message = settings["Label"] + " >> " + str(i.key) + " " + str(i.val) + "\n"
+                            output.write(message)
         return 0
 
 
