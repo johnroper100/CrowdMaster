@@ -1,9 +1,9 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "John Roper",
-    "version": (1, 1),
+    "version": (1, 0, 1),
     "blender": (2, 77, 0),
-    "location": "Properties > Scene and Node Editor",
+    "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
     "warning": "This is still a work in progress and is not functional yet.",
     "wiki_url": "https://github.com/johnroper100/CrowdMaster/wiki",
