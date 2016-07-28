@@ -318,6 +318,7 @@ class SCENE_PT_CrowdMaster(Panel):
             initialise()
         layout = self.layout
         sce = context.scene
+        preferences = context.user_preferences.addons[__package__].preferences
         
         pcoll = icon_load.icon_collection["main"]
         def cicon(name):
@@ -378,7 +379,10 @@ class SCENE_PT_CrowdMaster(Panel):
 
         row = layout.row()
         row.scale_y = 1.5
-        row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('run_sim'))
+        if preferences.use_custom_icons == True:
+            row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('run_sim'))
+        else:
+            row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
 
         row = layout.row()
         row.operator(SCENE_OT_cm_stop.bl_idname)
