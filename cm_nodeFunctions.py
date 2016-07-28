@@ -6,6 +6,7 @@ from . import cm_pythonEmbededInterpreter
 from .cm_pythonEmbededInterpreter import Interpreter
 import copy
 import bpy
+import os
 
 
 """
