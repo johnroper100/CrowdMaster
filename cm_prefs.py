@@ -63,7 +63,13 @@ class CMPreferences(AddonPreferences):
     show_debug_options = BoolProperty(
         name = "Show Debug Options",
         description = "Chose whether to show the debug options in the interface. This also enables debug mode.",
-        default = False,
+        default = True,
+        )
+    
+    play_animation = BoolProperty(
+        name = "Start Animation Automatically",
+        description = "Start and stop the animation automatically when the start and stop sim buttons are pressed.",
+        default = True,
         )
     
     prefs_tab_items = [
@@ -91,6 +97,12 @@ class CMPreferences(AddonPreferences):
             else:
                 row.prop(preferences, 'use_custom_icons', icon='SEQ_CHROMA_SCOPE')
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
+                
+            row = layout.row()
+            if preferences.use_custom_icons == True:
+                row.prop(preferences, 'play_animation', icon_value=cicon('node_tree_logo'))
+            else:
+                row.prop(preferences, 'play_animation', icon='ACTION')
 
         if preferences.prefs_tab == "UPDATE":
             row = layout.row()

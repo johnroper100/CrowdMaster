@@ -86,7 +86,7 @@ class SCENE_UL_action(UIList):
 
 class SCENE_PT_action(Panel):
     """Creates CrowdMaster Panel in the node editor."""
-    bl_label = "CrowdMaster - Actions"
+    bl_label = "Actions"
     bl_idname = "SCENE_PT_action"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'

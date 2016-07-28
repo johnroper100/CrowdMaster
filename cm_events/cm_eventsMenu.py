@@ -93,7 +93,7 @@ class SCENE_UL_event(UIList):
 
 class SCENE_PT_event(Panel):
     """Creates CrowdMaster Panel in the node editor"""
-    bl_label = "CrowdMaster - Events"
+    bl_label = "Events"
     bl_idname = "SCENE_PT_event"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'

@@ -1,7 +1,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "John Roper",
-    "version": (1, 0, 1),
+    "version": (1, 0, 5),
     "blender": (2, 77, 0),
     "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
@@ -280,14 +280,19 @@ class SCENE_OT_cm_start(Operator):
             sim.newagent(ag.name)"""
         sim.createAgents(bpy.context.scene.cm_agents.coll)
         sim.startFrameHandler()
+        
+        if preferences.play_animation == True:
+            bpy.ops.screen.animation_play()
         return {'FINISHED'}
-
 
 class SCENE_OT_cm_stop(Operator):
     bl_idname = "scene.cm_stop"
     bl_label = "Stop Simulation"
 
     def execute(self, context):
+        preferences = context.user_preferences.addons[__package__].preferences
+        if preferences.play_animation == True:
+              bpy.ops.screen.animation_cancel()
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
@@ -299,11 +304,58 @@ class SCENE_OT_cm_stop(Operator):
 global initialised
 initialised = False
 
-
 class SCENE_PT_CrowdMaster(Panel):
     """Creates CrowdMaster Panel in the node editor."""
     bl_label = "Main"
     bl_idname = "SCENE_PT_CrowdMaster"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'TOOLS'
+    bl_category = "CrowdMaster"
+    
+    @classmethod
+    def poll(self, context):
+        try:
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType'
+        except (AttributeError, KeyError, TypeError):
+            return False
+
+    def draw(self, context):
+        layout = self.layout
+        sce = context.scene
+        preferences = context.user_preferences.addons[__package__].preferences
+        
+        pcoll = icon_load.icon_collection["main"]
+        def cicon(name):
+            return pcoll[name].icon_id
+
+        default = bpy.context.scene.cm_agents_default
+        layout.label(text="Default agents group:")
+
+        row = layout.row()
+        row.prop(default, "startType", expand=True)
+        row.prop(default, "setno", text="")
+
+        row = layout.row()
+        row.prop(default, "contType", expand=True)
+
+        row = layout.row()
+        row.scale_y = 1.5
+        if preferences.use_custom_icons == True:
+            row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))
+        else:
+            row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
+
+        row = layout.row()
+        row.scale_y = 1.25
+        if preferences.use_custom_icons == True:
+            row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
+        else:
+            row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
+
+class SCENE_PT_CrowdMasterAgents(Panel):
+    """Creates CrowdMaster agent panel in the node editor."""
+    bl_label = "Agents"
+    bl_idname = "SCENE_PT_CrowdMasterAgents"
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
@@ -370,27 +422,6 @@ class SCENE_PT_CrowdMaster(Panel):
         blid_am = SCENE_OT_agent_move.bl_idname
         sub.operator(blid_am, text="", icon="TRIA_UP").direction = 'UP'
         sub.operator(blid_am, text="", icon="TRIA_DOWN").direction = 'DOWN'
-
-        default = bpy.context.scene.cm_agents_default
-        layout.label(text="Default agents group:")
-
-        row = layout.row()
-        row.prop(default, "startType", expand=True)
-        row.prop(default, "setno", text="")
-
-        row = layout.row()
-        row.prop(default, "contType", expand=True)
-
-        row = layout.row()
-        row.scale_y = 1.5
-        if preferences.use_custom_icons == True:
-            row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('run_sim'))
-        else:
-            row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
-
-        row = layout.row()
-        row.scale_y = 1.25
-        row.operator(SCENE_OT_cm_stop.bl_idname)
 
 def register():
     register_icons()
