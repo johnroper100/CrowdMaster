@@ -478,22 +478,27 @@ class MyNodeCategory(NodeCategory):
     def poll(cls, context):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
-# all categories in a list
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
-        NodeItem("InputNode")
+        NodeItem("InputNode"),
+        NodeItem("PythonNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
-        NodeItem("OutputNode")
+        NodeItem("OutputNode"),
+        NodeItem("PrintNode")
         ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
-        NodeItem("AndNode"),
-        NodeItem("OrNode"),
-        NodeItem("StrongNode"),
-        NodeItem("WeakNode"),
         NodeItem("MapNode"),
         NodeItem("PriorityNode")
+        ]),
+    MyNodeCategory("LOGIC", "Logic", items=[
+        NodeItem("AndNode"),
+        NodeItem("OrNode")
+        ]),
+    MyNodeCategory("STRENGTH", "Strength", items=[
+        NodeItem("StrongNode"),
+        NodeItem("WeakNode")
         ]),
     MyNodeCategory("STATE", "State", items=[
         NodeItem("StartState"),
@@ -504,10 +509,6 @@ node_categories = [
         NodeItem("SetTagNode"),
         NodeItem("VariableNode"),
         NodeItem("EventNode")
-        ]),
-    MyNodeCategory("DEVELOPER", "Developer", items=[
-        NodeItem("PythonNode"),
-        NodeItem("PrintNode")
         ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
