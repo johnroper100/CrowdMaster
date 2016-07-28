@@ -1,7 +1,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "John Roper",
-    "version": (1, 0, 5),
+    "version": (1, 0, 7),
     "blender": (2, 77, 0),
     "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
@@ -337,6 +337,13 @@ class SCENE_PT_CrowdMaster(Panel):
 
         row = layout.row()
         row.prop(default, "contType", expand=True)
+        
+        row = layout.row()
+        row.scale_y = 1.15
+        row.prop(sce, 'use_agent_generation', icon='MOD_ARRAY')
+        
+        row = layout.row()
+        row.separator()
 
         row = layout.row()
         row.scale_y = 1.5
@@ -427,6 +434,12 @@ def register():
     register_icons()
     addon_updater_ops.register(bl_info)
     bpy.utils.register_module(__name__)
+    
+    global gen_register
+    from .cm_agent_generation import gen_register
+    global gen_unregister
+    from .cm_agent_generation import gen_unregister
+
     global action_register
     from .cm_actions import action_register
     global action_unregister
@@ -449,6 +462,7 @@ def register():
     registerTypes()
     action_register()
     event_register()
+    gen_register()
 
 def initialise():
     sce = bpy.context.scene
@@ -465,8 +479,8 @@ def initialise():
 def unregister():
     unregister_icons()
     bpy.utils.unregister_module(__name__)
-    
-    # ...and this one unregisters the SCENE_PT_CrowdMaster
+
+    gen_unregister()
     action_unregister()
     event_unregister()
     from .cm_blenderData import unregisterAllTypes

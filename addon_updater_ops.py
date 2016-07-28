@@ -586,7 +586,7 @@ def register(bl_info):
         #updater.verbose = True # optional, consider turning off for production or allow as option
     #else:
         #updater.verbose = False
-    updater.verbose = True
+    updater.verbose = False
     updater.backup_current = True # True by default
     updater.fake_install = False # Set to true to test callback/reloading
 
