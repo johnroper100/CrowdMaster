@@ -265,6 +265,10 @@ class SCENE_OT_cm_start(Operator):
     bl_label = "Start simulation"
 
     def execute(self, context):
+        preferences = context.user_preferences.addons[__package__].preferences
+        if (bpy.data.is_dirty) and (preferences.show_debug_options == False):
+            self.report({'ERROR'}, "You must save your file first!")
+            return {'CANCELLED'}
         context.scene.frame_current = context.scene.frame_start
         global sim
         if "sim" in globals():
@@ -281,7 +285,7 @@ class SCENE_OT_cm_start(Operator):
 
 class SCENE_OT_cm_stop(Operator):
     bl_idname = "scene.cm_stop"
-    bl_label = "Unregister the advance frame handler"
+    bl_label = "Stop Simulation"
 
     def execute(self, context):
         global sim
@@ -393,6 +397,7 @@ class SCENE_PT_CrowdMaster(Panel):
 def register():
     register_icons()
     addon_updater_ops.register(bl_info)
+    bpy.utils.register_module(__name__)
     global action_register
     from .cm_actions import action_register
     global action_unregister
@@ -415,7 +420,6 @@ def register():
     registerTypes()
     action_register()
     event_register()
-    bpy.utils.register_module(__name__)
 
 def initialise():
     sce = bpy.context.scene
@@ -431,6 +435,7 @@ def initialise():
 
 def unregister():
     unregister_icons()
+    bpy.utils.unregister_module(__name__)
     
     # ...and this one unregisters the SCENE_PT_CrowdMaster
     action_unregister()
@@ -440,8 +445,6 @@ def unregister():
 
     addon_updater_ops.unregister()
     # cm_bpyNodes.unregister()
-    unregister_icons()
-    bpy.utils.unregister_module(__name__)
 
 if __name__ == "__main__":
     register()
