@@ -389,10 +389,8 @@ class SCENE_PT_CrowdMaster(Panel):
             row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
 
         row = layout.row()
+        row.scale_y = 1.25
         row.operator(SCENE_OT_cm_stop.bl_idname)
-
-        row = layout.row()
-        row.label(text="ALWAYS save before pressing the start button!")
 
 def register():
     register_icons()
