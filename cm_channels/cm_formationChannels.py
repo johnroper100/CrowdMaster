@@ -45,7 +45,12 @@ class Formation(Mc):
 
 
 class EmptyChannel():
+    # TODO Way too hacky... need to think of another way of stopping crashes
+    #   if the channel doesn't exist.
     def __getattr__(self, attr):
+        return self
+
+    def __call__(self, *args, **kwargs):
         return None
 
 
@@ -136,25 +141,63 @@ class Channel:
         else:
             return False
 
+    def fixedDist(self, fixedPoint):
+        """Distance from this agent to the position in formation.
+        :type fixedPoint: int
+        :param fixedPoint: overrides the cluster matching behaviour so that an
+                            agent can always target the same point"""
+        objs = bpy.data.objects
+
+        if fixedPoint < len(self.targets):
+            to = self.targets[fixedPoint]
+            loc = objs[self.userid].location
+            return math.sqrt((loc[0] - to[0])**2 + (loc[1] - to[1])**2
+                             + (loc[2] - to[2])**2)
+        else:
+            return None
+
     @property
     def dist(self):
         """Distance from this agent to the position in formation"""
         objs = bpy.data.objects
+        to = self.checkCalcd()
 
-        result = self.checkCalcd()
-        if result:
+        if to:
             loc = objs[self.userid].location
-            return math.sqrt((loc[0] - result[0])**2 + (loc[1] - result[1])**2
-                             + (loc[2] - result[2])**2)
+            return math.sqrt((loc[0] - to[0])**2 + (loc[1] - to[1])**2
+                             + (loc[2] - to[2])**2)
         else:
             return None
+
+    def fixedRz(self, fixedPoint):
+        """Horizontal rotation to be pointing at position in formation.
+        :type fixedPoint: int
+        :param fixedPoint: overrides the cluster matching behaviour so that an
+                            agent can always target the same point"""
+        objs = bpy.data.objects
+
+        if fixedPoint < len(self.targets):
+            to = self.targets[fixedPoint]
+
+            ag = objs[self.userid]
+
+            target = to - ag.location
+
+            z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+            y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+            x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+
+            rotation = x * y * z
+            relative = target * rotation
+
+            return math.atan2(relative[0], relative[1])/math.pi
 
     @property
     def rz(self):
         """Horizontal rotation to be pointing at position in formation"""
         objs = bpy.data.objects
-
         to = self.checkCalcd()
+
         if to:
             ag = objs[self.userid]
 
@@ -171,12 +214,36 @@ class Channel:
         else:
             return None
 
+    def fixedRx(self, fixedPoint):
+        """Vertical rotation to be pointing at position in formation.
+        :type fixedPoint: int
+        :param fixedPoint: overrides the cluster matching behaviour so that an
+                            agent can always target the same point"""
+        objs = bpy.data.objects
+
+        if fixedPoint < len(self.targets):
+            to = self.targets[fixedPoint]
+
+            ag = objs[self.userid]
+
+            target = to - ag.location
+
+            z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+            y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+            x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+
+            rotation = x * y * z
+            relative = target * rotation
+
+            return math.atan2(relative[2], relative[1])/math.pi
+
+
     @property
     def rx(self):
         """Vertical rotation to be pointing at position in formation"""
         objs = bpy.data.objects
-
         to = self.checkCalcd()
+
         if to:
             ag = objs[self.userid]
 
