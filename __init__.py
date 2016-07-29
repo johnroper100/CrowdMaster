@@ -22,12 +22,11 @@ from . import mysql
 from . mysql import mysql_general as cmDB
 from . import icon_load
 from . icon_load import register_icons, unregister_icons
-from .cm_agent_generation.generation import generate_agents_random
+from .cm_agent_generation import *
 
 from . import addon_updater_ops
 
 # =============== GROUPS LIST START ===============#
-
 
 class SCENE_UL_group(UIList):
     """for drawing each row"""
@@ -273,11 +272,14 @@ class SCENE_OT_cm_start(Operator):
         
         scene = context.scene
         if scene.use_agent_generation == True:
-            if scene.positionMode == "vector":
-                print("vector")
-            elif scene.positionMode == "object":
-                print("object")
-            generate_agents_random()
+            if scene.positionType == "random":
+                if scene.positionMode == "vector":
+                    vector = [scene.positionVector[0], scene.positionVector[1]]
+                elif scene.positionMode == "object":
+                    objStart = bpy.data.objects[scene.positionObject]
+                    vector = [objStart.location.x, objStart.location.y]
+                from .cm_agent_generation.generation import generate_agents_random
+                generate_agents_random(scene.positionMode, vector)
             
         context.scene.frame_current = context.scene.frame_start
         global sim
@@ -331,7 +333,7 @@ class SCENE_PT_CrowdMaster(Panel):
 
     def draw(self, context):
         layout = self.layout
-        sce = context.scene
+        scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
         
         pcoll = icon_load.icon_collection["main"]
@@ -340,22 +342,25 @@ class SCENE_PT_CrowdMaster(Panel):
         
         row = layout.row()
         row.scale_y = 1.1
-        row.prop(sce, 'use_agent_generation', icon='MOD_ARRAY')
+        row.prop(scene, 'use_agent_generation', icon='MOD_ARRAY')
         
-        if sce.use_agent_generation == True:
+        if scene.use_agent_generation == True:
             row = layout.row()
-            row.prop_search(sce, "agentGroup", bpy.data, "groups")
+            row.prop_search(scene, "agentGroup", bpy.data, "groups")
 
             row = layout.row()
-            row.prop_search(sce, "groundObject", sce, "objects")
+            row.prop_search(scene, "groundObject", scene, "objects")
 
             row = layout.row()
-            row.prop(sce, "agentNumber")
+            row.prop(scene, "agentNumber")
         
         row = layout.row()
         row.separator()
 
         row = layout.row()
+        if scene.use_agent_generation == True:
+            if (scene.agentGroup == "") or (scene.groundObject == ""):
+                row.enabled = False
         row.scale_y = 1.5
         if preferences.use_custom_icons == True:
             row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))
@@ -390,7 +395,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             initialised = True
             initialise()
         layout = self.layout
-        sce = context.scene
+        scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
         
         pcoll = icon_load.icon_collection["main"]
@@ -398,8 +403,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             return pcoll[name].icon_id
 
         row = layout.row()
-        row.template_list("SCENE_UL_group", "", sce.cm_groups,
-                          "coll", sce.cm_groups, "index")
+        row.template_list("SCENE_UL_group", "", scene.cm_groups,
+                          "coll", scene.cm_groups, "index")
 
         col = row.column()
         sub = col.column(True)
@@ -417,15 +422,15 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         #####
 
         layout.label(text="Selected Agents")
-        layout.template_list("SCENE_UL_selected", "", sce.cm_agents_selected,
-                             "coll", sce.cm_agents_selected, "index")
+        layout.template_list("SCENE_UL_selected", "", scene.cm_agents_selected,
+                             "coll", scene.cm_agents_selected, "index")
 
         #####
 
         layout.label(text="All agents:")
         row = layout.row()
-        row.template_list("SCENE_UL_agents", "", sce.cm_agents,
-                          "coll", sce.cm_agents, "index")
+        row.template_list("SCENE_UL_agents", "", scene.cm_agents,
+                          "coll", scene.cm_agents, "index")
 
         col = row.column()
         sub = col.column(True)
@@ -455,10 +460,10 @@ def register():
     addon_updater_ops.register(bl_info)
     bpy.utils.register_module(__name__)
     
-    global gen_register
-    from .cm_agent_generation import gen_register
-    global gen_unregister
-    from .cm_agent_generation import gen_unregister
+    #global gen_register
+    #from .cm_agent_generation import gen_register
+    #global gen_unregister
+    #from .cm_agent_generation import gen_unregister
 
     global action_register
     from .cm_actions import action_register
@@ -482,7 +487,7 @@ def register():
     registerTypes()
     action_register()
     event_register()
-    gen_register()
+    #gen_register()
 
 def initialise():
     sce = bpy.context.scene
@@ -500,7 +505,7 @@ def unregister():
     unregister_icons()
     bpy.utils.unregister_module(__name__)
 
-    gen_unregister()
+    #gen_unregister()
     action_unregister()
     event_unregister()
     from .cm_blenderData import unregisterAllTypes

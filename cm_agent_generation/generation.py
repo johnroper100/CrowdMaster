@@ -7,13 +7,12 @@ import time
 def generate_agents_random(positionMode, locationVector):
     start_time = time.time()
 
-    scene = context.scene
+    scene = bpy.context.scene
     wm = bpy.context.window_manager
 
     number = scene.agentNumber
     group = bpy.data.groups.get(scene.agentGroup)
     groupObjs = group.objects
-    actions = [scene.agentAction1, scene.agentAction2, scene.agentAction3]
     obs = [o for o in group.objects]
     ground =  bpy.data.objects[scene.groundObject]
 
@@ -34,12 +33,9 @@ def generate_agents_random(positionMode, locationVector):
                 if o.parent in obs:
                     o.parent = group_objects[obs.index(o.parent)]
                 if o.type == 'ARMATURE':
-                    o.animation_data.action = bpy.data.actions[random.choice(actions)]
-
                     randRot = random.uniform(0, scene.randomPositionMaxRot)
                     eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
                     eul.rotate_axis('Z', math.radians(randRot))
-
                     scene.update()
 
                     if positionMode == "rectangle":

@@ -57,6 +57,8 @@ class Agent:
         self.apz = objs[blenderid].location[2]
         self.pz = 0
         self.sz = 0
+        
+        self.globalVelocity = mathutils.Vector([0,0,0])
 
         """Clear out the nla"""
         objs = bpy.data.objects

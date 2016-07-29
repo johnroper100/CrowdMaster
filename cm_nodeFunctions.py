@@ -82,6 +82,10 @@ class LogicAND(Neuron):
             for i in into:
                 if i.key in results:
                     results[i.key] *= i.val
+                    if settings["Method"] == "MUL":
+                        results[i.key] *= i.val
+                    else:  # Method == "MIN"
+                        results[i.key] = min(results[i.key], i.val)
                 else:
                     inAll = True
                     if settings["IncludeAll"]:
@@ -94,6 +98,11 @@ class LogicAND(Neuron):
             total = 1
             for k, v in results.items():
                 total *= v
+            if settings["Method"] == "MUL":
+                for k, v in results.items():
+                    total *= v
+            else:  # Method == "MIN"
+                total = min(results)
             return {"None": total}
         else:
             return results
@@ -107,15 +116,22 @@ class LogicOR(Neuron):
         if settings["SingleOutput"]:
             total = 1
             for into in inps:
-                for i in [i.val for i in into]:
-                    total *= (1-i)
-            return 1-total
+                if settings["Method"] == "MUL":
+                    for i in [i.val for i in into]:
+                        total *= (1-i)
+                    total = 1 - total
+                else:  # Method == "MAX"
+                    total = max(into.values())
+            return total
         else:
             results = {}
             for into in inps:
                 for i in into:
                     if i.key in results:
-                        results[i.key] *= (1-i.val)
+                        if settings["Method"] == "MUL":
+                            results[i.key] *= (1-i.val)
+                        else:  # Method == "MAX"
+                            results[i.key] = min(1-results[i.key], 1-i.val)
                     else:
                         results[i.key] = (1-i.val)
             results.update((k, 1-v) for k, v in results.items())

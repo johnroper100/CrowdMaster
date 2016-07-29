@@ -161,14 +161,18 @@ class AndNode(LogicNode):
     """CrowdMaster and node"""
     bl_label = "And"
 
+    Method = EnumProperty(items=[("MUL", "Mul", "", 1),
+                                 ("MIN", "Min", "", 2)])
     SingleOutput = BoolProperty(default=False)
     IncludeAll = BoolProperty(default=True)
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "Method", expand=True)
         layout.prop(self, "SingleOutput")
         layout.prop(self, "IncludeAll")
 
     def getSettings(self, node):
+        node.settings["Method"] = self.Method
         node.settings["SingleOutput"] = self.SingleOutput
         node.settings["IncludeAll"] = self.IncludeAll
 
@@ -177,13 +181,20 @@ class OrNode(LogicNode):
     """CrowdMaster or node"""
     bl_label = "Or"
 
+    Method = EnumProperty(items=[("MUL", "Mul", "", 1),
+                                 ("MAX", "Max", "", 2)])
     SingleOutput = BoolProperty(default=True)
+    IncludeAll = BoolProperty(default=True)
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "Method", expand=True)
         layout.prop(self, "SingleOutput")
+        layout.prop(self, "IncludeAll")
 
     def getSettings(self, node):
+        node.settings["Method"] = self.Method
         node.settings["SingleOutput"] = self.SingleOutput
+        node.settings["IncludeAll"] = self.IncludeAll
 
 
 class StrongNode(LogicNode):

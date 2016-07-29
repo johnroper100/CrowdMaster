@@ -9,7 +9,6 @@ from . import cm_channels as chan
 wr = chan.Wrapper
 
 from .cm_agent import Agent
-from .cm_actions import getmotions
 
 class Simulation():
     """The object that contains everything once the simulation starts"""
