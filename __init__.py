@@ -22,6 +22,7 @@ from . import mysql
 from . mysql import mysql_general as cmDB
 from . import icon_load
 from . icon_load import register_icons, unregister_icons
+from .cm_agent_generation.generation import generate_agents_random
 
 from . import addon_updater_ops
 
@@ -269,6 +270,15 @@ class SCENE_OT_cm_start(Operator):
         if (bpy.data.is_dirty) and (preferences.show_debug_options == False):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
+        
+        scene = context.scene
+        if scene.use_agent_generation == True:
+            if scene.positionMode == "vector":
+                print("vector")
+            elif scene.positionMode == "object":
+                print("object")
+            generate_agents_random()
+            
         context.scene.frame_current = context.scene.frame_start
         global sim
         if "sim" in globals():

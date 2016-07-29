@@ -4,7 +4,7 @@ import mathutils
 import math
 import time
 
-def generate_agents():
+def generate_agents_random(positionMode, locationVector):
     start_time = time.time()
 
     scene = context.scene
@@ -42,13 +42,8 @@ def generate_agents():
 
                     scene.update()
 
-                    if scene.positionType == "random":
-                        if scene.randomPositionMode == "rectangle":
-                            if scene.positionMode == "vector":
-                                o.location = (random.uniform(scene.positionVector[0], scene.randomPositionMaxX), random.uniform(scene.positionVector[1], scene.randomPositionMaxY), ground.location.z)
-                            elif scene.positionMode == "object":
-                                objStart = bpy.data.objects[scene.positionObject]
-                                o.location = (random.uniform(objStart.location.x, scene.randomPositionMaxX), random.uniform(objStart.location.y, scene.randomPositionMaxY), ground.location.z)
+                    if positionMode == "rectangle":
+                        o.location = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
