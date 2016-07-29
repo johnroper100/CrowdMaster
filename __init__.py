@@ -329,8 +329,18 @@ class SCENE_PT_CrowdMaster(Panel):
             return pcoll[name].icon_id
         
         row = layout.row()
-        row.scale_y = 1.15
+        row.scale_y = 1.1
         row.prop(sce, 'use_agent_generation', icon='MOD_ARRAY')
+        
+        if sce.use_agent_generation == True:
+            row = layout.row()
+            row.prop_search(sce, "agentGroup", bpy.data, "groups")
+
+            row = layout.row()
+            row.prop_search(sce, "groundObject", sce, "objects")
+
+            row = layout.row()
+            row.prop(sce, "agentNumber")
         
         row = layout.row()
         row.separator()

@@ -26,18 +26,6 @@ class CrowdMasterUIPosition(bpy.types.Panel):
         
         if scene.use_agent_generation == True:
             row = layout.row()
-            row.prop_search(scene, "agentGroup", bpy.data, "groups")
-
-            row = layout.row()
-            row.prop_search(scene, "groundObject", scene, "objects")
-
-            row = layout.row()
-            row.prop(scene, "agentNumber")
-
-            row = layout.row()
-            row.separator()
-
-            row = layout.row()
             row.prop(scene, "positionMode")
 
             if scene.positionMode == "vector":
