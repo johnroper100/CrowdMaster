@@ -1,7 +1,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "John Roper",
-    "version": (1, 0, 7),
+    "version": (1, 0, 8),
     "blender": (2, 77, 0),
     "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
@@ -327,16 +327,6 @@ class SCENE_PT_CrowdMaster(Panel):
         pcoll = icon_load.icon_collection["main"]
         def cicon(name):
             return pcoll[name].icon_id
-
-        default = bpy.context.scene.cm_agents_default
-        layout.label(text="Default agents group:")
-
-        row = layout.row()
-        row.prop(default, "startType", expand=True)
-        row.prop(default, "setno", text="")
-
-        row = layout.row()
-        row.prop(default, "contType", expand=True)
         
         row = layout.row()
         row.scale_y = 1.15
@@ -429,6 +419,16 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         blid_am = SCENE_OT_agent_move.bl_idname
         sub.operator(blid_am, text="", icon="TRIA_UP").direction = 'UP'
         sub.operator(blid_am, text="", icon="TRIA_DOWN").direction = 'DOWN'
+        
+        default = bpy.context.scene.cm_agents_default
+        layout.label(text="Default agents group:")
+
+        row = layout.row()
+        row.prop(default, "startType", expand=True)
+        row.prop(default, "setno", text="")
+
+        row = layout.row()
+        row.prop(default, "contType", expand=True)
 
 def register():
     register_icons()
