@@ -269,17 +269,6 @@ class SCENE_OT_cm_start(Operator):
         if (bpy.data.is_dirty) and (preferences.show_debug_options == False):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
-        
-        scene = context.scene
-        if scene.use_agent_generation == True:
-            if scene.positionType == "random":
-                if scene.positionMode == "vector":
-                    vector = [scene.positionVector[0], scene.positionVector[1]]
-                elif scene.positionMode == "object":
-                    objStart = bpy.data.objects[scene.positionObject]
-                    vector = [objStart.location.x, objStart.location.y]
-                from .cm_agent_generation.generation import generate_agents_random
-                generate_agents_random(scene.positionMode, vector)
             
         context.scene.frame_current = context.scene.frame_start
         global sim
@@ -353,14 +342,17 @@ class SCENE_PT_CrowdMaster(Panel):
 
             row = layout.row()
             row.prop(scene, "agentNumber")
+            
+            row = layout.row()
+            if (scene.agentGroup == "") or (scene.groundObject == ""):
+                row.enabled = False
+            row.scale_y = 1.15
+            row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_green'))
         
         row = layout.row()
         row.separator()
-
+        
         row = layout.row()
-        if scene.use_agent_generation == True:
-            if (scene.agentGroup == "") or (scene.groundObject == ""):
-                row.enabled = False
         row.scale_y = 1.5
         if preferences.use_custom_icons == True:
             row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))

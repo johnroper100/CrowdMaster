@@ -33,10 +33,10 @@ def generate_agents_random(positionMode, locationVector):
                 if o.parent in obs:
                     o.parent = group_objects[obs.index(o.parent)]
                 if o.type == 'ARMATURE':
-                    randRot = random.uniform(0, scene.randomPositionMaxRot)
-                    eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
-                    eul.rotate_axis('Z', math.radians(randRot))
-                    scene.update()
+                    #randRot = random.uniform(0, scene.randomPositionMaxRot)
+                    #eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                    #eul.rotate_axis('Z', math.radians(randRot))
+                    #scene.update()
 
                     if positionMode == "rectangle":
                         o.location = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
@@ -45,4 +45,5 @@ def generate_agents_random(positionMode, locationVector):
                 scene.objects.link(o)
 
     elapsed_time = time.time() - start_time
-    print("Time taken: " + str(elapsed_time))
+    #print("Time taken: " + str(elapsed_time))
+    return {'FINISHED'}
