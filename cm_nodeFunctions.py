@@ -313,28 +313,21 @@ class LogicEVENT(Neuron):
             if e.eventname == en:
                 result = 1
                 if e.category == "Time" or e.category == "Time+Volume":
-                    if e.time == bpy.context.scene.frame_current:
-                        result *= 1
-                    else:
-                        result *= 0
+                    if e.time != bpy.context.scene.frame_current:
+                        result = 0
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
                         pt = bpy.data.objects[self.brain.userid].location
                         l = bpy.data.objects[e.volume].location
                         d = bpy.data.objects[e.volume].dimensions
 
-                        ins = False
-                        if l.x-(d.x/2) <= pt.x <= l.x+(d.x/2):
-                            if l.y-(d.y/2) <= pt.y <= l.y+(d.y/2):
-                                if l.z-(d.z/2) <= pt.z <= l.z+(d.z/2):
-                                    ins = True
-                        if ins:
-                            result *= 1
-                        else:
-                            result *= 0
-                return result
+                        if not (l.x-(d.x/2) <= pt.x <= l.x+(d.x/2) and
+                                l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
+                                l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
+                             result = 0
+                if result:
+                    return result
         return 0
-
 
 class LogicPYTHON(Neuron):
     """execute a python expression"""

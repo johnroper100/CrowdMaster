@@ -46,7 +46,6 @@ class Channel:
         ag = O[self.userid]
         userDim = self.sim.agents[self.userid].dimensions
 
-        print(self.sim.agents)
         tDim = max(self.sim.agents[self.target].dimensions)
         uDim = max(userDim)
 

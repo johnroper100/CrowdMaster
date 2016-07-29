@@ -88,7 +88,8 @@ class Simulation():
             self.framelast = bpy.context.scene.frame_current
             self.step(scene)
         if self.framelast >= bpy.context.scene.frame_current:
-            if bpy.context.active_object.name in self.agents:
+            active = bpy.context.active_object
+            if active and active in self.agents:
                 self.agents[bpy.context.active_object.name].highLight()
 
     def startFrameHandler(self):

@@ -311,7 +311,8 @@ class Brain():
 
     def execute(self):
         """Called for each time the agents needs to evaluate"""
-        self.isActiveSelection = bpy.context.active_object.name == self.userid
+        actv = bpy.context.active_object
+        self.isActiveSelection = actv is not None and actv.name == self.userid
         self.reset()
         for name, var in self.lvars.items():
             var.setuser(self.userid)
