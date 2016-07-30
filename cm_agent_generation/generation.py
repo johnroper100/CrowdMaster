@@ -27,6 +27,8 @@ def generate_agents_random(positionMode, locationVector):
             group_objects = [o.copy() for o in obs]
             new_group = bpy.data.groups.new(scene.agentGroup)
             # Numbers will be appended automatically to the name
+            
+            newLoc = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
 
             for o in group_objects:
                 if o.parent in obs:
@@ -37,11 +39,11 @@ def generate_agents_random(positionMode, locationVector):
                 eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
                 eul.rotate_axis('Z', math.radians(randRot))
 
-                if positionMode == "rectangle":
-                    o.location = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
+                #if positionMode == "rectangle":
+                o.location = newLoc
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
 
     elapsed_time = time.time() - start_time
-    #print("Time taken: " + str(elapsed_time))
+    print("Time taken: " + str(elapsed_time))
