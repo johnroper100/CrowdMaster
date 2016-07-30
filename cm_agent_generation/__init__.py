@@ -17,3 +17,4 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
                     objStart = bpy.data.objects[scene.positionObject]
                     vector = [objStart.location.x, objStart.location.y]
                 generate_agents_random(scene.positionMode, vector)
+        return {'FINISHED'}

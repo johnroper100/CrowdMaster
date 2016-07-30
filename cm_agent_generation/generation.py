@@ -18,32 +18,30 @@ def generate_agents_random(positionMode, locationVector):
 
     bpy.context.scene.frame_current = 1
 
-    for object in groupObjs:
-        if scene.groundObject == object.name:
+    for obj in groupObjs:
+        if scene.groundObject == obj.name:
             self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
-
-    bpy.context.scene.objects.active.select = False
 
     if group is not None:
         for g in range(number):
             group_objects = [o.copy() for o in obs]
-            new_group = bpy.data.groups.new("CrowdMaster Agent")
+            new_group = bpy.data.groups.new(scene.agentGroup)
+            # Numbers will be appended automatically to the name
 
             for o in group_objects:
                 if o.parent in obs:
                     o.parent = group_objects[obs.index(o.parent)]
-                if o.type == 'ARMATURE':
-                    #randRot = random.uniform(0, scene.randomPositionMaxRot)
-                    #eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
-                    #eul.rotate_axis('Z', math.radians(randRot))
-                    #scene.update()
+                    # Reparent to new copies?
 
-                    if positionMode == "rectangle":
-                        o.location = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
+                randRot = random.uniform(0, scene.randomPositionMaxRot)
+                eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                eul.rotate_axis('Z', math.radians(randRot))
+
+                if positionMode == "rectangle":
+                    o.location = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
 
     elapsed_time = time.time() - start_time
     #print("Time taken: " + str(elapsed_time))
-    return {'FINISHED'}
