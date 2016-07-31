@@ -1,3 +1,4 @@
+[[ https://github.com/johnroper100/CrowdMaster/raw/master/CrowdMaster-logo.gif | height = 1000px ]]
 # CrowdMaster
 __If you are a python coder and want to help, send me an email [here] (mailto:johnroper100@gmail.com) and tell me what you can do. I would be glad to have your help.__
 
