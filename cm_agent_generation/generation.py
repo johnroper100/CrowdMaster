@@ -16,8 +16,6 @@ def generate_agents_random(positionMode, locationVector):
     obs = [o for o in group.objects]
     ground =  bpy.data.objects[scene.groundObject]
 
-    bpy.context.scene.frame_current = 1
-
     for obj in groupObjs:
         if scene.groundObject == obj.name:
             self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
@@ -35,12 +33,13 @@ def generate_agents_random(positionMode, locationVector):
                     o.parent = group_objects[obs.index(o.parent)]
                     # Reparent to new copies?
 
-                randRot = random.uniform(0, scene.randomPositionMaxRot)
-                eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
-                eul.rotate_axis('Z', math.radians(randRot))
+                if o.type == 'ARMATURE' or o.type == 'MESH':
+                    randRot = random.uniform(0, scene.randomPositionMaxRot)
+                    eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                    eul.rotate_axis('Z', math.radians(randRot))
 
-                #if positionMode == "rectangle":
-                o.location = newLoc
+                    if positionMode == "rectangle":
+                        o.location = newLoc
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
