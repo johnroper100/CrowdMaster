@@ -27,6 +27,7 @@ def generate_agents_random(positionMode, locationVector):
             # Numbers will be appended automatically to the name
 
             newLoc = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
+            newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
             for o in group_objects:
                 if o.parent in obs:
@@ -39,6 +40,8 @@ def generate_agents_random(positionMode, locationVector):
                     eul.rotate_axis('Z', math.radians(randRot))
 
                     o.rotation_euler.rotate(eul)
+                    
+                    o.scale = (newScale, newScale, newScale)
 
                     if positionMode == "rectangle":
                         o.location = newLoc

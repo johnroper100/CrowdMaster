@@ -44,6 +44,18 @@ class CrowdMasterUIPosition(bpy.types.Panel):
             
             row = layout.row()
             row.prop(scene, "maxRandRot")
+            
+            row = layout.row()
+            row.separator()
+            
+            row = layout.row()
+            row.prop(scene, "minRandSz")
+            
+            row = layout.row()
+            row.prop(scene, "maxRandSz")
+            
+            row = layout.row()
+            row.separator()
 
             row = layout.row()
             row.prop(scene, "positionType")
