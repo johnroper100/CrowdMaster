@@ -1,6 +1,7 @@
 import bpy
 import random
 import mathutils
+from mathutils import Vector
 import math
 import time
 
@@ -46,6 +47,94 @@ def generate_agents_random(locationVector):
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
+
+    elapsed_time = time.time() - start_time
+    print("Time taken: " + str(elapsed_time))
+
+def generate_agents_array(locationVector):
+    start_time = time.time()
+
+    scene = bpy.context.scene
+    wm = bpy.context.window_manager
+
+    number = scene.agentNumber
+    half_agents = number // 2
+    offsetX = scene.formationArrayX
+    offsetY = scene.formationArrayY
+
+    group = bpy.data.groups.get(scene.agentGroup)
+    groupObjs = group.objects
+    obs = [o for o in group.objects]
+    ground =  bpy.data.objects[scene.groundObject]
+
+    for obj in groupObjs:
+        if scene.groundObject == obj.name:
+            self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
+
+    if group is not None:
+        for g in range(half_agents):
+            group_objects = [o.copy() for o in obs]
+            new_group = bpy.data.groups.new(scene.agentGroup)
+            # Numbers will be appended automatically to the name
+
+            location = Vector((locationVector[0], locationVector[1], ground.location.z))
+
+            newLoc = (locationVector[0], locationVector[1], ground.location.z)
+            newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
+            offsetXLoc = (scene.arrayObjScale + offsetX)
+            offsetYLoc = (scene.arrayObjScale + offsetY)
+
+            for o in group_objects:
+                # Reparent to new copies
+                if o.parent in obs:
+                    o.parent = group_objects[obs.index(o.parent)]
+
+                randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
+                eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                eul.rotate_axis('Z', math.radians(randRot))
+
+                o.rotation_euler.rotate(eul)
+
+                o.scale = (newScale, newScale, newScale)
+
+                o.location = location
+
+                new_group.objects.link(o)
+                scene.objects.link(o)
+                
+                location.x -= offsetXLoc
+        
+        for g in range(half_agents):
+            group_objects = [o.copy() for o in obs]
+            new_group = bpy.data.groups.new(scene.agentGroup)
+            # Numbers will be appended automatically to the name
+
+            location = Vector((locationVector[0], locationVector[1], ground.location.z))
+
+            newLoc = (locationVector[0], locationVector[1], ground.location.z)
+            newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
+            offsetXLoc = (scene.arrayObjScale + offsetX)
+            offsetYLoc = (scene.arrayObjScale + offsetY)
+
+            for o in group_objects:
+                # Reparent to new copies
+                if o.parent in obs:
+                    o.parent = group_objects[obs.index(o.parent)]
+
+                randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
+                eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                eul.rotate_axis('Z', math.radians(randRot))
+
+                o.rotation_euler.rotate(eul)
+
+                o.scale = (newScale, newScale, newScale)
+
+                o.location = location
+
+                new_group.objects.link(o)
+                scene.objects.link(o)
+                
+                location.y -= offsetYLoc
 
     elapsed_time = time.time() - start_time
     print("Time taken: " + str(elapsed_time))

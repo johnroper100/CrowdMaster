@@ -48,3 +48,4 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
 
 bpy.types.Scene.formationArrayX = FloatProperty(name="Array X", description="The distance between each agent on the X axis.", default = 0)
 bpy.types.Scene.formationArrayY = FloatProperty(name="Array Y", description="The distance between each agent on the Y axis.", default = 0)
+bpy.types.Scene.arrayObjScale = FloatProperty(name="Array Item Size", description="The relative scale of the object.", default = 0)
