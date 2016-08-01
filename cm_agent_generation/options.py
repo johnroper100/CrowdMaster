@@ -21,7 +21,7 @@ bpy.types.Scene.positionType = bpy.props.EnumProperty(
 bpy.types.Scene.maxRandRot = FloatProperty(name="Max Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0, max=360.0)
 bpy.types.Scene.minRandRot = FloatProperty(name="Min Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0, min=-360.0)
 
-bpy.types.Scene.maxRandSz = FloatProperty(name="Max Scale", description="The maximum random scale for each agent.", default = 25.0)
+bpy.types.Scene.maxRandSz = FloatProperty(name="Max Scale", description="The maximum random scale for each agent.", default = 5.0)
 bpy.types.Scene.minRandSz = FloatProperty(name="Min Scale", description="The minimum random scale for each agent.", default = 0.0)
 
 bpy.types.Scene.positionMode = bpy.props.EnumProperty(
