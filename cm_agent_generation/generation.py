@@ -34,7 +34,7 @@ def generate_agents_random(positionMode, locationVector):
                     # Reparent to new copies?
 
                 if o.type == 'ARMATURE' or o.type == 'MESH':
-                    randRot = random.uniform(0, scene.randomPositionMaxRot)
+                    randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
                     eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
                     eul.rotate_axis('Z', math.radians(randRot))
 

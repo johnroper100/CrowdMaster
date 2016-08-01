@@ -18,6 +18,9 @@ bpy.types.Scene.positionType = bpy.props.EnumProperty(
         description = "Which layout algorithim the simulator should use.",
         default = "random")
 
+bpy.types.Scene.maxRandRot = FloatProperty(name="Max Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0)
+bpy.types.Scene.minRandRot = FloatProperty(name="Min Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0)
+
 bpy.types.Scene.positionMode = bpy.props.EnumProperty(
         items = [('vector', 'Vector', 'The span location is specified as a list of vector coordinates.'), 
                  ('object', 'Object', 'The span location is specified as the location of an object.')],
@@ -40,8 +43,6 @@ bpy.types.Scene.randomPositionRadius = FloatProperty(name="Spawn Radius", descri
 
 bpy.types.Scene.randomPositionMaxX = FloatProperty(name="Max X", description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.", default = 50.0)
 bpy.types.Scene.randomPositionMaxY = FloatProperty(name="Max Y", description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.", default = 50.0)
-
-bpy.types.Scene.randomPositionMaxRot = FloatProperty(name="Max Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 0.0)
 
 # Formation positioning
 bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(

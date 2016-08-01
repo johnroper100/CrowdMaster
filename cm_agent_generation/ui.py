@@ -38,6 +38,12 @@ class CrowdMasterUIPosition(bpy.types.Panel):
 
             row = layout.row()
             row.separator()
+            
+            row = layout.row()
+            row.prop(scene, "minRandRot")
+            
+            row = layout.row()
+            row.prop(scene, "maxRandRot")
 
             row = layout.row()
             row.prop(scene, "positionType")
@@ -45,9 +51,6 @@ class CrowdMasterUIPosition(bpy.types.Panel):
             if scene.positionType == "random":   
                 row = layout.row()
                 row.prop(scene, "randomPositionMode")
-
-                row = layout.row()
-                row.prop(scene, "randomPositionMaxRot")
 
                 if scene.randomPositionMode == "rectangle":
                     row = layout.row()
