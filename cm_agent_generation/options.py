@@ -35,15 +35,6 @@ bpy.types.Scene.positionVector = FloatVectorProperty(name="Spawn Position", desc
 bpy.types.Scene.positionObject = StringProperty(name="Spawn Object", description="The object from where the agents will be spawned.")
 
 # Random positioning
-bpy.types.Scene.randomPositionMode = bpy.props.EnumProperty(
-        items = [('rectangle', 'Rectangle', 'The agents are spawned inside a specified rectangle.'), 
-                 ('circle', 'Circle', 'The agents are spawned inside a circle.')],
-        name = "Random Position Type",
-        description = "Where shape inside which the agents are spawned.",
-        default = "rectangle")
-
-bpy.types.Scene.randomPositionRadius = FloatProperty(name="Spawn Radius", description="The radius around the center point where the agents will be randomly spawned.", default = 10.0)
-
 bpy.types.Scene.randomPositionMaxX = FloatProperty(name="Max X", description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.", default = 50.0)
 bpy.types.Scene.randomPositionMaxY = FloatProperty(name="Max Y", description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.", default = 50.0)
 

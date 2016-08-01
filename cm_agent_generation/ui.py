@@ -63,18 +63,10 @@ class CrowdMasterUIPosition(bpy.types.Panel):
 
             if scene.positionType == "random":   
                 row = layout.row()
-                row.prop(scene, "randomPositionMode")
+                row.prop(scene, "randomPositionMaxX")
 
-                if scene.randomPositionMode == "rectangle":
-                    row = layout.row()
-                    row.prop(scene, "randomPositionMaxX")
-
-                    row = layout.row()
-                    row.prop(scene, "randomPositionMaxY")
-
-                if scene.randomPositionMode == "circle":
-                    row = layout.row()
-                    row.prop(scene, "randomPositionRadius")
+                row = layout.row()
+                row.prop(scene, "randomPositionMaxY")
 
             if scene.positionType == "formation":
                 row = layout.row()

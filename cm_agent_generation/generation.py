@@ -4,7 +4,7 @@ import mathutils
 import math
 import time
 
-def generate_agents_random(positionMode, locationVector):
+def generate_agents_random(locationVector):
     start_time = time.time()
 
     scene = bpy.context.scene
@@ -30,21 +30,19 @@ def generate_agents_random(positionMode, locationVector):
             newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
             for o in group_objects:
+                # Reparent to new copies
                 if o.parent in obs:
                     o.parent = group_objects[obs.index(o.parent)]
-                    # Reparent to new copies?
 
-                if o.type == 'ARMATURE' or o.type == 'MESH':
-                    randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
-                    eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
-                    eul.rotate_axis('Z', math.radians(randRot))
+                randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
+                eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                eul.rotate_axis('Z', math.radians(randRot))
 
-                    o.rotation_euler.rotate(eul)
-                    
-                    o.scale = (newScale, newScale, newScale)
+                o.rotation_euler.rotate(eul)
 
-                    if positionMode == "rectangle":
-                        o.location = newLoc
+                o.scale = (newScale, newScale, newScale)
+
+                o.location = newLoc
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
