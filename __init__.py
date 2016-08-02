@@ -34,7 +34,7 @@ class SCENE_UL_group(UIList):
                   active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             layout.label(text=str(item.name))
-            layout.prop(item, "type", text="")
+            layout.prop(item, "type", text="Node tree name")
             # layout.prop_search(item, "type", bpy.data, "actions", text="")
             # this draws each row in the list. Each line is a widget
         elif self.layout_type in {'GRID'}:
@@ -127,7 +127,7 @@ class SCENE_UL_agents(UIList):
             else:
                 ic = 'ERROR'
             layout.prop_search(item, "name", bpy.data, "objects")
-            layout.prop(item, "group", text="")
+            layout.prop(item, "group", text="Group number")
             typ = [g.type for g in bpy.context.scene.cm_groups.coll
                    if int(g.name) == item.group][0]
             layout.label(text=typ)
@@ -413,7 +413,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
 
         #####
 
-        layout.label(text="Selected Agents")
+        layout.label(text="Selected Agents:")
         layout.template_list("SCENE_UL_selected", "", scene.cm_agents_selected,
                              "coll", scene.cm_agents_selected, "index")
 
@@ -442,7 +442,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
 
         row = layout.row()
         row.prop(default, "startType", expand=True)
-        row.prop(default, "setno", text="")
+        row.prop(default, "setno", text="Group number")
 
         row = layout.row()
         row.prop(default, "contType", expand=True)

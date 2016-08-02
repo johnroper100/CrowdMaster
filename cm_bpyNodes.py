@@ -5,7 +5,7 @@ from bpy.props import EnumProperty, IntProperty
 
 
 class CrowdMasterTree(NodeTree):
-    """New type of node tree to contain the CrowdMaster nodes"""
+    """The node tree that contains the CrowdMaster nodes"""
     bl_idname = 'CrowdMasterTreeType'
     bl_label = 'CrowdMaster'
     bl_icon = 'MOD_REMESH'
@@ -17,7 +17,7 @@ class DefaultSocket(NodeSocket):
     # If not explicitly defined, the python class name is used.
     bl_idname = 'DefaultSocketType'
     # Label for nice name display
-    bl_label = 'Default Node Socket'
+    bl_label = 'Default CrowdMaster Node Socket'
 
     filterProperty = EnumProperty(items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
@@ -46,7 +46,7 @@ class DefaultSocket(NodeSocket):
 class StateSocket(NodeSocket):
     """Socket used for state tree transitions"""
     bl_idname = 'StateSocketType'
-    bl_label = 'State Node Socket'
+    bl_label = 'CrowdMaster State Node Socket'
 
     def draw(self, context, layout, node, text):
         layout.label(text)
@@ -58,7 +58,7 @@ class StateSocket(NodeSocket):
 class DependanceSocket(NodeSocket):
     """Socket used for state tree transitions"""
     bl_idname = 'DependanceSocketType'
-    bl_label = 'Dependance Node Socket'
+    bl_label = 'CrowdMaster Dependance Node Socket'
 
     def draw(self, context, layout, node, text):
         layout.label(text)
@@ -68,7 +68,7 @@ class DependanceSocket(NodeSocket):
 
 
 class CrowdMasterNode(Node):
-    """CrowdMaster nodes superclass"""
+    """CrowdMaster node superclass"""
     # bl_idname = 'CustomNodeType'  # Class name used if not defined
     # Label for nice name display
     bl_label = 'Super class'
