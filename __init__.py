@@ -477,11 +477,6 @@ def register():
     register_icons()
     addon_updater_ops.register(bl_info)
     bpy.utils.register_module(__name__)
-    
-    #global gen_register
-    #from .cm_agent_generation import gen_register
-    #global gen_unregister
-    #from .cm_agent_generation import gen_unregister
 
     global action_register
     from .cm_actions import action_register
@@ -505,7 +500,6 @@ def register():
     registerTypes()
     action_register()
     event_register()
-    #gen_register()
 
 def initialise():
     sce = bpy.context.scene
@@ -523,7 +517,6 @@ def unregister():
     unregister_icons()
     bpy.utils.unregister_module(__name__)
 
-    #gen_unregister()
     action_unregister()
     event_unregister()
     from .cm_blenderData import unregisterAllTypes
