@@ -1,7 +1,7 @@
 import bpy
 from . import options
 from .ui import gen_register, gen_unregister
-from .generation import generate_agents_array
+from .generation import generate_agents_random, generate_agents_array
 
 class CrowdMaster_generate_agents(bpy.types.Operator):
     bl_idname = "scene.cm_gen_agents"

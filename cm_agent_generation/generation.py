@@ -34,16 +34,16 @@ def generate_agents_random(locationVector):
                 # Reparent to new copies
                 if o.parent in obs:
                     o.parent = group_objects[obs.index(o.parent)]
+                else:
+                    randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
+                    eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                    eul.rotate_axis('Z', math.radians(randRot))
 
-                randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
-                eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
-                eul.rotate_axis('Z', math.radians(randRot))
+                    o.rotation_euler.rotate(eul)
 
-                o.rotation_euler.rotate(eul)
+                    o.scale = (newScale, newScale, newScale)
 
-                o.scale = (newScale, newScale, newScale)
-
-                o.location = newLoc
+                    o.location = newLoc
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
