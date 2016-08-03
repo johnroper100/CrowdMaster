@@ -2,7 +2,6 @@ import bpy
 import sys
 from .. import icon_load
 from . import options
-from .ui import gen_register, gen_unregister
 from .generation import generate_agents_random, generate_agents_array
 
 class CrowdMaster_generate_agents(bpy.types.Operator):
@@ -40,16 +39,7 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             return pcoll[name].icon_id
 
         row = layout.row()
-        row.prop_search(scene, "agentGroup", bpy.data, "groups")
-
-        row = layout.row()
-        row.prop_search(scene, "groundObject", scene, "objects")
-
-        row = layout.row()
         row.prop(scene, "agentNumber")
-        
-        row = layout.row()
-        row.prop(scene, "positionMode")
 
         if scene.positionMode == "vector":
             row = layout.row()
@@ -62,39 +52,38 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         row = layout.row()
         row.separator()
 
-        row = layout.row()
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
         row.prop(scene, "minRandRot")
-
-        row = layout.row()
         row.prop(scene, "maxRandRot")
 
-        row = layout.row()
-        row.scale_y = 0.25
-        row.separator()
-
-        row = layout.row()
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
         row.prop(scene, "minRandSz")
-
-        row = layout.row()
         row.prop(scene, "maxRandSz")
 
         row = layout.row()
         row.separator()
 
-        row = layout.row()
-        row.prop(scene, "positionType")
+        if scene.positionType == "random":
+            if scene.positionMode == "scene":
+                row = layout.row(align=True)
+                row.alignment = 'EXPAND'
+                row.prop(scene, "randomPositionMinX")
+                row.prop(scene, "randomPositionMaxX")
 
-        if scene.positionType == "random":   
-            row = layout.row()
-            row.prop(scene, "randomPositionMaxX")
-
-            row = layout.row()
-            row.prop(scene, "randomPositionMaxY")
+                row = layout.row(align=True)
+                row.alignment = 'EXPAND'
+                row.prop(scene, "randomPositionMinY")
+                row.prop(scene, "randomPositionMaxY")
+            
+            else:
+                row = layout.row(align=True)
+                row.alignment = 'EXPAND'
+                row.prop(scene, "randomPositionMaxX")
+                row.prop(scene, "randomPositionMaxY")
 
         if scene.positionType == "formation":
-            row = layout.row()
-            row.prop(scene, "formationPositionType")
-
             if scene.formationPositionType == "array":
                 row = layout.row()
                 row.prop(scene, "formationArrayX")
