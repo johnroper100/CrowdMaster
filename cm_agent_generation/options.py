@@ -60,3 +60,9 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         default = "array")
 
 bpy.types.Scene.formationArrayRows = FloatProperty(name="Rows", description="The number of rows in the array.", default = 0)
+
+bpy.types.Scene.add_to_agent_list = BoolProperty(
+        name = "Add to Agent List",
+        description = "Add the generated agents to the agent list.",
+        default = True,
+        )

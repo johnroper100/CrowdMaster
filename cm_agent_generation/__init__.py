@@ -16,6 +16,8 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             elif scene.positionMode == "object":
                 objStart = bpy.data.objects[scene.positionObject]
                 vector = [objStart.location.x, objStart.location.y]
+            elif scene.positionMode == "scene":
+                vector = 0
 
             if scene.positionType == "random":
                 generate_agents_random(vector)
@@ -59,6 +61,7 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
 
         row = box.row()
         row.prop(scene, "agentNumber")
+        row.prop(scene, "add_to_agent_list")
 
         if scene.positionMode == "vector":
             row = box.row()
