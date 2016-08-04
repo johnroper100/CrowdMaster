@@ -65,6 +65,8 @@ def generate_agents_array(locationVector):
     wm = bpy.context.window_manager
 
     number = scene.agentNumber
+    rows = scene.formationArrayRows
+    agentsPerRow = number/rows
     group = bpy.data.groups.get(scene.agentGroup)
     groupObjs = group.objects
     obs = [o for o in group.objects]
@@ -75,12 +77,12 @@ def generate_agents_array(locationVector):
             self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
 
     if group is not None:
-        for g in range(number):
+        for r in range(agentsPerRow):
             group_objects = [o.copy() for o in obs]
             new_group = bpy.data.groups.new(scene.agentGroup)
             # Numbers will be appended automatically to the name
 
-            newLoc = (random.uniform(locationVector[0], scene.randomPositionMaxX), random.uniform(locationVector[1], scene.randomPositionMaxY), ground.location.z)
+            newLoc = (12, 14, ground.location.z)
             newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
             for o in group_objects:
