@@ -284,22 +284,6 @@ class SCENE_OT_cm_start(Operator):
         if preferences.play_animation == True:
             bpy.ops.screen.animation_play()
         return {'FINISHED'}
-    
-    def invoke(self, context, event):
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=250)
-
-    def draw(self, context):
-        layout = self.layout
-        scene = context.scene
-        
-        row = layout.row()
-        row.label("This may take a while!", icon='CANCEL')
-        
-        row = layout.row()
-        numAgentsLab = "Number of agents: " + str(scene.agentNumber)
-        row.label(numAgentsLab)
-
 
 class SCENE_OT_cm_stop(Operator):
     bl_idname = "scene.cm_stop"
