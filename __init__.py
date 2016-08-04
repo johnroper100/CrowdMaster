@@ -343,20 +343,6 @@ class SCENE_PT_CrowdMaster(Panel):
             row = box.row()
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
-            row.prop(scene, "positionMode")
-            
-            row = box.row()
-            if (scene.agentGroup == "") or (scene.groundObject == ""):
-                row.enabled = False
-            row.prop(scene, "positionType")
-            
-            if scene.positionType == "formation":
-                row = box.row()
-                row.prop(scene, "formationPositionType")
-            
-            row = box.row()
-            if (scene.agentGroup == "") or (scene.groundObject == ""):
-                row.enabled = False
             row.scale_y = 1.15
             if preferences.use_custom_icons == True:
                 row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_yellow'))
