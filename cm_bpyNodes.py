@@ -258,6 +258,30 @@ class VariableNode(LogicNode):
         node.settings["Variable"] = self.Variable
 
 
+class FilterNode(LogicNode):
+    """CrowdMaster Filter node"""
+    bl_label = "Filter"
+
+    Operation = EnumProperty(items=[("EQUAL", "Equal", "", 1),
+                                    ("NOT EQUAL", "Not equal", "", 2),
+                                    ("LESS", "Less than", "", 3),
+                                    ("GREATER", "Greater than", "", 4),
+                                    ("LEAST", "Least only", "", 5),
+                                    ("Most", "Most only", "", 6),
+                                    ("AVERAGE", "Average", "", 7)])
+    Value = FloatProperty(default=0.0)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "Operation")
+        if (self.Operation == "EQUAL" or self.Operation == "NOT EQUAL" or
+            self.Operation == "LESS" or self.Operation == "GREATER"):
+            layout.prop(self, "Value")
+
+    def getSettings(self, node):
+        node.settings["Operation"] = self.Operation
+        node.settings["Value"] = self.Value
+
+
 class MapNode(LogicNode):
     """CrowdMaster Map node"""
     bl_label = "Map"
@@ -342,7 +366,7 @@ class PrintNode(LogicNode):
         description = "Save the printed statements to a file for later viewing.",
         default = False,
         )
-    
+
     output_filepath = bpy.props.StringProperty \
       (
       name = "Output Filepath",
@@ -519,6 +543,7 @@ node_categories = [
         NodeItem("QueryTagNode"),
         NodeItem("SetTagNode"),
         NodeItem("VariableNode"),
+        NodeItem("FilterNode"),
         NodeItem("EventNode")
         ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
@@ -546,6 +571,7 @@ def register():
     bpy.utils.register_class(QueryTagNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(VariableNode)
+    bpy.utils.register_class(FilterNode)
     bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
@@ -580,6 +606,7 @@ def unregister():
     bpy.utils.unregister_class(QueryTagNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(VariableNode)
+    bpy.utils.unregister_class(FilterNode)
     bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)

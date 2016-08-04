@@ -222,6 +222,63 @@ class LogicVARIABLE(Neuron):
         return self.brain.agvars[settings["Variable"]]
 
 
+class LogicFILTER(Neuron):
+    """Only allow some values through"""
+
+    def core(self, inps, settings):
+        result = {}
+
+        # TODO what if multiple inputs have the same keys?
+        if self.settings["Operation"] == "EQUAL":
+            for into in inps:
+                for i in into:
+                    if i.val == self.settings["Value"]:
+                        result[i.key] = i.val
+        elif self.settings["Operation"] == "NOT EQUAL":
+            for into in inps:
+                for i in into:
+                    if i.val != self.settings["Value"]:
+                        result[i.key] = i.val
+        elif self.settings["Operation"] == "LESS":
+            for into in inps:
+                for i in into:
+                    if i.val <= self.settings["Value"]:
+                        result[i.key] = i.val
+        elif self.settings["Operation"] == "GREATER":
+            for into in inps:
+                for i in into:
+                    if i.val > self.settings["Value"]:
+                        result[i.key] = i.val
+        elif self.settings["Operation"] == "LEAST":
+            leastVal = -float("inf")
+            leastName = "None"
+            for into in inps:
+                for i in into:
+                    if i.val < leastVal:
+                        leastVal = i.val
+                        leastName = i.key
+            result = {leastName: leastVal}
+        elif self.settings["Operation"] == "MOST":
+            mostVal = -float("inf")
+            mostName = "None"
+            for into in inps:
+                for i in into:
+                    if i.val > mostVal:
+                        mostVal = i.val
+                        mostName = i.key
+            result = {mostName: mostVal}
+        elif self.settings["Operation"] == "AVERAGE":
+            total = -float("inf")
+            count = 0
+            for into in inps:
+                for i in into:
+                    total += i.val
+                    count += 1
+            result = {"None": total/count}
+        return result
+
+
+
 class LogicMAP(Neuron):
     """Map the input from the input range to the output range
     (extrapolates outside of input range)"""
@@ -392,6 +449,7 @@ logictypes = OrderedDict([
     ("QueryTagNode", LogicQUERYTAG),
     ("SetTagNode", LogicSETTAG),
     ("VariableNode", LogicVARIABLE),
+    ("FilterNode", LogicFILTER),
     ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
