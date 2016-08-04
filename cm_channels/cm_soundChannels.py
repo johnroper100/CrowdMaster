@@ -194,7 +194,7 @@ class Channel:
             changex = math.atan2(relative[2], relative[1])/math.pi
             self.store[emitterid] = {"rz": changez,
                                      "rx": changex,
-                                     "distProp": 1-(dist/(val+eDim+uDim))}
+                                     "distProp": dist/(val+eDim+uDim)}
             # (z rot, x rot, dist proportion, time until prediction)"""
 
         # The old implementation not using octree
@@ -286,7 +286,7 @@ class Channel:
                         # https://www.desmos.com/calculator/godi4zejgd
                     self.storePrediction[emitterid] = {"rz": changez,
                                                        "changex": changex,
-                                                       "distProp": 1-(dist/val),
+                                                       "distProp": dist/val,
                                                        "cert": cert}
                     # (z rot, x rot, dist proportion, time until prediction)
 
@@ -392,7 +392,7 @@ class Channel:
 
                     self.storeSteering[emitterid] = {"rz": changez,
                                                      "rx": changex,
-                                                     "distProp": 1,
+                                                     "distProp": 0,
                                                      "acc": acc,
                                                      "overlap": overlap,
                                                      "cert": cert}
@@ -416,7 +416,7 @@ class Channel:
                 changez = relative[0] / (abs(relative[0]) + 1)
                 changex = relative[2] / (abs(relative[2]) + 1)
 
-                dstp = 1-(dist/val)  # distance proportion 0-1
+                dstp = dist/val  # distance proportion 1-0
 
                 if tc < 0:
                     # collision in the past
@@ -503,6 +503,14 @@ class Channel:
         items = self.calcAndGetItems()
         if items:
             return self.buildDictFromProperty(items, "distProp")
+
+    @property
+    def close(self):
+        """Return how close the sound emitting is 0-1"""
+        items = self.calcAndGetItems()
+        if items:
+            result = self.buildDictFromProperty(items, "distProp")
+            return {k: 1-v for k, v in result}
 
     @property
     def db(self):
