@@ -31,9 +31,20 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         return wm.invoke_props_dialog(self, width=600)
     
     def check(self, context):
-        if self.use_rand_rot is True:
+        scene = context.scene
+        if scene.use_rand_rot is True:
             return True
-        if self.use_rand_scale is True:
+        if scene.use_rand_scale is True:
+            return True
+        if scene.use_rand_rot is False:
+            return True
+        if scene.use_rand_scale is False:
+            return True
+        if scene.positionMode != scene.positionMode:
+            return True
+        if scene.positionType != scene.positionType:
+            return True
+        if scene.formationPositionType != scene.formationPositionType:
             return True
 
     def draw(self, context):
@@ -48,11 +59,6 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
 
         row = box.row()
         row.prop(scene, "agentNumber")
-        
-        if scene.positionType == "formation":
-            if scene.formationPositionType == "array":
-                row = box.row()
-                row.prop(scene, "formationArrayRows")
 
         if scene.positionMode == "vector":
             row = box.row()
@@ -61,6 +67,18 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         elif scene.positionMode == "object":
             row = box.row()
             row.prop_search(scene, "positionObject", scene, "objects")
+        
+        box = layout.box()
+        
+        row = box.row()
+        row.prop(scene, "positionMode")
+
+        row = box.row()
+        row.prop(scene, "positionType")
+
+        if scene.positionType == "formation":
+            row = box.row()
+            row.prop(scene, "formationPositionType")
         
         box = layout.box()
 
@@ -103,3 +121,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
                 row.alignment = 'EXPAND'
                 row.prop(scene, "randomPositionMaxX")
                 row.prop(scene, "randomPositionMaxY")
+        
+        if scene.positionType == "formation":
+            box = layout.box()
+            if scene.formationPositionType == "array":
+                row = box.row()
+                row.prop(scene, "formationArrayRows")

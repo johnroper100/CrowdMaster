@@ -358,7 +358,10 @@ class SCENE_PT_CrowdMaster(Panel):
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
             row.scale_y = 1.15
-            row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_green'))
+            if preferences.use_custom_icons == True:
+                row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_yellow'))
+            else:
+                row.operator(CrowdMaster_generate_agents.bl_idname, icon='MOD_ARMATURE')
         
         row = layout.row()
         row.separator()

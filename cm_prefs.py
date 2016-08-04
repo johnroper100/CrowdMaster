@@ -91,11 +91,10 @@ class CMPreferences(AddonPreferences):
         
         if preferences.prefs_tab == "GEN":
             row = layout.row()
+            row.prop(preferences, 'use_custom_icons', icon_value=cicon('setup_plug'))
             if preferences.use_custom_icons == True:
-                row.prop(preferences, 'use_custom_icons', icon_value=cicon('setup_plug'))
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('debug'))
             else:
-                row.prop(preferences, 'use_custom_icons', icon='SEQ_CHROMA_SCOPE')
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
                 
             row = layout.row()

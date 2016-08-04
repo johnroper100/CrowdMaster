@@ -1,7 +1,7 @@
 import os
 import bpy
 
-ICONS = '3_agents 2_agents 1_agent node_tree_logo setup_plug start_sim plus_green minus_green minus_red debug stop_sim'.split(' ')
+ICONS = '3_agents 2_agents 1_agent node_tree_logo setup_plug start_sim plus_green minus_green minus_red debug stop_sim plus_yellow'.split(' ')
 icon_collection = {}
 
 def register_icons():
