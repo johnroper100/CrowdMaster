@@ -25,6 +25,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             if scene.positionType == "formation":
                 if scene.formationPositionType == "array":
                     generate_agents_array(vector)
+                    
+            if scene.add_to_agent_list == True:
+                bpy.ops.scene.cm_agents_populate()
 
         return {'FINISHED'}
 

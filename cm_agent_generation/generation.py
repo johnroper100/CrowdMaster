@@ -54,7 +54,6 @@ def generate_agents_random(locationVector):
                 scene.objects.link(o)
                 if scene.add_to_agent_list == True:
                     o.select = True
-                    bpy.ops.scene.cm_agents_populate()
 
     elapsed_time = time.time() - start_time
     print("Time taken: " + str(elapsed_time))
@@ -105,7 +104,6 @@ def generate_agents_array(locationVector):
                 scene.objects.link(o)
                 if scene.add_to_agent_list == True:
                     o.select = True
-                    bpy.ops.scene.cm_agents_populate()
 
     elapsed_time = time.time() - start_time
     print("Time taken: " + str(elapsed_time))
