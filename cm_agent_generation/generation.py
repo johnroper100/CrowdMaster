@@ -42,9 +42,11 @@ def generate_agents_random(locationVector):
                     eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
                     eul.rotate_axis('Z', math.radians(randRot))
 
-                    o.rotation_euler.rotate(eul)
+                    if scene.use_rand_rot == True:
+                        o.rotation_euler.rotate(eul)
 
-                    o.scale = (newScale, newScale, newScale)
+                    if scene.use_rand_scale == True:
+                        o.scale = (newScale, newScale, newScale)
 
                     o.location = newLoc
 
@@ -88,9 +90,11 @@ def generate_agents_array(locationVector):
                     eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
                     eul.rotate_axis('Z', math.radians(randRot))
 
-                    o.rotation_euler.rotate(eul)
+                    if scene.use_rand_rot == True:
+                        o.rotation_euler.rotate(eul)
 
-                    o.scale = (newScale, newScale, newScale)
+                    if scene.use_rand_scale == True:
+                        o.scale = (newScale, newScale, newScale)
 
                     o.location = newLoc
 

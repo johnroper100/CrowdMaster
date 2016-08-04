@@ -29,64 +29,77 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
     def invoke(self, context, event):
         wm = context.window_manager
         return wm.invoke_props_dialog(self, width=600)
+    
+    def check(self, context):
+        if self.use_rand_rot is True:
+            return True
+        if self.use_rand_scale is True:
+            return True
 
     def draw(self, context):
         layout = self.layout
         scene = context.scene
         
+        box = layout.box()
+        
         pcoll = icon_load.icon_collection["main"]
         def cicon(name):
             return pcoll[name].icon_id
 
-        row = layout.row()
+        row = box.row()
         row.prop(scene, "agentNumber")
+        
+        if scene.positionType == "formation":
+            if scene.formationPositionType == "array":
+                row = box.row()
+                row.prop(scene, "formationArrayRows")
 
         if scene.positionMode == "vector":
-            row = layout.row()
+            row = box.row()
             row.prop(scene, "positionVector")
 
         elif scene.positionMode == "object":
-            row = layout.row()
+            row = box.row()
             row.prop_search(scene, "positionObject", scene, "objects")
+        
+        box = layout.box()
 
-        row = layout.row()
-        row.separator()
+        row = box.row()
+        row.prop(scene, "use_rand_rot")
 
-        row = layout.row(align=True)
+        row = box.row(align=True)
         row.alignment = 'EXPAND'
+        if scene.use_rand_rot == False:
+            row.enabled = False
         row.prop(scene, "minRandRot")
         row.prop(scene, "maxRandRot")
+        
+        row = box.row()
+        row.prop(scene, "use_rand_scale")
 
-        row = layout.row(align=True)
+        row = box.row(align=True)
         row.alignment = 'EXPAND'
+        if scene.use_rand_scale == False:
+            row.enabled = False
         row.prop(scene, "minRandSz")
         row.prop(scene, "maxRandSz")
 
-        row = layout.row()
-        row.separator()
-
         if scene.positionType == "random":
+            box = layout.box()
+    
             if scene.positionMode == "scene":
-                row = layout.row(align=True)
+                row = box.row(align=True)
                 row.alignment = 'EXPAND'
                 row.prop(scene, "randomPositionMinX")
                 row.prop(scene, "randomPositionMaxX")
 
-                row = layout.row(align=True)
+                row = box.row(align=True)
                 row.alignment = 'EXPAND'
                 row.prop(scene, "randomPositionMinY")
                 row.prop(scene, "randomPositionMaxY")
             
             else:
-                row = layout.row(align=True)
+                row = box.row(align=True)
                 row.alignment = 'EXPAND'
                 row.prop(scene, "randomPositionMaxX")
                 row.prop(scene, "randomPositionMaxY")
-
-        if scene.positionType == "formation":
-            if scene.formationPositionType == "array":
-                row = layout.row()
-                row.prop(scene, "formationArrayX")
-
-                row = layout.row()
-                row.prop(scene, "formationArrayY")

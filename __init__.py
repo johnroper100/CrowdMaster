@@ -331,29 +331,30 @@ class SCENE_PT_CrowdMaster(Panel):
         row = layout.row()
         row.scale_y = 1.1
         row.prop(scene, 'use_agent_generation', icon='MOD_ARRAY')
-        
+
         if scene.use_agent_generation == True:
-            row = layout.row()
+            box = layout.box()
+            row = box.row()
             row.prop_search(scene, "agentGroup", bpy.data, "groups")
 
-            row = layout.row()
+            row = box.row()
             row.prop_search(scene, "groundObject", scene, "objects")
             
-            row = layout.row()
+            row = box.row()
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
             row.prop(scene, "positionMode")
             
-            row = layout.row()
+            row = box.row()
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
             row.prop(scene, "positionType")
             
             if scene.positionType == "formation":
-                row = layout.row()
+                row = box.row()
                 row.prop(scene, "formationPositionType")
             
-            row = layout.row()
+            row = box.row()
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
             row.scale_y = 1.15

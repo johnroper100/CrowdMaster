@@ -18,10 +18,20 @@ bpy.types.Scene.positionType = bpy.props.EnumProperty(
         description = "Which layout algorithim the simulator should use.",
         default = "random")
 
-bpy.types.Scene.maxRandRot = FloatProperty(name="Max Rand Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 0.0, max=360.0)
+bpy.types.Scene.use_rand_rot = BoolProperty(
+        name = "Use Random Rotation",
+        description = "Give each agent a random rotation.",
+        default = False,
+        )
+bpy.types.Scene.maxRandRot = FloatProperty(name="Max Rand Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0, max=360.0)
 bpy.types.Scene.minRandRot = FloatProperty(name="Min Rand Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0, min=-360.0)
 
-bpy.types.Scene.maxRandSz = FloatProperty(name="Max Rand Scale", description="The maximum random scale for each agent.", default = 1.0)
+bpy.types.Scene.use_rand_scale = BoolProperty(
+        name = "Use Random Scale",
+        description = "Give each agent a random scale.",
+        default = False,
+        )
+bpy.types.Scene.maxRandSz = FloatProperty(name="Max Rand Scale", description="The maximum random scale for each agent.", default = 5.0)
 bpy.types.Scene.minRandSz = FloatProperty(name="Min Rand Scale", description="The minimum random scale for each agent.", default = 1.0)
 
 bpy.types.Scene.positionMode = bpy.props.EnumProperty(
@@ -49,6 +59,4 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         description = "Where the spawn location is pulled from.",
         default = "array")
 
-bpy.types.Scene.formationArrayX = FloatProperty(name="Array X", description="The distance between each agent on the X axis.", default = 0)
-bpy.types.Scene.formationArrayY = FloatProperty(name="Array Y", description="The distance between each agent on the Y axis.", default = 0)
-bpy.types.Scene.arrayObjScale = FloatProperty(name="Array Item Size", description="The relative scale of the object.", default = 0)
+bpy.types.Scene.formationArrayRows = FloatProperty(name="Rows", description="The number of rows in the array.", default = 0)
