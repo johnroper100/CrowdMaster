@@ -325,12 +325,16 @@ class LogicOUTPUT(Neuron):
                     print("Val:", i.val)
                     Sm += i.val
                     SmSquared += i.val * abs(i.val)  # To retain sign
-            print(Sm, SmSquared)
+            # print(Sm, SmSquared)
             if Sm == 0:
                 out = 0
             else:
                 out = SmSquared / Sm
-            print("out", out)
+        elif settings["MultiInputType"] == "SUM":
+            out = 0
+            for into in inps:
+                for i in into:
+                    out += i.val
         self.brain.outvars[settings["Output"]] = out
         return out
 

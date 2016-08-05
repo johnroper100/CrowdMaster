@@ -317,7 +317,8 @@ class OutputNode(LogicNode):
                                  ])
     MultiInputType = EnumProperty(items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
-                                         ("SIZEAVERAGE", "Size Average", "", 3)
+                                         ("SIZEAVERAGE", "Size Average", "", 3),
+                                         ("SUM", "Sum", "", 4)
                                          ])
 
     def draw_buttons(self, context, layout):
