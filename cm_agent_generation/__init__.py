@@ -67,7 +67,10 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
 
         row = box.row()
         row.prop(scene, "agentNumber")
+        
+        row = box.row()
         row.prop(scene, "add_to_agent_list")
+        row.prop(scene, "group_all_agents")
 
         if scene.positionMode == "vector":
             row = box.row()
