@@ -490,7 +490,7 @@ class ActionState(StateNode):
 
 class NoteNode(Node):
     """For keeping the graph well organised"""
-    bl_label = 'Note Node'
+    bl_label = 'Note'
 
     noteText = StringProperty(default="Enter text here")
 
