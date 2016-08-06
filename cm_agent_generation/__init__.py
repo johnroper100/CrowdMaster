@@ -63,6 +63,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             return pcoll[name].icon_id
 
         row = box.row()
+        row.label("General:", icon='FILE_TICK')
+
+        row = box.row()
         row.prop(scene, "agentNumber")
         row.prop(scene, "add_to_agent_list")
 
@@ -77,6 +80,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         box = layout.box()
         
         row = box.row()
+        row.label("Positioning:", icon='MANIPUL')
+        
+        row = box.row()
         row.prop(scene, "positionMode")
 
         row = box.row()
@@ -87,6 +93,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             row.prop(scene, "formationPositionType")
         
         box = layout.box()
+        
+        row = box.row()
+        row.label("Randomization:", icon='FILE_REFRESH')
 
         row = box.row()
         row.prop(scene, "use_rand_rot")
@@ -110,6 +119,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
 
         if scene.positionType == "random":
             box = layout.box()
+            
+            row = box.row()
+            row.label("Random Positoning:", icon='FCURVE')
     
             if scene.positionMode == "scene":
                 row = box.row(align=True)
@@ -130,6 +142,10 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         
         if scene.positionType == "formation":
             box = layout.box()
+            
+            row = box.row()
+            row.label("Formation Positoning:", icon='FCURVE')
+
             if scene.formationPositionType == "array":
                 row = box.row()
                 row.prop(scene, "formationArrayRows")
