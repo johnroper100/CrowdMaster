@@ -91,9 +91,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         row = box.row()
         row.prop(scene, "positionType")
 
-        if scene.positionType == "formation":
-            row = box.row()
-            row.prop(scene, "formationPositionType")
+        #if scene.positionType == "formation":
+            #row = box.row()
+            #row.prop(scene, "formationPositionType")
         
         box = layout.box()
         
@@ -124,7 +124,7 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             box = layout.box()
             
             row = box.row()
-            row.label("Random Positoning:", icon='FCURVE')
+            row.label("Random Positioning:", icon='FCURVE')
     
             if scene.positionMode == "scene":
                 row = box.row(align=True)
@@ -147,8 +147,13 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             box = layout.box()
             
             row = box.row()
-            row.label("Formation Positoning:", icon='FCURVE')
+            row.label("Formation Positioning:", icon='FCURVE')
 
             if scene.formationPositionType == "array":
                 row = box.row()
                 row.prop(scene, "formationArrayRows")
+                
+                row = box.row(align=True)
+                row.alignment = 'EXPAND'
+                row.prop(scene, "formationArrayRowMargin")
+                row.prop(scene, "formationArrayColumnMargin")

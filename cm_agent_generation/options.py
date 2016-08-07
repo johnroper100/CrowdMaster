@@ -60,6 +60,8 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         default = "array")
 
 bpy.types.Scene.formationArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default = 0)
+bpy.types.Scene.formationArrayRowMargin = FloatProperty(name="Row Margin", description="The margin between each row.")
+bpy.types.Scene.formationArrayColumnMargin = FloatProperty(name="Column Margin", description="The margin between each column.")
 
 bpy.types.Scene.add_to_agent_list = BoolProperty(
         name = "Add to Agent List",
