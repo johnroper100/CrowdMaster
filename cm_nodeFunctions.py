@@ -138,7 +138,7 @@ class LogicOR(Neuron):
             return results
 
 
-class LogicStrong(Neuron):
+class LogicSTRONG(Neuron):
     """Make 1's and 0's stronger"""
     # https://www.desmos.com/calculator/izfhogpchr
 
@@ -150,7 +150,7 @@ class LogicStrong(Neuron):
         return results
 
 
-class LogicWeak(Neuron):
+class LogicWEAK(Neuron):
     """Make 1's and 0's stronger"""
     # https://www.desmos.com/calculator/izfhogpchr
 
@@ -449,8 +449,8 @@ logictypes = OrderedDict([
     ("GraphNode", LogicGRAPH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
-    ("StrongNode", LogicStrong),
-    ("WeakNode", LogicWeak),
+    ("StrongNode", LogicSTRONG),
+    ("WeakNode", LogicWEAK),
     ("QueryTagNode", LogicQUERYTAG),
     ("SetTagNode", LogicSETTAG),
     ("VariableNode", LogicVARIABLE),
