@@ -3,7 +3,7 @@ from .addon_updater import Updater as updater
 from bpy.app.handlers import persistent
 import os
 
-addonname = updater.addon.lower()
+addonname = "crowdmaster"  # more consistent than using updater.addon.lower()
 
 # -----------------------------------------------------------------------------
 # Example operators utilizing Updater
