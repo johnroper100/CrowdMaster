@@ -79,6 +79,8 @@ def generate_agents_array(locationVector):
             self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
 
     if group is not None:
+        x = 0
+        y = 0
         for row in range(rows):
             for ag in range(agentsPerRow):
                 group_objects = [o.copy() for o in obs]
