@@ -53,7 +53,10 @@ def generate_agents_random(locationVector):
                 new_group.objects.link(o)
                 scene.objects.link(o)
                 if scene.add_to_agent_list == True:
-                    o.select = True
+                    if o.type == 'ARMATURE':
+                        o.select = True
+                    else:
+                        o.select = False
 
     elapsed_time = time.time() - start_time
     print("Time taken: " + str(elapsed_time))
