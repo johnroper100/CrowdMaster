@@ -83,8 +83,8 @@ def generate_agents_array(locationVector):
         y = 0
         for row in range(rows):
             x = x + scene.formationArrayColumnMargin
+            y = 0
             for ag in range(int(agentsPerRow)):
-                y = 0
                 y = y + scene.formationArrayRowMargin
                 group_objects = [o.copy() for o in obs]
                 new_group = bpy.data.groups.new(scene.agentGroup)
