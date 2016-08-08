@@ -82,12 +82,14 @@ def generate_agents_array(locationVector):
         x = 0
         y = 0
         for row in range(rows):
-            for ag in range(agentsPerRow):
+            x = x + scene.formationArrayColumnMargin
+            for ag in range(int(agentsPerRow)):
+                y = y + scene.formationArrayRowMargin
                 group_objects = [o.copy() for o in obs]
                 new_group = bpy.data.groups.new(scene.agentGroup)
                 # Numbers will be appended automatically to the name
 
-                newLoc = (12, 14, ground.location.z)
+                newLoc = (x, y, ground.location.z)
                 newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
                 for o in group_objects:

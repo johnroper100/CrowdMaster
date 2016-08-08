@@ -59,7 +59,7 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         description = "Where the spawn location is pulled from.",
         default = "array")
 
-bpy.types.Scene.formationArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default = 0)
+bpy.types.Scene.formationArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default=1, min=1)
 bpy.types.Scene.formationArrayRowMargin = FloatProperty(name="Row Margin", description="The margin between each row.")
 bpy.types.Scene.formationArrayColumnMargin = FloatProperty(name="Column Margin", description="The margin between each column.")
 
