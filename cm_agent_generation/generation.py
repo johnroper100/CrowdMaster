@@ -56,7 +56,7 @@ def generate_agents_random(locationVector):
                 if o.type == 'ARMATURE':
                     aName = o.name
                 if o.type == 'MESH':
-                    for mod in bo.modifiers:
+                    for mod in o.modifiers:
                         if mod.type == "ARMATURE":
                             modName = mod.name
                     o.modifiers[modName].object = bpy.data.objects[aName]
@@ -93,6 +93,8 @@ def generate_agents_array(locationVector):
         for row in range(rows):
             x = x + scene.formationArrayColumnMargin
             y = 0
+            aName = "Armature"
+            mName = "Mesh"
             for ag in range(int(agentsPerRow)):
                 y = y + scene.formationArrayRowMargin
                 group_objects = [o.copy() for o in obs]
@@ -121,6 +123,13 @@ def generate_agents_array(locationVector):
 
                     new_group.objects.link(o)
                     scene.objects.link(o)
+                    if o.type == 'ARMATURE':
+                        aName = o.name
+                    if o.type == 'MESH':
+                        for mod in o.modifiers:
+                            if mod.type == "ARMATURE":
+                                modName = mod.name
+                        o.modifiers[modName].object = bpy.data.objects[aName]
                     if scene.add_to_agent_list == True:
                         o.select = True
 
