@@ -23,3 +23,14 @@ class Noise(Mc):
         result = random.random()
         random.setstate(state)
         return result
+
+    def agentMultiRandom(self, offset):
+        """Return a random number that is consistent between frame but can
+        be offset by an integer"""
+        state = random.getstate()
+        random.seed(hash(self.userid) - 1 + offset)
+        # -1 so that this number is different to the first random number
+        # generated on frame 0 (if used) of the simulation
+        result = random.random()
+        random.setstate(state)
+        return result
