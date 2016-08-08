@@ -32,6 +32,8 @@ def generate_agents_random(locationVector):
 
             newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
+            aName = "Armature"
+            mName = "Mesh"
             for o in group_objects:
                 # Reparent to new copies
                 if o.parent in obs:
@@ -51,6 +53,10 @@ def generate_agents_random(locationVector):
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
+                if o.type == 'ARMATURE':
+                    aName = o.name
+                if o.type == 'MESH':
+                    o.modifiers["Armature"].object = bpy.data.objects[aName]
                 if scene.add_to_agent_list == True:
                     if o.type == 'ARMATURE':
                         o.select = True
