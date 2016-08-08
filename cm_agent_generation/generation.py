@@ -56,7 +56,10 @@ def generate_agents_random(locationVector):
                 if o.type == 'ARMATURE':
                     aName = o.name
                 if o.type == 'MESH':
-                    o.modifiers["Armature"].object = bpy.data.objects[aName]
+                    for mod in bo.modifiers:
+                        if mod.type == "ARMATURE":
+                            modName = mod.name
+                    o.modifiers[modName].object = bpy.data.objects[aName]
                 if scene.add_to_agent_list == True:
                     if o.type == 'ARMATURE':
                         o.select = True
