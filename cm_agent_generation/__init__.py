@@ -28,6 +28,10 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
                     
             if scene.add_to_agent_list == True:
                 bpy.ops.scene.cm_agents_populate()
+            
+            if scene.group_all_agents == True:
+                bpy.ops.group.create(name="CrowdMaster Agents")
+                bpy.ops.object.group_link(group="CrowdMaster Agents") 
 
         return {'FINISHED'}
 
