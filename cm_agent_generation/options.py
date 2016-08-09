@@ -74,3 +74,13 @@ bpy.types.Scene.group_all_agents = BoolProperty(
         description = "Add the generated agents to one large group.",
         default = True,
         )
+
+bpy.types.Scene.use_rand_animation = BoolProperty(
+        name = "Use Random Animation",
+        description = "Use this if you do not want to use the node-based simulator for animation.",
+        default = False,
+        )
+
+bpy.types.Scene.agentAction1 = StringProperty(name="Action 1", description="The first action.")
+bpy.types.Scene.agentAction2 = StringProperty(name="Action 2", description="The second action.")
+bpy.types.Scene.agentAction3 = StringProperty(name="Action 3", description="The thrid action.")

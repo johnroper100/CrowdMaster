@@ -497,7 +497,7 @@ def unregister():
     unregisterAllTypes()
 
     addon_updater_ops.unregister()
-    # cm_bpyNodes.unregister()
+    #cm_bpyNodes.unregister()
 
 if __name__ == "__main__":
     register()
