@@ -144,6 +144,7 @@ def generate_agents_array(locationVector):
                         else:
                             for mod in o.modifiers:
                                 if mod.type == "ARMATURE":
+                                    modName = mod.name
                                     o.modifiers[modName].object = bpy.data.objects[aName]
                     if scene.add_to_agent_list == True:
                         o.select = True
