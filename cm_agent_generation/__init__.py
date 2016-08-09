@@ -130,21 +130,30 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         
         row = box.row()
         row.prop(scene, "use_rand_animation")
+
+        row = box.row()
         if scene.use_rand_animation == False:
             row.enabled = False
-        row = box.row()
         row.prop_search(scene, "agentAction1", bpy.data, "actions")
 
         row = box.row()
+        if scene.use_rand_animation == False:
+            row.enabled = False
         row.prop_search(scene, "agentAction2", bpy.data, "actions")
 
         row = box.row()
+        if scene.use_rand_animation == False:
+            row.enabled = False
         row.prop_search(scene, "agentAction3", bpy.data, "actions")
         
         row = box.row()
+        if scene.use_rand_animation == False:
+            row.enabled = False
         row.prop_search(scene, "agentAction4", bpy.data, "actions")
         
         row = box.row()
+        if scene.use_rand_animation == False:
+            row.enabled = False
         row.prop_search(scene, "agentAction5", bpy.data, "actions")
 
         if scene.positionType == "random":
