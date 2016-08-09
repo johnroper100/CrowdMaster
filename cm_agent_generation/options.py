@@ -84,3 +84,5 @@ bpy.types.Scene.use_rand_animation = BoolProperty(
 bpy.types.Scene.agentAction1 = StringProperty(name="Action 1", description="The first action.")
 bpy.types.Scene.agentAction2 = StringProperty(name="Action 2", description="The second action.")
 bpy.types.Scene.agentAction3 = StringProperty(name="Action 3", description="The thrid action.")
+bpy.types.Scene.agentAction4 = StringProperty(name="Action 4", description="The forth action.")
+bpy.types.Scene.agentAction5 = StringProperty(name="Action 5", description="The fifth action.")

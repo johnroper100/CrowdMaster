@@ -103,18 +103,6 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             #row = box.row()
             #row.prop(scene, "formationPositionType")
         
-        if scene.use_rand_animation == True:
-            box = layout.box()
-
-            row = box.row()
-            row.prop(scene, "agentAction1")
-
-            row = box.row()
-            row.prop(scene, "agentAction2")
-
-            row = box.row()
-            row.prop(scene, "agentAction3")
-        
         box = layout.box()
         
         row = box.row()
@@ -142,15 +130,22 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         
         row = box.row()
         row.prop(scene, "use_rand_animation")
-        if scene.use_rand_animation:
-            row = box.row()
-            row.prop_search(scene, "agentAction1", bpy.data, "actions")
+        if scene.use_rand_animation == False:
+            row.enabled = False
+        row = box.row()
+        row.prop_search(scene, "agentAction1", bpy.data, "actions")
 
-            row = box.row()
-            row.prop_search(scene, "agentAction2", bpy.data, "actions")
+        row = box.row()
+        row.prop_search(scene, "agentAction2", bpy.data, "actions")
 
-            row = box.row()
-            row.prop_search(scene, "agentAction3", bpy.data, "actions")
+        row = box.row()
+        row.prop_search(scene, "agentAction3", bpy.data, "actions")
+        
+        row = box.row()
+        row.prop_search(scene, "agentAction4", bpy.data, "actions")
+        
+        row = box.row()
+        row.prop_search(scene, "agentAction5", bpy.data, "actions")
 
         if scene.positionType == "random":
             box = layout.box()
