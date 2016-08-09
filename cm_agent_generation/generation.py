@@ -68,6 +68,7 @@ def generate_agents_random(locationVector):
                             if mod.type == "ARMATURE":
                                 modName = mod.name
                                 o.modifiers[modName].object = bpy.data.objects[aName]
+
                 if scene.add_to_agent_list == True:
                     if o.type == 'ARMATURE':
                         o.select = True
@@ -146,8 +147,12 @@ def generate_agents_array(locationVector):
                                 if mod.type == "ARMATURE":
                                     modName = mod.name
                                     o.modifiers[modName].object = bpy.data.objects[aName]
+
                     if scene.add_to_agent_list == True:
-                        o.select = True
+                        if o.type == 'ARMATURE':
+                            o.select = True
+                        else:
+                            o.select = False
 
     elapsed_time = time.time() - start_time
     print("Time taken: " + str(elapsed_time))
