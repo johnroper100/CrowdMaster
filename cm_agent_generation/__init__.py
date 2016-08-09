@@ -49,6 +49,10 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             return True
         if scene.use_rand_scale is False:
             return True
+        if scene.use_rand_animation is True:
+            return True
+        if scene.use_rand_animation is False:
+            return True
         if scene.positionMode != scene.positionMode:
             return True
         if scene.positionType != scene.positionType:
@@ -138,7 +142,7 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         
         row = box.row()
         row.prop(scene, "use_rand_animation")
-        if scene.use_rand_animation == True:
+        if scene.use_rand_animation:
             row = box.row()
             row.prop_search(scene, "agentAction1", bpy.data, "actions")
 

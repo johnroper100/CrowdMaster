@@ -50,6 +50,11 @@ def generate_agents_random(locationVector):
                         o.scale = (newScale, newScale, newScale)
 
                     o.location = newLoc
+                    
+                    if o.type == 'ARMATURE':
+                        if scene.use_rand_animation:
+                            actions = [scene.agentAction1, scene.agentAction2, scene.agentAction3]
+                            o.animation_data.action = bpy.data.actions[random.choice(actions)]
 
                 new_group.objects.link(o)
                 scene.objects.link(o)
@@ -123,6 +128,11 @@ def generate_agents_array(locationVector):
                             o.scale = (newScale, newScale, newScale)
 
                         o.location = newLoc
+                        
+                        if o.type == 'ARMATURE':
+                            if scene.use_rand_animation:
+                                actions = [scene.agentAction1, scene.agentAction2, scene.agentAction3]
+                                o.animation_data.action = bpy.data.actions[random.choice(actions)]
 
                     new_group.objects.link(o)
                     scene.objects.link(o)
