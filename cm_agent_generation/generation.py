@@ -56,7 +56,7 @@ def generate_agents_random(locationVector):
                 if o.type == 'ARMATURE':
                     aName = o.name
                 if o.type == 'MESH':
-                    if len(ob.modifiers) == 0:
+                    if len(o.modifiers) == 0:
                         print("No modifiers!")
                     else:
                         for mod in o.modifiers:
@@ -129,7 +129,7 @@ def generate_agents_array(locationVector):
                     if o.type == 'ARMATURE':
                         aName = o.name
                     if o.type == 'MESH':
-                        if len(ob.modifiers) == 0:
+                        if len(o.modifiers) == 0:
                             print("No modifiers!")
                         else:
                             for mod in o.modifiers:
