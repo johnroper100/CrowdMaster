@@ -91,6 +91,14 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         box = layout.box()
         
         row = box.row()
+        row.label("Obstacles:", icon='MESH_ICOSPHERE')
+        
+        row = box.row()
+        row.prop(scene, "obstacleGroup")
+        
+        box = layout.box()
+        
+        row = box.row()
         row.label("Positioning:", icon='MANIPUL')
         
         row = box.row()

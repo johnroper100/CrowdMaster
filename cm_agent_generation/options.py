@@ -86,3 +86,10 @@ bpy.types.Scene.agentAction2 = StringProperty(name="Action 2", description="The 
 bpy.types.Scene.agentAction3 = StringProperty(name="Action 3", description="The thrid action.")
 bpy.types.Scene.agentAction4 = StringProperty(name="Action 4", description="The forth action.")
 bpy.types.Scene.agentAction5 = StringProperty(name="Action 5", description="The fifth action.")
+
+bpy.types.Scene.use_obstacles = BoolProperty(
+        name = "Use Obstacles",
+        description = "Use this if you want to use obstacles for positioning.",
+        default = False,
+        )
+bpy.types.Scene.obstacleGroup = StringProperty(name="Obstacles", description="The group that holds the obstale objects.")
