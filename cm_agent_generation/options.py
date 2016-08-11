@@ -93,3 +93,4 @@ bpy.types.Scene.use_obstacles = BoolProperty(
         default = False,
         )
 bpy.types.Scene.obstacleGroup = StringProperty(name="Obstacles", description="The group that holds the obstale objects.")
+bpy.types.Scene.obstacleMargin = FloatProperty(name="Margin", description="The margin around each obstacle object.", default = 1.0)
