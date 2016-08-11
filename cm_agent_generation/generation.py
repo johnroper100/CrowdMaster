@@ -14,16 +14,33 @@ def generate_agents_random(locationVector):
     groupObjs = group.objects
     obs = [o for o in group.objects]
     ground =  bpy.data.objects[scene.groundObject]
+    obstacles = bpy.data.groups.get(scene.obstacleGroup)
+    obstacleGroupObjs = obstacles.objects
+    obstacleObs = [o for o in obstacles.objects]
+    
+    boundCoords = []
 
     for obj in groupObjs:
         if scene.groundObject == obj.name:
             self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
 
     if group is not None:
+        if scene.use_obstacles == True:
+            if scene.positionMode == "scene":
+                if obstacles is not None:
+                    for obj in obstacleGroupObjs:
+                        boundCoords.append((obj.bound_box[0][0], obj.bound_box[0][1]))
+                        boundCoords.append((obj.bound_box[3][0], obj.bound_box[3][1]))
+                        boundCoords.append((obj.bound_box[4][0], obj.bound_box[4][1]))
+                        boundCoords.append((obj.bound_box[7][0], obj.bound_box[7][1]))
+                        print(boundCoords)
+                
         for g in range(number):
             group_objects = [o.copy() for o in obs]
             new_group = bpy.data.groups.new(scene.agentGroup)
-            # Numbers will be appended automatically to the name
+            
+            startLocX = random.uniform(scene.randomPositionMinX, scene.randomPositionMaxX)
+            startLocY = random.uniform(scene.randomPositionMinY, scene.randomPositionMaxY)
 
             if scene.positionMode == "scene":
                 newLoc = (random.uniform(scene.randomPositionMinX, scene.randomPositionMaxX), random.uniform(scene.randomPositionMinY, scene.randomPositionMaxY), ground.location.z)
@@ -61,9 +78,7 @@ def generate_agents_random(locationVector):
                 if o.type == 'ARMATURE':
                     aName = o.name
                 if o.type == 'MESH':
-                    if len(o.modifiers) == 0:
-                        print("No modifiers!")
-                    else:
+                    if len(o.modifiers) > 0:
                         for mod in o.modifiers:
                             if mod.type == "ARMATURE":
                                 modName = mod.name
@@ -140,9 +155,7 @@ def generate_agents_array(locationVector):
                     if o.type == 'ARMATURE':
                         aName = o.name
                     if o.type == 'MESH':
-                        if len(o.modifiers) == 0:
-                            print("No modifiers!")
-                        else:
+                        if len(o.modifiers) > 0:
                             for mod in o.modifiers:
                                 if mod.type == "ARMATURE":
                                     modName = mod.name
