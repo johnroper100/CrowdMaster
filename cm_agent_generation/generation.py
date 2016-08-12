@@ -14,11 +14,6 @@ def generate_agents_random(locationVector):
     groupObjs = group.objects
     obs = [o for o in group.objects]
     ground =  bpy.data.objects[scene.groundObject]
-    obstacles = bpy.data.groups.get(scene.obstacleGroup)
-    obstacleGroupObjs = obstacles.objects
-    obstacleObs = [o for o in obstacles.objects]
-    
-    boundCoords = []
 
     for obj in groupObjs:
         if scene.groundObject == obj.name:
@@ -28,6 +23,10 @@ def generate_agents_random(locationVector):
         if scene.use_obstacles == True:
             if scene.positionMode == "scene":
                 if obstacles is not None:
+                    obstacles = bpy.data.groups.get(scene.obstacleGroup)
+                    obstacleGroupObjs = obstacles.objects
+                    obstacleObs = [o for o in obstacles.objects]
+                    boundCoords = []
                     for obj in obstacleGroupObjs:
                         boundCoords.append((obj.bound_box[0][0], obj.bound_box[0][1]))
                         boundCoords.append((obj.bound_box[3][0], obj.bound_box[3][1]))
