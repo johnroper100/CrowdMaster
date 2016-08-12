@@ -107,23 +107,23 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             #row = box.row()
             #row.prop(scene, "formationPositionType")
         
-        if scene.positionType == "random":
-            if scene.positionMode == "scene":
-                box = layout.box()
+        #if scene.positionType == "random":
+            #if scene.positionMode == "scene":
+                #box = layout.box()
 
-                row = box.row()
-                row.label("Obstacles:", icon='MESH_ICOSPHERE')
+                #row = box.row()
+                #row.label("Obstacles:", icon='MESH_ICOSPHERE')
 
-                row = box.row()
-                row.prop(scene, "use_obstacles")
+                #row = box.row()
+                #row.prop(scene, "use_obstacles")
 
-                row = box.row(align=True)
-                row.alignment = 'EXPAND'
-                if scene.use_obstacles == False:
-                    row.enabled = False
-                row.prop_search(scene, "obstacleGroup", bpy.data, "groups")
-                row.prop(scene, "obstacleMargin")
-        
+                #row = box.row(align=True)
+                #row.alignment = 'EXPAND'
+                #if scene.use_obstacles == False:
+                    #row.enabled = False
+                #row.prop_search(scene, "obstacleGroup", bpy.data, "groups")
+                #row.prop(scene, "obstacleMargin")
+
         box = layout.box()
         
         row = box.row()
