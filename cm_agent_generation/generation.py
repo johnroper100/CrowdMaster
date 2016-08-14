@@ -176,6 +176,8 @@ def generate_agents_target():
     group = bpy.data.groups.get(scene.agentGroup)
     groupObjs = group.objects
     obs = [o for o in group.objects]
+    
+    targets = scene.targetGroup
 
     for obj in groupObjs:
         if scene.groundObject == obj.name:
