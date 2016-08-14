@@ -84,6 +84,17 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         row.prop(scene, "add_to_agent_list")
         row.prop(scene, "group_all_agents")
 
+        box = layout.box()
+        
+        row = box.row()
+        row.label("Positioning:", icon='MANIPUL')   
+
+        row = box.row()
+        row.prop(scene, "positionType")
+        
+        row = box.row()
+        row.prop(scene, "positionMode")
+        
         if scene.positionMode == "vector":
             row = box.row()
             row.prop(scene, "positionVector")
@@ -91,17 +102,6 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         elif scene.positionMode == "object":
             row = box.row()
             row.prop_search(scene, "positionObject", scene, "objects")
-        
-        box = layout.box()
-        
-        row = box.row()
-        row.label("Positioning:", icon='MANIPUL')
-        
-        row = box.row()
-        row.prop(scene, "positionMode")
-
-        row = box.row()
-        row.prop(scene, "positionType")
 
         #if scene.positionType == "formation":
             #row = box.row()

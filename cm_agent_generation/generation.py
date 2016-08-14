@@ -21,7 +21,6 @@ def generate_agents_random(locationVector):
 
     if group is not None:
         if scene.use_obstacles == True:
-            if scene.positionMode == "scene":
                 if obstacles is not None:
                     obstacles = bpy.data.groups.get(scene.obstacleGroup)
                     obstacleGroupObjs = obstacles.objects
