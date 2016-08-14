@@ -11,6 +11,10 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         if scene.use_agent_generation == True:
+            if scene.use_rand_animation == True:
+                if (scene.agentAction1 == "") or (scene.agentAction2 == "") or (scene.agentAction3 == "") or (scene.agentAction4 == "") or (scene.agentAction5 == ""):
+                    print("All actions need to be filled!")
+
             if scene.positionMode == "vector":
                 vector = [scene.positionVector[0], scene.positionVector[1]]
             elif scene.positionMode == "object":
