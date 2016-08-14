@@ -13,7 +13,8 @@ bpy.types.Scene.groundObject = StringProperty(name="Ground Object", description=
 
 bpy.types.Scene.positionType = bpy.props.EnumProperty(
         items = [('random', 'Random', 'Agents are aligned randomly around a center point.'),
-                 ('formation', 'Formation', 'Agents are aligned within a specified shape.')],
+                 ('formation', 'Formation', 'Agents are aligned within a specified shape.'),
+                 ('target', 'Target', 'Agents are aligned at the location of each object in the target group.')],
         name = "Position Type",
         description = "Which layout algorithim the simulator should use.",
         default = "random")
@@ -58,6 +59,9 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
         name = "Formation Type",
         description = "Where the spawn location is pulled from.",
         default = "array")
+
+# Target Positioning
+bpy.types.Scene.targetGroup = StringProperty(name="Target Objects", description="The group that holds the target objects.")
 
 bpy.types.Scene.formationArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default=1, min=1)
 bpy.types.Scene.formationArrayRowMargin = FloatProperty(name="Row Margin", description="The margin between each row.")

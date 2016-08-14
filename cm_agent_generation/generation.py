@@ -167,3 +167,68 @@ def generate_agents_array(locationVector):
 
     elapsed_time = time.time() - start_time
     print("Time taken: " + str(elapsed_time))
+
+def generate_agents_target():
+    start_time = time.time()
+    scene = bpy.context.scene
+    wm = bpy.context.window_manager
+
+    group = bpy.data.groups.get(scene.agentGroup)
+    groupObjs = group.objects
+    obs = [o for o in group.objects]
+
+    for obj in groupObjs:
+        if scene.groundObject == obj.name:
+            self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
+
+    if group is not None:     
+        for g in range(number):
+            group_objects = [o.copy() for o in obs]
+            new_group = bpy.data.groups.new(scene.agentGroup)
+
+            newLoc = (0, 0, 0)
+            newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
+
+            aName = "Armature"
+            mName = "Mesh"
+            for o in group_objects:
+                # Reparent to new copies
+                if o.parent in obs:
+                    o.parent = group_objects[obs.index(o.parent)]
+                else:
+                    randRot = random.uniform(scene.minRandRot, scene.maxRandRot)
+                    eul = mathutils.Euler((0.0, 0.0, 0.0), 'XYZ')
+                    eul.rotate_axis('Z', math.radians(randRot))
+
+                    if scene.use_rand_rot == True:
+                        o.rotation_euler.rotate(eul)
+
+                    if scene.use_rand_scale == True:
+                        o.scale = (newScale, newScale, newScale)
+
+                    o.location = newLoc
+                    
+                    if o.type == 'ARMATURE':
+                        if scene.use_rand_animation:
+                            actions = [scene.agentAction1, scene.agentAction2, scene.agentAction3]
+                            o.animation_data.action = bpy.data.actions[random.choice(actions)]
+
+                new_group.objects.link(o)
+                scene.objects.link(o)
+                if o.type == 'ARMATURE':
+                    aName = o.name
+                if o.type == 'MESH':
+                    if len(o.modifiers) > 0:
+                        for mod in o.modifiers:
+                            if mod.type == "ARMATURE":
+                                modName = mod.name
+                                o.modifiers[modName].object = bpy.data.objects[aName]
+
+                if scene.add_to_agent_list == True:
+                    if o.type == 'ARMATURE':
+                        o.select = True
+                    else:
+                        o.select = False
+
+    elapsed_time = time.time() - start_time
+    print("Time taken: " + str(elapsed_time))

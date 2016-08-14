@@ -2,7 +2,7 @@ import bpy
 import sys
 from .. import icon_load
 from . import options
-from .generation import generate_agents_random, generate_agents_array
+from .generation import generate_agents_random, generate_agents_array, generate_agents_target
 
 class CrowdMaster_generate_agents(bpy.types.Operator):
     bl_idname = "scene.cm_gen_agents"
@@ -82,8 +82,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         row = box.row()
         row.label("General:", icon='FILE_TICK')
 
-        row = box.row()
-        row.prop(scene, "agentNumber")
+        if scene.positionType != "target":
+            row = box.row()
+            row.prop(scene, "agentNumber")
         
         row = box.row()
         row.prop(scene, "add_to_agent_list")
@@ -97,16 +98,21 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         row = box.row()
         row.prop(scene, "positionType")
         
-        row = box.row()
-        row.prop(scene, "positionMode")
-        
-        if scene.positionMode == "vector":
+        if scene.positionType != "target":
             row = box.row()
-            row.prop(scene, "positionVector")
+            row.prop(scene, "positionMode")
 
-        elif scene.positionMode == "object":
+            if scene.positionMode == "vector":
+                row = box.row()
+                row.prop(scene, "positionVector")
+
+            elif scene.positionMode == "object":
+                row = box.row()
+                row.prop_search(scene, "positionObject", scene, "objects")
+
+        else:
             row = box.row()
-            row.prop_search(scene, "positionObject", scene, "objects")
+            row.prop_search(scene, "targetGroup", bpy.data, "groups")
 
         #if scene.positionType == "formation":
             #row = box.row()
