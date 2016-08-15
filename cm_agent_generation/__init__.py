@@ -27,9 +27,12 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
             if scene.positionType == "random":
                 generate_agents_random(vector)
 
-            if scene.positionType == "formation":
+            elif scene.positionType == "formation":
                 if scene.formationPositionType == "array":
                     generate_agents_array(vector)
+            
+            elif scene.positionType == "target":
+                generate_agents_target()
                     
             if scene.add_to_agent_list == True:
                 bpy.ops.scene.cm_agents_populate()

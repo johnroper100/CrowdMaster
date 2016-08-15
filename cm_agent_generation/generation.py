@@ -177,18 +177,19 @@ def generate_agents_target():
     groupObjs = group.objects
     obs = [o for o in group.objects]
     
-    targets = scene.targetGroup
-
-    for obj in groupObjs:
-        if scene.groundObject == obj.name:
-            self.report({'ERROR'}, "The ground object must not be in the same group as the agent!")
+    targets = bpy.data.groups.get(scene.targetGroup)
+    number = len(targets.objects)
+    targetLocs = []
+    for t in targets.objects:
+        targetLocs.append((t.location.x, t.location.y, t.location.z))
+    print(targetLocs)
 
     if group is not None:     
         for g in range(number):
             group_objects = [o.copy() for o in obs]
             new_group = bpy.data.groups.new(scene.agentGroup)
 
-            newLoc = (0, 0, 0)
+            newLoc = (targetLocs[g][0], targetLocs[g][1], targetLocs[g][2])
             newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
             aName = "Armature"
