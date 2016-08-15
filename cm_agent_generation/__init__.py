@@ -116,6 +116,9 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         else:
             row = box.row()
             row.prop_search(scene, "targetGroup", bpy.data, "groups")
+            
+            row = box.row()
+            row.prop(scene, "targetOffset")
 
         #if scene.positionType == "formation":
             #row = box.row()

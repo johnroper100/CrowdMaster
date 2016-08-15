@@ -62,6 +62,7 @@ bpy.types.Scene.formationPositionType = bpy.props.EnumProperty(
 
 # Target Positioning
 bpy.types.Scene.targetGroup = StringProperty(name="Target Objects", description="The group that holds the target objects.")
+bpy.types.Scene.targetOffset = FloatVectorProperty(name="Offset", description="Tweak the location of the generated agents.", default = [0, 0, 0], subtype = "XYZ")
 
 bpy.types.Scene.formationArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default=1, min=1)
 bpy.types.Scene.formationArrayRowMargin = FloatProperty(name="Row Margin", description="The margin between each row.")

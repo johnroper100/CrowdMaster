@@ -189,7 +189,7 @@ def generate_agents_target():
             group_objects = [o.copy() for o in obs]
             new_group = bpy.data.groups.new(scene.agentGroup)
 
-            newLoc = (targetLocs[g][0], targetLocs[g][1], targetLocs[g][2])
+            newLoc = (targetLocs[g][0] + scene.targetOffset[0], targetLocs[g][1] + scene.targetOffset[1], targetLocs[g][2] + scene.targetOffset[2])
             newScale = random.uniform(scene.minRandSz, scene.maxRandSz)
 
             aName = "Armature"
