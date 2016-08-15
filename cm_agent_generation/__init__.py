@@ -90,9 +90,10 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
         row = box.row()
         row.label("General:", icon='FILE_TICK')
 
-        if scene.positionType != "target":
-            row = box.row()
-            row.prop(scene, "agentNumber")
+        row = box.row()
+        if scene.positionType == "target":
+            row.enabled = False
+        row.prop(scene, "agentNumber")
         
         row = box.row()
         row.prop(scene, "add_to_agent_list")
