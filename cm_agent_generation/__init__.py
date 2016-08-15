@@ -11,6 +11,11 @@ class CrowdMaster_generate_agents(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         if scene.use_agent_generation == True:
+            if scene.positionType == "target":
+                if scene.targetGroup == "":
+                    self.report({'ERROR'}, "The target objects group must be inputted!")
+                    return {'CANCELLED'}
+
             if scene.use_rand_animation == True:
                 if (scene.agentAction1 == "") or (scene.agentAction2 == "") or (scene.agentAction3 == "") or (scene.agentAction4 == "") or (scene.agentAction5 == ""):
                     self.report({'ERROR'}, "All actions for random animation need to be filled!")
