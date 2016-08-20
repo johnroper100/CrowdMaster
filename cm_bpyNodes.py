@@ -8,7 +8,7 @@ class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes"""
     bl_idname = 'CrowdMasterTreeType'
     bl_label = 'CrowdMaster Simulation'
-    bl_icon = 'MOD_REMESH'
+    bl_icon = 'OUTLINER_OB_ARMATURE'
 
 class CrowdMasterGenTree(NodeTree):
     """The node tree that contains the CrowdMaster agent gen nodes"""
