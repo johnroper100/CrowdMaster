@@ -116,30 +116,6 @@ class InputNode(LogicNode):
     def getSettings(self, node):
         node.settings["Input"] = self.Input
 
-class GroupInputNode(LogicNode):
-    """CrowdMaster group input node"""
-    bl_label = "Group"
-
-    Group = StringProperty(default="")
-
-    def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Group", bpy.data, "groups")
-
-    def getSettings(self, node):
-        node.settings["Group"] = self.Group
-
-class ObjectInputNode(LogicNode):
-    """CrowdMaster object input node"""
-    bl_label = "Object"
-
-    Object = StringProperty(default="")
-
-    def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Object", context.scene, "objects")
-
-    def getSettings(self, node):
-        node.settings["Object"] = self.Object
-
 def update_properties(self, context):
     """Keeps the values in the graph node in the correct order"""
     if self.UpperZero < self.UpperOne:
@@ -548,8 +524,6 @@ node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("InputNode"),
         NodeItem("PythonNode"),
-        #NodeItem("GroupInputNode"),
-        #NodeItem("ObjectInputNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
@@ -593,12 +567,9 @@ def register():
     bpy.utils.register_class(StateSocket)
     bpy.utils.register_class(DependanceSocket)
     bpy.utils.register_class(LogicNode)
-    bpy.utils.register_class(InfoNode)
     bpy.utils.register_class(StateNode)
 
     bpy.utils.register_class(InputNode)
-    bpy.utils.register_class(GroupInputNode)
-    bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GraphNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
@@ -631,12 +602,9 @@ def unregister():
     bpy.utils.unregister_class(StateSocket)
     bpy.utils.unregister_class(DependanceSocket)
     bpy.utils.unregister_class(LogicNode)
-    bpy.utils.unregister_class(InfoNode)
     bpy.utils.unregister_class(StateNode)
 
     bpy.utils.unregister_class(InputNode)
-    bpy.utils.unregister_class(GroupInputNode)
-    bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GraphNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
