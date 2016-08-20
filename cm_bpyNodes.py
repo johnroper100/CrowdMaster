@@ -126,7 +126,7 @@ class InputNode(LogicNode):
     def getSettings(self, node):
         node.settings["Input"] = self.Input
 
-class GroupInputNode(InfoNode):
+class GroupInputNode(LogicNode):
     """CrowdMaster group input node"""
     bl_label = "Group"
 
@@ -138,7 +138,7 @@ class GroupInputNode(InfoNode):
     def getSettings(self, node):
         node.settings["Group"] = self.Group
 
-class ObjectInputNode(InfoNode):
+class ObjectInputNode(LogicNode):
     """CrowdMaster object input node"""
     bl_label = "Object"
 
@@ -150,7 +150,7 @@ class ObjectInputNode(InfoNode):
     def getSettings(self, node):
         node.settings["Object"] = self.Object
 
-class NumberInputNode(InfoNode):
+class NumberInputNode(LogicNode):
     """CrowdMaster number input node"""
     bl_label = "Number"
 
