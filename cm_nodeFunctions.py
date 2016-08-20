@@ -49,6 +49,20 @@ class LogicOBJECT(Neuron):
         result = bpy.data.objects[settings["Object"]]
         return result
 
+class LogicNUMBER(Neuron):
+    """Retrieve a number"""
+
+    def core(self, inps, settings):
+        lvars = copy.copy(self.brain.lvars)
+        lvars["math"] = math
+        lvars["inps"] = inps
+        numType = settings["numType"]
+        if numType == "int":
+            result = settings["int"]
+        elif numType == "float":
+            result = settings["float"]
+        return result
+
 class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
@@ -467,6 +481,7 @@ logictypes = OrderedDict([
     ("InputNode", LogicINPUT),
     ("GroupInputNode", LogicGROUP),
     ("ObjectInputNode", LogicOBJECT),
+    ("NumberInputNode", LogicNUMBER),
     ("GraphNode", LogicGRAPH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),

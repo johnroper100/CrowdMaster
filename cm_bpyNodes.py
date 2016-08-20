@@ -126,7 +126,7 @@ class InputNode(LogicNode):
     def getSettings(self, node):
         node.settings["Input"] = self.Input
 
-class GroupInputNode(LogicNode):
+class GroupInputNode(InfoNode):
     """CrowdMaster group input node"""
     bl_label = "Group"
 
@@ -138,7 +138,7 @@ class GroupInputNode(LogicNode):
     def getSettings(self, node):
         node.settings["Group"] = self.Group
 
-class ObjectInputNode(LogicNode):
+class ObjectInputNode(InfoNode):
     """CrowdMaster object input node"""
     bl_label = "Object"
 
@@ -149,6 +149,32 @@ class ObjectInputNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["Object"] = self.Object
+
+class NumberInputNode(InfoNode):
+    """CrowdMaster number input node"""
+    bl_label = "Number"
+
+    Int = IntProperty(name="Integer", default=1)
+    Float = FloatProperty(name="Float", default=1.0)
+    
+    numType = EnumProperty(
+        items = [('int', 'Integer', 'The number is an integer type.'), 
+                 ('float', 'Float', 'The number is a float type.')],
+        name = "Number Type",
+        description = "Which type of number to use.",
+        default = "int")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "numType")
+        if self.numType == "int":
+            layout.prop(self, "Int")
+        elif self.numType == "float":
+            layout.prop(self, "Float")
+
+    def getSettings(self, node):
+        node.settings["numType"] = self.numType
+        node.settings["Int"] = self.Int
+        node.settings["Float"] = self.Float
 
 def update_properties(self, context):
     """Keeps the values in the graph node in the correct order"""
@@ -566,7 +592,8 @@ node_categories = [
         NodeItem("InputNode"),
         NodeItem("PythonNode"),
         NodeItem("GroupInputNode"),
-        NodeItem("ObjectInputNode")
+        NodeItem("ObjectInputNode"),
+        NodeItem("NumberInputNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
@@ -618,6 +645,7 @@ def register():
     bpy.utils.register_class(InputNode)
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(ObjectInputNode)
+    bpy.utils.register_class(NumberInputNode)
     bpy.utils.register_class(GraphNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
@@ -658,6 +686,7 @@ def unregister():
     bpy.utils.unregister_class(InputNode)
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(ObjectInputNode)
+    bpy.utils.unregister_class(NumberInputNode)
     bpy.utils.unregister_class(GraphNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
