@@ -92,6 +92,16 @@ class LogicNode(CrowdMasterNode):
     def getSettings(self, node):
         pass
 
+class GenerateNode(CrowdMasterNode):
+    bl_label = 'Generate super class'
+
+    def init(self, context):
+        self.inputs.new("DefaultSocketType", "Input")
+        self.inputs[0].link_limit = 4095
+
+    def getSettings(self, node):
+        pass
+
 class InfoNode(CrowdMasterNode):
     bl_label = 'Info super class'
 
@@ -359,6 +369,13 @@ class OutputNode(LogicNode):
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
 
+class AGenNode(GenerateNode):
+    """CrowdMaster generate node"""
+    bl_label = "Generate"
+
+    def draw_buttons(self, context, layout):
+        layout.scale_y = 1.5
+        layout.operator("scene.cm_gen_agents")
 
 class EventNode(LogicNode):
     """CrowdMaster Event node"""
@@ -553,7 +570,8 @@ node_categories = [
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
-        NodeItem("PrintNode")
+        NodeItem("PrintNode"),
+        NodeItem("AGenNode")
         ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
@@ -593,6 +611,7 @@ def register():
     bpy.utils.register_class(StateSocket)
     bpy.utils.register_class(DependanceSocket)
     bpy.utils.register_class(LogicNode)
+    bpy.utils.register_class(GenerateNode)
     bpy.utils.register_class(InfoNode)
     bpy.utils.register_class(StateNode)
 
@@ -610,6 +629,7 @@ def register():
     bpy.utils.register_class(FilterNode)
     bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
+    bpy.utils.register_class(AGenNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(EventNode)
     bpy.utils.register_class(PythonNode)
@@ -631,6 +651,7 @@ def unregister():
     bpy.utils.unregister_class(StateSocket)
     bpy.utils.unregister_class(DependanceSocket)
     bpy.utils.unregister_class(LogicNode)
+    bpy.utils.unregister_class(GenerateNode)
     bpy.utils.unregister_class(InfoNode)
     bpy.utils.unregister_class(StateNode)
 
@@ -648,6 +669,7 @@ def unregister():
     bpy.utils.unregister_class(FilterNode)
     bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
+    bpy.utils.unregister_class(AGenNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(EventNode)
     bpy.utils.unregister_class(PythonNode)
