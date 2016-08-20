@@ -513,7 +513,7 @@ from nodeitems_utils import NodeCategory, NodeItem
 class MyNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
-        return context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+        return context.space_data.tree_type == 'CrowdMasterTreeType'
 
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
