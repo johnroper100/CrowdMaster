@@ -445,9 +445,6 @@ class LogicAction(Neuron):
 
 logictypes = OrderedDict([
     ("InputNode", LogicINPUT),
-    ("GroupInputNode", LogicGROUP),
-    ("ObjectInputNode", LogicOBJECT),
-    ("NumberInputNode", LogicNUMBER),
     ("GraphNode", LogicGRAPH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),

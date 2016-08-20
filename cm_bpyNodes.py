@@ -513,7 +513,7 @@ from nodeitems_utils import NodeCategory, NodeItem
 class MyNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
-        return context.space_data.tree_type == 'CrowdMasterTreeType'
+        return context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
 
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
@@ -577,7 +577,6 @@ def register():
     bpy.utils.register_class(FilterNode)
     bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
-    bpy.utils.register_class(AGenNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(EventNode)
     bpy.utils.register_class(PythonNode)
@@ -614,7 +613,6 @@ def unregister():
     bpy.utils.unregister_class(FilterNode)
     bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
-    bpy.utils.unregister_class(AGenNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(EventNode)
     bpy.utils.unregister_class(PythonNode)
