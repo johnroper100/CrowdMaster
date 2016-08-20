@@ -7,7 +7,7 @@ from bpy.props import EnumProperty, IntProperty
 class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes"""
     bl_idname = 'CrowdMasterTreeType'
-    bl_label = 'CrowdMaster Simulation'
+    bl_label = 'CrowdMaster Agent Simulation'
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
 class CrowdMasterGenTree(NodeTree):
