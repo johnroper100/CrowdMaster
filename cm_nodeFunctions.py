@@ -29,40 +29,6 @@ class LogicINPUT(Neuron):
         result = eval(settings["Input"], lvars)
         return result
 
-class LogicGROUP(Neuron):
-    """Retrieve information about a group"""
-
-    def core(self, inps, settings):
-        lvars = copy.copy(self.brain.lvars)
-        lvars["math"] = math
-        lvars["inps"] = inps
-        result = bpy.data.groups.get(settings["Group"])
-        return result
-
-class LogicOBJECT(Neuron):
-    """Retrieve information about an object"""
-
-    def core(self, inps, settings):
-        lvars = copy.copy(self.brain.lvars)
-        lvars["math"] = math
-        lvars["inps"] = inps
-        result = bpy.data.objects[settings["Object"]]
-        return result
-
-class LogicNUMBER(Neuron):
-    """Retrieve a number"""
-
-    def core(self, inps, settings):
-        lvars = copy.copy(self.brain.lvars)
-        lvars["math"] = math
-        lvars["inps"] = inps
-        numType = settings["numType"]
-        if numType == "int":
-            result = settings["int"]
-        elif numType == "float":
-            result = settings["float"]
-        return result
-
 class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
