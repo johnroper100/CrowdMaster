@@ -7,9 +7,14 @@ from bpy.props import EnumProperty, IntProperty
 class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes"""
     bl_idname = 'CrowdMasterTreeType'
-    bl_label = 'CrowdMaster'
+    bl_label = 'CrowdMaster Simulation'
     bl_icon = 'MOD_REMESH'
 
+class CrowdMasterGenTree(NodeTree):
+    """The node tree that contains the CrowdMaster agent gen nodes"""
+    bl_idname = 'CrowdMasterGenTreeType'
+    bl_label = 'CrowdMaster Agent Generation'
+    bl_icon = 'MOD_ARRAY'
 
 class DefaultSocket(NodeSocket):
     # Description string
@@ -553,6 +558,7 @@ node_categories = [
 
 def register():
     bpy.utils.register_class(CrowdMasterTree)
+    bpy.utils.register_class(CrowdMasterGenTree)
     bpy.utils.register_class(DefaultSocket)
     bpy.utils.register_class(StateSocket)
     bpy.utils.register_class(DependanceSocket)
@@ -589,6 +595,7 @@ def unregister():
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
 
     bpy.utils.unregister_class(CrowdMasterTree)
+    bpy.utils.unregister_class(CrowdMasterGenTree)
     bpy.utils.unregister_class(DefaultSocket)
     bpy.utils.unregister_class(StateSocket)
     bpy.utils.unregister_class(DependanceSocket)
