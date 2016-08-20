@@ -561,10 +561,10 @@ class MyNodeCategory2(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterGenTreeType'
 
 node_categories2 = [
-    MyNodeCategory("input", "Input", items=[
+    MyNodeCategory2("INPUT", "Input", items=[
 
         ]),
-    MyNodeCategory("input", "Output", items=[
+    MyNodeCategory2("OUTPUT", "Output", items=[
 
         ])
     ]
