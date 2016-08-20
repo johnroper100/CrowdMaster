@@ -548,8 +548,8 @@ node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("InputNode"),
         NodeItem("PythonNode"),
-        #NodeItem("GroupInputNode"),
-        #NodeItem("ObjectInputNode")
+        NodeItem("GroupInputNode"),
+        NodeItem("ObjectInputNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
