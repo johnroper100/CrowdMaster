@@ -555,6 +555,19 @@ node_categories = [
         ])
     ]
 
+class MyNodeCategory2(NodeCategory):
+    @classmethod
+    def poll(cls, context):
+        return context.space_data.tree_type == 'CrowdMasterGenTreeType'
+
+node_categories2 = [
+    MyNodeCategory("input", "Input", items=[
+
+        ]),
+    MyNodeCategory("input", "Output", items=[
+
+        ])
+    ]
 
 def register():
     bpy.utils.register_class(CrowdMasterTree)
@@ -588,10 +601,12 @@ def register():
     bpy.utils.register_class(NoteNode)
 
     nodeitems_utils.register_node_categories("CrowdMaster_NODES", node_categories)
+    nodeitems_utils.register_node_categories("CrowdMasterGen_NODES", node_categories2)
 
 
 def unregister():
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
+    nodeitems_utils.unregister_node_categories("CrowdMasterGen_NODES")
 
     bpy.utils.unregister_class(CrowdMasterTree)
     bpy.utils.unregister_class(CrowdMasterGenTree)
