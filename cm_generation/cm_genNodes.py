@@ -2,6 +2,7 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
+from .. icon_load import cicon
 
 class CrowdMasterGenTree(NodeTree):
     """The node tree that contains the CrowdMaster agent gen nodes"""
@@ -140,6 +141,13 @@ class GenNoteNode(Node):
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterGenTreeType'
 
+class GenOutputNode(DataInputNode):
+    """CrowdMaster generation output node"""
+    bl_label = "Generate"
+
+    def draw_buttons(self, context, layout):
+        layout.scale_y = 1.5		
+        layout.operator("scene.cm_gen_agents", icon_value=cicon('plus_yellow'))
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -154,6 +162,9 @@ node_categories2 = [
         NodeItem("GroupInputNode"),
         NodeItem("ObjectInputNode"),
         NodeItem("NumberInputNode")
+        ]),
+    MyNodeCategory2("output", "Output", items=[
+        NodeItem("GenOutputNode")
         ]),
     MyNodeCategory2("layout", "Layout", items=[
         NodeItem("GenNoteNode")
@@ -170,6 +181,7 @@ def register():
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(NumberInputNode)
     bpy.utils.register_class(GenNoteNode)
+    bpy.utils.register_class(GenOutputNode)
 
     nodeitems_utils.register_node_categories("CrowdMasterGen_NODES", node_categories2)
 
@@ -186,6 +198,7 @@ def unregister():
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(NumberInputNode)
     bpy.utils.unregister_class(GenNoteNode)
+    bpy.utils.unregister_class(GenOutputNode)
 
 if __name__ == "__main__":
     register()
