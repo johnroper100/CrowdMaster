@@ -10,31 +10,28 @@ class CrowdMasterGenTree(NodeTree):
     bl_label = 'CrowdMaster Agent Generation'
     bl_icon = 'MOD_ARRAY'
 
-class DefaultSocket(NodeSocket):
-    # Description string
-    """Default socket"""
-    # If not explicitly defined, the python class name is used.
-    bl_idname = 'DefaultSocketType'
-    # Label for nice name display
-    bl_label = 'Default CrowdMaster Node Socket'
+class TemplateSocket(NodeSocket):
+    """Template socket"""
+    bl_idname = 'TemplateSocketType'
+    bl_label = 'Template CrowdMaster Node Socket'
 
-    filterProperty = EnumProperty(items=[("AVERAGE", "Average", "", 1),
-                                         ("MAX", "Max", "", 2),
-                                         ("MIN", "Min", "", 3)
-                                         ])
-    defaultValueProperty = FloatProperty(default=1.0)
-
-    # Optional function for drawing the socket input value
     def draw(self, context, layout, node, text):
-        if not self.is_output and node.bl_idname == "ActionState":
-            if self.is_linked:
-                layout.prop(self, "filterProperty", text=text)
-            else:
-                layout.prop(self, "defaultValueProperty", text=text)
-        else:
-            layout.label(text)
+        layout.label(text)
 
-    # Socket color
+    def draw_color(self, context, node):
+        if self.is_linked:
+            return (0.8, 0.515, 0.0, 0.7)
+        else:
+            return (0.8, 0.515, 0.0, 0.5)
+
+class GeoTemplateSocket(NodeSocket):
+    """GeoTemplate socket"""
+    bl_idname = 'GeoTemplateSocketType'
+    bl_label = 'GeoTemplate CrowdMaster Node Socket'
+
+    def draw(self, context, layout, node, text):
+        layout.label(text)
+
     def draw_color(self, context, node):
         if self.is_linked:
             return (0.0, 0.0, 0.0, 0.7)
@@ -53,7 +50,7 @@ class DataInputNode(CrowdMasterGenNode):
     bl_label = 'Data input super class'
 
     def init(self, context):
-        self.inputs.new("DefaultSocketType", "Input")
+        self.inputs.new("GeoTemplateSocket", "Input")
         self.inputs[0].link_limit = 4095
 
     def getSettings(self, node):
@@ -63,7 +60,7 @@ class DataOutputNode(CrowdMasterGenNode):
     bl_label = 'Data output super class'
 
     def init(self, context):
-        self.outputs.new('DefaultSocketType', "Output")
+        self.outputs.new('GeoTemplateSocket', "Output")
 
     def getSettings(self, node):
         pass
@@ -173,7 +170,8 @@ node_categories2 = [
 
 def register():
     bpy.utils.register_class(CrowdMasterGenTree)
-    bpy.utils.register_class(DefaultSocket)
+    bpy.utils.register_class(TemplateSocket)
+    bpy.utils.register_class(GeoTemplateSocket)
     bpy.utils.register_class(DataInputNode)
     bpy.utils.register_class(DataOutputNode)
 
@@ -190,7 +188,8 @@ def unregister():
     nodeitems_utils.unregister_node_categories("CrowdMasterGen_NODES")
 
     bpy.utils.unregister_class(CrowdMasterGenTree)
-    bpy.utils.unregister_class(DefaultSocket)
+    bpy.utils.unregister_class(TemplateSocket)
+    bpy.utils.unregister_class(GeoTemplateSocket)
     bpy.utils.unregister_class(DataInputNode)
     bpy.utils.unregister_class(DataOutputNode)
 
