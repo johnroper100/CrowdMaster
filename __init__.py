@@ -1,6 +1,6 @@
 bl_info = {
     "name": "CrowdMaster",
-    "author": "John Roper",
+    "author": "John Roper, Peter Noble, Patrick Crawford",
     "version": (1, 0, 8),
     "blender": (2, 77, 0),
     "location": "Node Editor > CrowdMaster",
