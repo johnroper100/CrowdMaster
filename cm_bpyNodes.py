@@ -74,14 +74,19 @@ class DependanceSocket(NodeSocket):
 
 class CrowdMasterNode(Node):
     """CrowdMaster node superclass"""
-    # bl_idname = 'CustomNodeType'  # Class name used if not defined
-    # Label for nice name display
     bl_label = 'Super class'
-    # bl_icon = 'SOUND'
 
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterTreeType'
+
+class CrowdMasterGenNode(Node):
+    """CrowdMaster generate node superclass"""
+    bl_label = 'Super class'
+
+    @classmethod
+    def poll(cls, ntree):
+        return ntree.bl_idname == 'CrowdMasterGenTreeType'
 
 
 class LogicNode(CrowdMasterNode):
@@ -93,6 +98,25 @@ class LogicNode(CrowdMasterNode):
 
         self.outputs.new('DefaultSocketType', "Output")
         self.outputs.new("DependanceSocketType", "Dependant")
+
+    def getSettings(self, node):
+        pass
+
+class DataInputNode(CrowdMasterGenNode):
+    bl_label = 'Data input super class'
+
+    def init(self, context):
+        self.inputs.new("DefaultSocketType", "Input")
+        self.inputs[0].link_limit = 4095
+
+    def getSettings(self, node):
+        pass
+
+class DataOutputNode(CrowdMasterGenNode):
+    bl_label = 'Data output super class'
+
+    def init(self, context):
+        self.outputs.new('DefaultSocketType', "Output")
 
     def getSettings(self, node):
         pass
@@ -111,6 +135,30 @@ class InputNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["Input"] = self.Input
+
+class GroupInputNode(DataOutputNode):
+    """CrowdMaster group input node"""
+    bl_label = "Group"
+
+    Group = StringProperty()
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "Group", bpy.data, "groups")
+
+    def getSettings(self, node):
+        node.settings["Group"] = self.Group
+
+class ObjectInputNode(DataOutputNode):
+    """CrowdMaster group input node"""
+    bl_label = "Object"
+
+    Object = StringProperty()
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "Object", context.scene, "objects")
+
+    def getSettings(self, node):
+        node.settings["Object"] = self.Object
 
 def update_properties(self, context):
     """Keeps the values in the graph node in the correct order"""
@@ -562,7 +610,8 @@ class MyNodeCategory2(NodeCategory):
 
 node_categories2 = [
     MyNodeCategory2("input", "Input", items=[
-
+        NodeItem("GroupInputNode"),
+        NodeItem("ObjectInputNode")
         ]),
     MyNodeCategory2("output", "Output", items=[
 
@@ -577,8 +626,12 @@ def register():
     bpy.utils.register_class(DependanceSocket)
     bpy.utils.register_class(LogicNode)
     bpy.utils.register_class(StateNode)
+    bpy.utils.register_class(DataInputNode)
+    bpy.utils.register_class(DataOutputNode)
 
     bpy.utils.register_class(InputNode)
+    bpy.utils.register_class(GroupInputNode)
+    bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GraphNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
@@ -615,8 +668,12 @@ def unregister():
     bpy.utils.unregister_class(DependanceSocket)
     bpy.utils.unregister_class(LogicNode)
     bpy.utils.unregister_class(StateNode)
+    bpy.utils.unregister_class(DataInputNode)
+    bpy.utils.unregister_class(DataOutputNode)
 
     bpy.utils.unregister_class(InputNode)
+    bpy.utils.unregister_class(GroupInputNode)
+    bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GraphNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
