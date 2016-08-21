@@ -10,12 +10,6 @@ class CrowdMasterTree(NodeTree):
     bl_label = 'CrowdMaster Agent Simulation'
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
-class CrowdMasterGenTree(NodeTree):
-    """The node tree that contains the CrowdMaster agent gen nodes"""
-    bl_idname = 'CrowdMasterGenTreeType'
-    bl_label = 'CrowdMaster Agent Generation'
-    bl_icon = 'MOD_ARRAY'
-
 class DefaultSocket(NodeSocket):
     # Description string
     """Default socket"""
@@ -80,14 +74,6 @@ class CrowdMasterNode(Node):
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterTreeType'
 
-class CrowdMasterGenNode(Node):
-    """CrowdMaster generate node superclass"""
-    bl_label = 'Super class'
-
-    @classmethod
-    def poll(cls, ntree):
-        return ntree.bl_idname == 'CrowdMasterGenTreeType'
-
 
 class LogicNode(CrowdMasterNode):
     bl_label = 'Logic super class'
@@ -98,25 +84,6 @@ class LogicNode(CrowdMasterNode):
 
         self.outputs.new('DefaultSocketType', "Output")
         self.outputs.new("DependanceSocketType", "Dependant")
-
-    def getSettings(self, node):
-        pass
-
-class DataInputNode(CrowdMasterGenNode):
-    bl_label = 'Data input super class'
-
-    def init(self, context):
-        self.inputs.new("DefaultSocketType", "Input")
-        self.inputs[0].link_limit = 4095
-
-    def getSettings(self, node):
-        pass
-
-class DataOutputNode(CrowdMasterGenNode):
-    bl_label = 'Data output super class'
-
-    def init(self, context):
-        self.outputs.new('DefaultSocketType', "Output")
 
     def getSettings(self, node):
         pass
@@ -135,61 +102,6 @@ class InputNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["Input"] = self.Input
-
-class GroupInputNode(DataOutputNode):
-    """CrowdMaster group input node"""
-    bl_label = "Group"
-
-    Group = StringProperty()
-
-    def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Group", bpy.data, "groups")
-
-    def getSettings(self, node):
-        node.settings["Group"] = self.Group
-
-class ObjectInputNode(DataOutputNode):
-    """CrowdMaster group input node"""
-    bl_label = "Object"
-
-    Object = StringProperty()
-
-    def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Object", context.scene, "objects")
-
-    def getSettings(self, node):
-        node.settings["Object"] = self.Object
-
-class NumberInputNode(DataOutputNode):
-    """CrowdMaster number input node"""
-    bl_label = "Number"
-
-    Int = IntProperty(name="Integer", default=1)
-    Float = FloatProperty(name="Float", default=1.0)
-    Vector = FloatVectorProperty(name="Vector", default = [0, 0, 0], subtype = "XYZ")
-    
-    numType = EnumProperty(
-        items = [('int', 'Integer', 'An integer type number.'), 
-                 ('float', 'Float', 'A float type number.'),
-                 ('vector', 'Vector', 'A vector type number.')],
-        name = "Number Type",
-        description = "Which type of number to input",
-        default = "int")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "numType")
-        if self.numType == "int":
-            layout.prop(self, "Int")
-        elif self.numType == "float":
-            layout.prop(self, "Float")
-        elif self.numType == "vector":
-            layout.prop(self, "Vector")
-
-    def getSettings(self, node):
-        node.settings["numType"] = self.numType
-        node.settings["Int"] = self.Int
-        node.settings["Float"] = self.Float
-        node.settings["Vector"] = self.Vector
 
 def update_properties(self, context):
     """Keeps the values in the graph node in the correct order"""
@@ -634,37 +546,15 @@ node_categories = [
         ])
     ]
 
-class MyNodeCategory2(NodeCategory):
-    @classmethod
-    def poll(cls, context):
-        return context.space_data.tree_type == 'CrowdMasterGenTreeType'
-
-node_categories2 = [
-    MyNodeCategory2("input", "Input", items=[
-        NodeItem("GroupInputNode"),
-        NodeItem("ObjectInputNode"),
-        NodeItem("NumberInputNode")
-        ]),
-    MyNodeCategory2("output", "Output", items=[
-
-        ])
-    ]
-
 def register():
     bpy.utils.register_class(CrowdMasterTree)
-    bpy.utils.register_class(CrowdMasterGenTree)
     bpy.utils.register_class(DefaultSocket)
     bpy.utils.register_class(StateSocket)
     bpy.utils.register_class(DependanceSocket)
     bpy.utils.register_class(LogicNode)
     bpy.utils.register_class(StateNode)
-    bpy.utils.register_class(DataInputNode)
-    bpy.utils.register_class(DataOutputNode)
 
     bpy.utils.register_class(InputNode)
-    bpy.utils.register_class(GroupInputNode)
-    bpy.utils.register_class(ObjectInputNode)
-    bpy.utils.register_class(NumberInputNode)
     bpy.utils.register_class(GraphNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
@@ -687,27 +577,19 @@ def register():
     bpy.utils.register_class(NoteNode)
 
     nodeitems_utils.register_node_categories("CrowdMaster_NODES", node_categories)
-    nodeitems_utils.register_node_categories("CrowdMasterGen_NODES", node_categories2)
 
 
 def unregister():
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
-    nodeitems_utils.unregister_node_categories("CrowdMasterGen_NODES")
 
     bpy.utils.unregister_class(CrowdMasterTree)
-    bpy.utils.unregister_class(CrowdMasterGenTree)
     bpy.utils.unregister_class(DefaultSocket)
     bpy.utils.unregister_class(StateSocket)
     bpy.utils.unregister_class(DependanceSocket)
     bpy.utils.unregister_class(LogicNode)
     bpy.utils.unregister_class(StateNode)
-    bpy.utils.unregister_class(DataInputNode)
-    bpy.utils.unregister_class(DataOutputNode)
 
     bpy.utils.unregister_class(InputNode)
-    bpy.utils.unregister_class(GroupInputNode)
-    bpy.utils.unregister_class(ObjectInputNode)
-    bpy.utils.unregister_class(NumberInputNode)
     bpy.utils.unregister_class(GraphNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)

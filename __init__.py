@@ -470,6 +470,10 @@ def register():
     global cm_bpyNodes
     from . import cm_bpyNodes
     cm_bpyNodes.register()
+    
+    global cm_genNodes
+    from .cm_generation import cm_genNodes
+    cm_genNodes.register()
 
     registerTypes()
     action_register()
@@ -498,6 +502,7 @@ def unregister():
 
     addon_updater_ops.unregister()
     #cm_bpyNodes.unregister()
+    #cm_genNodes.unregister()
 
 if __name__ == "__main__":
     register()
