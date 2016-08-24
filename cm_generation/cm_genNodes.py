@@ -107,13 +107,19 @@ class TemplateNode(DataThroughNode):
     """CrowdMaster template node"""
     bl_label = "Template"
 
-    Object = StringProperty()
+    brainType = EnumProperty(
+        items = [('int', 'Integer', 'An integer type number.'), 
+                 ('float', 'Float', 'A float type number.'),
+                 ('vector', 'Vector', 'A vector type number.')],
+        name = "Number Type",
+        description = "Which type of number to input",
+        default = "int")
 
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Object", context.scene, "objects")
+        layout.prop(self, "brainType")
 
     def getSettings(self, node):
-        node.settings["Object"] = self.Object
+        node.settings["brainType"] = self.brainType
 
 class NumberInputNode(DataOutputNode):
     """CrowdMaster number input node"""
