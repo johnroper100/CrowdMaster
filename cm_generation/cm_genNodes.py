@@ -103,6 +103,18 @@ class ObjectInputNode(DataOutputNode):
     def getSettings(self, node):
         node.settings["Object"] = self.Object
 
+class TemplateNode(DataThroughNode):
+    """CrowdMaster template node"""
+    bl_label = "Template"
+
+    Object = StringProperty()
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "Object", context.scene, "objects")
+
+    def getSettings(self, node):
+        node.settings["Object"] = self.Object
+
 class NumberInputNode(DataOutputNode):
     """CrowdMaster number input node"""
     bl_label = "Number"
@@ -175,6 +187,9 @@ node_categories2 = [
     MyNodeCategory2("output", "Output", items=[
         NodeItem("GenOutputNode")
         ]),
+    MyNodeCategory2("through", "Through", items=[
+        NodeItem("TemplateNode")
+        ]),
     MyNodeCategory2("layout", "Layout", items=[
         NodeItem("GenNoteNode")
         ])
@@ -190,6 +205,7 @@ def register():
 
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(ObjectInputNode)
+    bpy.utils.register_class(TemplateNode)
     bpy.utils.register_class(NumberInputNode)
     bpy.utils.register_class(GenNoteNode)
     bpy.utils.register_class(GenOutputNode)
@@ -209,6 +225,7 @@ def unregister():
 
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(ObjectInputNode)
+    bpy.utils.unregister_class(TemplateNode)
     bpy.utils.unregister_class(NumberInputNode)
     bpy.utils.unregister_class(GenNoteNode)
     bpy.utils.unregister_class(GenOutputNode)
