@@ -38,20 +38,6 @@ class GeoTemplateSocket(NodeSocket):
         else:
             return (0.0, 0.0, 0.0, 0.4)
 
-class GroupInputSocket(NodeSocket):
-    """Group input socket"""
-    bl_idname = 'GroupInputSocketType'
-    bl_label = 'Group input CrowdMaster Node Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text)
-
-    def draw_color(self, context, node):
-        if self.is_linked:
-            return (0.0, 0.0, 0.0, 0.7)
-        else:
-            return (0.0, 0.0, 0.0, 0.4)
-
 class CrowdMasterGenNode(Node):
     """CrowdMaster generate node superclass"""
     bl_label = 'Super class'
@@ -74,6 +60,18 @@ class DataOutputNode(CrowdMasterGenNode):
     bl_label = 'Data output super class'
 
     def init(self, context):
+        self.outputs.new('GeoTemplateSocket', "Output")
+
+    def getSettings(self, node):
+        pass
+
+class DataThroughNode(CrowdMasterGenNode):
+    bl_label = 'Data through super class'
+
+    def init(self, context):
+        self.inputs.new('GroupInputSocket', "Input")
+        self.inputs[0].link_limit = 4095
+
         self.outputs.new('GeoTemplateSocket', "Output")
 
     def getSettings(self, node):
@@ -186,9 +184,9 @@ def register():
     bpy.utils.register_class(CrowdMasterGenTree)
     bpy.utils.register_class(TemplateSocket)
     bpy.utils.register_class(GeoTemplateSocket)
-    bpy.utils.register_class(GroupInputSocket)
     bpy.utils.register_class(DataInputNode)
     bpy.utils.register_class(DataOutputNode)
+    bpy.utils.register_class(DataThroughNode)
 
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(ObjectInputNode)
@@ -205,9 +203,9 @@ def unregister():
     bpy.utils.unregister_class(CrowdMasterGenTree)
     bpy.utils.unregister_class(TemplateSocket)
     bpy.utils.unregister_class(GeoTemplateSocket)
-    bpy.utils.unregister_class(GroupInputSocket)
     bpy.utils.unregister_class(DataInputNode)
     bpy.utils.unregister_class(DataOutputNode)
+    bpy.utils.unregister_class(DataThroughNode)
 
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(ObjectInputNode)

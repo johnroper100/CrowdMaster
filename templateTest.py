@@ -18,5 +18,3 @@ else:
     print("Error in graph or settings")
 
 print("Total time:", time.time() - t)
-
-
