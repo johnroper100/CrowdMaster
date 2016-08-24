@@ -121,6 +121,27 @@ class TemplateNode(DataThroughNode):
     def getSettings(self, node):
         node.settings["brainType"] = self.brainType
 
+class RandomNode(DataThroughNode):
+    """CrowdMaster random node"""
+    bl_label = "Random"
+    
+    maxRandRot = FloatProperty(name="Max Rand Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0, max=360.0)
+    minRandRot = FloatProperty(name="Min Rand Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0, min=-360.0)
+    maxRandSz = FloatProperty(name="Max Rand Scale", description="The maximum random scale for each agent.", default = 2.0)
+    minRandSz = FloatProperty(name="Min Rand Scale", description="The minimum random scale for each agent.", default = 1.0)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "maxRandRot")
+        layout.prop(self, "minRandRot")
+        layout.prop(self, "maxRandSz")
+        layout.prop(self, "minRandSz")
+
+    def getSettings(self, node):
+        node.settings["maxRandRot"] = self.maxRandRot
+        node.settings["minRandRot"] = self.minRandRot
+        node.settings["maxRandSz"] = self.maxRandSz
+        node.settings["minRandSz"] = self.minRandSz
+
 class NumberInputNode(DataOutputNode):
     """CrowdMaster number input node"""
     bl_label = "Number"
@@ -194,7 +215,8 @@ node_categories2 = [
         NodeItem("GenOutputNode")
         ]),
     MyNodeCategory2("through", "Through", items=[
-        NodeItem("TemplateNode")
+        NodeItem("TemplateNode"),
+        NodeItem("RandomNode")
         ]),
     MyNodeCategory2("layout", "Layout", items=[
         NodeItem("GenNoteNode")
@@ -212,6 +234,7 @@ def register():
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(TemplateNode)
+    bpy.utils.register_class(RandomNode)
     bpy.utils.register_class(NumberInputNode)
     bpy.utils.register_class(GenNoteNode)
     bpy.utils.register_class(GenOutputNode)
@@ -232,6 +255,7 @@ def unregister():
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(TemplateNode)
+    bpy.utils.unregister_class(RandomNode)
     bpy.utils.unregister_class(NumberInputNode)
     bpy.utils.unregister_class(GenNoteNode)
     bpy.utils.unregister_class(GenOutputNode)
