@@ -4,7 +4,9 @@ from mathutils import Vector
 
 import math
 
-from .libs.ins_clustering import clusterMatch
+import sys
+sys.paht.append("..")
+from libs.ins_clustering import clusterMatch
 
 import bpy
 
