@@ -1,8 +1,6 @@
 import random
 import time
 
-import sys
-sys.path.append("..")
 from ..libs.ins_vector import Vector
 
 class Template():

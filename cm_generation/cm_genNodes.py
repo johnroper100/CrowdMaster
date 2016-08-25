@@ -4,261 +4,170 @@ from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from .. icon_load import cicon
 
-class CrowdMasterGenTree(NodeTree):
-    """The node tree that contains the CrowdMaster agent gen nodes"""
-    bl_idname = 'CrowdMasterGenTreeType'
-    bl_label = 'CrowdMaster Agent Generation'
-    bl_icon = 'MOD_ARRAY'
+class MyCustomTree(NodeTree):
+    # Description string
+    '''A custom node tree type that will show up in the node editor header'''
+    # Optional identifier string. If not explicitly defined, the python class name is used.
+    bl_idname = 'CustomTreeType'
+    # Label for nice name display
+    bl_label = 'Custom Node Tree'
+    # Icon identifier
+    bl_icon = 'NODETREE'
 
-class TemplateSocket(NodeSocket):
-    """Template socket"""
-    bl_idname = 'TemplateSocketType'
-    bl_label = 'Template CrowdMaster Node Socket'
 
+# Custom socket type
+class MyCustomSocket(NodeSocket):
+    # Description string
+    '''Custom node socket type'''
+    # Optional identifier string. If not explicitly defined, the python class name is used.
+    bl_idname = 'CustomSocketType'
+    # Label for nice name display
+    bl_label = 'Custom Node Socket'
+
+    # Enum items list
+    my_items = [
+        ("DOWN", "Down", "Where your feet are"),
+        ("UP", "Up", "Where your head should be"),
+        ("LEFT", "Left", "Not right"),
+        ("RIGHT", "Right", "Not left")
+    ]
+
+    myEnumProperty = bpy.props.EnumProperty(name="Direction", description="Just an example", items=my_items, default='UP')
+
+    # Optional function for drawing the socket input value
     def draw(self, context, layout, node, text):
-        layout.label(text)
-
-    def draw_color(self, context, node):
-        if self.is_linked:
-            return (0.8, 0.515, 0.0, 0.7)
+        if self.is_output or self.is_linked:
+            layout.label(text)
         else:
-            return (0.8, 0.515, 0.0, 0.5)
+            layout.prop(self, "myEnumProperty", text=text)
 
-class GeoTemplateSocket(NodeSocket):
-    """GeoTemplate socket"""
-    bl_idname = 'GeoTemplateSocketType'
-    bl_label = 'GeoTemplate CrowdMaster Node Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text)
-
+    # Socket color
     def draw_color(self, context, node):
-        if self.is_linked:
-            return (0.0, 0.0, 0.0, 0.7)
-        else:
-            return (0.0, 0.0, 0.0, 0.4)
+        return (1.0, 0.4, 0.216, 0.5)
 
-class CrowdMasterGenNode(Node):
-    """CrowdMaster generate node superclass"""
-    bl_label = 'Super class'
 
+# Mix-in class for all custom nodes in this tree type.
+# Defines a poll function to enable instantiation.
+class MyCustomTreeNode:
     @classmethod
     def poll(cls, ntree):
-        return ntree.bl_idname == 'CrowdMasterGenTreeType'
+        return ntree.bl_idname == 'CustomTreeType'
 
-class DataInputNode(CrowdMasterGenNode):
-    bl_label = 'Data input super class'
 
+# Derived from the Node base type.
+class MyCustomNode(Node, MyCustomTreeNode):
+    # === Basics ===
+    # Description string
+    '''A custom node'''
+    # Optional identifier string. If not explicitly defined, the python class name is used.
+    bl_idname = 'CustomNodeType'
+    # Label for nice name display
+    bl_label = 'Custom Node'
+    # Icon identifier
+    bl_icon = 'SOUND'
+
+    # === Custom Properties ===
+    # These work just like custom properties in ID data blocks
+    # Extensive information can be found under
+    # http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Properties
+    myStringProperty = bpy.props.StringProperty()
+    myFloatProperty = bpy.props.FloatProperty(default=3.1415926)
+
+    # === Optional Functions ===
+    # Initialization function, called when a new node is created.
+    # This is the most common place to create the sockets for a node, as shown below.
+    # NOTE: this is not the same as the standard __init__ function in Python, which is
+    #       a purely internal Python method and unknown to the node system!
     def init(self, context):
-        self.inputs.new('GeoTemplateSocket', "Input")
-        self.inputs[0].link_limit = 4095
+        self.inputs.new('CustomSocketType', "Hello")
+        self.inputs.new('NodeSocketFloat', "World")
+        self.inputs.new('NodeSocketVector', "!")
 
-    def getSettings(self, node):
-        pass
+        self.outputs.new('NodeSocketColor', "How")
+        self.outputs.new('NodeSocketColor', "are")
+        self.outputs.new('NodeSocketFloat', "you")
 
-class DataOutputNode(CrowdMasterGenNode):
-    bl_label = 'Data output super class'
+    # Copy function to initialize a copied node from an existing one.
+    def copy(self, node):
+        print("Copying from node ", node)
 
-    def init(self, context):
-        self.outputs.new('GeoTemplateSocket', "Output")
+    # Free function to clean up on removal.
+    def free(self):
+        print("Removing node ", self, ", Goodbye!")
 
-    def getSettings(self, node):
-        pass
-
-class DataThroughNode(CrowdMasterGenNode):
-    bl_label = 'Data through super class'
-
-    def init(self, context):
-        self.inputs.new('GeoTemplateSocket', "Input")
-        self.inputs[0].link_limit = 4095
-
-        self.outputs.new('GeoTemplateSocket', "Output")
-
-    def getSettings(self, node):
-        pass
-
-# ============ End of super classes ============
-
-class GroupInputNode(DataOutputNode):
-    """CrowdMaster group input node"""
-    bl_label = "Group"
-
-    Group = StringProperty()
-
+    # Additional buttons displayed on the node.
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Group", bpy.data, "groups")
+        layout.label("Node settings")
+        layout.prop(self, "myFloatProperty")
 
-    def getSettings(self, node):
-        node.settings["Group"] = self.Group
-
-class ObjectInputNode(DataOutputNode):
-    """CrowdMaster group input node"""
-    bl_label = "Object"
-
-    Object = StringProperty()
-
-    def draw_buttons(self, context, layout):
-        layout.prop_search(self, "Object", context.scene, "objects")
-
-    def getSettings(self, node):
-        node.settings["Object"] = self.Object
-
-class TemplateNode(DataThroughNode):
-    """CrowdMaster template node"""
-    bl_label = "Template"
-
-    brainType = EnumProperty(
-        items = [('int', 'Integer', 'An integer type number.'), 
-                 ('float', 'Float', 'A float type number.'),
-                 ('vector', 'Vector', 'A vector type number.')],
-        name = "Number Type",
-        description = "Which type of number to input",
-        default = "int")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "brainType")
-
-    def getSettings(self, node):
-        node.settings["brainType"] = self.brainType
-
-class RandomNode(DataThroughNode):
-    """CrowdMaster random node"""
-    bl_label = "Random"
-    
-    maxRandRot = FloatProperty(name="Max Rand Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0, max=360.0)
-    minRandRot = FloatProperty(name="Min Rand Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0, min=-360.0)
-    maxRandSz = FloatProperty(name="Max Rand Scale", description="The maximum random scale for each agent.", default = 2.0)
-    minRandSz = FloatProperty(name="Min Rand Scale", description="The minimum random scale for each agent.", default = 1.0)
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "maxRandRot")
-        layout.prop(self, "minRandRot")
-        layout.prop(self, "maxRandSz")
-        layout.prop(self, "minRandSz")
-
-    def getSettings(self, node):
-        node.settings["maxRandRot"] = self.maxRandRot
-        node.settings["minRandRot"] = self.minRandRot
-        node.settings["maxRandSz"] = self.maxRandSz
-        node.settings["minRandSz"] = self.minRandSz
-
-class NumberInputNode(DataOutputNode):
-    """CrowdMaster number input node"""
-    bl_label = "Number"
-
-    Int = IntProperty(name="Integer", default=1)
-    Float = FloatProperty(name="Float", default=1.0)
-    Vector = FloatVectorProperty(name="Vector", default = [0, 0, 0], subtype = "XYZ")
-    
-    numType = EnumProperty(
-        items = [('int', 'Integer', 'An integer type number.'), 
-                 ('float', 'Float', 'A float type number.'),
-                 ('vector', 'Vector', 'A vector type number.')],
-        name = "Number Type",
-        description = "Which type of number to input",
-        default = "int")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "numType")
-        if self.numType == "int":
-            layout.prop(self, "Int")
-        elif self.numType == "float":
-            layout.prop(self, "Float")
-        elif self.numType == "vector":
-            layout.prop(self, "Vector")
-
-    def getSettings(self, node):
-        node.settings["numType"] = self.numType
-        node.settings["Int"] = self.Int
-        node.settings["Float"] = self.Float
-        node.settings["Vector"] = self.Vector
-
-class GenNoteNode(Node):
-    """For keeping the graph well organised"""
-    bl_label = 'Note'
-
-    noteText = StringProperty(name="Note Text", default="Enter text here")
-
-    def draw_buttons(self, context, layout):
-        layout.label(self.noteText)
-
+    # Detail buttons in the sidebar.
+    # If this function is not defined, the draw_buttons function is used instead
     def draw_buttons_ext(self, context, layout):
-        layout.prop(self, "noteText")
+        layout.prop(self, "myFloatProperty")
+        # myStringProperty button will only be visible in the sidebar
+        layout.prop(self, "myStringProperty")
 
-    @classmethod
-    def poll(cls, ntree):
-        return ntree.bl_idname == 'CrowdMasterGenTreeType'
+    # Optional: custom label
+    # Explicit user label overrides this, but here we can define a label dynamically
+    def draw_label(self):
+        return "I am a custom node"
 
-class GenOutputNode(DataInputNode):
-    """CrowdMaster generation output node"""
-    bl_label = "Generate"
 
-    def draw_buttons(self, context, layout):
-        layout.scale_y = 1.5		
-        layout.operator("scene.cm_gen_agents", icon_value=cicon('plus_yellow'))
+### Node Categories ###
+# Node categories are a python system for automatically
+# extending the Add menu, toolbar panels and search operator.
+# For more examples see release/scripts/startup/nodeitems_builtins.py
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
-class MyNodeCategory2(NodeCategory):
+
+# our own base class with an appropriate poll function,
+# so the categories only show up in our own tree type
+class MyNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
-        return context.space_data.tree_type == 'CrowdMasterGenTreeType'
+        return context.space_data.tree_type == 'CustomTreeType'
 
-node_categories2 = [
-    MyNodeCategory2("input", "Input", items=[
-        NodeItem("GroupInputNode"),
-        NodeItem("ObjectInputNode"),
-        NodeItem("NumberInputNode")
+# all categories in a list
+node_categories = [
+    # identifier, label, items list
+    MyNodeCategory("SOMENODES", "Some Nodes", items=[
+        # our basic node
+        NodeItem("CustomNodeType"),
         ]),
-    MyNodeCategory2("output", "Output", items=[
-        NodeItem("GenOutputNode")
+    MyNodeCategory("OTHERNODES", "Other Nodes", items=[
+        # the node item can have additional settings,
+        # which are applied to new nodes
+        # NB: settings values are stored as string expressions,
+        # for this reason they should be converted to strings using repr()
+        NodeItem("CustomNodeType", label="Node A", settings={
+            "myStringProperty": repr("Lorem ipsum dolor sit amet"),
+            "myFloatProperty": repr(1.0),
+            }),
+        NodeItem("CustomNodeType", label="Node B", settings={
+            "myStringProperty": repr("consectetur adipisicing elit"),
+            "myFloatProperty": repr(2.0),
+            }),
         ]),
-    MyNodeCategory2("through", "Through", items=[
-        NodeItem("TemplateNode"),
-        NodeItem("RandomNode")
-        ]),
-    MyNodeCategory2("layout", "Layout", items=[
-        NodeItem("GenNoteNode")
-        ])
     ]
 
+
 def register():
-    bpy.utils.register_class(CrowdMasterGenTree)
-    bpy.utils.register_class(TemplateSocket)
-    bpy.utils.register_class(GeoTemplateSocket)
-    bpy.utils.register_class(DataInputNode)
-    bpy.utils.register_class(DataOutputNode)
-    bpy.utils.register_class(DataThroughNode)
+    bpy.utils.register_class(MyCustomTree)
+    bpy.utils.register_class(MyCustomSocket)
+    bpy.utils.register_class(MyCustomNode)
 
-    bpy.utils.register_class(GroupInputNode)
-    bpy.utils.register_class(ObjectInputNode)
-    bpy.utils.register_class(TemplateNode)
-    bpy.utils.register_class(RandomNode)
-    bpy.utils.register_class(NumberInputNode)
-    bpy.utils.register_class(GenNoteNode)
-    bpy.utils.register_class(GenOutputNode)
-
-    nodeitems_utils.register_node_categories("CrowdMasterGen_NODES", node_categories2)
+    nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)
 
 
 def unregister():
-    nodeitems_utils.unregister_node_categories("CrowdMasterGen_NODES")
+    nodeitems_utils.unregister_node_categories("CUSTOM_NODES")
 
-    bpy.utils.unregister_class(CrowdMasterGenTree)
-    bpy.utils.unregister_class(TemplateSocket)
-    bpy.utils.unregister_class(GeoTemplateSocket)
-    bpy.utils.unregister_class(DataInputNode)
-    bpy.utils.unregister_class(DataOutputNode)
-    bpy.utils.unregister_class(DataThroughNode)
+    bpy.utils.unregister_class(MyCustomTree)
+    bpy.utils.unregister_class(MyCustomSocket)
+    bpy.utils.unregister_class(MyCustomNode)
 
-    bpy.utils.unregister_class(GroupInputNode)
-    bpy.utils.unregister_class(ObjectInputNode)
-    bpy.utils.unregister_class(TemplateNode)
-    bpy.utils.unregister_class(RandomNode)
-    bpy.utils.unregister_class(NumberInputNode)
-    bpy.utils.unregister_class(GenNoteNode)
-    bpy.utils.unregister_class(GenOutputNode)
 
 if __name__ == "__main__":
     register()
