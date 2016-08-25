@@ -4,18 +4,12 @@ from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from .. icon_load import cicon
 
-class MyCustomTree(NodeTree):
-    # Description string
-    '''A custom node tree type that will show up in the node editor header'''
-    # Optional identifier string. If not explicitly defined, the python class name is used.
-    bl_idname = 'CustomTreeType'
-    # Label for nice name display
-    bl_label = 'Custom Node Tree'
-    # Icon identifier
-    bl_icon = 'NODETREE'
+class CrowdMasterAGenTree(NodeTree):
+    '''CrowdMaster agent generation node tree'''
+    bl_idname = 'CrowdMasterAGenTreeType'
+    bl_label = 'CrowdMaster Agent Generation'
+    bl_icon = 'MOD_ARRAY'
 
-
-# Custom socket type
 class MyCustomSocket(NodeSocket):
     # Description string
     '''Custom node socket type'''
@@ -51,7 +45,7 @@ class MyCustomSocket(NodeSocket):
 class MyCustomTreeNode:
     @classmethod
     def poll(cls, ntree):
-        return ntree.bl_idname == 'CustomTreeType'
+        return ntree.bl_idname == 'CrowdMasterAGenTreeType'
 
 
 # Derived from the Node base type.
@@ -112,35 +106,19 @@ class MyCustomNode(Node, MyCustomTreeNode):
     def draw_label(self):
         return "I am a custom node"
 
-
-### Node Categories ###
-# Node categories are a python system for automatically
-# extending the Add menu, toolbar panels and search operator.
-# For more examples see release/scripts/startup/nodeitems_builtins.py
-
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
-
-# our own base class with an appropriate poll function,
-# so the categories only show up in our own tree type
-class MyNodeCategory(NodeCategory):
+class CrowdMasterAGenCategories(NodeCategory):
     @classmethod
     def poll(cls, context):
-        return context.space_data.tree_type == 'CustomTreeType'
+        return context.space_data.tree_type == 'CrowdMasterAGenTreeType'
 
-# all categories in a list
-node_categories = [
-    # identifier, label, items list
-    MyNodeCategory("SOMENODES", "Some Nodes", items=[
-        # our basic node
+agen_node_categories = [
+    CrowdMasterAGenCategories("SOMENODES", "Some Nodes", items=[
         NodeItem("CustomNodeType"),
         ]),
-    MyNodeCategory("OTHERNODES", "Other Nodes", items=[
-        # the node item can have additional settings,
-        # which are applied to new nodes
-        # NB: settings values are stored as string expressions,
-        # for this reason they should be converted to strings using repr()
+    CrowdMasterAGenCategories("OTHERNODES", "Other Nodes", items=[
         NodeItem("CustomNodeType", label="Node A", settings={
             "myStringProperty": repr("Lorem ipsum dolor sit amet"),
             "myFloatProperty": repr(1.0),
@@ -152,19 +130,18 @@ node_categories = [
         ]),
     ]
 
-
 def register():
-    bpy.utils.register_class(MyCustomTree)
+    bpy.utils.register_class(CrowdMasterAGenTree)
     bpy.utils.register_class(MyCustomSocket)
     bpy.utils.register_class(MyCustomNode)
 
-    nodeitems_utils.register_node_categories("CUSTOM_NODES", node_categories)
+    nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
 
 def unregister():
-    nodeitems_utils.unregister_node_categories("CUSTOM_NODES")
+    nodeitems_utils.unregister_node_categories("AGEN_CUSTOM_NODES")
 
-    bpy.utils.unregister_class(MyCustomTree)
+    bpy.utils.unregister_class(CrowdMasterAGenTree)
     bpy.utils.unregister_class(MyCustomSocket)
     bpy.utils.unregister_class(MyCustomNode)
 
