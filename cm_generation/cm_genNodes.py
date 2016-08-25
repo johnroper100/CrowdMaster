@@ -140,6 +140,16 @@ class GenerateNode(Node, CrowdMasterAGenTreeNode):
         layout.scale_y = 1.5
         layout.operator("scene.cm_gen_agents", icon_value=cicon('plus_yellow'))
 
+class GeoInputNode(Node, CrowdMasterAGenTreeNode):
+    '''The geo input node'''
+    bl_idname = 'GeoInputNodeType'
+    bl_label = 'Geometry'
+    bl_icon = 'SOUND'
+
+    def init(self, context):
+        self.outputs.new('ObjectSocketType', "Object")
+        self.outputs.new('GroupSocketType', "Group")
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -149,7 +159,10 @@ class CrowdMasterAGenCategories(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterAGenTreeType'
 
 agen_node_categories = [
-    CrowdMasterAGenCategories("SOMENODES", "Some Nodes", items=[
+    CrowdMasterAGenCategories("input", "Input", items=[
+        NodeItem("GeoInputNodeType"),
+        ]),
+    CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType"),
         ]),
     ]
@@ -161,9 +174,9 @@ def register():
     bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(GroupSocket)
     bpy.utils.register_class(GenerateNode)
+    bpy.utils.register_class(GeoInputNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
-
 
 def unregister():
     nodeitems_utils.unregister_node_categories("AGEN_CUSTOM_NODES")
@@ -173,8 +186,7 @@ def unregister():
     bpy.utils.unregister_class(TemplateSocket)
     bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(GroupSocket)
-    bpy.utils.unregister_class(GenerateNode)
-
+    bpy.utils.unregister_class(GeoInputNode)
 
 if __name__ == "__main__":
     register()
