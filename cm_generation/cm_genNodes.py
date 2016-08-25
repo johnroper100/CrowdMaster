@@ -21,6 +21,17 @@ class GeoSocket(NodeSocket):
     def draw_color(self, context, node):
         return (0.0, 0.0, 0.2, 0.5)
 
+class TemplateSocket(NodeSocket):
+    '''Template node socket type'''
+    bl_idname = 'TemplateSocketType'
+    bl_label = 'Template Node Socket'
+
+    def draw(self, context, layout, node, text):
+        layout.label(text)
+
+    def draw_color(self, context, node):
+        return (0.8, 0.5, 0.0, 0.9)
+
 class ObjectSocket(NodeSocket):
     '''Object node socket type'''
     bl_idname = 'ObjectSocketType'
@@ -34,9 +45,8 @@ class ObjectSocket(NodeSocket):
         else:
             layout.prop_search(self, "inputObject", context.scene, "objects", text=text)
 
-    # Socket color
     def draw_color(self, context, node):
-        return (1.0, 0.4, 0.216, 0.5)
+        return (1.0, 0.5, 0.2, 0.5)
 
 class GroupSocket(NodeSocket):
     '''Group node socket type'''
@@ -51,15 +61,13 @@ class GroupSocket(NodeSocket):
         else:
             layout.prop_search(self, "inputGroup", bpy.data, "groups", text=text)
 
-    # Socket color
     def draw_color(self, context, node):
-        return (1.0, 0.4, 0.216, 0.5)
+        return (1.0, 0.5, 0.2, 0.5)
 
 class MyCustomTreeNode:
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterAGenTreeType'
-
 
 # Derived from the Node base type.
 class MyCustomNode(Node, MyCustomTreeNode):
@@ -147,6 +155,7 @@ agen_node_categories = [
 def register():
     bpy.utils.register_class(CrowdMasterAGenTree)
     bpy.utils.register_class(GeoSocket)
+    bpy.utils.register_class(TemplateSocket)
     bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(GroupSocket)
     bpy.utils.register_class(MyCustomNode)
@@ -159,6 +168,7 @@ def unregister():
 
     bpy.utils.unregister_class(CrowdMasterAGenTree)
     bpy.utils.unregister_class(GeoSocket)
+    bpy.utils.unregister_class(TemplateSocket)
     bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(GroupSocket)
     bpy.utils.unregister_class(MyCustomNode)
