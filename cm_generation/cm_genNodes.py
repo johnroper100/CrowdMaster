@@ -140,15 +140,33 @@ class GenerateNode(Node, CrowdMasterAGenTreeNode):
         layout.scale_y = 1.5
         layout.operator("scene.cm_gen_agents", icon_value=cicon('plus_yellow'))
 
-class GeoInputNode(Node, CrowdMasterAGenTreeNode):
-    '''The geo input node'''
-    bl_idname = 'GeoInputNodeType'
-    bl_label = 'Geometry'
+class ObjectInputNode(Node, CrowdMasterAGenTreeNode):
+    '''The object input node'''
+    bl_idname = 'ObjectInputNodeType'
+    bl_label = 'Object'
     bl_icon = 'SOUND'
 
+    inputObject = StringProperty(name="Object")
+
     def init(self, context):
-        self.outputs.new('ObjectSocketType', "Object")
-        self.outputs.new('GroupSocketType', "Group")
+        self.outputs.new('GeoSocketType', "Geometry")
+    
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "inputObject", context.scene, "objects")
+
+class GroupInputNode(Node, CrowdMasterAGenTreeNode):
+    '''The group input node'''
+    bl_idname = 'GroupInputNodeType'
+    bl_label = 'Group'
+    bl_icon = 'SOUND'
+
+    inputGroup = StringProperty(name="Group")
+
+    def init(self, context):
+        self.outputs.new('GeoSocketType', "Geometry")
+    
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "inputGroup", bpy.data, "groups")
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -160,7 +178,8 @@ class CrowdMasterAGenCategories(NodeCategory):
 
 agen_node_categories = [
     CrowdMasterAGenCategories("input", "Input", items=[
-        NodeItem("GeoInputNodeType"),
+        NodeItem("ObjectInputNodeType"),
+        NodeItem("GroupInputNodeType"),
         ]),
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType"),
@@ -174,7 +193,8 @@ def register():
     bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(GroupSocket)
     bpy.utils.register_class(GenerateNode)
-    bpy.utils.register_class(GeoInputNode)
+    bpy.utils.register_class(ObjectInputNode)
+    bpy.utils.register_class(GroupInputNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -186,7 +206,8 @@ def unregister():
     bpy.utils.unregister_class(TemplateSocket)
     bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(GroupSocket)
-    bpy.utils.unregister_class(GeoInputNode)
+    bpy.utils.unregister_class(ObjectInputNode)
+    bpy.utils.unregister_class(GroupInputNode)
 
 if __name__ == "__main__":
     register()
