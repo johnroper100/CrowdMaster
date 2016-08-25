@@ -64,13 +64,12 @@ class GroupSocket(NodeSocket):
     def draw_color(self, context, node):
         return (1.0, 0.5, 0.2, 0.5)
 
-class MyCustomTreeNode:
+class CrowdMasterAGenTreeNode:
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterAGenTreeType'
 
-# Derived from the Node base type.
-class MyCustomNode(Node, MyCustomTreeNode):
+class MyCustomNode(Node, CrowdMasterAGenTreeNode):
     # === Basics ===
     # Description string
     '''A custom node'''
@@ -128,6 +127,19 @@ class MyCustomNode(Node, MyCustomTreeNode):
     def draw_label(self):
         return "I am a custom node"
 
+class GenerateNode(Node, CrowdMasterAGenTreeNode):
+    '''The generate node'''
+    bl_idname = 'GenerateNodeType'
+    bl_label = 'Generate'
+    bl_icon = 'SOUND'
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.scale_y = 1.5
+        layout.operator("scene.cm_gen_agents", icon_value=cicon('plus_yellow'))
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -138,17 +150,7 @@ class CrowdMasterAGenCategories(NodeCategory):
 
 agen_node_categories = [
     CrowdMasterAGenCategories("SOMENODES", "Some Nodes", items=[
-        NodeItem("CustomNodeType"),
-        ]),
-    CrowdMasterAGenCategories("OTHERNODES", "Other Nodes", items=[
-        NodeItem("CustomNodeType", label="Node A", settings={
-            "myStringProperty": repr("Lorem ipsum dolor sit amet"),
-            "myFloatProperty": repr(1.0),
-            }),
-        NodeItem("CustomNodeType", label="Node B", settings={
-            "myStringProperty": repr("consectetur adipisicing elit"),
-            "myFloatProperty": repr(2.0),
-            }),
+        NodeItem("GenerateNodeType"),
         ]),
     ]
 
@@ -158,7 +160,7 @@ def register():
     bpy.utils.register_class(TemplateSocket)
     bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(GroupSocket)
-    bpy.utils.register_class(MyCustomNode)
+    bpy.utils.register_class(GenerateNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -171,7 +173,7 @@ def unregister():
     bpy.utils.unregister_class(TemplateSocket)
     bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(GroupSocket)
-    bpy.utils.unregister_class(MyCustomNode)
+    bpy.utils.unregister_class(GenerateNode)
 
 
 if __name__ == "__main__":
