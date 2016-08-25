@@ -10,38 +10,51 @@ class CrowdMasterAGenTree(NodeTree):
     bl_label = 'CrowdMaster Agent Generation'
     bl_icon = 'MOD_ARRAY'
 
-class MyCustomSocket(NodeSocket):
-    # Description string
-    '''Custom node socket type'''
-    # Optional identifier string. If not explicitly defined, the python class name is used.
-    bl_idname = 'CustomSocketType'
-    # Label for nice name display
-    bl_label = 'Custom Node Socket'
+class GeoSocket(NodeSocket):
+    '''Geo node socket type'''
+    bl_idname = 'GeoSocketType'
+    bl_label = 'Geo Node Socket'
 
-    # Enum items list
-    my_items = [
-        ("DOWN", "Down", "Where your feet are"),
-        ("UP", "Up", "Where your head should be"),
-        ("LEFT", "Left", "Not right"),
-        ("RIGHT", "Right", "Not left")
-    ]
-
-    myEnumProperty = bpy.props.EnumProperty(name="Direction", description="Just an example", items=my_items, default='UP')
-
-    # Optional function for drawing the socket input value
     def draw(self, context, layout, node, text):
-        if self.is_output or self.is_linked:
+        layout.label(text)
+
+    def draw_color(self, context, node):
+        return (0.0, 0.0, 0.2, 0.5)
+
+class ObjectSocket(NodeSocket):
+    '''Object node socket type'''
+    bl_idname = 'ObjectSocketType'
+    bl_label = 'Object Node Socket'
+
+    inputObject = StringProperty(name="Object")
+
+    def draw(self, context, layout, node, text):
+        if self.is_linked:
             layout.label(text)
         else:
-            layout.prop(self, "myEnumProperty", text=text)
+            layout.prop_search(self, "inputObject", context.scene, "objects", text=text)
 
     # Socket color
     def draw_color(self, context, node):
         return (1.0, 0.4, 0.216, 0.5)
 
+class GroupSocket(NodeSocket):
+    '''Group node socket type'''
+    bl_idname = 'GroupSocketType'
+    bl_label = 'Group Node Socket'
 
-# Mix-in class for all custom nodes in this tree type.
-# Defines a poll function to enable instantiation.
+    inputGroup = StringProperty(name="Group")
+
+    def draw(self, context, layout, node, text):
+        if self.is_linked:
+            layout.label(text)
+        else:
+            layout.prop_search(self, "inputGroup", bpy.data, "groups", text=text)
+
+    # Socket color
+    def draw_color(self, context, node):
+        return (1.0, 0.4, 0.216, 0.5)
+
 class MyCustomTreeNode:
     @classmethod
     def poll(cls, ntree):
@@ -73,12 +86,13 @@ class MyCustomNode(Node, MyCustomTreeNode):
     # NOTE: this is not the same as the standard __init__ function in Python, which is
     #       a purely internal Python method and unknown to the node system!
     def init(self, context):
-        self.inputs.new('CustomSocketType', "Hello")
+        self.inputs.new('ObjectSocketType', "Hello")
         self.inputs.new('NodeSocketFloat', "World")
         self.inputs.new('NodeSocketVector', "!")
 
         self.outputs.new('NodeSocketColor', "How")
         self.outputs.new('NodeSocketColor', "are")
+        self.outputs.new('GroupSocketType', "are")
         self.outputs.new('NodeSocketFloat', "you")
 
     # Copy function to initialize a copied node from an existing one.
@@ -132,7 +146,9 @@ agen_node_categories = [
 
 def register():
     bpy.utils.register_class(CrowdMasterAGenTree)
-    bpy.utils.register_class(MyCustomSocket)
+    bpy.utils.register_class(GeoSocket)
+    bpy.utils.register_class(ObjectSocket)
+    bpy.utils.register_class(GroupSocket)
     bpy.utils.register_class(MyCustomNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
@@ -142,7 +158,9 @@ def unregister():
     nodeitems_utils.unregister_node_categories("AGEN_CUSTOM_NODES")
 
     bpy.utils.unregister_class(CrowdMasterAGenTree)
-    bpy.utils.unregister_class(MyCustomSocket)
+    bpy.utils.unregister_class(GeoSocket)
+    bpy.utils.unregister_class(ObjectSocket)
+    bpy.utils.unregister_class(GroupSocket)
     bpy.utils.unregister_class(MyCustomNode)
 
 

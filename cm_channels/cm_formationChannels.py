@@ -1,12 +1,9 @@
 from .cm_masterChannels import MasterChannel as Mc
 import mathutils
 from mathutils import Vector
-
 import math
 
-import sys
-sys.paht.append("..")
-from libs.ins_clustering import clusterMatch
+from ..libs.ins_clustering import clusterMatch
 
 import bpy
 
