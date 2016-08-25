@@ -168,6 +168,23 @@ class GroupInputNode(Node, CrowdMasterAGenTreeNode):
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "inputGroup", bpy.data, "groups")
 
+class GeoSwitchNode(Node, CrowdMasterAGenTreeNode):
+    '''The geo switch node'''
+    bl_idname = 'GeoSwitchNodeType'
+    bl_label = 'Geo Switch'
+    bl_icon = 'SOUND'
+
+    switchAmount = FloatProperty(name="Amount", default = 0.5, min=0.0, max=1.0)
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Object 1")
+        self.inputs.new('GeoSocketType', "Object 2")
+        
+        self.outputs.new('GeoSocketType', "Objects")
+    
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "switchAmount")
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -184,6 +201,9 @@ agen_node_categories = [
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType"),
         ]),
+    CrowdMasterAGenCategories("geometry", "Geometry", items=[
+        NodeItem("GeoSwitchNodeType", label="Switch"),
+        ]),
     ]
 
 def register():
@@ -195,6 +215,7 @@ def register():
     bpy.utils.register_class(GenerateNode)
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
+    bpy.utils.register_class(GeoSwitchNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -208,6 +229,7 @@ def unregister():
     bpy.utils.unregister_class(GroupSocket)
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
+    bpy.utils.unregister_class(GeoSwitchNode)
 
 if __name__ == "__main__":
     register()
