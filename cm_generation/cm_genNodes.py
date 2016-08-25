@@ -50,7 +50,7 @@ class DataInputNode(CrowdMasterGenNode):
     bl_label = 'Data input super class'
 
     def init(self, context):
-        self.inputs.new('GroupInputSocket', "Input")
+        self.inputs.new('GeoTemplateSocket', "Input")
         self.inputs[0].link_limit = 4095
 
     def getSettings(self, node):
@@ -69,7 +69,7 @@ class DataThroughNode(CrowdMasterGenNode):
     bl_label = 'Data through super class'
 
     def init(self, context):
-        self.inputs.new('GroupInputSocket', "Input")
+        self.inputs.new('GeoTemplateSocket', "Input")
         self.inputs[0].link_limit = 4095
 
         self.outputs.new('GeoTemplateSocket', "Output")
