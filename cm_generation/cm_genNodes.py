@@ -19,7 +19,10 @@ class GeoSocket(NodeSocket):
         layout.label(text)
 
     def draw_color(self, context, node):
-        return (0.0, 0.0, 0.2, 0.5)
+        if self.is_linked:
+            return (0.0, 0.0, 0.2, 0.9)
+        else:
+            return (0.0, 0.0, 0.2, 0.5)
 
 class TemplateSocket(NodeSocket):
     '''Template node socket type'''
@@ -30,7 +33,11 @@ class TemplateSocket(NodeSocket):
         layout.label(text)
 
     def draw_color(self, context, node):
-        return (0.8, 0.5, 0.0, 0.9)
+        if self.is_linked:
+            return (0.8, 0.5, 0.0, 0.9)
+        else:
+            return (0.8, 0.5, 0.0, 0.5)
+        
 
 class ObjectSocket(NodeSocket):
     '''Object node socket type'''
@@ -174,13 +181,30 @@ class GeoSwitchNode(Node, CrowdMasterAGenTreeNode):
     bl_label = 'Geo Switch'
     bl_icon = 'SOUND'
 
-    switchAmount = FloatProperty(name="Amount", default = 0.5, min=0.0, max=1.0)
+    switchAmount = FloatProperty(name="Amount", default = 0.5, min=0.0, max=1.0, precision=0)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Object 1")
         self.inputs.new('GeoSocketType', "Object 2")
         
         self.outputs.new('GeoSocketType', "Objects")
+    
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "switchAmount")
+
+class TemplateSwitchNode(Node, CrowdMasterAGenTreeNode):
+    '''The template switch node'''
+    bl_idname = 'TemplateSwitchNodeType'
+    bl_label = 'Template Switch'
+    bl_icon = 'SOUND'
+
+    switchAmount = FloatProperty(name="Amount", default = 0.5, min=0.0, max=1.0, precision=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template 1")
+        self.inputs.new('TemplateSocketType', "Template 2")
+        
+        self.outputs.new('TemplateSocketType', "Templates")
     
     def draw_buttons(self, context, layout):
         layout.prop(self, "switchAmount")
@@ -194,15 +218,16 @@ class CrowdMasterAGenCategories(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterAGenTreeType'
 
 agen_node_categories = [
-    CrowdMasterAGenCategories("input", "Input", items=[
-        NodeItem("ObjectInputNodeType"),
-        NodeItem("GroupInputNodeType"),
-        ]),
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType"),
         ]),
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
+        NodeItem("ObjectInputNodeType"),
+        NodeItem("GroupInputNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
+        ]),
+    CrowdMasterAGenCategories("template", "Template", items=[
+        NodeItem("TemplateSwitchNodeType", label="Switch"),
         ]),
     ]
 
@@ -216,6 +241,7 @@ def register():
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(GeoSwitchNode)
+    bpy.utils.register_class(TemplateSwitchNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -230,6 +256,7 @@ def unregister():
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(GeoSwitchNode)
+    bpy.utils.unregister_class(TemplateSwitchNode)
 
 if __name__ == "__main__":
     register()
