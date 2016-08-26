@@ -76,64 +76,6 @@ class CrowdMasterAGenTreeNode:
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterAGenTreeType'
 
-class MyCustomNode(Node, CrowdMasterAGenTreeNode):
-    # === Basics ===
-    # Description string
-    '''A custom node'''
-    # Optional identifier string. If not explicitly defined, the python class name is used.
-    bl_idname = 'CustomNodeType'
-    # Label for nice name display
-    bl_label = 'Custom Node'
-    # Icon identifier
-    bl_icon = 'SOUND'
-
-    # === Custom Properties ===
-    # These work just like custom properties in ID data blocks
-    # Extensive information can be found under
-    # http://wiki.blender.org/index.php/Doc:2.6/Manual/Extensions/Python/Properties
-    myStringProperty = bpy.props.StringProperty()
-    myFloatProperty = bpy.props.FloatProperty(default=3.1415926)
-
-    # === Optional Functions ===
-    # Initialization function, called when a new node is created.
-    # This is the most common place to create the sockets for a node, as shown below.
-    # NOTE: this is not the same as the standard __init__ function in Python, which is
-    #       a purely internal Python method and unknown to the node system!
-    def init(self, context):
-        self.inputs.new('ObjectSocketType', "Hello")
-        self.inputs.new('NodeSocketFloat', "World")
-        self.inputs.new('NodeSocketVector', "!")
-
-        self.outputs.new('NodeSocketColor', "How")
-        self.outputs.new('NodeSocketColor', "are")
-        self.outputs.new('GroupSocketType', "are")
-        self.outputs.new('NodeSocketFloat', "you")
-
-    # Copy function to initialize a copied node from an existing one.
-    def copy(self, node):
-        print("Copying from node ", node)
-
-    # Free function to clean up on removal.
-    def free(self):
-        print("Removing node ", self, ", Goodbye!")
-
-    # Additional buttons displayed on the node.
-    def draw_buttons(self, context, layout):
-        layout.label("Node settings")
-        layout.prop(self, "myFloatProperty")
-
-    # Detail buttons in the sidebar.
-    # If this function is not defined, the draw_buttons function is used instead
-    def draw_buttons_ext(self, context, layout):
-        layout.prop(self, "myFloatProperty")
-        # myStringProperty button will only be visible in the sidebar
-        layout.prop(self, "myStringProperty")
-
-    # Optional: custom label
-    # Explicit user label overrides this, but here we can define a label dynamically
-    def draw_label(self):
-        return "I am a custom node"
-
 class GenerateNode(Node, CrowdMasterAGenTreeNode):
     '''The generate node'''
     bl_idname = 'GenerateNodeType'
@@ -209,6 +151,44 @@ class TemplateSwitchNode(Node, CrowdMasterAGenTreeNode):
     def draw_buttons(self, context, layout):
         layout.prop(self, "switchAmount")
 
+class ParentNode(Node, CrowdMasterAGenTreeNode):
+    '''The parent node'''
+    bl_idname = 'ParentNodeType'
+    bl_label = 'Parent'
+    bl_icon = 'SOUND'
+    
+    parentTo = StringProperty(name="Parent To")
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Parent Group")
+        self.inputs.new('GeoSocketType', "Child Object")
+        
+        self.outputs.new('GeoSocketType', "Objects")
+    
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "parentTo", context.scene, "objects")
+
+class TemplateNode(Node, CrowdMasterAGenTreeNode):
+    '''The template node'''
+    bl_idname = 'TemplateNodeType'
+    bl_label = 'Template'
+    bl_icon = 'SOUND'
+    
+    brainType = EnumProperty(
+        items = [('1', '1', 'Brain type 1'),
+                 ('2', '2', 'Brain type 2')],
+        name = "Brain Type",
+        description = "Which brain type to use",
+        default = "1")
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Objects")
+        
+        self.outputs.new('TemplateSocketType', "Template")
+    
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "brainType")
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -225,8 +205,10 @@ agen_node_categories = [
         NodeItem("ObjectInputNodeType"),
         NodeItem("GroupInputNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
+        NodeItem("ParentNodeType"),
         ]),
     CrowdMasterAGenCategories("template", "Template", items=[
+        NodeItem("TemplateNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch"),
         ]),
     ]
@@ -237,11 +219,14 @@ def register():
     bpy.utils.register_class(TemplateSocket)
     bpy.utils.register_class(ObjectSocket)
     bpy.utils.register_class(GroupSocket)
+
     bpy.utils.register_class(GenerateNode)
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
+    bpy.utils.register_class(ParentNode)
+    bpy.utils.register_class(TemplateNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -253,10 +238,13 @@ def unregister():
     bpy.utils.unregister_class(TemplateSocket)
     bpy.utils.unregister_class(ObjectSocket)
     bpy.utils.unregister_class(GroupSocket)
+
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
+    bpy.utils.unregister_class(ParentNode)
+    bpy.utils.unregister_class(TemplateNode)
 
 if __name__ == "__main__":
     register()
