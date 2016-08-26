@@ -202,6 +202,12 @@ class RandomNode(Node, CrowdMasterAGenTreeNode):
     bl_label = 'Random'
     bl_icon = 'SOUND'
 
+    maxRandRot = FloatProperty(name="Max Rand Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0, max=360.0)
+    minRandRot = FloatProperty(name="Min Rand Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0, min=-360.0)
+
+    maxRandSz = FloatProperty(name="Max Rand Scale", description="The maximum random scale for each agent.", default = 2.0, precision=3)
+    minRandSz = FloatProperty(name="Min Rand Scale", description="The minimum random scale for each agent.", default = 1.0, precision=3)
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs[0].link_limit = 1
@@ -209,7 +215,15 @@ class RandomNode(Node, CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
     
     def draw_buttons(self, context, layout):
-        #layout.prop(self, "brainType")
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
+        row.prop(self, "minRandRot")
+        row.prop(self, "maxRandRot")
+        
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
+        row.prop(self, "minRandSz")
+        row.prop(self, "maxRandSz")
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
