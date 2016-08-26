@@ -480,7 +480,7 @@ class Channel:
         return items
 
     @staticmethod
-    def buildDictFromProperty(dictionary, prop, default=0):
+    def _buildDictFromProperty(dictionary, prop, default=0):
         return {k: v[prop] if prop in v else default for k, v in dictionary}
 
     @property
@@ -488,28 +488,28 @@ class Channel:
         """Return the horizontal angle of sound emitting agents"""
         items = self.calcAndGetItems()
         if items:
-            return self.buildDictFromProperty(items, "rz")
+            return self._buildDictFromProperty(items, "rz")
 
     @property
     def rx(self):
         """Return the vertical angle of sound emitting agents"""
         items = self.calcAndGetItems()
         if items:
-            return self.buildDictFromProperty(items, "rx")
+            return self._buildDictFromProperty(items, "rx")
 
     @property
     def dist(self):
         """Return the distance to the sound emitting agents 0-1"""
         items = self.calcAndGetItems()
         if items:
-            return self.buildDictFromProperty(items, "distProp")
+            return self._buildDictFromProperty(items, "distProp")
 
     @property
     def close(self):
         """Return how close the sound emitting is 0-1"""
         items = self.calcAndGetItems()
         if items:
-            result = self.buildDictFromProperty(items, "distProp")
+            result = self._buildDictFromProperty(items, "distProp")
             return {k: 1-v for k, v in result}
 
     @property
@@ -517,26 +517,26 @@ class Channel:
         """Return the volume (dist^2) of sound emitting agents"""
         items = self.calcAndGetItems()
         if items:
-            tmp = self.buildDictFromProperty(items, "rz")
-            return {k: v**2 for k, v in tmp.items()}
+            tmp = self._buildDictFromProperty(items, "distProp")
+            return {k: (1-v)**2 for k, v in tmp.items()}
 
     @property
     def cert(self):
         """Return the certainty of a prediction 0-1"""
         items = self.calcAndGetItems()
         if items:
-            return self.buildDictFromProperty(items, "cert", default=1)
+            return self._buildDictFromProperty(items, "cert", default=1)
 
     @property
     def acc(self):
         """Return the recommended acceleration to avoid a collision"""
         items = self.calcAndGetItems()
         if items:
-            return self.buildDictFromProperty(items, "acc")
+            return self._buildDictFromProperty(items, "acc")
 
     @property
     def over(self):
         """Return the predicted worst case overlap"""
         items = self.calcAndGetItems()
         if items:
-            return self.buildDictFromProperty(items, "overlap")
+            return self._buildDictFromProperty(items, "overlap")
