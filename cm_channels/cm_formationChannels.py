@@ -9,7 +9,7 @@ import bpy
 
 
 class Formation(Mc):
-    """Get data about the ground near the agent"""
+    """Get and set data to allow agents to align themselves into formations"""
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.formations = {}
