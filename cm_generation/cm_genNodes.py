@@ -128,6 +128,8 @@ class GeoSwitchNode(Node, CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('GeoSocketType', "Object 1")
         self.inputs.new('GeoSocketType', "Object 2")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
         
         self.outputs.new('GeoSocketType', "Objects")
     
@@ -145,6 +147,8 @@ class TemplateSwitchNode(Node, CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template 1")
         self.inputs.new('TemplateSocketType', "Template 2")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
         
         self.outputs.new('TemplateSocketType', "Templates")
     
@@ -162,6 +166,8 @@ class ParentNode(Node, CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
         self.inputs.new('GeoSocketType', "Child Object")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
         
         self.outputs.new('GeoSocketType', "Objects")
     
@@ -183,11 +189,27 @@ class TemplateNode(Node, CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
+        self.inputs[0].link_limit = 1
         
         self.outputs.new('TemplateSocketType', "Template")
     
     def draw_buttons(self, context, layout):
         layout.prop(self, "brainType")
+
+class RandomNode(Node, CrowdMasterAGenTreeNode):
+    '''The random node'''
+    bl_idname = 'RandomNodeType'
+    bl_label = 'Random'
+    bl_icon = 'SOUND'
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+        
+        self.outputs.new('TemplateSocketType', "Template")
+    
+    def draw_buttons(self, context, layout):
+        #layout.prop(self, "brainType")
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -210,6 +232,7 @@ agen_node_categories = [
     CrowdMasterAGenCategories("template", "Template", items=[
         NodeItem("TemplateNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch"),
+        NodeItem("RandomNodeType"),
         ]),
     ]
 
@@ -227,6 +250,7 @@ def register():
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
     bpy.utils.register_class(TemplateNode)
+    bpy.utils.register_class(RandomNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -245,6 +269,7 @@ def unregister():
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)
     bpy.utils.unregister_class(TemplateNode)
+    bpy.utils.unregister_class(RandomNode)
 
 if __name__ == "__main__":
     register()
