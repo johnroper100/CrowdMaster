@@ -324,7 +324,7 @@ class TargetPositionNode(Node, CrowdMasterAGenTreeNode):
     
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        self.inputs.new('GeoSocketType', "Objects")
+        self.inputs.new('GeoSocketType', "Target Objects")
         self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
