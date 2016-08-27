@@ -244,7 +244,7 @@ class RandomNode(Node, CrowdMasterAGenTreeNode):
 class RandomPositionNode(Node, CrowdMasterAGenTreeNode):
     '''The random positioing node'''
     bl_idname = 'RandomPositionNodeType'
-    bl_label = 'Position Random'
+    bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
     
     locationType = EnumProperty(
@@ -287,7 +287,7 @@ class RandomPositionNode(Node, CrowdMasterAGenTreeNode):
 class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
     '''The formation positioing node'''
     bl_idname = 'FormationPositionNodeType'
-    bl_label = 'Position Formation'
+    bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
 
     ArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default=1, min=1)
@@ -309,6 +309,26 @@ class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
         row.alignment = 'EXPAND'
         row.prop(self, "ArrayRowMargin")
         row.prop(self, "ArrayColumnMargin")
+
+class TargetPositionNode(Node, CrowdMasterAGenTreeNode):
+    '''The target positioing node'''
+    bl_idname = 'TargetPositionNodeType'
+    bl_label = 'Target Positioning'
+    bl_icon = 'SOUND'
+
+    targetOffset = FloatVectorProperty(name="Offset", description="Tweak the location of the generated agents.", default = [0, 0, 0], subtype = "XYZ")
+    
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs.new('GeoSocketType', "Objects")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
+        
+        self.outputs.new('TemplateSocketType', "Template")
+    
+    def draw_buttons(self, context, layout):
+        row = layout.row()
+        row.prop(self, "targetOffset")
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -333,6 +353,7 @@ agen_node_categories = [
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("FormationPositionNodeType", label="Formation"),
+        NodeItem("TargetPositionNodeType", label="Target"),
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
@@ -359,6 +380,7 @@ def register():
     bpy.utils.register_class(RandomNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(FormationPositionNode)
+    bpy.utils.register_class(TargetPositionNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -382,6 +404,7 @@ def unregister():
     bpy.utils.unregister_class(RandomNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
+    bpy.utils.unregister_class(TargetPositionNode)
 
 if __name__ == "__main__":
     register()
