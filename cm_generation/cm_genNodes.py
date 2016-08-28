@@ -243,6 +243,42 @@ def updateRandomNode(self, context):
     if self.minRandSz > self.maxRandSz:
         self.maxRandSz = self.minRandSz
 
+class OffsetNode(CrowdMasterAGenTreeNode):
+    '''The offset node'''
+    bl_idname = 'OffsetNodeType'
+    bl_label = 'Offset'
+    bl_icon = 'SOUND'
+
+    offset = BoolProperty(name="offset (else global)",
+                          description="Should the given location be added to the position requested or simple overwrite it",
+                          default=True)
+    referenceObject = StringProperty(name="location object",
+                                    description="An object in the scene from which to get the location")
+    locationOffset = FloatVectorProperty(name="Location offset",
+                                       description="Also add this to the location",
+                                       default = [0, 0, 0], subtype = "XYZ")
+    rotationOffset = FloatVectorProperty(name="Rotation offset",
+                                       description="Also add this to the rotation",
+                                       default = [0, 0, 0], subtype = "XYZ")
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "offset")
+        layout.prop_search(self, "referenceObject", context.scene, "objects")
+        layout.prop(self, "locationOffset")
+        layout.prop(self, "rotationOffset")
+
+    def getSettings(self):
+        return {"offset": self.offset,
+                "referenceObject": self.referenceObject,
+                "locationOffset": self.locationOffset,
+                "rotationOffset": self.rotationOffset}
+
 class RandomNode(CrowdMasterAGenTreeNode):
     '''The random node'''
     bl_idname = 'RandomNodeType'
@@ -415,6 +451,9 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     #                                   default = [0, 0, 0], subtype = "XYZ")
     targetObject = StringProperty(name="Target",
                                   description="Placement will be on the vertices of this object")
+    overwritePosition = BoolProperty(name="Overwrite position",
+                                     description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
+                                     default=True)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
@@ -430,6 +469,7 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
         row = layout.row()
         #row.prop(self, "targetOffset")
         layout.prop_search(self, "targetObject", context.scene, "objects")
+        layout.prop(self, "overwritePosition")
 
     def getSettings(self):
         #return {"targetOffset": self.targetOffset}
@@ -448,6 +488,7 @@ agen_node_categories = [
         NodeItem("TemplateNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch"),
         NodeItem("RandomNodeType"),
+        NodeItem("OffsetNodeType")
         ]),
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
         NodeItem("ObjectInputNodeType"),
@@ -482,6 +523,7 @@ def register():
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
     bpy.utils.register_class(TemplateNode)
+    bpy.utils.register_class(OffsetNode)
     bpy.utils.register_class(RandomNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(FormationPositionNode)
@@ -506,6 +548,7 @@ def unregister():
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)
     bpy.utils.unregister_class(TemplateNode)
+    bpy.utils.unregister_class(OffsetNode)
     bpy.utils.unregister_class(RandomNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)

@@ -170,6 +170,21 @@ class TemplateSWITCH(Template):
         index -= 1
         self.inputs[index].build(pos, rot, scale, tags)"""
 
+class TemplateOFFSET(Template):
+    def build(self, pos, rot, scale, tags):
+        nPos = Vector()
+        nRot = Vector()
+        if self.settings["offset"]:
+            nPos = Vector(pos)
+            nRot = Vector(rot)
+        if self.settings["referenceObject"] in bpy.data.objects:
+            refObj = bpy.data.objects[self.settings["referenceObject"]]
+            nPos += refObj.location
+            nRot += Vector(refObj.rotation_euler)
+        nPos += self.settings["locationOffset"]
+        nRot += self.settings["rotationOffset"]
+        self.inputs["Template"].build(nPos, nRot, scale, tags)
+
 class TemplateRANDOM(Template):
     def build(self, pos, rot, scale, tags):
         rotDiff = random.uniform(self.settings["minRandRot"],
@@ -206,11 +221,17 @@ class TemplateFORMATION(Template):
 class TemplateTARGET(Template):
     def build(self, pos, rot, scale, tags):
         obj = bpy.data.objects[self.settings["targetObject"]]
-        wrld = obj.matrix_world
-        targets = [wrld*v.co for v in obj.data.vertices]
-        # TODO do something clever with rot and scale to transform points
-        for vert in targets:
-            self.inputs["Template"].build(vert.co + pos, rot, scale, tags)
+        if self.settings["overwritePosition"]:
+            wrld = obj.matrix_world
+            targets = [wrld*v.co for v in obj.data.vertices]
+            newRot = Vector(obj.rotation_euler)
+            for vert in targets:
+                self.inputs["Template"].build(vert, newRot, scale, tags)
+        else:
+            targets = [v.co for v in obj.data.vertices]
+            # TODO do something clever with rot and scale to transform points
+            for vert in targets:
+                self.inputs["Template"].build(vert + pos, rot, scale, tags)
 
 class TemplateSETTAG(Template):
     def build(self, pos, rot, scale, tags):
@@ -225,6 +246,7 @@ templates = OrderedDict([
     ("TemplateSwitchNodeType", TemplateSWITCH),
     ("ParentNodeType", GeoTemplatePARENT),
     ("TemplateNodeType", TemplateAGENT),
+    ("OffsetNodeType", TemplateOFFSET),
     ("RandomNodeType", TemplateRANDOM),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("FormationPositionNodeType", TemplateFORMATION),
