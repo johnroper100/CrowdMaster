@@ -207,16 +207,21 @@ class TemplateRANDOMPOSITIONING(Template):
                 length = random.random() * self.settings["radius"]
                 x *= length
                 y *= length
-                newPos = Vector((pos.x + x, pos.y + y, pos.z))
+                diff = Vector((x, y, 0))
+                diff.rotate(mathutils.Euler(rot))
+                newPos = Vector(pos) + diff
                 self.inputs["Template"].build(newPos, rot, scale, tags)
 
 class TemplateFORMATION(Template):
     def build(self, pos, rot, scale, tags):
         placePos = Vector(pos)
+        diffVec = Vector((self.settings["ArrayRowMargin"],
+                          self.settings["ArrayColumnMargin"], 0))
+        diffVec.rotate(mathutils.Euler(rot))
+        diffVec *= scale
         for i in range(self.settings["ArrayRows"]):
             self.inputs["Template"].build(placePos, rot, scale, tags)
-            placePos.x += self.settings["ArrayRowMargin"]
-            placePos.y += self.settings["ArrayColumnMargin"]
+            placePos += diffVec
 
 class TemplateTARGET(Template):
     def build(self, pos, rot, scale, tags):
@@ -228,10 +233,11 @@ class TemplateTARGET(Template):
             for vert in targets:
                 self.inputs["Template"].build(vert, newRot, scale, tags)
         else:
-            targets = [v.co for v in obj.data.vertices]
-            # TODO do something clever with rot and scale to transform points
-            for vert in targets:
-                self.inputs["Template"].build(vert + pos, rot, scale, tags)
+            targets = [Vector(v.co) for v in obj.data.vertices]
+            for loc in targets:
+                loc.rotate(mathutils.Euler(rot))
+                loc *= scale
+                self.inputs["Template"].build(loc + pos, rot, scale, tags)
 
 class TemplateSETTAG(Template):
     def build(self, pos, rot, scale, tags):

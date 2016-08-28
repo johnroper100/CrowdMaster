@@ -253,13 +253,13 @@ class OffsetNode(CrowdMasterAGenTreeNode):
                           description="Should the given location be added to the position requested or simple overwrite it",
                           default=True)
     referenceObject = StringProperty(name="location object",
-                                    description="An object in the scene from which to get the location")
+                                     description="An object in the scene from which to get the location")
     locationOffset = FloatVectorProperty(name="Location offset",
-                                       description="Also add this to the location",
-                                       default = [0, 0, 0], subtype = "XYZ")
+                                         description="Also add this to the location",
+                                         default = [0, 0, 0], subtype = "XYZ")
     rotationOffset = FloatVectorProperty(name="Rotation offset",
-                                       description="Also add this to the rotation",
-                                       default = [0, 0, 0], subtype = "XYZ")
+                                         description="Also add this to the rotation",
+                                         default = [0, 0, 0], subtype = "XYZ")
 
     def init(self, context):
         self.inputs.new("TemplateSocketType", "Template")
