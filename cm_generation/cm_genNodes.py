@@ -370,7 +370,6 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         #self.inputs.new('VectorSocketType', "Vector")
-        #self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
         #self.inputs[1].link_limit = 1
         #self.inputs[2].link_limit = 1
@@ -423,7 +422,6 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         #self.inputs.new('VectorSocketType', "Vector")
-        #self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
         #self.inputs[1].link_limit = 1
         #self.inputs[2].link_limit = 1
@@ -463,7 +461,6 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         #self.inputs.new('GeoSocketType', "Target Objects")
-        #self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
         #self.inputs[1].link_limit = 1
         #self.inputs[2].link_limit = 1
