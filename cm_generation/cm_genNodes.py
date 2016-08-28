@@ -472,8 +472,8 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
         layout.prop(self, "overwritePosition")
 
     def getSettings(self):
-        #return {"targetOffset": self.targetOffset}
-        return {"targetObject": self.targetObject}
+        return {"targetObject": self.targetObject,
+                "overwritePosition": self.overwritePosition}
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
