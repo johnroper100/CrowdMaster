@@ -42,14 +42,6 @@ def setcmBrains():
     print("Loaded brains", cm_brains)
 
 
-def cm_brains_callback(scene, context):
-    """Turns the brain data into a format that EnumProperty can take"""
-    # print("Getting brains", cm_brains)
-    cm_brains = bpy.context.scene.cm_brains
-    lis = [(x.identify, x.dispname, x.brain,) for x in cm_brains]
-    return lis
-
-
 def updateagents(self, context):
     bpy.ops.scene.cm_groups_populate()
     bpy.ops.scene.cm_selected_populate()
@@ -57,10 +49,7 @@ def updateagents(self, context):
 
 class agent_entry(PropertyGroup):
     """The data structure for the agent entries"""
-    type = EnumProperty(
-        items=cm_brains_callback,
-        update=updateagents
-    )
+    type = StringProperty(update=updateagents)
     group = IntProperty(update=updateagents)
 
 
@@ -104,10 +93,6 @@ def GroupChange(self, context):
 
 class group_entry(PropertyGroup):
     """The data structure for the group entries"""
-    """type = EnumProperty(
-        items=cm_brains_callback,
-        update=GroupChange
-    )"""
     type = StringProperty()
     group = IntProperty(min=0)
     # TODO the group isn't actually used... it's the name that is used
