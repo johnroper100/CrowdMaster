@@ -56,6 +56,7 @@ class GeoTemplate(Template):
 # ==================== End of base classes ====================
 
 class GeoTemplateOBJECT(GeoTemplate):
+    """For placing objects into the scene"""
     def build(self, pos, rot, scale, group):
         cp = bpy.context.scene.objects[self.settings["inputObject"]].copy()
         group.objects.link(cp)
@@ -63,6 +64,8 @@ class GeoTemplateOBJECT(GeoTemplate):
         return cp
 
 class GeoTemplateGROUP(GeoTemplate):
+    """For placing groups into the scene"""
+    # TODO Meshes connected to armatures get very distorted
     def build(self, pos, rot, scale, group):
         dat = bpy.data
         gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
@@ -95,24 +98,15 @@ class GeoTemplateGROUP(GeoTemplate):
         return topObj
 
 class GeoTemplateSWITCH(GeoTemplate):
+    """Randomly (biased by "switchAmout") pick which of the inputs to use"""
     def build(self, pos, rot, scale, group):
         if random.random() < self.settings["switchAmout"]:
             return self.inputs["Object 1"].build(pos, rot, scale, group)
         else:
             return self.inputs["Object 2"].build(pos, rot, scale, group)
-        # The following is for may inputs
-        """weights = self.settings["weights"]
-        total = sum(weights)
-        r = random.random()
-        choice = r * total
-        index = 0
-        while choice > 0:
-            choice -= weights[index]
-            index += 1
-        index -= 1
-        self.inputs[index].build(parent)"""
 
 class GeoTemplatePARENT(GeoTemplate):
+    """Attach a piece of geo to a bone from the parent geo"""
     def build(self, pos, rot, scale, group):
         parent = self.inputs["Parent Group"].build(pos, rot, scale, group)
         child = self.inputs["Child Object"].build(pos, rot, scale, group)
@@ -120,6 +114,7 @@ class GeoTemplatePARENT(GeoTemplate):
 
 
 class TemplateAGENT(Template):
+    """Create a CrowdMaster agent"""
     def _findGroup(self, brainName):
         for g in bpy.context.scene.cm_groups.coll:
             if g.type == brainName:
@@ -148,29 +143,18 @@ class TemplateAGENT(Template):
                                         groupType=self.settings["brainType"])
             bpy.ops.scene.cm_agents_add(agentName=topObj.name,
                                         brainGroup=str(g[1]))
-        # Set tags, etc...
-        # print("Agent", self.settings["brainType"], pos, rot, scale, tags)
+        # TODO set tags
 
 class TemplateSWITCH(Template):
+    """Randomly (biased by "switchAmout") pick which of the inputs to use"""
     def build(self, pos, rot, scale, tags):
         if random.random() < self.settings["switchAmout"]:
             self.inputs["Template 1"].build(pos, rot, scale, tags)
         else:
             self.inputs["Template 2"].build(pos, rot, scale, tags)
 
-        # The following is for may inputs
-        """weights = self.settings["weights"]
-        total = sum(weights)
-        r = random.random()
-        choice = r * total
-        index = 0
-        while choice > 0:
-            choice -= weights[index]
-            index += 1
-        index -= 1
-        self.inputs[index].build(pos, rot, scale, tags)"""
-
 class TemplateOFFSET(Template):
+    """Modify the postion and/or the rotation of the request made"""
     def build(self, pos, rot, scale, tags):
         nPos = Vector()
         nRot = Vector()
@@ -186,6 +170,7 @@ class TemplateOFFSET(Template):
         self.inputs["Template"].build(nPos, nRot, scale, tags)
 
 class TemplateRANDOM(Template):
+    """Randomly modify rotation and scale of the request made"""
     def build(self, pos, rot, scale, tags):
         rotDiff = random.uniform(self.settings["minRandRot"],
                                  self.settings["maxRandRot"])
@@ -198,6 +183,7 @@ class TemplateRANDOM(Template):
         self.inputs["Template"].build(pos, Vector(eul), newScale, tags)
 
 class TemplateRANDOMPOSITIONING(Template):
+    """Place randomly"""
     def build(self, pos, rot, scale, tags):
         for a in range(self.settings["noToPlace"]):
             if self.settings["locationType"] == "radius":
@@ -213,17 +199,30 @@ class TemplateRANDOMPOSITIONING(Template):
                 self.inputs["Template"].build(newPos, rot, scale, tags)
 
 class TemplateFORMATION(Template):
+    """Place in a row"""
     def build(self, pos, rot, scale, tags):
         placePos = Vector(pos)
-        diffVec = Vector((self.settings["ArrayRowMargin"],
-                          self.settings["ArrayColumnMargin"], 0))
-        diffVec.rotate(mathutils.Euler(rot))
-        diffVec *= scale
-        for i in range(self.settings["ArrayRows"]):
-            self.inputs["Template"].build(placePos, rot, scale, tags)
-            placePos += diffVec
+        diffRow = Vector((self.settings["ArrayRowMargin"], 0, 0))
+        diffCol = Vector((0, self.settings["ArrayColumnMargin"], 0))
+        diffRow.rotate(mathutils.Euler(rot))
+        diffCol.rotate(mathutils.Euler(rot))
+        print("FORMATION")
+        print(diffRow)
+        print(diffCol)
+        diffRow *= scale
+        diffCol *= scale
+        number = self.settings["noToPlace"]
+        rows = self.settings["ArrayRows"]
+        for fullcols in range(number//rows):
+            for row in range(rows):
+                self.inputs["Template"].build(placePos + fullcols*diffCol +
+                                              row*diffRow, rot, scale, tags)
+        for leftOver in range(number%rows):
+            self.inputs["Template"].build(placePos + ((number//rows)+1)*diffCol
+                                          + leftOver*diffRow, rot, scale, tags)
 
 class TemplateTARGET(Template):
+    """Place based on the positions of vertices"""
     def build(self, pos, rot, scale, tags):
         obj = bpy.data.objects[self.settings["targetObject"]]
         if self.settings["overwritePosition"]:
@@ -240,6 +239,7 @@ class TemplateTARGET(Template):
                 self.inputs["Template"].build(loc + pos, rot, scale, tags)
 
 class TemplateSETTAG(Template):
+    """Set a tag for an agent to start with"""
     def build(self, pos, rot, scale, tags):
         tags[self.settings["tagName"]] = self.settings["tagValue"]
         self.inputs["Template"].build(pos, rot, scale, tags)

@@ -409,6 +409,9 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
 
+    noToPlace = IntProperty(name="Number",
+                            description="The number to place",
+                            default=1, min=1)
     ArrayRows = IntProperty(name="Rows",
                             description="The number of rows in the array.",
                             default=1, min=1)
@@ -428,6 +431,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "noToPlace")
         row = layout.row()
         row.prop(self, "ArrayRows")
         row = layout.row(align=True)
@@ -436,7 +440,8 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
         row.prop(self, "ArrayColumnMargin")
 
     def getSettings(self):
-        return {"ArrayRows": self.ArrayRows,
+        return {"noToPlace": self.noToPlace,
+                "ArrayRows": self.ArrayRows,
                 "ArrayRowMargin": self.ArrayRowMargin,
                 "ArrayColumnMargin": self.ArrayColumnMargin}
 
