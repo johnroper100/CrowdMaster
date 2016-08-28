@@ -71,6 +71,20 @@ class SCENE_OT_group_populate(Operator):
 # TODO  needs list clean up adding
 
 
+class SCENE_OT_group_add(Operator):
+    bl_idname = "scene.cm_groups_add"
+    bl_label = "Add a single group"
+
+    groupName = StringProperty()
+    groupType = StringProperty()
+
+    def execute(self, context):
+        item = context.scene.cm_groups.coll.add()
+        item.name = self.groupName
+        item.type = self.groupType
+        return {'FINISHED'}
+
+
 class SCENE_OT_group_remove(Operator):
     """NOT USED NEEDS REMOVING ONCE THE POPULATE KEEPS THE LIST CLEAR"""
     bl_idname = "scene.cm_groups_remove"
@@ -137,18 +151,19 @@ class SCENE_UL_agents(UIList):
             # no idea when this is actually used
 
 
+def findFreeGroup(self):
+    g = [x.group for x in bpy.context.scene.cm_agents.coll]
+    i = 1
+    while True:
+        if i not in g:
+            return i
+        else:
+            i += 1
+
+
 class SCENE_OT_cm_agents_populate(Operator):
     bl_idname = "scene.cm_agents_populate"
     bl_label = "Populate cm agents list"
-
-    def findNext(self):
-        g = [x.group for x in bpy.context.scene.cm_agents.coll]
-        i = 1
-        while True:
-            if i not in g:
-                return i
-            else:
-                i += 1
 
     def execute(self, context):
         setcmBrains()
@@ -156,7 +171,7 @@ class SCENE_OT_cm_agents_populate(Operator):
         ag = [x.name for x in bpy.context.scene.cm_agents.coll]
 
         if bpy.context.scene.cm_agents_default.startType == "Next":
-            group = self.findNext()
+            group = findFreeGroup()
         else:
             group = bpy.context.scene.cm_agents_default.setno
 
@@ -167,12 +182,30 @@ class SCENE_OT_cm_agents_populate(Operator):
                 item.group = group
                 if bpy.context.scene.cm_agents_default.contType == "Inc":
                     if context.scene.cm_agents_default.startType == "Next":
-                        group = self.findNext()
+                        group = findFreeGroup()
                     else:
                         bpy.context.scene.cm_agents_default.setno += 1
                         group = bpy.context.scene.cm_agents_default.setno
                 item.type = 'NONE'
         bpy.ops.scene.cm_groups_populate()
+        return {'FINISHED'}
+
+
+class SCENE_OT_cm_agents_add(Operator):
+    bl_idname = "scene.cm_agents_add"
+    bl_label = "Add single agent to cm agents list"
+
+    agentName = StringProperty()
+    brainGroup = StringProperty()
+
+    def execute(self, context):
+        if bpy.context.scene.cm_agents.coll.find(self.agentName) == -1:
+            item = context.scene.cm_agents.coll.add()
+            item.name = self.agentName
+            item.group = int(self.brainGroup)
+            item.type = 'NONE'
+        else:
+            return {'CANCELLED'}
         return {'FINISHED'}
 
 
@@ -268,7 +301,7 @@ class SCENE_OT_cm_start(Operator):
         if (bpy.data.is_dirty) and (preferences.show_debug_options == False):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
-            
+
         context.scene.frame_current = context.scene.frame_start
         global sim
         if "sim" in globals():
@@ -280,7 +313,7 @@ class SCENE_OT_cm_start(Operator):
             sim.newagent(ag.name)"""
         sim.createAgents(bpy.context.scene.cm_agents.coll)
         sim.startFrameHandler()
-        
+
         if preferences.play_animation == True:
             bpy.ops.screen.animation_play()
         return {'FINISHED'}
@@ -311,7 +344,7 @@ class SCENE_PT_CrowdMaster(Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
-    
+
     @classmethod
     def poll(self, context):
         try:
@@ -323,11 +356,11 @@ class SCENE_PT_CrowdMaster(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         pcoll = icon_load.icon_collection["main"]
         def cicon(name):
             return pcoll[name].icon_id
-        
+
         row = layout.row()
         row.scale_y = 1.1
         row.prop(scene, 'use_agent_generation', icon='MOD_ARRAY')
@@ -339,7 +372,7 @@ class SCENE_PT_CrowdMaster(Panel):
 
             row = box.row()
             row.prop_search(scene, "groundObject", scene, "objects")
-            
+
             row = box.row()
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
@@ -348,10 +381,10 @@ class SCENE_PT_CrowdMaster(Panel):
                 row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_yellow'))
             else:
                 row.operator(CrowdMaster_generate_agents.bl_idname, icon='MOD_ARMATURE')
-        
+
         row = layout.row()
         row.separator()
-        
+
         row = layout.row()
         row.scale_y = 1.5
         if preferences.use_custom_icons == True:
@@ -373,7 +406,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
-    
+
     @classmethod
     def poll(self, context):
         try:
@@ -389,7 +422,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         pcoll = icon_load.icon_collection["main"]
         def cicon(name):
             return pcoll[name].icon_id
@@ -436,7 +469,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         blid_am = SCENE_OT_agent_move.bl_idname
         sub.operator(blid_am, text="", icon="TRIA_UP").direction = 'UP'
         sub.operator(blid_am, text="", icon="TRIA_DOWN").direction = 'DOWN'
-        
+
         default = bpy.context.scene.cm_agents_default
         layout.label(text="Default agents group:")
 
@@ -470,10 +503,10 @@ def register():
     global cm_bpyNodes
     from . import cm_bpyNodes
     cm_bpyNodes.register()
-    
-    global cm_genNodes
-    from .cm_generation import cm_genNodes
-    cm_genNodes.register()
+
+    global cm_generation
+    from . import cm_generation
+    cm_generation.register()
 
     registerTypes()
     action_register()
@@ -501,8 +534,8 @@ def unregister():
     unregisterAllTypes()
 
     addon_updater_ops.unregister()
-    #cm_bpyNodes.unregister()
-    #cm_genNodes.unregister()
+    cm_bpyNodes.unregister()
+    cm_generation.unregister()
 
 if __name__ == "__main__":
     register()

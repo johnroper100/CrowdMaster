@@ -42,7 +42,7 @@ class TemplateSocket(NodeSocket):
 
     def draw_color(self, context, node):
         return (0.125, 0.575, 0.125, 1.0)
-        
+
 
 class ObjectSocket(NodeSocket):
     '''Object node socket type'''
@@ -76,12 +76,12 @@ class GroupSocket(NodeSocket):
     def draw_color(self, context, node):
         return (1.0, 0.5, 0.2, 0.5)
 
-class CrowdMasterAGenTreeNode:
+class CrowdMasterAGenTreeNode(Node):
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterAGenTreeType'
 
-class GenerateNode(Node, CrowdMasterAGenTreeNode):
+class GenerateNode(CrowdMasterAGenTreeNode):
     '''The generate node'''
     bl_idname = 'GenerateNodeType'
     bl_label = 'Generate'
@@ -93,9 +93,12 @@ class GenerateNode(Node, CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.scale_y = 1.5
-        layout.operator("scene.cm_gen_agents", icon_value=cicon('plus_yellow'))
+        oper = layout.operator("scene.cm_agent_nodes_generate",
+                               icon_value=cicon('plus_yellow'))
+        oper.nodeName = self.name
+        oper.nodeTreeName = self.id_data.name
 
-class ObjectInputNode(Node, CrowdMasterAGenTreeNode):
+class ObjectInputNode(CrowdMasterAGenTreeNode):
     '''The object input node'''
     bl_idname = 'ObjectInputNodeType'
     bl_label = 'Object'
@@ -106,11 +109,14 @@ class ObjectInputNode(Node, CrowdMasterAGenTreeNode):
     def init(self, context):
         self.outputs.new('GeoSocketType', "Geometry")
         self.outputs.new('VectorSocketType', "Location")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "inputObject", context.scene, "objects")
 
-class GroupInputNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"inputObject": self.inputObject}
+
+class GroupInputNode(CrowdMasterAGenTreeNode):
     '''The group input node'''
     bl_idname = 'GroupInputNodeType'
     bl_label = 'Group'
@@ -120,11 +126,14 @@ class GroupInputNode(Node, CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.outputs.new('GeoSocketType', "Geometry")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "inputGroup", bpy.data, "groups")
 
-class VectorInputNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"inputGroup": self.inputGroup}
+
+class VectorInputNode(CrowdMasterAGenTreeNode):
     '''The vector input node'''
     bl_idname = 'VectorInputNodeType'
     bl_label = 'Vector'
@@ -134,11 +143,11 @@ class VectorInputNode(Node, CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.outputs.new('VectorSocketType', "Vector")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "inputVector")
 
-class GeoSwitchNode(Node, CrowdMasterAGenTreeNode):
+class GeoSwitchNode(CrowdMasterAGenTreeNode):
     '''The geo switch node'''
     bl_idname = 'GeoSwitchNodeType'
     bl_label = 'Geo Switch'
@@ -151,13 +160,16 @@ class GeoSwitchNode(Node, CrowdMasterAGenTreeNode):
         self.inputs.new('GeoSocketType', "Object 2")
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
-        
+
         self.outputs.new('GeoSocketType', "Objects")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "switchAmount")
 
-class TemplateSwitchNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"switchAmout": self.switchAmount}
+
+class TemplateSwitchNode(CrowdMasterAGenTreeNode):
     '''The template switch node'''
     bl_idname = 'TemplateSwitchNodeType'
     bl_label = 'Template Switch'
@@ -170,18 +182,21 @@ class TemplateSwitchNode(Node, CrowdMasterAGenTreeNode):
         self.inputs.new('TemplateSocketType', "Template 2")
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
-        
+
         self.outputs.new('TemplateSocketType', "Templates")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "switchAmount")
 
-class ParentNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"switchAmout": self.switchAmount}
+
+class ParentNode(CrowdMasterAGenTreeNode):
     '''The parent node'''
     bl_idname = 'ParentNodeType'
     bl_label = 'Parent'
     bl_icon = 'SOUND'
-    
+
     parentTo = StringProperty(name="Parent To")
 
     def init(self, context):
@@ -189,30 +204,36 @@ class ParentNode(Node, CrowdMasterAGenTreeNode):
         self.inputs.new('GeoSocketType', "Child Object")
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
-        
+
         self.outputs.new('GeoSocketType', "Objects")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "parentTo", context.scene, "objects")
 
-class TemplateNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"parentTo": self.parentTo}
+
+class TemplateNode(CrowdMasterAGenTreeNode):
     '''The template node'''
     bl_idname = 'TemplateNodeType'
     bl_label = 'Template'
     bl_icon = 'SOUND'
-    
+
     brainType = StringProperty(name="Brain Type")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
         self.inputs[0].link_limit = 1
-        
+
         self.outputs.new('TemplateSocketType', "Template")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "brainType")
 
-class RandomNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"brainType": self.brainType}
+
+class RandomNode(CrowdMasterAGenTreeNode):
     '''The random node'''
     bl_idname = 'RandomNodeType'
     bl_label = 'Random'
@@ -227,33 +248,39 @@ class RandomNode(Node, CrowdMasterAGenTreeNode):
     def init(self, context):
         self.inputs.new('VectorSocketType', "Vector")
         self.inputs[0].link_limit = 1
-        
+
         self.outputs.new('TemplateSocketType', "Template")
-    
+
     def draw_buttons(self, context, layout):
         row = layout.row(align=True)
         row.alignment = 'EXPAND'
         row.prop(self, "minRandRot")
         row.prop(self, "maxRandRot")
-        
+
         row = layout.row(align=True)
         row.alignment = 'EXPAND'
         row.prop(self, "minRandSz")
         row.prop(self, "maxRandSz")
 
-class RandomPositionNode(Node, CrowdMasterAGenTreeNode):
+    def getSettings(self):
+        return {"maxRandRot": self.maxRandRot,
+                "minRandRot": self.minRandRot,
+                "maxRandSz": self.maxRandSz,
+                "minRandSz": self.minRandSz}
+
+class RandomPositionNode(CrowdMasterAGenTreeNode):
     '''The random positioing node'''
     bl_idname = 'RandomPositionNodeType'
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
-    
+
     locationType = EnumProperty(
         items = [('vector', 'Vector', 'Vector location type'),
                  ('scene', 'Scene', 'Scene location type')],
         name = "Location Type",
         description = "Which location type to use",
         default = "vector")
-    
+
     MaxX = FloatProperty(name="Max X", description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.", default = 50.0)
     MaxY = FloatProperty(name="Max Y", description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.", default = 50.0)
     MinX = FloatProperty(name="Min X", description="The minimum distance in the X direction around the center point where the agents will be randomly spawned.", default = -50.0)
@@ -266,9 +293,8 @@ class RandomPositionNode(Node, CrowdMasterAGenTreeNode):
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
         self.inputs[2].link_limit = 1
-        
         self.outputs.new('TemplateSocketType', "Template")
-    
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "locationType")
         if self.locationType == "vector":
@@ -286,6 +312,13 @@ class RandomPositionNode(Node, CrowdMasterAGenTreeNode):
             row.prop(self, "MinY")
             row.prop(self, "MaxY")
 
+    def getSettings(self):
+        return {"locationType": self.locationType,
+                "MaxX": self.MaxX,
+                "MaxY": self.MaxY,
+                "MinX": self.MinX,
+                "MinY": self.MinY}
+
 class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
     '''The formation positioing node'''
     bl_idname = 'FormationPositionNodeType'
@@ -295,7 +328,7 @@ class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
     ArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default=1, min=1)
     ArrayRowMargin = FloatProperty(name="Row Margin", description="The margin between each row.")
     ArrayColumnMargin = FloatProperty(name="Column Margin", description="The margin between each column.")
-    
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs.new('VectorSocketType', "Vector")
@@ -303,9 +336,9 @@ class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
         self.inputs[2].link_limit = 1
-        
+
         self.outputs.new('TemplateSocketType', "Template")
-    
+
     def draw_buttons(self, context, layout):
         row = layout.row()
         row.prop(self, "ArrayRows")
@@ -321,7 +354,7 @@ class TargetPositionNode(Node, CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
 
     targetOffset = FloatVectorProperty(name="Offset", description="Tweak the location of the generated agents.", default = [0, 0, 0], subtype = "XYZ")
-    
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs.new('GeoSocketType', "Target Objects")
@@ -329,9 +362,9 @@ class TargetPositionNode(Node, CrowdMasterAGenTreeNode):
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
         self.inputs[2].link_limit = 1
-        
+
         self.outputs.new('TemplateSocketType', "Template")
-    
+
     def draw_buttons(self, context, layout):
         row = layout.row()
         row.prop(self, "targetOffset")
