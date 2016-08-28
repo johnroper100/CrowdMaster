@@ -319,7 +319,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                 "MinX": self.MinX,
                 "MinY": self.MinY}
 
-class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
+class FormationPositionNode(CrowdMasterAGenTreeNode):
     '''The formation positioing node'''
     bl_idname = 'FormationPositionNodeType'
     bl_label = 'Formation Positioning'
@@ -347,7 +347,7 @@ class FormationPositionNode(Node, CrowdMasterAGenTreeNode):
         row.prop(self, "ArrayRowMargin")
         row.prop(self, "ArrayColumnMargin")
 
-class TargetPositionNode(Node, CrowdMasterAGenTreeNode):
+class TargetPositionNode(CrowdMasterAGenTreeNode):
     '''The target positioing node'''
     bl_idname = 'TargetPositionNodeType'
     bl_label = 'Target Positioning'
