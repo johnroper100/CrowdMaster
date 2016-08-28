@@ -206,9 +206,6 @@ class TemplateFORMATION(Template):
         diffCol = Vector((0, self.settings["ArrayColumnMargin"], 0))
         diffRow.rotate(mathutils.Euler(rot))
         diffCol.rotate(mathutils.Euler(rot))
-        print("FORMATION")
-        print(diffRow)
-        print(diffCol)
         diffRow *= scale
         diffCol *= scale
         number = self.settings["noToPlace"]
@@ -218,7 +215,7 @@ class TemplateFORMATION(Template):
                 self.inputs["Template"].build(placePos + fullcols*diffCol +
                                               row*diffRow, rot, scale, tags)
         for leftOver in range(number%rows):
-            self.inputs["Template"].build(placePos + ((number//rows)+1)*diffCol
+            self.inputs["Template"].build(placePos + (number//rows)*diffCol
                                           + leftOver*diffRow, rot, scale, tags)
 
 class TemplateTARGET(Template):
