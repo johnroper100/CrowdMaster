@@ -249,15 +249,15 @@ class OffsetNode(CrowdMasterAGenTreeNode):
     bl_label = 'Offset'
     bl_icon = 'SOUND'
 
-    offset = BoolProperty(name="offset (else global)",
-                          description="Should the given location be added to the position requested or simple overwrite it",
+    offset = BoolProperty(name="Overwrite",
+                          description="Should the given location be added to the position requested or simply overwrite it?",
                           default=True)
-    referenceObject = StringProperty(name="location object",
+    referenceObject = StringProperty(name="Location Object",
                                      description="An object in the scene from which to get the location")
-    locationOffset = FloatVectorProperty(name="Location offset",
+    locationOffset = FloatVectorProperty(name="Location Offset",
                                          description="Also add this to the location",
                                          default = [0, 0, 0], subtype = "XYZ")
-    rotationOffset = FloatVectorProperty(name="Rotation offset",
+    rotationOffset = FloatVectorProperty(name="Rotation Offset",
                                          description="Also add this to the rotation",
                                          default = [0, 0, 0], subtype = "XYZ")
 
@@ -333,7 +333,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
 
-    noToPlace = IntProperty(name="Number",
+    noToPlace = IntProperty(name="Number Of Agents",
                             description="The number of agents to place",
                             default=1)
 
@@ -409,8 +409,8 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
 
-    noToPlace = IntProperty(name="Number",
-                            description="The number to place",
+    noToPlace = IntProperty(name="Number Of Agents",
+                            description="The number of agents to place",
                             default=1, min=1)
     ArrayRows = IntProperty(name="Rows",
                             description="The number of rows in the array.",
@@ -489,17 +489,17 @@ class CrowdMasterAGenCategories(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterAGenTreeType'
 
 agen_node_categories = [
-    CrowdMasterAGenCategories("template", "Template", items=[
-        NodeItem("TemplateNodeType"),
-        NodeItem("TemplateSwitchNodeType", label="Switch"),
-        NodeItem("RandomNodeType"),
-        NodeItem("OffsetNodeType")
-        ]),
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
         NodeItem("ObjectInputNodeType"),
         NodeItem("GroupInputNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
-        NodeItem("ParentNodeType"),
+        #NodeItem("ParentNodeType"),
+        ]),
+    CrowdMasterAGenCategories("template", "Template", items=[
+        NodeItem("TemplateNodeType"),
+        NodeItem("TemplateSwitchNodeType", label="Switch"),
+        NodeItem("RandomNodeType"),
+        NodeItem("OffsetNodeType"),
         ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("RandomPositionNodeType", label="Random"),
