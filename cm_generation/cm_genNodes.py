@@ -475,6 +475,23 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
         return {"targetObject": self.targetObject,
                 "overwritePosition": self.overwritePosition}
 
+class ObstacleNode(CrowdMasterAGenTreeNode):
+    '''The obstacle node'''
+    bl_idname = 'ObstacleNodeType'
+    bl_label = 'Obstacle'
+    bl_icon = 'SOUND'
+    
+    obstacleGroup = StringProperty(name="Obstacles")
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "obstacleGroup", bpy.data, "groups")
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -500,6 +517,7 @@ agen_node_categories = [
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("FormationPositionNodeType", label="Formation"),
         NodeItem("TargetPositionNodeType", label="Target"),
+        NodeItem("ObstacleNodeType"),
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
@@ -528,6 +546,7 @@ def register():
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
+    bpy.utils.register_class(ObstacleNode)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -553,6 +572,7 @@ def unregister():
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
+    bpy.utils.unregister_class(ObstacleNode)
 
 if __name__ == "__main__":
     register()
