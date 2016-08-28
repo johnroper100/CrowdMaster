@@ -21,7 +21,7 @@ class GeoSocket(NodeSocket):
     def draw_color(self, context, node):
         return (0.125, 0.125, 0.575, 1.0)
 
-class VectorSocket(NodeSocket):
+"""class VectorSocket(NodeSocket):
     '''Vector node socket type'''
     bl_idname = 'VectorSocketType'
     bl_label = 'Vector Node Socket'
@@ -30,7 +30,7 @@ class VectorSocket(NodeSocket):
         layout.label(text)
 
     def draw_color(self, context, node):
-        return (0.35, 0.35, 0.35, 1.0)
+        return (0.35, 0.35, 0.35, 1.0)"""
 
 class TemplateSocket(NodeSocket):
     '''Template node socket type'''
@@ -44,7 +44,7 @@ class TemplateSocket(NodeSocket):
         return (0.125, 0.575, 0.125, 1.0)
 
 
-class ObjectSocket(NodeSocket):
+"""class ObjectSocket(NodeSocket):
     '''Object node socket type'''
     bl_idname = 'ObjectSocketType'
     bl_label = 'Object Node Socket'
@@ -58,9 +58,9 @@ class ObjectSocket(NodeSocket):
             layout.prop_search(self, "inputObject", context.scene, "objects", text=text)
 
     def draw_color(self, context, node):
-        return (1.0, 0.5, 0.2, 0.5)
+        return (1.0, 0.5, 0.2, 0.5)"""
 
-class GroupSocket(NodeSocket):
+"""class GroupSocket(NodeSocket):
     '''Group node socket type'''
     bl_idname = 'GroupSocketType'
     bl_label = 'Group Node Socket'
@@ -74,7 +74,7 @@ class GroupSocket(NodeSocket):
             layout.prop_search(self, "inputGroup", bpy.data, "groups", text=text)
 
     def draw_color(self, context, node):
-        return (1.0, 0.5, 0.2, 0.5)
+        return (1.0, 0.5, 0.2, 0.5)"""
 
 class CrowdMasterAGenTreeNode(Node):
     @classmethod
@@ -108,7 +108,7 @@ class ObjectInputNode(CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.outputs.new('GeoSocketType', "Geometry")
-        self.outputs.new('VectorSocketType', "Location")
+        # self.outputs.new('VectorSocketType', "Location")
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "inputObject", context.scene, "objects")
@@ -133,7 +133,7 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"inputGroup": self.inputGroup}
 
-class VectorInputNode(CrowdMasterAGenTreeNode):
+"""class VectorInputNode(CrowdMasterAGenTreeNode):
     '''The vector input node'''
     bl_idname = 'VectorInputNodeType'
     bl_label = 'Vector'
@@ -146,6 +146,9 @@ class VectorInputNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "inputVector")
+
+    def getSettings(self):
+        return {"inputVector": self.inputVector}"""
 
 class GeoSwitchNode(CrowdMasterAGenTreeNode):
     '''The geo switch node'''
@@ -233,20 +236,40 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"brainType": self.brainType}
 
+
+def updateRandomNode(self, context):
+    if self.minRandRot > self.maxRandRot:
+        self.maxRandRot = self.minRandRot
+    if self.minRandSz > self.maxRandSz:
+        self.maxRandSz = self.minRandSz
+
 class RandomNode(CrowdMasterAGenTreeNode):
     '''The random node'''
     bl_idname = 'RandomNodeType'
     bl_label = 'Random'
     bl_icon = 'SOUND'
 
-    maxRandRot = FloatProperty(name="Max Rand Rotation", description="The maximum random rotation in the Z axis for each agent.", default = 360.0, max=360.0)
-    minRandRot = FloatProperty(name="Min Rand Rotation", description="The minimum random rotation in the Z axis for each agent.", default = 0.0, min=-360.0)
+    minRandRot = FloatProperty(name="Min Rand Rotation",
+                               description="The minimum random rotation in the Z axis for each agent.",
+                               default = -10, min=-360.0, max=360,
+                               update=updateRandomNode)
+    maxRandRot = FloatProperty(name="Max Rand Rotation",
+                               description="The maximum random rotation in the Z axis for each agent.",
+                               default = 10, min=-360, max=360.0,
+                               update=updateRandomNode)
 
-    maxRandSz = FloatProperty(name="Max Rand Scale", description="The maximum random scale for each agent.", default = 2.0, precision=3)
-    minRandSz = FloatProperty(name="Min Rand Scale", description="The minimum random scale for each agent.", default = 1.0, precision=3)
+    minRandSz = FloatProperty(name="Min Rand Scale",
+                              description="The minimum random scale for each agent.",
+                              default = 1.0, min=0, precision=3,
+                              update=updateRandomNode)
+    maxRandSz = FloatProperty(name="Max Rand Scale",
+                              description="The maximum random scale for each agent.",
+                              default = 1.0, min=0, precision=3,
+                              update=updateRandomNode)
 
     def init(self, context):
-        self.inputs.new('VectorSocketType', "Vector")
+        #self.inputs.new('VectorSocketType', "Vector")
+        self.inputs.new("TemplateSocketType", "Template")
         self.inputs[0].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
@@ -274,37 +297,60 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
 
-    locationType = EnumProperty(
+    noToPlace = IntProperty(name="Number",
+                            description="The number of agents to place",
+                            default=1)
+
+    """locationType = EnumProperty(
         items = [('vector', 'Vector', 'Vector location type'),
                  ('scene', 'Scene', 'Scene location type')],
         name = "Location Type",
         description = "Which location type to use",
-        default = "vector")
+        default = "vector")"""
+    locationType = EnumProperty(
+        items = [("radius", "Radius", "Within radius of requested")],
+        name = "Location Type",
+        description = "Which location type to use",
+        default = "radius"
+    )
 
-    MaxX = FloatProperty(name="Max X", description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.", default = 50.0)
-    MaxY = FloatProperty(name="Max Y", description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.", default = 50.0)
-    MinX = FloatProperty(name="Min X", description="The minimum distance in the X direction around the center point where the agents will be randomly spawned.", default = -50.0)
-    MinY = FloatProperty(name="Min Y", description="The minimum distance in the Y direction around the center point where the agents will be randomly spawned.", default = -50.0)
+    radius = FloatProperty(name="Radius",
+                           description="The distance from the requested position to place",
+                           default=5, min=0)
+
+    MaxX = FloatProperty(name="Max X",
+                         description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.",
+                         default = 50.0)
+    MaxY = FloatProperty(name="Max Y",
+                         description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.",
+                         default = 50.0)
+    MinX = FloatProperty(name="Min X",
+                         description="The minimum distance in the X direction around the center point where the agents will be randomly spawned.",
+                         default = -50.0)
+    MinY = FloatProperty(name="Min Y",
+                         description="The minimum distance in the Y direction around the center point where the agents will be randomly spawned.",
+                         default = -50.0)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        self.inputs.new('VectorSocketType', "Vector")
-        self.inputs.new('GeoSocketType', "Obstacles")
+        #self.inputs.new('VectorSocketType', "Vector")
+        #self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
-        self.inputs[1].link_limit = 1
-        self.inputs[2].link_limit = 1
+        #self.inputs[1].link_limit = 1
+        #self.inputs[2].link_limit = 1
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "noToPlace")
         layout.prop(self, "locationType")
-        if self.locationType == "vector":
-            row = layout.row(align=True)
-            row.alignment = 'EXPAND'
+        row = layout.row(align=True)
+        row.alignment = 'EXPAND'
+        if self.locationType == "radius":
+            row.prop(self, "radius")
+        elif self.locationType == "vector":
             row.prop(self, "MaxX")
             row.prop(self, "MaxY")
         elif self.locationType == "scene":
-            row = layout.row(align=True)
-            row.alignment = 'EXPAND'
             row.prop(self, "MinX")
             row.prop(self, "MaxX")
             row = layout.row(align=True)
@@ -317,7 +363,9 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                 "MaxX": self.MaxX,
                 "MaxY": self.MaxY,
                 "MinX": self.MinX,
-                "MinY": self.MinY}
+                "MinY": self.MinY,
+                "noToPlace": self.noToPlace,
+                "radius": self.radius}
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
     '''The formation positioing node'''
@@ -325,17 +373,21 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
 
-    ArrayRows = IntProperty(name="Rows", description="The number of rows in the array.", default=1, min=1)
-    ArrayRowMargin = FloatProperty(name="Row Margin", description="The margin between each row.")
-    ArrayColumnMargin = FloatProperty(name="Column Margin", description="The margin between each column.")
+    ArrayRows = IntProperty(name="Rows",
+                            description="The number of rows in the array.",
+                            default=1, min=1)
+    ArrayRowMargin = FloatProperty(name="Row Margin",
+                                   description="The margin between each row.")
+    ArrayColumnMargin = FloatProperty(name="Column Margin",
+                                      description="The margin between each column.")
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        self.inputs.new('VectorSocketType', "Vector")
-        self.inputs.new('GeoSocketType', "Obstacles")
+        #self.inputs.new('VectorSocketType', "Vector")
+        #self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
-        self.inputs[1].link_limit = 1
-        self.inputs[2].link_limit = 1
+        #self.inputs[1].link_limit = 1
+        #self.inputs[2].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
@@ -347,27 +399,41 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
         row.prop(self, "ArrayRowMargin")
         row.prop(self, "ArrayColumnMargin")
 
+    def getSettings(self):
+        return {"ArrayRows": self.ArrayRows,
+                "ArrayRowMargin": self.ArrayRowMargin,
+                "ArrayColumnMargin": self.ArrayColumnMargin}
+
 class TargetPositionNode(CrowdMasterAGenTreeNode):
     '''The target positioing node'''
     bl_idname = 'TargetPositionNodeType'
     bl_label = 'Target Positioning'
     bl_icon = 'SOUND'
 
-    targetOffset = FloatVectorProperty(name="Offset", description="Tweak the location of the generated agents.", default = [0, 0, 0], subtype = "XYZ")
+    #targetOffset = FloatVectorProperty(name="Offset",
+    #                                   description="Tweak the location of the generated agents.",
+    #                                   default = [0, 0, 0], subtype = "XYZ")
+    targetObject = StringProperty(name="Target",
+                                  description="Placement will be on the vertices of this object")
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        self.inputs.new('GeoSocketType', "Target Objects")
-        self.inputs.new('GeoSocketType', "Obstacles")
+        #self.inputs.new('GeoSocketType', "Target Objects")
+        #self.inputs.new('GeoSocketType', "Obstacles")
         self.inputs[0].link_limit = 1
-        self.inputs[1].link_limit = 1
-        self.inputs[2].link_limit = 1
+        #self.inputs[1].link_limit = 1
+        #self.inputs[2].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
         row = layout.row()
-        row.prop(self, "targetOffset")
+        #row.prop(self, "targetOffset")
+        layout.prop_search(self, "targetObject", context.scene, "objects")
+
+    def getSettings(self):
+        #return {"targetOffset": self.targetOffset}
+        return {"targetObject": self.targetObject}
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
@@ -396,22 +462,22 @@ agen_node_categories = [
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
-        NodeItem("VectorInputNodeType"),
+        #NodeItem("VectorInputNodeType"),
         ]),
     ]
 
 def register():
     bpy.utils.register_class(CrowdMasterAGenTree)
     bpy.utils.register_class(GeoSocket)
-    bpy.utils.register_class(VectorSocket)
+    #bpy.utils.register_class(VectorSocket)
     bpy.utils.register_class(TemplateSocket)
-    bpy.utils.register_class(ObjectSocket)
-    bpy.utils.register_class(GroupSocket)
+    #bpy.utils.register_class(ObjectSocket)
+    #bpy.utils.register_class(GroupSocket)
 
     bpy.utils.register_class(GenerateNode)
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
-    bpy.utils.register_class(VectorInputNode)
+    #bpy.utils.register_class(VectorInputNode)
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
@@ -428,14 +494,14 @@ def unregister():
 
     bpy.utils.unregister_class(CrowdMasterAGenTree)
     bpy.utils.unregister_class(GeoSocket)
-    bpy.utils.unregister_class(VectorSocket)
+    #bpy.utils.unregister_class(VectorSocket)
     bpy.utils.unregister_class(TemplateSocket)
-    bpy.utils.unregister_class(ObjectSocket)
-    bpy.utils.unregister_class(GroupSocket)
+    #bpy.utils.unregister_class(ObjectSocket)
+    #bpy.utils.unregister_class(GroupSocket)
 
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
-    bpy.utils.unregister_class(VectorInputNode)
+    #bpy.utils.unregister_class(VectorInputNode)
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)

@@ -1,9 +1,11 @@
 import bpy
+import mathutils
 
 from collections import OrderedDict
 
 import random
 import time
+import math
 
 from ..libs.ins_vector import Vector
 
@@ -45,7 +47,7 @@ class Template():
 
 class GeoTemplate(Template):
     """Abstract super class.
-    GeoTemplates are a sort of description of how to create some arrangement of
+    GeoTemplates are a description of how to create some arrangement of
      geometry"""
     def build(self, parent):
         """Called when this GeoTemplate is being used to modify the scene"""
@@ -54,23 +56,50 @@ class GeoTemplate(Template):
 # ==================== End of base classes ====================
 
 class GeoTemplateOBJECT(GeoTemplate):
-    def build(self, group):
+    def build(self, pos, rot, scale, group):
         cp = bpy.context.scene.objects[self.settings["inputObject"]].copy()
         group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
         return cp
-        # print("Object with parent:", parent)
 
 class GeoTemplateGROUP(GeoTemplate):
-    def build(self, parent):
-        print("Group with parent:", parent)
+    def build(self, pos, rot, scale, group):
+        dat = bpy.data
+        gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
+        group_objects = [o.copy() for o in gp]
+
+        topObj = None
+
+        for obj in group_objects:
+            if obj.parent in gp:
+                obj.parent = group_objects[gp.index(obj.parent)]
+            else:
+                self.rotation_euler = rot
+                self.scale = Vector((scale, scale, scale))
+                obj.location = pos
+
+            group.objects.link(obj)
+            bpy.context.scene.objects.link(obj)
+            if obj.type == 'ARMATURE':
+                aName = obj.name
+            if obj.type == 'MESH':
+                if len(obj.modifiers) > 0:
+                    for mod in obj.modifiers:
+                        if mod.type == "ARMATURE":
+                            modName = mod.name
+                            obj.modifiers[modName].object = dat.objects[aName]
+
+            if obj.type == 'ARMATURE':
+                topObj = obj
+
+        return topObj
 
 class GeoTemplateSWITCH(GeoTemplate):
-    def build(self, group):
+    def build(self, pos, rot, scale, group):
         if random.random() < self.settings["switchAmout"]:
-            return self.inputs["Object 1"].build(group)
+            return self.inputs["Object 1"].build(pos, rot, scale, group)
         else:
-            return self.inputs["Object 2"].build(group)
+            return self.inputs["Object 2"].build(pos, rot, scale, group)
         # The following is for may inputs
         """weights = self.settings["weights"]
         total = sum(weights)
@@ -84,9 +113,9 @@ class GeoTemplateSWITCH(GeoTemplate):
         self.inputs[index].build(parent)"""
 
 class GeoTemplatePARENT(GeoTemplate):
-    def build(self, group):
-        parent = self.inputs["Parent Group"].build(group)
-        child = self.inputs["Child Object"].build(group)
+    def build(self, pos, rot, scale, group):
+        parent = self.inputs["Parent Group"].build(pos, rot, scale, group)
+        child = self.inputs["Child Object"].build(pos, rot, scale, group)
         # TODO parent child to self.settings["parentTo"] from parent
 
 
@@ -105,7 +134,7 @@ class TemplateAGENT(Template):
 
     def build(self, pos, rot, scale, tags):
         new_group = bpy.data.groups.new(self.settings["brainType"])
-        topObj = self.inputs["Objects"].build(new_group)
+        topObj = self.inputs["Objects"].build(pos, rot, scale, new_group)
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
@@ -143,41 +172,61 @@ class TemplateSWITCH(Template):
 
 class TemplateRANDOM(Template):
     def build(self, pos, rot, scale, tags):
-        pr = self.settings["posRange"]
-        x = pr.x * 2 * (random.random() - 0.5)
-        y = pr.y * 2 * (random.random() - 0.5)
-        z = pr.z * 2 * (random.random() - 0.5)
-        newPos = pos + Vector((x, y, z))
-        rr = self.settings["rotRange"]
-        x = rr.x * 2 * (random.random() - 0.5)
-        y = rr.y * 2 * (random.random() - 0.5)
-        z = rr.z * 2 * (random.random() - 0.5)
-        newRot = rot + Vector((x, y, z))
-        scale  *= self.settings["scaleFactor"]
-        scale += 2 * (random.random() - 0.5) * self.settings["scaleRange"]
-        self.inputs[0].build(newPos, newRot, scale, tags)
+        rotDiff = random.uniform(self.settings["minRandRot"],
+                                 self.settings["maxRandRot"])
+        eul = mathutils.Euler(rot, 'XYZ')
+        eul.rotate_axis('Z', math.radians(rotDiff))
 
-class TemplateLAYOUT(Template):
+        scaleDiff = random.uniform(self.settings["minRandSz"],
+                                   self.settings["maxRandSz"])
+        newScale = scale * scaleDiff
+        self.inputs["Template"].build(pos, Vector(eul), newScale, tags)
+
+class TemplateRANDOMPOSITIONING(Template):
     def build(self, pos, rot, scale, tags):
-        for f in range(3000):
-            self.inputs[0].build(pos + Vector((f,0,0)), rot + Vector((0,0,0)),
-                                 scale, tags)
-        #TODO Move layout behaviours from generator script
+        for a in range(self.settings["noToPlace"]):
+            if self.settings["locationType"] == "radius":
+                angle = random.uniform(-math.pi, math.pi)
+                x = math.sin(angle)
+                y = math.cos(angle)
+                length = random.random() * self.settings["radius"]
+                x *= length
+                y *= length
+                newPos = Vector((pos.x + x, pos.y + y, pos.z))
+                self.inputs["Template"].build(newPos, rot, scale, tags)
+
+class TemplateFORMATION(Template):
+    def build(self, pos, rot, scale, tags):
+        placePos = Vector(pos)
+        for i in range(self.settings["ArrayRows"]):
+            self.inputs["Template"].build(placePos, rot, scale, tags)
+            placePos.x += self.settings["ArrayRowMargin"]
+            placePos.y += self.settings["ArrayColumnMargin"]
+
+class TemplateTARGET(Template):
+    def build(self, pos, rot, scale, tags):
+        obj = bpy.data.objects[self.settings["targetObject"]]
+        wrld = obj.matrix_world
+        targets = [wrld*v.co for v in obj.data.vertices]
+        # TODO do something clever with rot and scale to transform points
+        for vert in targets:
+            self.inputs["Template"].build(vert.co + pos, rot, scale, tags)
 
 class TemplateSETTAG(Template):
     def build(self, pos, rot, scale, tags):
         tags[self.settings["tagName"]] = self.settings["tagValue"]
-        self.inputs[0].build(pos, rot, scale, tags)
+        self.inputs["Template"].build(pos, rot, scale, tags)
 
 
 templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
     ("GroupInputNodeType", GeoTemplateGROUP),
-    #("VectorInputNodeType", ),
     ("GeoSwitchNodeType", GeoTemplateSWITCH),
     ("TemplateSwitchNodeType", TemplateSWITCH),
     ("ParentNodeType", GeoTemplatePARENT),
     ("TemplateNodeType", TemplateAGENT),
     ("RandomNodeType", TemplateRANDOM),
-    ("RandomPositionNodeType", TemplateLAYOUT)
+    ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
+    ("FormationPositionNodeType", TemplateFORMATION),
+    ("TargetPositionNodeType", TemplateTARGET)
 ])
