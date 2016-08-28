@@ -372,7 +372,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
         #self.inputs.new('VectorSocketType', "Vector")
         self.inputs[0].link_limit = 1
         #self.inputs[1].link_limit = 1
-        #self.inputs[2].link_limit = 1
+
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
@@ -424,7 +424,6 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
         #self.inputs.new('VectorSocketType', "Vector")
         self.inputs[0].link_limit = 1
         #self.inputs[1].link_limit = 1
-        #self.inputs[2].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
@@ -463,7 +462,6 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
         #self.inputs.new('GeoSocketType', "Target Objects")
         self.inputs[0].link_limit = 1
         #self.inputs[1].link_limit = 1
-        #self.inputs[2].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
