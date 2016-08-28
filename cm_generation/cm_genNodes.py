@@ -451,8 +451,19 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     #targetOffset = FloatVectorProperty(name="Offset",
     #                                   description="Tweak the location of the generated agents.",
     #                                   default = [0, 0, 0], subtype = "XYZ")
-    targetObject = StringProperty(name="Target",
+    
+    targetType = EnumProperty(
+        items = [("object", "Object", "Use the locations of each object in a group"),
+                 ("vertex", "Vertex", "Use the location of each vertex on an object")],
+        name = "Target Type",
+        description = "Which target type to use",
+        default = "object"
+    )
+
+    targetObject = StringProperty(name="Target Object",
                                   description="Placement will be on the vertices of this object")
+    targetGroups = StringProperty(name="Target Objects",
+                                  description="Placement will be at the location of each object")
     overwritePosition = BoolProperty(name="Overwrite position",
                                      description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
                                      default=True)
@@ -466,10 +477,16 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        row = layout.row()
+        #row = layout.row()
         #row.prop(self, "targetOffset")
-        layout.prop_search(self, "targetObject", context.scene, "objects")
-        layout.prop(self, "overwritePosition")
+        layout.prop(self, "targetType")
+        if self.targetType == "object":
+            layout.prop_search(self, "targetGroups", bpy.data, "groups")
+        elif self.targetType == "vertex":
+            row = layout.row(align=True)
+            row.alignment = 'EXPAND'
+            row.prop_search(self, "targetObject", context.scene, "objects")
+            row.prop(self, "overwritePosition")
 
     def getSettings(self):
         return {"targetObject": self.targetObject,
