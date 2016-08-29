@@ -49,6 +49,7 @@ class SCENE_OT_cm_groups_reset(Operator):
         for agent in group.agents:
             for obj in bpy.data.groups[agent.geoGroup].objects:
                 obj.select = True
+            bpy.data.groups.remove(bpy.data.groups[agent.geoGroup])
         bpy.ops.object.delete(use_global=True)
         groupIndex = context.scene.cm_groups.find(self.groupName)
         context.scene.cm_groups.remove(groupIndex)
