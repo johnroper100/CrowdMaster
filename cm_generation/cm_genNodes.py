@@ -117,7 +117,7 @@ class AddToGroupNode(CrowdMasterAGenTreeNode):
         layout.prop(self, "groupName", text="cm_")
 
     def getSettings(self):
-        return {"groupName": self.groupName}
+        return {"groupName": "cm_" + self.groupName}
 
 class ObjectInputNode(CrowdMasterAGenTreeNode):
     '''The object input node'''
