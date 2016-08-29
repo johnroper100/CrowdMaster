@@ -8,6 +8,7 @@ import time
 import math
 
 from ..libs.ins_vector import Vector
+from ..libs.ins_octree import createOctreeFromBPYObjs
 
 # ==================== Some base classes ====================
 
@@ -229,12 +230,29 @@ class TemplateTARGET(Template):
                 loc *= scale
                 self.inputs["Template"].build(loc + pos, rot, scale, tags, cm_group)
 
+class TemplateOBSTACLE(Template):
+    """Refuse any requests that are withing the bounding box of an obstacle"""
+    def __init__(self, inputs, settings, bpyName):
+        Template.__init__(self, inputs, settings, bpyName)
+        self.octree = None
+
+    def build(self, pos, rot, scale, tags, cm_group):
+        if self.octree is None:
+            objs = bpy.data.groups[self.settings["obstacleGroup"]].objects
+            margin = self.settings["margin"]
+            mVec = Vector((margin, margin, margin))
+            radii = [(o.dimensions/2) + mVec for o in objs]
+            self.octree = createOctreeFromBPYObjs(objs, allSpheres=False,
+                                                  radii=radii)
+        intersections = self.octree.checkPoint(pos)
+        if len(intersections) == 0:
+            self.inputs["Template"].build(pos, rot, scale, tags, cm_group)
+
 class TemplateSETTAG(Template):
     """Set a tag for an agent to start with"""
     def build(self, pos, rot, scale, tags, cm_group):
         tags[self.settings["tagName"]] = self.settings["tagValue"]
         self.inputs["Template"].build(pos, rot, scale, tags, cm_group)
-
 
 templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
@@ -248,5 +266,6 @@ templates = OrderedDict([
     ("RandomNodeType", TemplateRANDOM),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("FormationPositionNodeType", TemplateFORMATION),
-    ("TargetPositionNodeType", TemplateTARGET)
+    ("TargetPositionNodeType", TemplateTARGET),
+    ("ObstacleNodeType", TemplateOBSTACLE)
 ])

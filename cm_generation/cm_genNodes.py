@@ -532,6 +532,10 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
         layout.prop_search(self, "obstacleGroup", bpy.data, "groups")
         layout.prop(self, "margin")
 
+    def getSettings(self):
+        return {"obstacleGroup": self.obstacleGroup,
+                "margin": self.margin}
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
