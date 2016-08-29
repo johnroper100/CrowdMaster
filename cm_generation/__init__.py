@@ -39,12 +39,18 @@ class SCENE_OT_agent_nodes_generate(Operator):
         cache = {}
         genSpaces = {} # TODO make into custom scene property
 
+        if "cm_allAgents" in context.scene.cm_groups:
+            bpy.ops.scene.cm_groups_reset(groupName="cm_allAgents")
+        newGroup = context.scene.cm_groups.add()
+        newGroup.groupName = "cm_allAgents"
+        newGroup.name = "cm_allAgents"
+
         for space in generateNode.inputs[0].links:
             tipNode = space.from_node
             genSpaces[tipNode] = self.construct(tipNode, cache)
-            # TODO check tree is valid
+
             genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)), 1,
-                                            {})
+                                            {}, context.scene.cm_groups["cm_allAgents"])
         return {'FINISHED'}
 
 

@@ -39,21 +39,19 @@ class Simulation():
         """Set up the actions"""
         self.actions = getmotions()
 
-    def newagent(self, name):
+    def newagent(self, name, brain):
         """Set up an agent"""
-        group = bpy.context.scene.cm_agents.coll[name].group
-        groupEntry = bpy.context.scene.cm_groups.coll[group-1]
-        ty = bpy.context.scene.cm_groups.coll[group-1].type
-        if ty in bpy.data.node_groups:
-            ag = Agent(name, bpy.data.node_groups[ty], self)
+        nGps = bpy.data.node_groups
+        if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
+            ag = Agent(name, nGps[brain], self)
             self.agents[name] = ag
         else:
-            print("No such brain type:" + ty)
+            print("No such brain type:" + brain)
 
-    def createAgents(self, agents):
+    def createAgents(self, group):
         """Set up all the agents at the beginning of the simulation"""
-        for ag in agents:
-            self.newagent(ag.name)
+        for ag in group.agents:
+            self.newagent(ag.objectName, ag.brainType)
 
     def step(self, scene):
         """Called when the next frame is moved to"""

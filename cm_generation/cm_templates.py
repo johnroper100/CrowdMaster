@@ -24,7 +24,7 @@ class Template():
         self.buildCount = 0
         self.checkCache = None
 
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         """Called when this template is being used to modify the scene"""
         self.buildCount += 1
 
@@ -115,47 +115,31 @@ class GeoTemplatePARENT(GeoTemplate):
 
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
-    def _findGroup(self, brainName):
-        for g in bpy.context.scene.cm_groups.coll:
-            if g.type == brainName:
-                return True, g.name
-        g = [x.group for x in bpy.context.scene.cm_agents.coll]
-        i = 1
-        while True:
-            if i not in g:
-                return False, i
-            else:
-                i += 1
-
-    def build(self, pos, rot, scale, tags):
-        new_group = bpy.data.groups.new(self.settings["brainType"])
+    def build(self, pos, rot, scale, tags, cm_group):
+        groupName = cm_group.groupName + "/" + self.settings["brainType"]
+        new_group = bpy.data.groups.new(groupName)
         topObj = self.inputs["Objects"].build(pos, rot, scale, new_group)
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
 
-        g = self._findGroup(self.settings["brainType"])
-        if g[0]:
-            bpy.ops.scene.cm_agents_add(agentName=topObj.name,
-                                        brainGroup=str(g[1]))
-        else:
-            bpy.ops.scene.cm_groups_add(groupName=str(g[1]),
-                                        groupType=self.settings["brainType"])
-            bpy.ops.scene.cm_agents_add(agentName=topObj.name,
-                                        brainGroup=str(g[1]))
+        bpy.ops.scene.cm_agent_add(agentName=topObj.name,
+                                    brainType=self.settings["brainType"],
+                                    groupName=cm_group.groupName,
+                                    geoGroupName=new_group.name)
         # TODO set tags
 
 class TemplateSWITCH(Template):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         if random.random() < self.settings["switchAmout"]:
-            self.inputs["Template 1"].build(pos, rot, scale, tags)
+            self.inputs["Template 1"].build(pos, rot, scale, tags, cm_group)
         else:
-            self.inputs["Template 2"].build(pos, rot, scale, tags)
+            self.inputs["Template 2"].build(pos, rot, scale, tags, cm_group)
 
 class TemplateOFFSET(Template):
     """Modify the postion and/or the rotation of the request made"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         nPos = Vector()
         nRot = Vector()
         if self.settings["offset"]:
@@ -167,11 +151,11 @@ class TemplateOFFSET(Template):
             nRot += Vector(refObj.rotation_euler)
         nPos += self.settings["locationOffset"]
         nRot += self.settings["rotationOffset"]
-        self.inputs["Template"].build(nPos, nRot, scale, tags)
+        self.inputs["Template"].build(nPos, nRot, scale, tags, cm_group)
 
 class TemplateRANDOM(Template):
     """Randomly modify rotation and scale of the request made"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         rotDiff = random.uniform(self.settings["minRandRot"],
                                  self.settings["maxRandRot"])
         eul = mathutils.Euler(rot, 'XYZ')
@@ -180,11 +164,11 @@ class TemplateRANDOM(Template):
         scaleDiff = random.uniform(self.settings["minRandSz"],
                                    self.settings["maxRandSz"])
         newScale = scale * scaleDiff
-        self.inputs["Template"].build(pos, Vector(eul), newScale, tags)
+        self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group)
 
 class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         for a in range(self.settings["noToPlace"]):
             if self.settings["locationType"] == "radius":
                 angle = random.uniform(-math.pi, math.pi)
@@ -196,11 +180,11 @@ class TemplateRANDOMPOSITIONING(Template):
                 diff = Vector((x, y, 0))
                 diff.rotate(mathutils.Euler(rot))
                 newPos = Vector(pos) + diff
-                self.inputs["Template"].build(newPos, rot, scale, tags)
+                self.inputs["Template"].build(newPos, rot, scale, tags, cm_group)
 
 class TemplateFORMATION(Template):
     """Place in a row"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         placePos = Vector(pos)
         diffRow = Vector((self.settings["ArrayRowMargin"], 0, 0))
         diffCol = Vector((0, self.settings["ArrayColumnMargin"], 0))
@@ -213,33 +197,33 @@ class TemplateFORMATION(Template):
         for fullcols in range(number//rows):
             for row in range(rows):
                 self.inputs["Template"].build(placePos + fullcols*diffCol +
-                                              row*diffRow, rot, scale, tags)
+                                              row*diffRow, rot, scale, tags, cm_group)
         for leftOver in range(number%rows):
             self.inputs["Template"].build(placePos + (number//rows)*diffCol
-                                          + leftOver*diffRow, rot, scale, tags)
+                                          + leftOver*diffRow, rot, scale, tags, cm_group)
 
 class TemplateTARGET(Template):
     """Place based on the positions of vertices"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         obj = bpy.data.objects[self.settings["targetObject"]]
         if self.settings["overwritePosition"]:
             wrld = obj.matrix_world
             targets = [wrld*v.co for v in obj.data.vertices]
             newRot = Vector(obj.rotation_euler)
             for vert in targets:
-                self.inputs["Template"].build(vert, newRot, scale, tags)
+                self.inputs["Template"].build(vert, newRot, scale, tags, cm_group)
         else:
             targets = [Vector(v.co) for v in obj.data.vertices]
             for loc in targets:
                 loc.rotate(mathutils.Euler(rot))
                 loc *= scale
-                self.inputs["Template"].build(loc + pos, rot, scale, tags)
+                self.inputs["Template"].build(loc + pos, rot, scale, tags, cm_group)
 
 class TemplateSETTAG(Template):
     """Set a tag for an agent to start with"""
-    def build(self, pos, rot, scale, tags):
+    def build(self, pos, rot, scale, tags, cm_group):
         tags[self.settings["tagName"]] = self.settings["tagValue"]
-        self.inputs["Template"].build(pos, rot, scale, tags)
+        self.inputs["Template"].build(pos, rot, scale, tags, cm_group)
 
 
 templates = OrderedDict([
