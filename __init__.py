@@ -35,18 +35,39 @@ class SCENE_UL_group(UIList):
         layout.label(text=str(len(item.agents)))
 
 
+class SCENE_OT_cm_groups_reset(Operator):
+    """Delete a group and all the agent in it (including the agents geo)"""
+    bl_idname = "scene.cm_groups_reset"
+    bl_label = "Reset group"
+
+    groupName = StringProperty()
+
+    def execute(self, context):
+        group = context.scene.cm_groups.get(self.groupName)
+        for obj in bpy.context.selected_objects:
+            obj.select = False
+        for agent in group.agents:
+            for obj in bpy.data.groups[agent.geoGroup].objects:
+                obj.select = True
+        bpy.ops.object.delete(use_global=True)
+        groupIndex = context.scene.cm_groups.find(self.groupName)
+        context.scene.cm_groups.remove(groupIndex)
+        return {'FINISHED'}
+
+
 # =============== GROUPS LIST END ===============#
 
 # =============== AGENTS LIST START ===============#
 
 
-class SCENE_OT_cm_agents_add(Operator):
+class SCENE_OT_cm_agent_add(Operator):
     bl_idname = "scene.cm_agent_add"
     bl_label = "Add single agent to cm agents list"
 
     agentName = StringProperty()
     brainType = StringProperty()
     groupName = StringProperty()
+    geoGroupName = StringProperty()
 
     def execute(self, context):
         if context.scene.cm_groups.find(self.groupName) == -1:
@@ -56,6 +77,7 @@ class SCENE_OT_cm_agents_add(Operator):
         newAgent = group.agents.add()
         newAgent.objectName = self.agentName
         newAgent.brainType = self.brainType
+        newAgent.geoGroup = self.geoGroupName
         return {'FINISHED'}
 
 

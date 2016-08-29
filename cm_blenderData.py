@@ -8,6 +8,7 @@ class agent_entry(PropertyGroup):
     """The data structure for the agent entries"""
     objectName = StringProperty()
     brainType = StringProperty()
+    geoGroup = StringProperty()
 
 
 class group_entry(PropertyGroup):
