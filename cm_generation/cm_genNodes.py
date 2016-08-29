@@ -98,6 +98,27 @@ class GenerateNode(CrowdMasterAGenTreeNode):
         oper.nodeName = self.name
         oper.nodeTreeName = self.id_data.name
 
+class AddToGroupNode(CrowdMasterAGenTreeNode):
+    '''The addToGroup node'''
+    bl_idname = 'AddToGroupNodeType'
+    bl_label = 'AddToGroup'
+    bl_icon = 'SOUND'
+
+    groupName = StringProperty()
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.label("Group name:")
+        layout.prop(self, "groupName", text="cm_")
+
+    def getSettings(self):
+        return {"groupName": self.groupName}
+
 class ObjectInputNode(CrowdMasterAGenTreeNode):
     '''The object input node'''
     bl_idname = 'ObjectInputNodeType'
@@ -451,7 +472,7 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     #targetOffset = FloatVectorProperty(name="Offset",
     #                                   description="Tweak the location of the generated agents.",
     #                                   default = [0, 0, 0], subtype = "XYZ")
-    
+
     targetType = EnumProperty(
         items = [("object", "Object", "Use the locations of each object in a group"),
                  ("vertex", "Vertex", "Use the location of each vertex on an object")],
@@ -497,7 +518,7 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
     bl_idname = 'ObstacleNodeType'
     bl_label = 'Obstacle'
     bl_icon = 'SOUND'
-    
+
     obstacleGroup = StringProperty(name="Obstacles")
     margin = FloatProperty(name="Margin", precision=3)
 
@@ -540,6 +561,7 @@ agen_node_categories = [
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
+        NodeItem("AddToGroupNodeType")
         #NodeItem("VectorInputNodeType"),
         ]),
     ]
@@ -553,6 +575,8 @@ def register():
     #bpy.utils.register_class(GroupSocket)
 
     bpy.utils.register_class(GenerateNode)
+    bpy.utils.register_class(AddToGroupNode)
+
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
     #bpy.utils.register_class(VectorInputNode)
@@ -578,6 +602,9 @@ def unregister():
     bpy.utils.unregister_class(TemplateSocket)
     #bpy.utils.unregister_class(ObjectSocket)
     #bpy.utils.unregister_class(GroupSocket)
+
+    bpy.utils.unregister_class(GenerateNode)
+    bpy.utils.unregister_class(AddToGroupNode)
 
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)

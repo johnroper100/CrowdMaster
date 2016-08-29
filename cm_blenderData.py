@@ -13,7 +13,6 @@ class agent_entry(PropertyGroup):
 
 class group_entry(PropertyGroup):
     """For storing data about the groups created by the generation nodes"""
-    groupName = StringProperty()
     agents = CollectionProperty(type=agent_entry)
 
 

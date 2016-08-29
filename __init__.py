@@ -31,7 +31,7 @@ class SCENE_UL_group(UIList):
     """for drawing each row"""
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
-        layout.label(text=str(item.groupName))
+        layout.label(text=str(item.name))
         layout.label(text=str(len(item.agents)))
 
 
@@ -47,9 +47,11 @@ class SCENE_OT_cm_groups_reset(Operator):
         for obj in bpy.context.selected_objects:
             obj.select = False
         for agent in group.agents:
-            for obj in bpy.data.groups[agent.geoGroup].objects:
-                obj.select = True
-            bpy.data.groups.remove(bpy.data.groups[agent.geoGroup], do_unlink=True)
+            if agent.geoGroup in bpy.data.groups:
+                for obj in bpy.data.groups[agent.geoGroup].objects:
+                    obj.select = True
+            bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
+                                   do_unlink=True)
         bpy.ops.object.delete(use_global=True)
         groupIndex = context.scene.cm_groups.find(self.groupName)
         context.scene.cm_groups.remove(groupIndex)

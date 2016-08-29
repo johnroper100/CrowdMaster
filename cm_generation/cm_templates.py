@@ -113,10 +113,20 @@ class GeoTemplatePARENT(GeoTemplate):
         # TODO parent child to self.settings["parentTo"] from parent
 
 
+class TemplateADDTOGROUP(Template):
+    """Change the group that agents are added to"""
+    def build(self, pos, rot, scale, tags, cm_group):
+        if bpy.context.scene.cm_groups.find(self.settings["groupName"]) != -1:
+            bpy.ops.scene.cm_groups_reset(groupName=self.settings["groupName"])
+        newGroup = bpy.context.scene.cm_groups.add()
+        newGroup.name = self.settings["groupName"]
+        group = bpy.context.scene.cm_groups[self.settings["groupName"]]
+        self.inputs["Template"].build(pos, rot, scale, tags, group)
+
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
     def build(self, pos, rot, scale, tags, cm_group):
-        groupName = cm_group.groupName + "/" + self.settings["brainType"]
+        groupName = cm_group.name + "/" + self.settings["brainType"]
         new_group = bpy.data.groups.new(groupName)
         topObj = self.inputs["Objects"].build(pos, rot, scale, new_group)
         topObj.location = pos
@@ -125,7 +135,7 @@ class TemplateAGENT(Template):
 
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                     brainType=self.settings["brainType"],
-                                    groupName=cm_group.groupName,
+                                    groupName=cm_group.name,
                                     geoGroupName=new_group.name)
         # TODO set tags
 
@@ -230,6 +240,7 @@ templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
     ("GroupInputNodeType", GeoTemplateGROUP),
     ("GeoSwitchNodeType", GeoTemplateSWITCH),
+    ("AddToGroupNodeType", TemplateADDTOGROUP),
     ("TemplateSwitchNodeType", TemplateSWITCH),
     ("ParentNodeType", GeoTemplatePARENT),
     ("TemplateNodeType", TemplateAGENT),
