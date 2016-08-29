@@ -499,6 +499,7 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     
     obstacleGroup = StringProperty(name="Obstacles")
+    margin = FloatProperty(name="Margin", precision=3)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
@@ -508,6 +509,7 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "obstacleGroup", bpy.data, "groups")
+        layout.prop(self, "margin")
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
