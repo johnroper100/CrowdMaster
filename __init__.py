@@ -33,6 +33,8 @@ class SCENE_UL_group(UIList):
                   active_propname):
         layout.label(text=str(item.name))
         layout.label(text=str(len(item.agents)))
+        op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
+        op.groupName=item.name
 
 
 class SCENE_OT_cm_groups_reset(Operator):
