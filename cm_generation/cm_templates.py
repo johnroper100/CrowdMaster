@@ -216,19 +216,37 @@ class TemplateFORMATION(Template):
 class TemplateTARGET(Template):
     """Place based on the positions of vertices"""
     def build(self, pos, rot, scale, tags, cm_group):
-        obj = bpy.data.objects[self.settings["targetObject"]]
-        if self.settings["overwritePosition"]:
-            wrld = obj.matrix_world
-            targets = [wrld*v.co for v in obj.data.vertices]
-            newRot = Vector(obj.rotation_euler)
-            for vert in targets:
-                self.inputs["Template"].build(vert, newRot, scale, tags, cm_group)
-        else:
-            targets = [Vector(v.co) for v in obj.data.vertices]
-            for loc in targets:
-                loc.rotate(mathutils.Euler(rot))
-                loc *= scale
-                self.inputs["Template"].build(loc + pos, rot, scale, tags, cm_group)
+        if self.settings["targetType"] == "object":
+            objs = bpy.data.groups[self.settings["targetGroups"]].objects
+            if self.settings["overwritePosition"]:
+                for obj in objs:
+                    self.inputs["Template"].build(obj.location,
+                                                  Vector(obj.rotation_euler),
+                                                  scale, tags, cm_group)
+            else:
+                for obj in objs:
+                    loc = obj.location
+                    oRot = Vector(obj.rotation_euler)
+                    loc.rotate(mathutils.Euler(rot))
+                    loc *= scale
+                    self.inputs["Template"].build(loc + pos, rot + oRot,
+                                                  scale, tags, cm_group)
+        else:  # targetGroups == "vertex"
+            obj = bpy.data.objects[self.settings["targetObject"]]
+            if self.settings["overwritePosition"]:
+                wrld = obj.matrix_world
+                targets = [wrld*v.co for v in obj.data.vertices]
+                newRot = Vector(obj.rotation_euler)
+                for vert in targets:
+                    self.inputs["Template"].build(vert, newRot, scale, tags,
+                                                  cm_group)
+            else:
+                targets = [Vector(v.co) for v in obj.data.vertices]
+                for loc in targets:
+                    loc.rotate(mathutils.Euler(rot))
+                    loc *= scale
+                    self.inputs["Template"].build(loc + pos, rot, scale, tags,
+                                                  cm_group)
 
 class TemplateOBSTACLE(Template):
     """Refuse any requests that are withing the bounding box of an obstacle"""

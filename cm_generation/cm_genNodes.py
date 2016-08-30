@@ -491,26 +491,22 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        #self.inputs.new('GeoSocketType', "Target Objects")
         self.inputs[0].link_limit = 1
-        #self.inputs[1].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        #row = layout.row()
-        #row.prop(self, "targetOffset")
         layout.prop(self, "targetType")
         if self.targetType == "object":
             layout.prop_search(self, "targetGroups", bpy.data, "groups")
         elif self.targetType == "vertex":
-            row = layout.row(align=True)
-            row.alignment = 'EXPAND'
-            row.prop_search(self, "targetObject", context.scene, "objects")
-            row.prop(self, "overwritePosition")
+            layout.prop_search(self, "targetObject", context.scene, "objects")
+        layout.prop(self, "overwritePosition")
 
     def getSettings(self):
-        return {"targetObject": self.targetObject,
+        return {"targetType": self.targetType,
+                "targetObject": self.targetObject,
+                "targetGroups": self.targetGroups,
                 "overwritePosition": self.overwritePosition}
 
 class ObstacleNode(CrowdMasterAGenTreeNode):
