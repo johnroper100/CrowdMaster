@@ -547,13 +547,13 @@ agen_node_categories = [
         NodeItem("TemplateNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch"),
         NodeItem("RandomNodeType"),
-        NodeItem("OffsetNodeType"),
         ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("FormationPositionNodeType", label="Formation"),
         NodeItem("TargetPositionNodeType", label="Target"),
         NodeItem("ObstacleNodeType"),
+        NodeItem("OffsetNodeType"),
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
