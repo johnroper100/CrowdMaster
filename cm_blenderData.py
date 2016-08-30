@@ -11,13 +11,22 @@ class agent_entry(PropertyGroup):
     geoGroup = StringProperty()
 
 
+class agent_type_entry(PropertyGroup):
+    """Contains a list of agents of a certain type.
+    Useful to separate into agents of each type to make collecting statistics
+    easier/more efficient."""
+    agents = CollectionProperty(type=agent_entry)
+
+
 class group_entry(PropertyGroup):
     """For storing data about the groups created by the generation nodes"""
-    agents = CollectionProperty(type=agent_entry)
+    agentTypes = CollectionProperty(type=agent_type_entry)
+    totalAgents = IntProperty(default=0)
 
 
 def registerTypes():
     bpy.utils.register_class(agent_entry)
+    bpy.utils.register_class(agent_type_entry)
     bpy.utils.register_class(group_entry)
     bpy.types.Scene.cm_groups = CollectionProperty(type=group_entry)
     bpy.types.Scene.cm_groups_index = IntProperty()
@@ -25,5 +34,6 @@ def registerTypes():
 
 def unregisterAllTypes():
     bpy.utils.unregister_class(agent_entry)
+    bpy.utils.register_class(agent_type_entry)
     bpy.utils.unregister_class(group_entry)
     del bpy.types.Scene.cm_groups

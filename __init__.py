@@ -32,7 +32,7 @@ class SCENE_UL_group(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         layout.label(text=str(item.name))
-        layout.label(text=str(len(item.agents)))
+        layout.label(text=str(item.totalAgents))
         op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
         op.groupName=item.name
 
@@ -48,12 +48,13 @@ class SCENE_OT_cm_groups_reset(Operator):
         group = context.scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
             obj.select = False
-        for agent in group.agents:
-            if agent.geoGroup in bpy.data.groups:
-                for obj in bpy.data.groups[agent.geoGroup].objects:
-                    obj.select = True
-            bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
-                                   do_unlink=True)
+        for agentType in group.agentTypes:
+            for agent in agentType.agents:
+                if agent.geoGroup in bpy.data.groups:
+                    for obj in bpy.data.groups[agent.geoGroup].objects:
+                        obj.select = True
+                    bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
+                                           do_unlink=True)
         bpy.ops.object.delete(use_global=True)
         groupIndex = context.scene.cm_groups.find(self.groupName)
         context.scene.cm_groups.remove(groupIndex)
@@ -79,10 +80,17 @@ class SCENE_OT_cm_agent_add(Operator):
             newGroup = context.scene.cm_groups.add()
             newGroup.groupName = self.groupName
         group = context.scene.cm_groups.get(self.groupName)
-        newAgent = group.agents.add()
+        ty = group.agentTypes.find(self.brainType)
+        if ty == -1:
+            at = group.agentTypes.add()
+            at.name = self.brainType
+            ty = group.agentTypes.find(at.name)
+        agentType = group.agentTypes[ty]
+        newAgent = agentType.agents.add()
         newAgent.objectName = self.agentName
-        newAgent.brainType = self.brainType
+        newAgent.name = self.brainType
         newAgent.geoGroup = self.geoGroupName
+        group.totalAgents += 1
         return {'FINISHED'}
 
 
