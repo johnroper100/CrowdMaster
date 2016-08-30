@@ -469,10 +469,6 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Target Positioning'
     bl_icon = 'SOUND'
 
-    #targetOffset = FloatVectorProperty(name="Offset",
-    #                                   description="Tweak the location of the generated agents.",
-    #                                   default = [0, 0, 0], subtype = "XYZ")
-
     targetType = EnumProperty(
         items = [("object", "Object", "Use the locations of each object in a group"),
                  ("vertex", "Vertex", "Use the location of each vertex on an object")],

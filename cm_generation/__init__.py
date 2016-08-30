@@ -14,8 +14,8 @@ class SCENE_OT_agent_nodes_generate(Operator):
     nodeTreeName = StringProperty(name="node tree")
 
     def construct(self, current, cache):
+        """returns: bool - successfully built, Template"""
         idName = current.bl_idname
-        # print(idName, current.name)
         if idName in templates:
             inps = {}
             for i in current.inputs:
@@ -24,33 +24,54 @@ class SCENE_OT_agent_nodes_generate(Operator):
                     if i.links[0].from_node in cache:
                         inps[nm] = cache[i.links[0].from_node]
                     else:
-                        inps[nm] = self.construct(i.links[0].from_node, cache)
+                        suc, temp = self.construct(i.links[0].from_node, cache)
+                        if not suc:
+                            return False, None
+                        inps[nm] = temp
             tmpt = templates[idName](inps, current.getSettings(), current.name)
+            if not tmpt.check():
+                current.use_custom_color = True
+                current.color = (255, 0, 0)
+                return False, None
             if len(current.outputs[0].links) > 1:
                 cache[self.name] = tmpt
-            return tmpt
+            current.use_custom_color = False
+            return True, tmpt
         else:
-            print("report error") # TODO
+            current.use_custom_color = True
+            current.color = (255, 0, 0)
+            return False, None
 
     def execute(self, context):
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
 
         cache = {}
-        genSpaces = {} # TODO make into custom scene property
-
-        if "cm_allAgents" in context.scene.cm_groups:
-            bpy.ops.scene.cm_groups_reset(groupName="cm_allAgents")
-        newGroup = context.scene.cm_groups.add()
-        newGroup.groupName = "cm_allAgents"
-        newGroup.name = "cm_allAgents"
+        genSpaces = {}
+        allSuccess = True
 
         for space in generateNode.inputs[0].links:
             tipNode = space.from_node
-            genSpaces[tipNode] = self.construct(tipNode, cache)
+            suc, temp = self.construct(tipNode, cache)
+            if suc:
+                genSpaces[tipNode] = temp
+            else:
+                allSuccess = False
 
-            genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)), 1,
-                                            {}, context.scene.cm_groups["cm_allAgents"])
+        if allSuccess:
+            if "cm_allAgents" in context.scene.cm_groups:
+                bpy.ops.scene.cm_groups_reset(groupName="cm_allAgents")
+                newGroup = context.scene.cm_groups.add()
+                newGroup.groupName = "cm_allAgents"
+                newGroup.name = "cm_allAgents"
+
+            for space in generateNode.inputs[0].links:
+                tipNode = space.from_node
+                genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)),
+                                                1, {},
+                                                context.scene.cm_groups["cm_allAgents"])
+        else:
+            return {'CANCELLED'}
         return {'FINISHED'}
 
 

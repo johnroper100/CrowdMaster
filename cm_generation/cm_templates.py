@@ -29,19 +29,6 @@ class Template():
         """Called when this template is being used to modify the scene"""
         self.buildCount += 1
 
-    def checkRecursive(self):
-        """Called after build to check that the node graph is a valid one"""
-        if self.checkCache is not None:
-            return self.checkCache
-        if not self.check():
-            self.checkCache = False, self.bpyName
-            return False, self.bpyName
-        for inp in self.inputs:
-            r = inp.checkRecursive()
-            if not r[0]:
-                return r
-        return True, None
-
     def check(self):
         """Return true if the inputs and gettings are correct"""
         return True
@@ -63,6 +50,9 @@ class GeoTemplateOBJECT(GeoTemplate):
         group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
         return cp
+
+    def check(self):
+        return self.settings["inputObject"] in bpy.context.scene.objects
 
 class GeoTemplateGROUP(GeoTemplate):
     """For placing groups into the scene"""
@@ -98,6 +88,9 @@ class GeoTemplateGROUP(GeoTemplate):
 
         return topObj
 
+    def check(self):
+        return self.settings["inputGroup"] in bpy.data.groups
+
 class GeoTemplateSWITCH(GeoTemplate):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
     def build(self, pos, rot, scale, group):
@@ -106,6 +99,17 @@ class GeoTemplateSWITCH(GeoTemplate):
         else:
             return self.inputs["Object 2"].build(pos, rot, scale, group)
 
+    def check(self):
+        if "Object 1" not in self.inputs:
+            return False
+        if "Object 2" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Object 1"], GeoTemplate):
+            return False
+        if not isinstance(self.settings["Object 2"], GeoTemplate):
+            return False
+        return True
+
 class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
     def build(self, pos, rot, scale, group):
@@ -113,6 +117,17 @@ class GeoTemplatePARENT(GeoTemplate):
         child = self.inputs["Child Object"].build(pos, rot, scale, group)
         # TODO parent child to self.settings["parentTo"] from parent
 
+    def check(self):
+        if not "Parent Group" in self.inputs:
+            return False
+        if not "Child Object" in self.inputs:
+            return False
+        if not isinstance(self.inputs["Object 1"], GeoTemplate):
+            return False
+        if not isinstance(self.settings["Object 2"], GeoTemplate):
+            return False
+        # TODO check that object is in parent group
+        return True
 
 class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
@@ -123,6 +138,15 @@ class TemplateADDTOGROUP(Template):
         newGroup.name = self.settings["groupName"]
         group = bpy.context.scene.cm_groups[self.settings["groupName"]]
         self.inputs["Template"].build(pos, rot, scale, tags, group)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
 
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
@@ -140,6 +164,13 @@ class TemplateAGENT(Template):
                                     geoGroupName=new_group.name)
         # TODO set tags
 
+    def check(self):
+        if "Objects" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Objects"], GeoTemplate):
+            return False
+        return True
+
 class TemplateSWITCH(Template):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -147,6 +178,22 @@ class TemplateSWITCH(Template):
             self.inputs["Template 1"].build(pos, rot, scale, tags, cm_group)
         else:
             self.inputs["Template 2"].build(pos, rot, scale, tags, cm_group)
+
+    def check(self):
+        if "Template 1" not in self.inputs:
+            return False
+        if "Template 2" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template 1"], Template):
+            return False
+        if isinstance(self.inputs["Template 1"], GeoTemplate):
+            return False
+        if not isinstance(self.inputs["Template 2"], Template):
+            return False
+        if isinstance(self.inputs["Template 2"], GeoTemplate):
+            return False
+        return True
+
 
 class TemplateOFFSET(Template):
     """Modify the postion and/or the rotation of the request made"""
@@ -156,13 +203,26 @@ class TemplateOFFSET(Template):
         if self.settings["offset"]:
             nPos = Vector(pos)
             nRot = Vector(rot)
-        if self.settings["referenceObject"] in bpy.data.objects:
+        if self.settings["referenceObject"] != "":
             refObj = bpy.data.objects[self.settings["referenceObject"]]
             nPos += refObj.location
             nRot += Vector(refObj.rotation_euler)
         nPos += self.settings["locationOffset"]
         nRot += self.settings["rotationOffset"]
         self.inputs["Template"].build(nPos, nRot, scale, tags, cm_group)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        ref = self.settings["referenceObject"]
+        if ref != "" and ref not in bpy.context.scene.objects:
+            return False
+        return True
+
 
 class TemplateRANDOM(Template):
     """Randomly modify rotation and scale of the request made"""
@@ -176,6 +236,15 @@ class TemplateRANDOM(Template):
                                    self.settings["maxRandSz"])
         newScale = scale * scaleDiff
         self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
 
 class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
@@ -192,6 +261,15 @@ class TemplateRANDOMPOSITIONING(Template):
                 diff.rotate(mathutils.Euler(rot))
                 newPos = Vector(pos) + diff
                 self.inputs["Template"].build(newPos, rot, scale, tags, cm_group)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
 
 class TemplateFORMATION(Template):
     """Place in a row"""
@@ -213,6 +291,15 @@ class TemplateFORMATION(Template):
             self.inputs["Template"].build(placePos + (number//rows)*diffCol
                                           + leftOver*diffRow, rot, scale, tags, cm_group)
 
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
+
 class TemplateTARGET(Template):
     """Place based on the positions of vertices"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -231,7 +318,7 @@ class TemplateTARGET(Template):
                     loc *= scale
                     self.inputs["Template"].build(loc + pos, rot + oRot,
                                                   scale, tags, cm_group)
-        else:  # targetGroups == "vertex"
+        else:  # targetType == "vertex"
             obj = bpy.data.objects[self.settings["targetObject"]]
             if self.settings["overwritePosition"]:
                 wrld = obj.matrix_world
@@ -247,6 +334,21 @@ class TemplateTARGET(Template):
                     loc *= scale
                     self.inputs["Template"].build(loc + pos, rot, scale, tags,
                                                   cm_group)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        if self.settings["targetType"] == "object":
+            if self.settings["targetGroups"] not in bpy.data.groups:
+                return False
+        elif self.settings["targetType"] == "vertex":
+            if self.settings["targetObject"] not in bpy.context.scene.objects:
+                return False
+        return True
 
 class TemplateOBSTACLE(Template):
     """Refuse any requests that are withing the bounding box of an obstacle"""
@@ -266,11 +368,30 @@ class TemplateOBSTACLE(Template):
         if len(intersections) == 0:
             self.inputs["Template"].build(pos, rot, scale, tags, cm_group)
 
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        if self.settings["obstacleGroup"] not in bpy.data.groups:
+            return False
+        return True
+
 class TemplateSETTAG(Template):
     """Set a tag for an agent to start with"""
     def build(self, pos, rot, scale, tags, cm_group):
         tags[self.settings["tagName"]] = self.settings["tagValue"]
         self.inputs["Template"].build(pos, rot, scale, tags, cm_group)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
 
 templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
