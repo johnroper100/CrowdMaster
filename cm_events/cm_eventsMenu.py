@@ -98,6 +98,7 @@ class SCENE_PT_event(Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
+    bl_options = {'DEFAULT_CLOSED'}
     
     @classmethod
     def poll(self, context):
