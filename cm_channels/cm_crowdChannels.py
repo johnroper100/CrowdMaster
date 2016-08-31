@@ -2,7 +2,7 @@ import bpy
 import mathutils
 import math
 from .cm_masterChannels import MasterChannel as Mc
-from .libs.ins_vector import Vector
+from mathutils import Vector
 
 class Crowd(Mc):
     """Used to access the data of other agents"""

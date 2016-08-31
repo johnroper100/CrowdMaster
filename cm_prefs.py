@@ -4,6 +4,7 @@ from bpy.types import AddonPreferences
 from bpy.props import *
 from . import addon_updater_ops
 from . import icon_load
+from . icon_load import cicon
 
 class CMSavePrefs(bpy.types.Operator):
     """Save the CrowdMaster preferences """
@@ -81,10 +82,6 @@ class CMPreferences(AddonPreferences):
     def draw(self, context):
         layout = self.layout
         preferences = context.user_preferences.addons[__package__].preferences
-        
-        pcoll = icon_load.icon_collection["main"]
-        def cicon(name):
-            return pcoll[name].icon_id
 
         row = layout.row()
         row.prop(preferences, "prefs_tab", expand = True)

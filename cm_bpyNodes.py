@@ -1,15 +1,14 @@
 import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
-from bpy.props import EnumProperty, IntProperty
+from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 
 
 class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes"""
     bl_idname = 'CrowdMasterTreeType'
-    bl_label = 'CrowdMaster'
-    bl_icon = 'MOD_REMESH'
-
+    bl_label = 'CrowdMaster Agent Simulation'
+    bl_icon = 'OUTLINER_OB_ARMATURE'
 
 class DefaultSocket(NodeSocket):
     # Description string
@@ -69,10 +68,7 @@ class DependanceSocket(NodeSocket):
 
 class CrowdMasterNode(Node):
     """CrowdMaster node superclass"""
-    # bl_idname = 'CustomNodeType'  # Class name used if not defined
-    # Label for nice name display
     bl_label = 'Super class'
-    # bl_icon = 'SOUND'
 
     @classmethod
     def poll(cls, ntree):
@@ -88,15 +84,6 @@ class LogicNode(CrowdMasterNode):
 
         self.outputs.new('DefaultSocketType', "Output")
         self.outputs.new("DependanceSocketType", "Dependant")
-
-    def getSettings(self, node):
-        pass
-
-class InfoNode(CrowdMasterNode):
-    bl_label = 'Info super class'
-
-    def init(self, context):
-        self.outputs.new('DefaultSocketType', "Output")
 
     def getSettings(self, node):
         pass
@@ -335,7 +322,6 @@ class OutputNode(LogicNode):
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
 
-
 class EventNode(LogicNode):
     """CrowdMaster Event node"""
     bl_label = "Event"
@@ -523,7 +509,7 @@ class MyNodeCategory(NodeCategory):
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("InputNode"),
-        NodeItem("PythonNode"),
+        NodeItem("PythonNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
@@ -559,7 +545,6 @@ node_categories = [
         NodeItem("NoteNode")
         ])
     ]
-
 
 def register():
     bpy.utils.register_class(CrowdMasterTree)

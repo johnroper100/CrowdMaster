@@ -3,7 +3,7 @@ import math
 import mathutils
 Vector = mathutils.Vector
 
-from .libs import ins_octree as ot
+from ..libs import ins_octree as ot
 
 if __name__ != "__main__":
     import bpy

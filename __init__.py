@@ -1,8 +1,8 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "John Roper, Peter Noble, Patrick Crawford",
-    "version": (1, 0, 8),
-    "blender": (2, 77, 0),
+    "version": (1, 0, 9),
+    "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
     "warning": "This is still a work in progress. Make sure to save often.",
@@ -18,243 +18,135 @@ from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from . import cm_prefs
-from . import mysql
-from . mysql import mysql_general as cmDB
 from . import icon_load
-from . icon_load import register_icons, unregister_icons
+from . icon_load import register_icons, unregister_icons, cicon
 from .cm_agent_generation import *
 
 from . import addon_updater_ops
 
 # =============== GROUPS LIST START ===============#
 
+
 class SCENE_UL_group(UIList):
     """for drawing each row"""
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            layout.label(text=str(item.name))
-            layout.prop(item, "type", text="Node tree name")
-            # layout.prop_search(item, "type", bpy.data, "actions", text="")
-            # this draws each row in the list. Each line is a widget
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
-            # no idea when this is actually used
+        layout.label(item.name)
+        layout.label(str(item.totalAgents) + " | " + item.groupType)
+        layout.label("Frozen" if item.freezePlacement else "Unlocked")
 
 
-class SCENE_OT_group_populate(Operator):
-    bl_idname = "scene.cm_groups_populate"
-    bl_label = "Populate group list"
+class SCENE_UL_agent_type(UIList):
+    """for drawing each row"""
+    use_filter_sort_alpha = True
 
-    def execute(self, context):
-        groups = []
-        toRemove = []
-        sce = context.scene
-        for f in range(len(sce.cm_groups.coll)):
-            name = context.scene.cm_groups.coll[f].name
-            if name not in groups:
-                if name in [str(x.group) for x in sce.cm_agents.coll]:
-                    groups.append(context.scene.cm_groups.coll[f].name)
-            else:
-                toRemove.append(f)
-        for f in reversed(toRemove):
-            context.scene.cm_groups.coll.remove(f)
-        for agent in context.scene.cm_agents.coll:
-            if str(agent.group) not in groups:
-                groups.append(str(agent.group))
-                item = context.scene.cm_groups.coll.add()
-                item.name = str(agent.group)
-                item.type = 'NONE'
-        return {'FINISHED'}
-
-# TODO  needs list clean up adding
+    def draw_item(self, context, layout, data, item, icon, active_data,
+                  active_propname):
+        layout.label(item.name)
+        layout.label(str(len(item.agents)))
 
 
-class SCENE_OT_group_remove(Operator):
-    """NOT USED NEEDS REMOVING ONCE THE POPULATE KEEPS THE LIST CLEAR"""
-    bl_idname = "scene.cm_groups_remove"
-    bl_label = "Remove"
+class SCENE_OT_cm_groups_reset(Operator):
+    """Delete a group and all the agent in it (including the agents geo)"""
+    bl_idname = "scene.cm_groups_reset"
+    bl_label = "Reset Group"
 
-    @classmethod
-    def poll(cls, context):
-        s = context.scene
-        return len(s.cm_groups.coll) > s.cm_groups.index >= 0
+    groupName = StringProperty()
 
     def execute(self, context):
-        s = context.scene
-        s.cm_groups.coll.remove(s.cm_groups.index)
-        if s.cm_groups.index > 0:
-            s.cm_groups.index -= 1
+        group = context.scene.cm_groups.get(self.groupName)
+        for obj in bpy.context.selected_objects:
+            obj.select = False
+        for agentType in group.agentTypes:
+            for agent in agentType.agents:
+                if group.groupType == "auto":
+                    if group.freezePlacement:
+                        if agent.name in context.scene.objects:
+                            context.scene.objects[agent.name].animation_data_clear()
+                    else:
+                        if agent.geoGroup in bpy.data.groups:
+                            for obj in bpy.data.groups[agent.geoGroup].objects:
+                                obj.select = True
+                            bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
+                                                   do_unlink=True)
+                elif group.groupType == "manual":
+                    if agent.name in context.scene.objects:
+                        context.scene.objects[agent.name].animation_data_clear()
+        if not group.freezePlacement:
+            bpy.ops.object.delete(use_global=True)
+            groupIndex = context.scene.cm_groups.find(self.groupName)
+            context.scene.cm_groups.remove(groupIndex)
         return {'FINISHED'}
 
-
-class SCENE_OT_group_move(Operator):
-    """NEEDS TO BE REMOVED ONCE POPULATE IS WORKING"""
-    bl_idname = "scene.cm_groups_move"
-    bl_label = "Move"
-
-    direction = EnumProperty(items=(
-        ('UP', "Up", "Move up"),
-        ('DOWN', "Down", "Move down"))
-    )
-
-    @classmethod
-    def poll(cls, context):
-        s = context.scene
-        return len(s.cm_groups.coll) > s.cm_groups.index >= 0
-
-    def execute(self, context):
-        s = context.scene
-        d = -1 if self.direction == 'UP' else 1
-        new_index = (s.cm_groups.index + d) % len(s.cm_groups.coll)
-        s.cm_groups.coll.move(s.cm_groups.index, new_index)
-        s.cm_groups.index = new_index
-        return {'FINISHED'}
 
 # =============== GROUPS LIST END ===============#
 
 # =============== AGENTS LIST START ===============#
 
-class SCENE_UL_agents(UIList):
-    """for drawing each row"""
-    def draw_item(self, context, layout, data, item, icon, active_data,
-                  active_propname):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            if item.name in context.scene.objects:
-                ic = 'OBJECT_DATA'
-            else:
-                ic = 'ERROR'
-            layout.prop_search(item, "name", bpy.data, "objects")
-            layout.prop(item, "group", text="Group number")
-            typ = [g.type for g in bpy.context.scene.cm_groups.coll
-                   if int(g.name) == item.group][0]
-            layout.label(text=typ)
-            # this draws each row in the list. Each line is a widget
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
-            # no idea when this is actually used
 
+class SCENE_OT_cm_agent_add(Operator):
+    bl_idname = "scene.cm_agent_add"
+    bl_label = "Add single agent to cm agents list"
 
-class SCENE_OT_cm_agents_populate(Operator):
-    bl_idname = "scene.cm_agents_populate"
-    bl_label = "Populate cm agents list"
-
-    def findNext(self):
-        g = [x.group for x in bpy.context.scene.cm_agents.coll]
-        i = 1
-        while True:
-            if i not in g:
-                return i
-            else:
-                i += 1
+    agentName = StringProperty()
+    brainType = StringProperty()
+    groupName = StringProperty()
+    geoGroupName = StringProperty()
 
     def execute(self, context):
-        setcmBrains()
-
-        ag = [x.name for x in bpy.context.scene.cm_agents.coll]
-
-        if bpy.context.scene.cm_agents_default.startType == "Next":
-            group = self.findNext()
-        else:
-            group = bpy.context.scene.cm_agents_default.setno
-
-        for i in bpy.context.selected_objects:
-            if i.name not in ag:
-                item = context.scene.cm_agents.coll.add()
-                item.name = i.name
-                item.group = group
-                if bpy.context.scene.cm_agents_default.contType == "Inc":
-                    if context.scene.cm_agents_default.startType == "Next":
-                        group = self.findNext()
-                    else:
-                        bpy.context.scene.cm_agents_default.setno += 1
-                        group = bpy.context.scene.cm_agents_default.setno
-                item.type = 'NONE'
-        bpy.ops.scene.cm_groups_populate()
+        if context.scene.cm_groups.find(self.groupName) == -1:
+            newGroup = context.scene.cm_groups.add()
+            newGroup.name = self.groupName
+            newGroup.groupType = "auto"
+        group = context.scene.cm_groups.get(self.groupName)
+        if group.groupType == "manual" or group.freezePlacement:
+            return {'CANCELLED'}
+        ty = group.agentTypes.find(self.brainType)
+        if ty == -1:
+            at = group.agentTypes.add()
+            at.name = self.brainType
+            ty = group.agentTypes.find(at.name)
+        agentType = group.agentTypes[ty]
+        newAgent = agentType.agents.add()
+        newAgent.name = self.agentName
+        newAgent.geoGroup = self.geoGroupName
+        group.totalAgents += 1
         return {'FINISHED'}
 
 
-class SCENE_OT_agent_remove(Operator):
-    bl_idname = "scene.cm_agents_remove"
-    bl_label = "Remove"
+class SCENE_OT_cm_agent_add_selected(Operator):
+    bl_idname = "scene.cm_agent_add_selected"
+    #bl_label = "Create agents from selected"
+    bl_label = "Create Manual Agents"
 
-    @classmethod
-    def poll(cls, context):
-        s = context.scene
-        return len(s.cm_agents.coll) > s.cm_agents.index >= 0
-
-    def execute(self, context):
-        s = context.scene
-        s.cm_agents.coll.remove(s.cm_agents.index)
-        if s.cm_agents.index > 0:
-            s.cm_agents.index -= 1
-        return {'FINISHED'}
-
-
-class SCENE_OT_agent_move(Operator):
-    bl_idname = "scene.cm_agents_move"
-    bl_label = "Move"
-
-    direction = EnumProperty(items=(
-        ('UP', "Up", "Move up"),
-        ('DOWN', "Down", "Move down"))
-    )
-
-    @classmethod
-    def poll(cls, context):
-        s = context.scene
-        return len(s.cm_agents.coll) > s.cm_agents.index >= 0
+    groupName = StringProperty(name="New Agent Group Name")
+    brainType = StringProperty(name="Brain Type")
 
     def execute(self, context):
-        s = context.scene
-        d = -1 if self.direction == 'UP' else 1
-        new_index = (s.cm_agents.index + d) % len(s.cm_agents.coll)
-        s.cm_agents.coll.move(s.cm_agents.index, new_index)
-        s.cm_agents.index = new_index
+        if self.groupName.strip() == "" or self.brainType.strip() == "":
+            return {'CANCELLED'}
+        if context.scene.cm_groups.find(self.groupName) == -1:
+            newGroup = context.scene.cm_groups.add()
+            newGroup.name = self.groupName
+            newGroup.groupType = "manual"
+        group = context.scene.cm_groups.get(self.groupName)
+        if group.groupType == "auto":
+            return {'CANCELLED'}
+        ty = group.agentTypes.find(self.brainType)
+        if ty == -1:
+            at = group.agentTypes.add()
+            at.name = self.brainType
+            ty = group.agentTypes.find(at.name)
+        agentType = group.agentTypes[ty]
+        for obj in context.selected_objects:
+            newAgent = agentType.agents.add()
+            newAgent.name = obj.name
+            group.totalAgents += 1
         return {'FINISHED'}
 
 
 # =============== AGENTS LIST END ===============#
 
-# =============== SELECTED LIST START ===============#
-
-
-class SCENE_UL_selected(UIList):
-    """for drawing each row"""
-    def draw_item(self, context, layout, data, item, icon, active_data,
-                  active_propname):
-        if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            if item.name in context.scene.objects:
-                ic = 'OBJECT_DATA'
-            else:
-                ic = 'ERROR'
-            layout.prop(item, "name", text="", emboss=False, icon=ic)
-            # this draws each row in the list. Each line is a widget
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
-            # no idea when this is actually used
-
-
-class SCENE_OT_cm_selected_populate(Operator):
-    bl_idname = "scene.cm_selected_populate"
-    bl_label = "See group"
-
-    def execute(self, context):
-        self.group = bpy.context.scene.cm_groups
-        self.group_selected = bpy.context.scene.cm_agents_selected
-        self.group_selected.coll.clear()
-
-        for i in bpy.context.scene.cm_agents.coll:
-            if self.group.index < len(self.group.coll):
-                if i.group == int(self.group.coll[self.group.index].name):
-                    item = context.scene.cm_agents_selected.coll.add()
-                    item.name = i.name
-        return {'FINISHED'}
-
-# =============== SELECTED LIST END ===============#
 
 # =============== SIMULATION START ===============#
 
@@ -268,7 +160,7 @@ class SCENE_OT_cm_start(Operator):
         if (bpy.data.is_dirty) and (preferences.show_debug_options == False):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
-            
+
         context.scene.frame_current = context.scene.frame_start
         global sim
         if "sim" in globals():
@@ -276,11 +168,12 @@ class SCENE_OT_cm_start(Operator):
             del sim
         sim = Simulation()
         sim.actions()
-        """for ag in bpy.context.scene.cm_agents.coll:
-            sim.newagent(ag.name)"""
-        sim.createAgents(bpy.context.scene.cm_agents.coll)
+
+        for group in context.scene.cm_groups:
+            sim.createAgents(group)
+
         sim.startFrameHandler()
-        
+
         if preferences.play_animation == True:
             bpy.ops.screen.animation_play()
         return {'FINISHED'}
@@ -311,11 +204,11 @@ class SCENE_PT_CrowdMaster(Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
-    
+
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType'
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -323,11 +216,7 @@ class SCENE_PT_CrowdMaster(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-        
-        pcoll = icon_load.icon_collection["main"]
-        def cicon(name):
-            return pcoll[name].icon_id
-        
+
         row = layout.row()
         row.scale_y = 1.1
         row.prop(scene, 'use_agent_generation', icon='MOD_ARRAY')
@@ -339,7 +228,7 @@ class SCENE_PT_CrowdMaster(Panel):
 
             row = box.row()
             row.prop_search(scene, "groundObject", scene, "objects")
-            
+
             row = box.row()
             if (scene.agentGroup == "") or (scene.groundObject == ""):
                 row.enabled = False
@@ -348,10 +237,10 @@ class SCENE_PT_CrowdMaster(Panel):
                 row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_yellow'))
             else:
                 row.operator(CrowdMaster_generate_agents.bl_idname, icon='MOD_ARMATURE')
-        
+
         row = layout.row()
         row.separator()
-        
+
         row = layout.row()
         row.scale_y = 1.5
         if preferences.use_custom_icons == True:
@@ -373,11 +262,11 @@ class SCENE_PT_CrowdMasterAgents(Panel):
     bl_space_type = 'NODE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
-    
+
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType'
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -388,64 +277,64 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             initialise()
         layout = self.layout
         scene = context.scene
-        preferences = context.user_preferences.addons[__package__].preferences
-        
-        pcoll = icon_load.icon_collection["main"]
-        def cicon(name):
-            return pcoll[name].icon_id
 
         row = layout.row()
-        row.template_list("SCENE_UL_group", "", scene.cm_groups,
-                          "coll", scene.cm_groups, "index")
+        row.label("Group name")
+        row.label("Number | origin")
+        row.label("Status")
 
-        col = row.column()
-        sub = col.column(True)
-        sub.operator(SCENE_OT_group_populate.bl_idname, text="", icon="ZOOMIN")
+        layout.template_list("SCENE_UL_group", "", scene,
+                             "cm_groups", scene, "cm_groups_index")
 
-        sub = col.column(True)
-        sub.separator()
-        blid_gm = SCENE_OT_group_move.bl_idname
-        sub.operator(blid_gm, text="", icon="TRIA_UP").direction = 'UP'
-        sub.operator(blid_gm, text="", icon="TRIA_DOWN").direction = 'DOWN'
-        sub.separator()
-        blid_sp = SCENE_OT_cm_selected_populate.bl_idname
-        sub.operator(blid_sp, text="", icon="PLUS")
+        layout.separator()
 
-        #####
+        if not scene.cm_view_details:
+            layout.prop(scene, "cm_view_details", icon='RIGHTARROW')
+        else:
+            layout.prop(scene, "cm_view_details", icon='DOWNARROW_HLT')
 
-        layout.label(text="Selected Agents:")
-        layout.template_list("SCENE_UL_selected", "", scene.cm_agents_selected,
-                             "coll", scene.cm_agents_selected, "index")
+            index = scene.cm_groups_index
+            if index >= 0 and index < len(scene.cm_groups):
+                group = scene.cm_groups[index]
 
-        #####
+                layout.template_list("SCENE_UL_agent_type", "", group,
+                                     "agentTypes", scene, "cm_view_details_index")
 
-        layout.label(text="All agents:")
-        row = layout.row()
-        row.template_list("SCENE_UL_agents", "", scene.cm_agents,
-                          "coll", scene.cm_agents, "index")
+                if group.name == "cm_allAgents":
+                    layout.label("cm_allAgents: To freeze use AddToGroup node")
+                else:
+                    layout.prop(group, "freezePlacement")
 
-        col = row.column()
-        sub = col.column(True)
-        blid_ap = SCENE_OT_cm_agents_populate.bl_idname
-        sub.operator(blid_ap, text="", icon="ZOOMIN")
-        blid_ar = SCENE_OT_agent_remove.bl_idname
-        sub.operator(blid_ar, text="", icon="ZOOMOUT")
+                op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
+                op.groupName = group.name
+            else:
+                layout.label("No group selected")
 
-        sub = col.column(True)
-        sub.separator()
-        blid_am = SCENE_OT_agent_move.bl_idname
-        sub.operator(blid_am, text="", icon="TRIA_UP").direction = 'UP'
-        sub.operator(blid_am, text="", icon="TRIA_DOWN").direction = 'DOWN'
-        
-        default = bpy.context.scene.cm_agents_default
-        layout.label(text="Default agents group:")
 
-        row = layout.row()
-        row.prop(default, "startType", expand=True)
-        row.prop(default, "setno", text="Group number")
+class SCENE_PT_CrowdMasterManualAgents(Panel):
+    """Creates CrowdMaster agent panel in the node editor."""
+    bl_label = "Manual Agents"
+    bl_idname = "SCENE_PT_CrowdMasterManualAgents"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'TOOLS'
+    bl_category = "CrowdMaster"
+    bl_options = {'DEFAULT_CLOSED'}
 
-        row = layout.row()
-        row.prop(default, "contType", expand=True)
+    @classmethod
+    def poll(self, context):
+        try:
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+        except (AttributeError, KeyError, TypeError):
+            return False
+
+    def draw(self, context):
+        layout = self.layout
+
+        layout.prop(context.scene.cm_manual, "groupName")
+        layout.prop(context.scene.cm_manual, "brainType")
+        op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
+        op.groupName = "cm_" + context.scene.cm_manual.groupName
+        op.brainType = context.scene.cm_manual.brainType
 
 def register():
     register_icons()
@@ -462,16 +351,21 @@ def register():
     global event_unregister
     from .cm_events import event_unregister
 
-    from .cm_blenderData import registerTypes
-
-    global setcmBrains
-    from .cm_blenderData import setcmBrains
+    from . import cm_blenderData
+    cm_blenderData.registerTypes()
 
     global cm_bpyNodes
     from . import cm_bpyNodes
     cm_bpyNodes.register()
 
-    registerTypes()
+    global cm_generation
+    from . import cm_generation
+    cm_generation.register()
+    
+    global cm_utilities
+    from . import cm_utilities
+    cm_utilities.register()
+
     action_register()
     event_register()
 
@@ -481,23 +375,19 @@ def initialise():
     global Simulation
     from .cm_simulate import Simulation
 
-    global update_cm_brains
-    from .cm_blenderData import update_cm_brains
-
-    global cm_brains
-    cm_brains = bpy.context.scene.cm_brains
-
 def unregister():
     unregister_icons()
     bpy.utils.unregister_module(__name__)
 
     action_unregister()
     event_unregister()
-    from .cm_blenderData import unregisterAllTypes
-    unregisterAllTypes()
+    from . import cm_blenderData
+    cm_blenderData.unregisterAllTypes()
 
     addon_updater_ops.unregister()
-    #cm_bpyNodes.unregister()
+    cm_bpyNodes.unregister()
+    cm_generation.unregister()
+    cm_utilities.unregister()
 
 if __name__ == "__main__":
     register()
