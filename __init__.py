@@ -20,8 +20,6 @@ from bpy.types import PropertyGroup, UIList, Panel, Operator
 from . import cm_prefs
 from . import icon_load
 from . icon_load import register_icons, unregister_icons, cicon
-from .cm_agent_generation import *
-
 from . import addon_updater_ops
 
 # =============== GROUPS LIST START ===============#
