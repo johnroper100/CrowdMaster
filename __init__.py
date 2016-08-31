@@ -114,7 +114,7 @@ class SCENE_OT_cm_agent_add_selected(Operator):
     #bl_label = "Create agents from selected"
     bl_label = "Create Manual Agents"
 
-    groupName = StringProperty(name="Agent Group")
+    groupName = StringProperty(name="Agent Group Name")
     brainType = StringProperty(name="Brain Type")
 
     def execute(self, context):
@@ -321,8 +321,8 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
     def draw(self, context):
         layout = self.layout
 
-        layout.prop(context.scene.cm_manual, "groupName", text="Put in agent group")
-        layout.prop(context.scene.cm_manual, "brainType", text="Brain type")
+        layout.prop(context.scene.cm_manual, "groupName")
+        layout.prop(context.scene.cm_manual, "brainType")
         op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
         op.groupName = "cm_" + context.scene.cm_manual.groupName
         op.brainType = context.scene.cm_manual.brainType
