@@ -321,8 +321,8 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
     def draw(self, context):
         layout = self.layout
 
-        layout.prop_search(context.scene.cm_manual, "groupName", bpy.data, "groups")
-        layout.prop(context.scene.cm_manual, "brainType")
+        layout.prop(context.scene.cm_manual, "groupName", text="Put in agent group")
+        layout.prop(context.scene.cm_manual, "brainType", text="Brain type")
         op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
         op.groupName = "cm_" + context.scene.cm_manual.groupName
         op.brainType = context.scene.cm_manual.brainType
