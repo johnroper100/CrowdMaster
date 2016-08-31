@@ -31,10 +31,19 @@ class SCENE_UL_group(UIList):
     """for drawing each row"""
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
-        layout.label(text=str(item.name))
-        layout.label(text=item.groupType + " | " + str(item.totalAgents))
-        op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
-        op.groupName=item.name
+        layout.label(item.name)
+        layout.label(str(item.totalAgents) + " | " + item.groupType)
+        layout.label("Frozen" if item.freezePlacement else "Unlocked")
+
+
+class SCENE_UL_agent_type(UIList):
+    """for drawing each row"""
+    use_filter_sort_alpha = True
+
+    def draw_item(self, context, layout, data, item, icon, active_data,
+                  active_propname):
+        layout.label(item.name)
+        layout.label(str(len(item.agents)))
 
 
 class SCENE_OT_cm_groups_reset(Operator):
@@ -85,7 +94,7 @@ class SCENE_OT_cm_agent_add(Operator):
             newGroup.name = self.groupName
             newGroup.groupType = "auto"
         group = context.scene.cm_groups.get(self.groupName)
-        if group.groupType == "manual":
+        if group.groupType == "manual" or group.freezePlacement:
             return {'CANCELLED'}
         ty = group.agentTypes.find(self.brainType)
         if ty == -1:
@@ -264,21 +273,34 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         layout = self.layout
         scene = context.scene
 
+        row = layout.row()
+        row.label("Group name")
+        row.label("Number | origin")
+        row.label("Status")
+
         layout.template_list("SCENE_UL_group", "", scene,
                              "cm_groups", scene, "cm_groups_index")
 
-        if not scene.view_group_details:
-            layout.prop(scene, "view_group_details", icon='RIGHTARROW')
+        layout.separator()
+
+        if not scene.cm_view_details:
+            layout.prop(scene, "cm_view_details", icon='RIGHTARROW')
         else:
-            layout.prop(scene, "view_group_details", icon='DOWNARROW_HLT')
+            layout.prop(scene, "cm_view_details", icon='DOWNARROW_HLT')
 
-            group = scene.cm_groups[scene.cm_groups_index]
+            index = scene.cm_groups_index
+            if index >= 0 and index < len(scene.cm_groups):
+                group = scene.cm_groups[index]
 
-            layout.label("Group name: " + group.name + ". Total agents" +
-                         group.totalAgents)
-            layout.label("Group type: " + group.groupType)
-            for at in group.agentTypes:
-                layout.label("Brain type: " + at.name + ". Number: " + len(at.agents))
+                layout.template_list("SCENE_UL_agent_type", "", group,
+                                     "agentTypes", scene, "cm_view_details_index")
+
+                layout.prop(group, "freezePlacement")
+
+                op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
+                op.groupName = group.name
+            else:
+                layout.label("No group selected")
 
 
 class SCENE_PT_CrowdMasterManualAgents(Panel):
