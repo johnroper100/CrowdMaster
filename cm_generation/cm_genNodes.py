@@ -21,17 +21,6 @@ class GeoSocket(NodeSocket):
     def draw_color(self, context, node):
         return (0.125, 0.125, 0.575, 1.0)
 
-"""class VectorSocket(NodeSocket):
-    '''Vector node socket type'''
-    bl_idname = 'VectorSocketType'
-    bl_label = 'Vector Node Socket'
-
-    def draw(self, context, layout, node, text):
-        layout.label(text)
-
-    def draw_color(self, context, node):
-        return (0.35, 0.35, 0.35, 1.0)"""
-
 class TemplateSocket(NodeSocket):
     '''Template node socket type'''
     bl_idname = 'TemplateSocketType'
@@ -44,42 +33,11 @@ class TemplateSocket(NodeSocket):
         return (0.125, 0.575, 0.125, 1.0)
 
 
-"""class ObjectSocket(NodeSocket):
-    '''Object node socket type'''
-    bl_idname = 'ObjectSocketType'
-    bl_label = 'Object Node Socket'
-
-    inputObject = StringProperty(name="Object")
-
-    def draw(self, context, layout, node, text):
-        if self.is_linked:
-            layout.label(text)
-        else:
-            layout.prop_search(self, "inputObject", context.scene, "objects", text=text)
-
-    def draw_color(self, context, node):
-        return (1.0, 0.5, 0.2, 0.5)"""
-
-"""class GroupSocket(NodeSocket):
-    '''Group node socket type'''
-    bl_idname = 'GroupSocketType'
-    bl_label = 'Group Node Socket'
-
-    inputGroup = StringProperty(name="Group")
-
-    def draw(self, context, layout, node, text):
-        if self.is_linked:
-            layout.label(text)
-        else:
-            layout.prop_search(self, "inputGroup", bpy.data, "groups", text=text)
-
-    def draw_color(self, context, node):
-        return (1.0, 0.5, 0.2, 0.5)"""
-
 class CrowdMasterAGenTreeNode(Node):
     @classmethod
     def poll(cls, ntree):
         return ntree.bl_idname == 'CrowdMasterAGenTreeType'
+
 
 class GenerateNode(CrowdMasterAGenTreeNode):
     '''The generate node'''
@@ -153,23 +111,6 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"inputGroup": self.inputGroup}
-
-"""class VectorInputNode(CrowdMasterAGenTreeNode):
-    '''The vector input node'''
-    bl_idname = 'VectorInputNodeType'
-    bl_label = 'Vector'
-    bl_icon = 'SOUND'
-
-    inputVector = FloatVectorProperty(name="Vector", default = [0, 0, 0], subtype = "XYZ")
-
-    def init(self, context):
-        self.outputs.new('VectorSocketType', "Vector")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "inputVector")
-
-    def getSettings(self):
-        return {"inputVector": self.inputVector}"""
 
 class GeoSwitchNode(CrowdMasterAGenTreeNode):
     '''The geo switch node'''
@@ -325,7 +266,6 @@ class RandomNode(CrowdMasterAGenTreeNode):
                               update=updateRandomNode)
 
     def init(self, context):
-        #self.inputs.new('VectorSocketType', "Vector")
         self.inputs.new("TemplateSocketType", "Template")
         self.inputs[0].link_limit = 1
 
@@ -358,12 +298,6 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                             description="The number of agents to place",
                             default=1)
 
-    """locationType = EnumProperty(
-        items = [('vector', 'Vector', 'Vector location type'),
-                 ('scene', 'Scene', 'Scene location type')],
-        name = "Location Type",
-        description = "Which location type to use",
-        default = "vector")"""
     locationType = EnumProperty(
         items = [("radius", "Radius", "Within radius of requested")],
         name = "Location Type",
@@ -390,9 +324,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        #self.inputs.new('VectorSocketType', "Vector")
         self.inputs[0].link_limit = 1
-        #self.inputs[1].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
@@ -442,9 +374,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
-        #self.inputs.new('VectorSocketType', "Vector")
         self.inputs[0].link_limit = 1
-        #self.inputs[1].link_limit = 1
 
         self.outputs.new('TemplateSocketType', "Template")
 
@@ -528,6 +458,20 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
         return {"obstacleGroup": self.obstacleGroup,
                 "margin": self.margin}
 
+
+class NoteNode(CrowdMasterAGenTreeNode):
+    """For keeping the graph well organised"""
+    bl_label = 'Note'
+
+    noteText = StringProperty(default="Enter text here")
+
+    def draw_buttons(self, context, layout):
+        layout.label(self.noteText)
+
+    def draw_buttons_ext(self, context, layout):
+        layout.prop(self, "noteText")
+
+
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 
@@ -541,7 +485,6 @@ agen_node_categories = [
         NodeItem("ObjectInputNodeType"),
         NodeItem("GroupInputNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
-        #NodeItem("ParentNodeType"),
         ]),
     CrowdMasterAGenCategories("template", "Template", items=[
         NodeItem("TemplateNodeType"),
@@ -558,24 +501,24 @@ agen_node_categories = [
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
         NodeItem("AddToGroupNodeType")
-        #NodeItem("VectorInputNodeType"),
         ]),
+    CrowdMasterAGenCategories("layout", "Layout", items=[
+        NodeItem("NodeFrame"),
+        NodeItem("NodeReroute"),
+        NodeItem("NoteNode")
+    ])
     ]
 
 def register():
     bpy.utils.register_class(CrowdMasterAGenTree)
     bpy.utils.register_class(GeoSocket)
-    #bpy.utils.register_class(VectorSocket)
     bpy.utils.register_class(TemplateSocket)
-    #bpy.utils.register_class(ObjectSocket)
-    #bpy.utils.register_class(GroupSocket)
 
     bpy.utils.register_class(GenerateNode)
     bpy.utils.register_class(AddToGroupNode)
 
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
-    #bpy.utils.register_class(VectorInputNode)
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
@@ -587,6 +530,8 @@ def register():
     bpy.utils.register_class(TargetPositionNode)
     bpy.utils.register_class(ObstacleNode)
 
+    bpy.utils.register_class(NoteNode)
+
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
 def unregister():
@@ -594,17 +539,13 @@ def unregister():
 
     bpy.utils.unregister_class(CrowdMasterAGenTree)
     bpy.utils.unregister_class(GeoSocket)
-    #bpy.utils.unregister_class(VectorSocket)
     bpy.utils.unregister_class(TemplateSocket)
-    #bpy.utils.unregister_class(ObjectSocket)
-    #bpy.utils.unregister_class(GroupSocket)
 
     bpy.utils.unregister_class(GenerateNode)
     bpy.utils.unregister_class(AddToGroupNode)
 
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
-    #bpy.utils.unregister_class(VectorInputNode)
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)
@@ -615,6 +556,8 @@ def unregister():
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
     bpy.utils.unregister_class(ObstacleNode)
+
+    bpy.utils.unregister_class(NoteNode)
 
 if __name__ == "__main__":
     register()

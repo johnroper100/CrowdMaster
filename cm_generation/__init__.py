@@ -13,18 +13,27 @@ class SCENE_OT_agent_nodes_generate(Operator):
     nodeName = StringProperty(name="node name")
     nodeTreeName = StringProperty(name="node tree")
 
+    def getInput(self, inp):
+        fr = inp.links[0].from_node
+        if fr.bl_idname == "NodeReroute":
+            return self.getInput(fr.inputs[0])
+        else:
+            return fr
+
     def construct(self, current, cache):
         """returns: bool - successfully built, Template"""
+
         idName = current.bl_idname
         if idName in templates:
             inps = {}
             for i in current.inputs:
                 nm = i.name
                 if i.is_linked:
-                    if i.links[0].from_node in cache:
-                        inps[nm] = cache[i.links[0].from_node]
+                    from_node = self.getInput(i)
+                    if from_node in cache:
+                        inps[nm] = cache[from_node.name]
                     else:
-                        suc, temp = self.construct(i.links[0].from_node, cache)
+                        suc, temp = self.construct(from_node, cache)
                         if not suc:
                             return False, None
                         inps[nm] = temp
@@ -52,6 +61,8 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
         for space in generateNode.inputs[0].links:
             tipNode = space.from_node
+            if tipNode.bl_idname == "NodeReroute":
+                tipNode = self.getInput(tipNode.inputs[0])
             suc, temp = self.construct(tipNode, cache)
             if suc:
                 genSpaces[tipNode] = temp
@@ -67,6 +78,8 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
             for space in generateNode.inputs[0].links:
                 tipNode = space.from_node
+                if tipNode.bl_idname == "NodeReroute":
+                    tipNode = self.getInput(tipNode.inputs[0])
                 genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)),
                                                 1, {},
                                                 context.scene.cm_groups["cm_allAgents"])
