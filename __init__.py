@@ -105,8 +105,8 @@ class SCENE_OT_cm_agent_add_selected(Operator):
     #bl_label = "Create agents from selected"
     bl_label = "Create Manual Agents"
 
-    groupName = StringProperty()
-    brainType = StringProperty()
+    groupName = StringProperty(name="Agent Group")
+    brainType = StringProperty(name="Brain Type")
 
     def execute(self, context):
         if self.groupName.strip() == "" or self.brainType.strip() == "":
