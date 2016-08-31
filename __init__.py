@@ -263,11 +263,23 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             initialise()
         layout = self.layout
         scene = context.scene
-        preferences = context.user_preferences.addons[__package__].preferences
 
-        row = layout.row()
-        row.template_list("SCENE_UL_group", "", scene,
-                          "cm_groups", scene, "cm_groups_index")
+        layout.template_list("SCENE_UL_group", "", scene,
+                             "cm_groups", scene, "cm_groups_index")
+
+        if not scene.view_group_details:
+            layout.prop(scene, "view_group_details", icon='RIGHTARROW')
+        else:
+            layout.prop(scene, "view_group_details", icon='DOWNARROW_HLT')
+
+            group = scene.cm_groups[scene.cm_groups_index]
+
+            layout.label("Group name: " + group.name + ". Total agents" +
+                         group.totalAgents)
+            layout.label("Group type: " + group.groupType)
+            for at in group.agentTypes:
+                layout.label("Brain type: " + at.name + ". Number: " + len(at.agents))
+
 
 class SCENE_PT_CrowdMasterManualAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""

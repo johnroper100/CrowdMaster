@@ -133,8 +133,6 @@ class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
     def build(self, pos, rot, scale, tags, cm_group):
         scene = bpy.context.scene
-        import pdb
-        pdb.set_trace()
         if scene.cm_groups.find(self.settings["groupName"]) != -1:
             if scene.cm_groups[self.settings["groupName"]].groupType == "auto":
                 bpy.ops.scene.cm_groups_reset(groupName=self.settings["groupName"])
