@@ -352,6 +352,10 @@ def register():
     global cm_generation
     from . import cm_generation
     cm_generation.register()
+    
+    global cm_utilities
+    from . import cm_utilities
+    cm_utilities.register()
 
     action_register()
     event_register()
@@ -374,6 +378,7 @@ def unregister():
     addon_updater_ops.unregister()
     cm_bpyNodes.unregister()
     cm_generation.unregister()
+    cm_utilities.unregister()
 
 if __name__ == "__main__":
     register()
