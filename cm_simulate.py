@@ -52,7 +52,7 @@ class Simulation():
         """Set up all the agents at the beginning of the simulation"""
         for ty in group.agentTypes:
             for ag in ty.agents:
-                self.newagent(ag.objectName, ag.brainType)
+                self.newagent(ag.name, ty.name)
 
     def step(self, scene):
         """Called when the next frame is moved to"""

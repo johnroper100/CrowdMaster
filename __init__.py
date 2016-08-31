@@ -32,7 +32,7 @@ class SCENE_UL_group(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         layout.label(text=str(item.name))
-        layout.label(text=str(item.totalAgents))
+        layout.label(text=item.groupType + " | " + str(item.totalAgents))
         op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
         op.groupName=item.name
 
@@ -50,11 +50,15 @@ class SCENE_OT_cm_groups_reset(Operator):
             obj.select = False
         for agentType in group.agentTypes:
             for agent in agentType.agents:
-                if agent.geoGroup in bpy.data.groups:
-                    for obj in bpy.data.groups[agent.geoGroup].objects:
-                        obj.select = True
-                    bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
-                                           do_unlink=True)
+                if group.groupType == "auto":
+                    if agent.geoGroup in bpy.data.groups:
+                        for obj in bpy.data.groups[agent.geoGroup].objects:
+                            obj.select = True
+                        bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
+                                               do_unlink=True)
+                elif group.groupType == "manual":
+                    if agent.name in context.scene.objects:
+                        context.scene.objects[agent.name].animation_data_clear()
         bpy.ops.object.delete(use_global=True)
         groupIndex = context.scene.cm_groups.find(self.groupName)
         context.scene.cm_groups.remove(groupIndex)
@@ -78,8 +82,11 @@ class SCENE_OT_cm_agent_add(Operator):
     def execute(self, context):
         if context.scene.cm_groups.find(self.groupName) == -1:
             newGroup = context.scene.cm_groups.add()
-            newGroup.groupName = self.groupName
+            newGroup.name = self.groupName
+            newGroup.groupType = "auto"
         group = context.scene.cm_groups.get(self.groupName)
+        if group.groupType == "manual":
+            return {'CANCELLED'}
         ty = group.agentTypes.find(self.brainType)
         if ty == -1:
             at = group.agentTypes.add()
@@ -87,10 +94,39 @@ class SCENE_OT_cm_agent_add(Operator):
             ty = group.agentTypes.find(at.name)
         agentType = group.agentTypes[ty]
         newAgent = agentType.agents.add()
-        newAgent.objectName = self.agentName
-        newAgent.name = self.brainType
+        newAgent.name = self.agentName
         newAgent.geoGroup = self.geoGroupName
         group.totalAgents += 1
+        return {'FINISHED'}
+
+
+class SCENE_OT_cm_agent_add_selected(Operator):
+    bl_idname = "scene.cm_agent_add_selected"
+    bl_label = "Create agents from selected"
+
+    groupName = StringProperty()
+    brainType = StringProperty()
+
+    def execute(self, context):
+        if self.groupName.strip() == "" or self.brainType.strip() == "":
+            return {'CANCELLED'}
+        if context.scene.cm_groups.find(self.groupName) == -1:
+            newGroup = context.scene.cm_groups.add()
+            newGroup.name = self.groupName
+            newGroup.groupType = "manual"
+        group = context.scene.cm_groups.get(self.groupName)
+        if group.groupType == "auto":
+            return {'CANCELLED'}
+        ty = group.agentTypes.find(self.brainType)
+        if ty == -1:
+            at = group.agentTypes.add()
+            at.name = self.brainType
+            ty = group.agentTypes.find(at.name)
+        agentType = group.agentTypes[ty]
+        for obj in context.selected_objects:
+            newAgent = agentType.agents.add()
+            newAgent.name = obj.name
+            group.totalAgents += 1
         return {'FINISHED'}
 
 
@@ -235,10 +271,34 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         pcoll = icon_load.icon_collection["main"]
         def cicon(name):
             return pcoll[name].icon_id
+            # TODO What is this?
 
         row = layout.row()
+        # TODO does there really need to be a row here?
         row.template_list("SCENE_UL_group", "", scene,
                           "cm_groups", scene, "cm_groups_index")
+
+class SCENE_PT_CrowdMasterManualAgents(Panel):
+    """Creates CrowdMaster agent panel in the node editor."""
+    bl_label = "Manual Agents"
+    bl_idname = "SCENE_PT_CrowdMasterManualAgents"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'TOOLS'
+    bl_category = "CrowdMaster"
+
+    @classmethod
+    def poll(self, context):
+        try:
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+        except (AttributeError, KeyError, TypeError):
+            return False
+
+    def draw(self, context):
+        self.layout.prop(context.scene.cm_manual, "groupName")
+        self.layout.prop(context.scene.cm_manual, "brainType")
+        op = self.layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
+        op.groupName = "cm_" + context.scene.cm_manual.groupName
+        op.brainType = context.scene.cm_manual.brainType
 
 def register():
     register_icons()

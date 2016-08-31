@@ -132,11 +132,17 @@ class GeoTemplatePARENT(GeoTemplate):
 class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
     def build(self, pos, rot, scale, tags, cm_group):
-        if bpy.context.scene.cm_groups.find(self.settings["groupName"]) != -1:
-            bpy.ops.scene.cm_groups_reset(groupName=self.settings["groupName"])
-        newGroup = bpy.context.scene.cm_groups.add()
+        scene = bpy.context.scene
+        import pdb
+        pdb.set_trace()
+        if scene.cm_groups.find(self.settings["groupName"]) != -1:
+            if scene.cm_groups[self.settings["groupName"]].groupType == "auto":
+                bpy.ops.scene.cm_groups_reset(groupName=self.settings["groupName"])
+            else:
+                return
+        newGroup = scene.cm_groups.add()
         newGroup.name = self.settings["groupName"]
-        group = bpy.context.scene.cm_groups[self.settings["groupName"]]
+        group = scene.cm_groups[self.settings["groupName"]]
         self.inputs["Template"].build(pos, rot, scale, tags, group)
 
     def check(self):
