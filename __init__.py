@@ -60,17 +60,22 @@ class SCENE_OT_cm_groups_reset(Operator):
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
-                    if agent.geoGroup in bpy.data.groups:
-                        for obj in bpy.data.groups[agent.geoGroup].objects:
-                            obj.select = True
-                        bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
-                                               do_unlink=True)
+                    if group.freezePlacement:
+                        if agent.name in context.scene.objects:
+                            context.scene.objects[agent.name].animation_data_clear()
+                    else:
+                        if agent.geoGroup in bpy.data.groups:
+                            for obj in bpy.data.groups[agent.geoGroup].objects:
+                                obj.select = True
+                            bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
+                                                   do_unlink=True)
                 elif group.groupType == "manual":
                     if agent.name in context.scene.objects:
                         context.scene.objects[agent.name].animation_data_clear()
-        bpy.ops.object.delete(use_global=True)
-        groupIndex = context.scene.cm_groups.find(self.groupName)
-        context.scene.cm_groups.remove(groupIndex)
+        if not group.freezePlacement:
+            bpy.ops.object.delete(use_global=True)
+            groupIndex = context.scene.cm_groups.find(self.groupName)
+            context.scene.cm_groups.remove(groupIndex)
         return {'FINISHED'}
 
 
@@ -295,7 +300,10 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 layout.template_list("SCENE_UL_agent_type", "", group,
                                      "agentTypes", scene, "cm_view_details_index")
 
-                layout.prop(group, "freezePlacement")
+                if group.name == "cm_allAgents":
+                    layout.label("cm_allAgents: To freeze use AddToGroup node")
+                else:
+                    layout.prop(group, "freezePlacement")
 
                 op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
                 op.groupName = group.name

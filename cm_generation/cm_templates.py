@@ -133,11 +133,16 @@ class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
     def build(self, pos, rot, scale, tags, cm_group):
         scene = bpy.context.scene
+        isFrozen = False
         if scene.cm_groups.find(self.settings["groupName"]) != -1:
-            if scene.cm_groups[self.settings["groupName"]].groupType == "auto":
+            group = scene.cm_groups[self.settings["groupName"]]
+            isFrozen = group.freezePlacement
+            if group.groupType == "auto":
                 bpy.ops.scene.cm_groups_reset(groupName=self.settings["groupName"])
             else:
                 return
+        if isFrozen:
+            return
         newGroup = scene.cm_groups.add()
         newGroup.name = self.settings["groupName"]
         group = scene.cm_groups[self.settings["groupName"]]
@@ -149,6 +154,8 @@ class TemplateADDTOGROUP(Template):
         if not isinstance(self.inputs["Template"], Template):
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        if self.settings["groupName"].strip() == "":
             return False
         return True
 
