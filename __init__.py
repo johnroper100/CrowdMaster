@@ -218,30 +218,6 @@ class SCENE_PT_CrowdMaster(Panel):
         preferences = context.user_preferences.addons[__package__].preferences
 
         row = layout.row()
-        row.scale_y = 1.1
-        row.prop(scene, 'use_agent_generation', icon='MOD_ARRAY')
-
-        if scene.use_agent_generation == True:
-            box = layout.box()
-            row = box.row()
-            row.prop_search(scene, "agentGroup", bpy.data, "groups")
-
-            row = box.row()
-            row.prop_search(scene, "groundObject", scene, "objects")
-
-            row = box.row()
-            if (scene.agentGroup == "") or (scene.groundObject == ""):
-                row.enabled = False
-            row.scale_y = 1.15
-            if preferences.use_custom_icons == True:
-                row.operator(CrowdMaster_generate_agents.bl_idname, icon_value=cicon('plus_yellow'))
-            else:
-                row.operator(CrowdMaster_generate_agents.bl_idname, icon='MOD_ARMATURE')
-
-        row = layout.row()
-        row.separator()
-
-        row = layout.row()
         row.scale_y = 1.5
         if preferences.use_custom_icons == True:
             row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))
