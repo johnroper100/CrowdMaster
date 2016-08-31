@@ -19,7 +19,7 @@ from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from . import cm_prefs
 from . import icon_load
-from . icon_load import register_icons, unregister_icons
+from . icon_load import register_icons, unregister_icons, cicon
 from .cm_agent_generation import *
 
 from . import addon_updater_ops
@@ -40,7 +40,7 @@ class SCENE_UL_group(UIList):
 class SCENE_OT_cm_groups_reset(Operator):
     """Delete a group and all the agent in it (including the agents geo)"""
     bl_idname = "scene.cm_groups_reset"
-    bl_label = "Reset group"
+    bl_label = "Reset Group"
 
     groupName = StringProperty()
 
@@ -102,7 +102,8 @@ class SCENE_OT_cm_agent_add(Operator):
 
 class SCENE_OT_cm_agent_add_selected(Operator):
     bl_idname = "scene.cm_agent_add_selected"
-    bl_label = "Create agents from selected"
+    #bl_label = "Create agents from selected"
+    bl_label = "Create Manual Agents"
 
     groupName = StringProperty()
     brainType = StringProperty()
@@ -202,10 +203,6 @@ class SCENE_PT_CrowdMaster(Panel):
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
-        pcoll = icon_load.icon_collection["main"]
-        def cicon(name):
-            return pcoll[name].icon_id
-
         row = layout.row()
         row.scale_y = 1.1
         row.prop(scene, 'use_agent_generation', icon='MOD_ARRAY')
@@ -268,13 +265,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
-        pcoll = icon_load.icon_collection["main"]
-        def cicon(name):
-            return pcoll[name].icon_id
-            # TODO What is this?
-
         row = layout.row()
-        # TODO does there really need to be a row here?
         row.template_list("SCENE_UL_group", "", scene,
                           "cm_groups", scene, "cm_groups_index")
 
@@ -294,9 +285,11 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
             return False
 
     def draw(self, context):
-        self.layout.prop(context.scene.cm_manual, "groupName")
-        self.layout.prop(context.scene.cm_manual, "brainType")
-        op = self.layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
+        layout = self.layout
+
+        layout.prop_search(context.scene.cm_manual, "groupName", bpy.data, "groups")
+        layout.prop(context.scene.cm_manual, "brainType")
+        op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
         op.groupName = "cm_" + context.scene.cm_manual.groupName
         op.brainType = context.scene.cm_manual.brainType
 
