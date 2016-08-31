@@ -4,6 +4,13 @@ from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
 
+bpy.types.Scene.show_utilities = BoolProperty(
+		name="Show or hide the utilities",
+		description="Show/hide the utilities",
+		default=False,
+		options={'HIDDEN'}
+	)
+
 class SCENE_PT_CrowdMasterUtilities(Panel):
     """Creates CrowdMaster utilities panel in the node editor."""
     bl_label = "Utilities"

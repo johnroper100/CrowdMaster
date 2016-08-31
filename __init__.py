@@ -228,6 +228,17 @@ class SCENE_PT_CrowdMaster(Panel):
             row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
+            
+        row = layout.row()
+        row.separator()
+        
+        row = layout.row()
+        if context.scene.show_utilities == False:
+            row.prop(context.scene, "show_utilities", icon="RIGHTARROW",\
+                text="Utilities")
+        else:
+            row.prop(context.scene, "show_utilities", icon="TRIA_DOWN",\
+                text="Utilities")
 
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
@@ -265,7 +276,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         if not scene.cm_view_details:
             layout.prop(scene, "cm_view_details", icon='RIGHTARROW')
         else:
-            layout.prop(scene, "cm_view_details", icon='DOWNARROW_HLT')
+            layout.prop(scene, "cm_view_details", icon='TRIA_DOWN')
 
             index = scene.cm_groups_index
             if index >= 0 and index < len(scene.cm_groups):
