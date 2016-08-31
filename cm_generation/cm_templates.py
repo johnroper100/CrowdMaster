@@ -106,7 +106,7 @@ class GeoTemplateSWITCH(GeoTemplate):
             return False
         if not isinstance(self.inputs["Object 1"], GeoTemplate):
             return False
-        if not isinstance(self.settings["Object 2"], GeoTemplate):
+        if not isinstance(self.inputs["Object 2"], GeoTemplate):
             return False
         return True
 
