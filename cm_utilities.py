@@ -1,8 +1,9 @@
 import bpy
 import os
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
+from bpy.types import Panel, Operator
+from bpy.props import FloatProperty, StringProperty, BoolProperty
+from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
+
 from . import icon_load
 from . icon_load import cicon
 
@@ -12,6 +13,9 @@ bpy.types.Scene.show_utilities = BoolProperty(
 		default=False,
 		options={'HIDDEN'}
 	)
+
+bpy.types.Scene.bbox_joinObjects = BoolProperty(name="Join Objects", description="Join all the created bounding box meshes into one object", default=False)
+bpy.types.Scene.bbox_margin = FloatProperty(name="Margin", description="Scale each bounding box by this")
 
 class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     bl_idname = "scene.cm_setup_sample_nodes"
@@ -46,11 +50,22 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
         row = layout.row()
         row.prop(self, "nodeTreeType")
 
+class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
+    bl_idname = "scene.cm_convert_to_bound_box"
+    bl_label = "Convert Selected To Bounding Box"
+
+    def execute(self, context):
+        scene = context.scene 
+
+        return {'FINISHED'}
+
 def register():
     bpy.utils.register_class(CrowdMaster_setup_sample_nodes)
+    bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
 
 def unregister():
     bpy.utils.unregister_class(CrowdMaster_setup_sample_nodes)
+    bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
 
 if __name__ == "__main__":
     register()

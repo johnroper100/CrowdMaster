@@ -237,11 +237,24 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
             
-            row = layout.row()
+            box = layout.box()
+            
+            row = box.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
             else:
                 row.operator("scene.cm_setup_sample_nodes")
+            
+            row = box.row()
+            row.separator()
+
+            row = box.row(align=True)
+            row.alignment = 'EXPAND'
+            row.prop(scene, "bbox_joinObjects")
+            row.prop(scene, "bbox_margin")
+
+            row = box.row()
+            row.operator("scene.cm_convert_to_bound_box")
 
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
@@ -266,7 +279,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-
+        
         row = layout.row()
         row.label("Group name")
         row.label("Number | origin")
@@ -281,26 +294,28 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             layout.prop(scene, "cm_view_details", icon='RIGHTARROW')
         else:
             layout.prop(scene, "cm_view_details", icon='TRIA_DOWN')
+            
+            box = layout.box()
 
             index = scene.cm_groups_index
             if index >= 0 and index < len(scene.cm_groups):
                 group = scene.cm_groups[index]
 
-                layout.template_list("SCENE_UL_agent_type", "", group,
+                box.template_list("SCENE_UL_agent_type", "", group,
                                      "agentTypes", scene, "cm_view_details_index")
 
                 if group.name == "cm_allAgents":
-                    layout.label("cm_allAgents: To freeze use AddToGroup node")
+                    box.label("cm_allAgents: To freeze use AddToGroup node")
                 else:
-                    layout.prop(group, "freezePlacement")
+                    box.prop(group, "freezePlacement")
 
                 if preferences.use_custom_icons == True:
-                    op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
+                    op = box.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
                 else:
-                    op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
+                    op = box.operator(SCENE_OT_cm_groups_reset.bl_idname)
                 op.groupName = group.name
             else:
-                layout.label("No group selected")
+                box.label("No group selected")
 
 
 class SCENE_PT_CrowdMasterManualAgents(Panel):
