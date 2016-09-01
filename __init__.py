@@ -318,7 +318,7 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
         layout.prop(context.scene.cm_manual, "groupName")
         layout.prop(context.scene.cm_manual, "brainType")
-        op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
+        op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         op.groupName = "cm_" + context.scene.cm_manual.groupName
         op.brainType = context.scene.cm_manual.brainType
 
