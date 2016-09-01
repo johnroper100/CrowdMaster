@@ -114,10 +114,9 @@ class SCENE_OT_cm_agent_add(Operator):
 
 class SCENE_OT_cm_agent_add_selected(Operator):
     bl_idname = "scene.cm_agent_add_selected"
-    #bl_label = "Create agents from selected"
     bl_label = "Create Manual Agents"
 
-    groupName = StringProperty(name="New Agent Group Name")
+    groupName = StringProperty(name="New Group Name")
     brainType = StringProperty(name="Brain Type")
 
     def execute(self, context):
