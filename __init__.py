@@ -239,22 +239,17 @@ class SCENE_PT_CrowdMaster(Panel):
             
             box = layout.box()
             
-            row = box.row()
+            """row = box.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
             else:
                 row.operator("scene.cm_setup_sample_nodes")
             
             row = box.row()
-            row.separator()
-
-            row = box.row(align=True)
-            row.alignment = 'EXPAND'
-            row.prop(scene, "bbox_joinObjects")
-            row.prop(scene, "bbox_margin")
+            row.separator()"""
 
             row = box.row()
-            row.operator("scene.cm_convert_to_bound_box")
+            row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
 
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""

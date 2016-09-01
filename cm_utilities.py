@@ -14,9 +14,6 @@ bpy.types.Scene.show_utilities = BoolProperty(
 		options={'HIDDEN'}
 	)
 
-bpy.types.Scene.bbox_joinObjects = BoolProperty(name="Join Objects", description="Join all the created bounding box meshes into one object", default=False)
-bpy.types.Scene.bbox_margin = FloatProperty(name="Margin", description="Scale each bounding box by this")
-
 class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     bl_idname = "scene.cm_setup_sample_nodes"
     bl_label = "Sample Node Setups"
@@ -55,7 +52,17 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
     bl_label = "Convert Selected To Bounding Box"
 
     def execute(self, context):
-        scene = context.scene 
+        scene = context.scene
+        
+        selected = bpy.context.selected_objects
+        for obj in selected:
+            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
+            bpy.ops.mesh.primitive_cube_add() 
+            bound_box = bpy.context.active_object 
+
+            bound_box.location = obj.location
+            bound_box.rotation_euler = obj.rotation_euler
+            bound_box.select = True
 
         return {'FINISHED'}
 
