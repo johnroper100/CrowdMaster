@@ -94,7 +94,7 @@ class InputNode(LogicNode):
     """CrowdMaster input node"""
     bl_label = "Input"
 
-    Input = StringProperty(default="Noise.random")
+    Input = StringProperty(name="Input", default="Noise.random")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Input")
@@ -117,14 +117,14 @@ class GraphNode(LogicNode):
     """CrowdMaster graph node"""
     bl_label = "Graph"
 
-    CurveType = EnumProperty(items=[("RBF", "RBF", "", 1),
-                                    ("RANGE", "Range", "", 2)
-                                    ])
+    CurveType = EnumProperty(name="Curve Type", 
+                             items=[("RBF", "RBF", "", 1),
+                                    ("RANGE", "Range", "", 2)])
 
-    LowerZero = FloatProperty(default=-1.0, update=update_properties)
-    LowerOne = FloatProperty(default=-0.5, update=update_properties)
-    UpperOne = FloatProperty(default=0.5, update=update_properties)
-    UpperZero = FloatProperty(default=1.0, update=update_properties)
+    LowerZero = FloatProperty(name="Lower Zero", default=-1.0, update=update_properties)
+    LowerOne = FloatProperty(name="Lower One", default=-0.5, update=update_properties)
+    UpperOne = FloatProperty(name="Upper One", default=0.5, update=update_properties)
+    UpperZero = FloatProperty(name="Upper Zero", default=1.0, update=update_properties)
 
     RBFMiddle = FloatProperty(default=0.0)
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
@@ -154,10 +154,11 @@ class AndNode(LogicNode):
     """CrowdMaster and node"""
     bl_label = "And"
 
-    Method = EnumProperty(items=[("MUL", "Mul", "", 1),
+    Method = EnumProperty(name="Method",
+                          items=[("MUL", "Mul", "", 1),
                                  ("MIN", "Min", "", 2)])
-    SingleOutput = BoolProperty(default=False)
-    IncludeAll = BoolProperty(default=True)
+    SingleOutput = BoolProperty(name="Single Output", default=False)
+    IncludeAll = BoolProperty(name="Include All", default=True)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Method", expand=True)
@@ -174,10 +175,11 @@ class OrNode(LogicNode):
     """CrowdMaster or node"""
     bl_label = "Or"
 
-    Method = EnumProperty(items=[("MUL", "Mul", "", 1),
+    Method = EnumProperty(name="Method",
+                          items=[("MUL", "Mul", "", 1),
                                  ("MAX", "Max", "", 2)])
-    SingleOutput = BoolProperty(default=True)
-    IncludeAll = BoolProperty(default=True)
+    SingleOutput = BoolProperty(name="Single Output", default=True)
+    IncludeAll = BoolProperty(name="Include All", default=True)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Method", expand=True)
@@ -204,7 +206,7 @@ class QueryTagNode(LogicNode):
     """CrowdMaster Query Tag node"""
     bl_label = "Query Tag"
 
-    Tag = StringProperty(default="default")
+    Tag = StringProperty(name="Tag", default="default")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Tag")
@@ -217,10 +219,11 @@ class SetTagNode(LogicNode):
     """CrowdMaster Set Tag node"""
     bl_label = "Set Tag"
 
-    Tag = StringProperty(default="default")
-    UseThreshold = BoolProperty(default=True)
-    Threshold = FloatProperty(default=0.5)
-    Action = EnumProperty(items=[("ADD", "Add", "", 1),
+    Tag = StringProperty(name="Tag", default="default")
+    UseThreshold = BoolProperty(name="Use Threshold", default=True)
+    Threshold = FloatProperty(name="Threshold", default=0.5)
+    Action = EnumProperty(name="Action",
+                          items=[("ADD", "Add", "", 1),
                                  ("REMOVE", "Remove", "", 2)
                                  ])
 
@@ -242,7 +245,7 @@ class VariableNode(LogicNode):
     """CrowdMaster Variable node"""
     bl_label = "Variable"
 
-    Variable = StringProperty(default="None")
+    Variable = StringProperty(name="Variable", default="None")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Variable")
@@ -255,14 +258,15 @@ class FilterNode(LogicNode):
     """CrowdMaster Filter node"""
     bl_label = "Filter"
 
-    Operation = EnumProperty(items=[("EQUAL", "Equal", "", 1),
+    Operation = EnumProperty(name="Operation",
+                             items=[("EQUAL", "Equal", "", 1),
                                     ("NOT EQUAL", "Not equal", "", 2),
                                     ("LESS", "Less than", "", 3),
                                     ("GREATER", "Greater than", "", 4),
                                     ("LEAST", "Least only", "", 5),
                                     ("Most", "Most only", "", 6),
                                     ("AVERAGE", "Average", "", 7)])
-    Value = FloatProperty(default=0.0)
+    Value = FloatProperty(name="Value", default=0.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Operation")
@@ -279,10 +283,10 @@ class MapNode(LogicNode):
     """CrowdMaster Map node"""
     bl_label = "Map"
 
-    LowerInput = FloatProperty(default=0.0)
-    UpperInput = FloatProperty(default=1.0)
-    LowerOutput = FloatProperty(default=0.0)
-    UpperOutput = FloatProperty(default=2.0)
+    LowerInput = FloatProperty(name="Lower Input", default=0.0)
+    UpperInput = FloatProperty(name="Upper Input", default=1.0)
+    LowerOutput = FloatProperty(name="Lower Output", default=0.0)
+    UpperOutput = FloatProperty(name="Upper Output", default=2.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "LowerInput")
@@ -301,14 +305,16 @@ class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
 
-    Output = EnumProperty(items=[("rz", "rz", "", 3),
+    Output = EnumProperty(name="Output",
+                          items=[("rz", "rz", "", 3),
                                  ("rx", "rx", "", 1),
                                  ("ry", "ry", "", 2),
                                  ("px", "px", "", 4),
                                  ("py", "py", "", 5),
                                  ("pz", "pz", "", 6)
                                  ])
-    MultiInputType = EnumProperty(items=[("AVERAGE", "Average", "", 1),
+    MultiInputType = EnumProperty(name="Multi Input Type",
+                                  items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
                                          ("SIZEAVERAGE", "Size Average", "", 3),
                                          ("SUM", "Sum", "", 4)
@@ -326,7 +332,7 @@ class EventNode(LogicNode):
     """CrowdMaster Event node"""
     bl_label = "Event"
 
-    EventName = bpy.props.StringProperty(default="default")
+    EventName = StringProperty(name="Event Name", default="default")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "EventName")
@@ -339,7 +345,7 @@ class PythonNode(LogicNode):
     """CrowdMaster Python node"""
     bl_label = "Python"
 
-    Expression = bpy.props.StringProperty(default="output = Noise.random")
+    Expression = StringProperty(name="Expression", default="output = Noise.random")
     # This really needs to link to a text block
 
     def draw_buttons(self, context, layout):
@@ -353,21 +359,21 @@ class PrintNode(LogicNode):
     """CrowdMaster Print Node"""
     bl_label = "Print"
 
-    Label = bpy.props.StringProperty(description = "The label to append to each printed statement.", default="")
+    Label = StringProperty(name="Label", description = "The label to append to each printed statement.", default="")
     save_to_file = BoolProperty(
-        name = "Save to file",
+        name = "Save To File",
         description = "Save the printed statements to a file for later viewing.",
         default = False,
         )
 
-    output_filepath = bpy.props.StringProperty \
+    output_filepath = StringProperty \
       (
       name = "Output Filepath",
       default = "",
       description = "Define the output file path.",
       subtype = 'DIR_PATH'
       )
-    # PrintSelected = bpy.props.BoolProperty(default=True)  # Not implemented
+    # PrintSelected = BoolProperty(name="Print Selected", default=True)  # Not implemented
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Label")
@@ -385,7 +391,7 @@ class PriorityNode(LogicNode):
     """CrowdMaster Priority node"""
     bl_label = "Priority"
 
-    defaultValue = bpy.props.FloatProperty(default=0)
+    defaultValue = FloatProperty(name="Default Value", default=0)
 
     def init(self, context):
         self.inputs.new("DefaultSocketType", "Values0")
@@ -455,10 +461,10 @@ class ActionState(StateNode):
     """CrowdMaster Action State"""
     bl_label = "Action"
 
-    stateLength = IntProperty(default=1)
-    cycleState = BoolProperty(default=False)
-    actionName = StringProperty(default="")
-    useValueOfSpeed = BoolProperty(default=True)
+    stateLength = IntProperty(name="State Length", default=1)
+    cycleState = BoolProperty(name="Cycle State", default=False)
+    actionName = StringProperty(name="Action Name", default="")
+    useValueOfSpeed = BoolProperty(name=" Use Value of Speed", default=True)
 
     def init(self, context):
         StateNode.init(self, context)
@@ -485,7 +491,7 @@ class NoteNode(CrowdMasterNode):
     bl_idname = 'LogicNoteNode'
     bl_label = 'Note'
 
-    noteText = StringProperty(default="Enter text here")
+    noteText = StringProperty(name="Note Text", default="Enter text here")
 
     def draw_buttons(self, context, layout):
         layout.label(self.noteText)
