@@ -115,16 +115,22 @@ class GeoTemplatePARENT(GeoTemplate):
     def build(self, pos, rot, scale, group):
         parent = self.inputs["Parent Group"].build(pos, rot, scale, group)
         child = self.inputs["Child Object"].build(pos, rot, scale, group)
-        # TODO parent child to self.settings["parentTo"] from parent
+        con = child.constraints.new("CHILD_OF")
+        con.target = parent
+        con.subtarget = self.settings["parentTo"]
+        bone = parent.pose.bones[self.settings["parentTo"]]
+        con.inverse_matrix = bone.matrix.inverted()
+        child.data.update()
+        return parent
 
     def check(self):
         if not "Parent Group" in self.inputs:
             return False
         if not "Child Object" in self.inputs:
             return False
-        if not isinstance(self.inputs["Object 1"], GeoTemplate):
+        if not isinstance(self.inputs["Parent Group"], GeoTemplate):
             return False
-        if not isinstance(self.settings["Object 2"], GeoTemplate):
+        if not isinstance(self.inputs["Child Object"], GeoTemplate):
             return False
         # TODO check that object is in parent group
         return True
