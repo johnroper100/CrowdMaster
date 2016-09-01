@@ -262,6 +262,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             initialise()
         layout = self.layout
         scene = context.scene
+        preferences = context.user_preferences.addons[__package__].preferences
 
         row = layout.row()
         row.label("Group name")
@@ -290,7 +291,10 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 else:
                     layout.prop(group, "freezePlacement")
 
-                op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
+                if preferences.use_custom_icons == True:
+                    op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
+                else:
+                    op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
                 op.groupName = group.name
             else:
                 layout.label("No group selected")
@@ -314,10 +318,14 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
     def draw(self, context):
         layout = self.layout
+        preferences = context.user_preferences.addons[__package__].preferences
 
         layout.prop(context.scene.cm_manual, "groupName")
         layout.prop(context.scene.cm_manual, "brainType")
-        op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
+        if preferences.use_custom_icons == True:
+            op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
+        else:
+            op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         op.groupName = "cm_" + context.scene.cm_manual.groupName
         op.brainType = context.scene.cm_manual.brainType
 
