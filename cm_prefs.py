@@ -96,7 +96,7 @@ class CMPreferences(AddonPreferences):
                 
             row = layout.row()
             if preferences.use_custom_icons == True:
-                row.prop(preferences, 'play_animation', icon_value=cicon('node_tree_logo'))
+                row.prop(preferences, 'play_animation', icon_value=cicon('animation'))
             else:
                 row.prop(preferences, 'play_animation', icon='ACTION')
 
