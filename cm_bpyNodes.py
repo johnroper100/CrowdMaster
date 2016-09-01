@@ -480,8 +480,9 @@ class ActionState(StateNode):
         row.prop(self, "useValueOfSpeed", text="")
 
 
-class NoteNode(Node):
+class NoteNode(CrowdMasterNode):
     """For keeping the graph well organised"""
+    bl_idname = 'LogicNoteNode'
     bl_label = 'Note'
 
     noteText = StringProperty(default="Enter text here")
@@ -491,10 +492,6 @@ class NoteNode(Node):
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "noteText")
-
-    @classmethod
-    def poll(cls, ntree):
-        return ntree.bl_idname == 'CrowdMasterTreeType'
 
 
 import nodeitems_utils
@@ -542,7 +539,7 @@ node_categories = [
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
         NodeItem("NodeReroute"),
-        NodeItem("NoteNode")
+        NodeItem("LogicNoteNode")
         ])
     ]
 
