@@ -234,11 +234,12 @@ class SCENE_PT_CrowdMaster(Panel):
         
         row = layout.row()
         if context.scene.show_utilities == False:
-            row.prop(context.scene, "show_utilities", icon="RIGHTARROW",\
-                text="Utilities")
+            row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
-            row.prop(context.scene, "show_utilities", icon="TRIA_DOWN",\
-                text="Utilities")
+            row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
+            
+            row = layout.row()
+            row.operator("scene.cm_setup_sample_nodes")
 
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
