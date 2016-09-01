@@ -59,7 +59,7 @@ class GenerateNode(CrowdMasterAGenTreeNode):
 class AddToGroupNode(CrowdMasterAGenTreeNode):
     '''The addToGroup node'''
     bl_idname = 'AddToGroupNodeType'
-    bl_label = 'AddToGroup'
+    bl_label = 'Add To Group'
     bl_icon = 'SOUND'
 
     groupName = StringProperty()
