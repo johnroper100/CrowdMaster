@@ -16,6 +16,14 @@ bpy.types.Scene.show_utilities = BoolProperty(
 class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     bl_idname = "scene.cm_setup_sample_nodes"
     bl_label = "Sample Node Setups"
+    
+    nodeTreeType = EnumProperty(
+        items = [("sim", "Simulation", "Simulation node setups"),
+                 ("gen", "Generation", "Generation node setups")],
+        name = "Node Tree Type",
+        description = "Which node tree setups to show",
+        default = "gen"
+    )
 
     def execute(self, context):
         scene = context.scene 
@@ -28,15 +36,15 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     
     def check(self, context):
         scene = context.scene
+        if self.nodeTreeType != self.nodeTreeType:
+            return True
 
     def draw(self, context):
         layout = self.layout
         scene = context.scene
         
-        box = layout.box()
-
-        row = box.row()
-        row.label("General:", icon='FILE_TICK')
+        row = layout.row()
+        row.prop(self, "nodeTreeType")
 
 def register():
     bpy.utils.register_class(CrowdMaster_setup_sample_nodes)
