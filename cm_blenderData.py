@@ -26,7 +26,7 @@ class group_entry(PropertyGroup):
     groupType = EnumProperty(items = [("auto", "Auto", "Created by nodes"),
                                       ("manual", "Manual", "Manually added")],
                                       default = "auto")
-    freezePlacement = BoolProperty(default=False)
+    freezePlacement = BoolProperty(name="Freeze Placement", default=False)
 
 
 class manual_props(PropertyGroup):

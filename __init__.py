@@ -290,7 +290,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 else:
                     layout.prop(group, "freezePlacement")
 
-                op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname)
+                op = layout.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
                 op.groupName = group.name
             else:
                 layout.label("No group selected")
