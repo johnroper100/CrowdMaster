@@ -162,7 +162,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
     bl_label = 'Parent'
     bl_icon = 'SOUND'
 
-    parentTo = StringProperty(name="Parent To")
+    parentTo = StringProperty(name="Parent To (Bone)", description="The bone you want to parent to")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
@@ -173,7 +173,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
         self.outputs.new('GeoSocketType', "Objects")
 
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "parentTo", context.scene, "objects")
+        layout.prop(self, "parentTo")
 
     def getSettings(self):
         return {"parentTo": self.parentTo}
@@ -485,6 +485,7 @@ agen_node_categories = [
         NodeItem("ObjectInputNodeType"),
         NodeItem("GroupInputNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
+        NodeItem("ParentNodeType")
         ]),
     CrowdMasterAGenCategories("template", "Template", items=[
         NodeItem("TemplateNodeType"),
