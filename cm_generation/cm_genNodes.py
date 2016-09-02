@@ -162,7 +162,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
     bl_label = 'Parent'
     bl_icon = 'SOUND'
 
-    parentTo = StringProperty(name="Parent To")
+    parentTo = StringProperty(name="Parent To (Bone)")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
