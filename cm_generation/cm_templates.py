@@ -6,6 +6,7 @@ from collections import OrderedDict
 import random
 import time
 import math
+from math import radians
 
 from ..libs.ins_vector import Vector
 from ..libs.ins_octree import createOctreeFromBPYObjs
@@ -225,7 +226,8 @@ class TemplateOFFSET(Template):
             nPos += refObj.location
             nRot += Vector(refObj.rotation_euler)
         nPos += self.settings["locationOffset"]
-        nRot += self.settings["rotationOffset"]
+        tmpRot = self.settings["rotationOffset"]
+        nRot += Vector((radians(tmpRot.x), radians(tmpRot.y), radians(tmpRot.z)))
         self.inputs["Template"].build(nPos, nRot, scale, tags, cm_group)
 
     def check(self):
