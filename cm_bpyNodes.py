@@ -117,7 +117,7 @@ class GraphNode(LogicNode):
     """CrowdMaster graph node"""
     bl_label = "Graph"
 
-    Multiply = FloatProperty(name="Mutilply", description="Multiply the outputted value by this number", default=1.0)
+    Multiply = FloatProperty(name="Multiply", description="Multiply the outputted value by this number", default=1.0)
     
     CurveType = EnumProperty(name="Curve Type", 
                              items=[("RBF", "RBF", "", 1),
