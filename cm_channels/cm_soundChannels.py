@@ -510,7 +510,7 @@ class Channel:
         items = self.calcAndGetItems()
         if items:
             result = self._buildDictFromProperty(items, "distProp")
-            return {k: 1-v for k, v in result}
+            return {k: 1-v for k, v in result.items()}
 
     @property
     def db(self):
