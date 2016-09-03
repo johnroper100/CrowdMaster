@@ -80,7 +80,6 @@ class LogicAND(Neuron):
         for into in inps:
             for i in into:
                 if i.key in results:
-                    results[i.key] *= i.val
                     if settings["Method"] == "MUL":
                         results[i.key] *= i.val
                     else:  # Method == "MIN"
