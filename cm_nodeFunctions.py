@@ -65,9 +65,9 @@ class LogicGRAPH(Neuron):
                              with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
-                        output[i.key] = RBF(i.val)
+                        output[i.key] = (RBF(i.val)*settings["Multiply"])
                     elif settings["CurveType"] == "RANGE":
-                        output[i.key] = linear(i.val)
+                        output[i.key] = (linear(i.val)*settings["Multiply"])
                     # cubic bezier could also be an option here (1/2 sided)
         return output
 

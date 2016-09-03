@@ -117,6 +117,8 @@ class GraphNode(LogicNode):
     """CrowdMaster graph node"""
     bl_label = "Graph"
 
+    Multiply = FloatProperty(name="Mutilply", description="Multiply the outputted value by this number", default=1.0)
+    
     CurveType = EnumProperty(name="Curve Type", 
                              items=[("RBF", "RBF", "", 1),
                                     ("RANGE", "Range", "", 2)])
@@ -130,6 +132,7 @@ class GraphNode(LogicNode):
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "Multiply")
         layout.prop(self, "CurveType", expand=True)
         if self.CurveType == "RBF":
             layout.prop(self, "RBFMiddle")
@@ -141,6 +144,7 @@ class GraphNode(LogicNode):
             layout.prop(self, "UpperZero")
 
     def getSettings(self, node):
+        node.settings["Multiply"] = self.Multiply
         node.settings["CurveType"] = self.CurveType
         node.settings["LowerZero"] = self.LowerZero
         node.settings["LowerOne"] = self.LowerOne
