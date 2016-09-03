@@ -267,13 +267,14 @@ class LogicFILTER(Neuron):
                         mostName = i.key
             result = {mostName: mostVal}
         elif self.settings["Operation"] == "AVERAGE":
-            total = -float("inf")
+            total = 0
             count = 0
             for into in inps:
                 for i in into:
                     total += i.val
                     count += 1
-            result = {"None": total/count}
+            if count != 0:
+                result = {"None": total/count}
         return result
 
 
