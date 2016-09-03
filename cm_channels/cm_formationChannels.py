@@ -47,6 +47,8 @@ class EmptyChannel():
     # TODO Way too hacky... need to think of another way of stopping crashes
     #   if the channel doesn't exist.
     def __getattr__(self, attr):
+        if attr in ("dist", "rz", "rx"):
+            return 0
         return self
 
     def __call__(self, *args, **kwargs):
