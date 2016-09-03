@@ -117,9 +117,10 @@ class LogicOR(Neuron):
                 if settings["Method"] == "MUL":
                     for i in [i.val for i in into]:
                         total *= (1-i)
-                    total = 1 - total
                 else:  # Method == "MAX"
                     total = max(into.values())
+            if settings["Method"] == "MUL":
+                total = 1 - total
             return total
         else:
             results = {}
