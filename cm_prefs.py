@@ -88,15 +88,15 @@ class CMPreferences(AddonPreferences):
         
         if preferences.prefs_tab == "GEN":
             row = layout.row()
-            row.prop(preferences, 'use_custom_icons', icon_value=cicon('setup_plug'))
+            row.prop(preferences, 'use_custom_icons', icon_value=cicon('plug'))
             if preferences.use_custom_icons == True:
-                row.prop(preferences, 'show_debug_options', icon_value=cicon('debug'))
+                row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
                 
             row = layout.row()
             if preferences.use_custom_icons == True:
-                row.prop(preferences, 'play_animation', icon_value=cicon('animation'))
+                row.prop(preferences, 'play_animation', icon_value=cicon('shuffle'))
             else:
                 row.prop(preferences, 'play_animation', icon='ACTION')
 

@@ -52,7 +52,7 @@ class GenerateNode(CrowdMasterAGenTreeNode):
     def draw_buttons(self, context, layout):
         layout.scale_y = 1.5
         oper = layout.operator("scene.cm_agent_nodes_generate",
-                               icon_value=cicon('plus_yellow'))
+                               icon_value=cicon('add_agents'))
         oper.nodeName = self.name
         oper.nodeTreeName = self.id_data.name
 
