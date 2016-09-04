@@ -8,7 +8,7 @@ from .cm_templates import templates
 
 class SCENE_OT_agent_nodes_generate(Operator):
     bl_idname = "scene.cm_agent_nodes_generate"
-    bl_label = "Generate agents"
+    bl_label = "Generate Agents"
 
     nodeName = StringProperty(name="node name")
     nodeTreeName = StringProperty(name="node tree")
