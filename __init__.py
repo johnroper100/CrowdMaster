@@ -1,6 +1,6 @@
 bl_info = {
     "name": "CrowdMaster",
-    "author": "John Roper, Peter Noble, Patrick Crawford",
+    "author": "Peter Noble, John Roper, Patrick Crawford",
     "version": (1, 1, 0),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster",
@@ -238,17 +238,19 @@ class SCENE_PT_CrowdMaster(Panel):
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
             
             box = layout.box()
-            
-            """row = box.row()
+            row = box.row()
+            row.prop(scene, "nodeTreeType")
+
+            row = box.row()
+            row.scale_y = 1.25
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
             else:
                 row.operator("scene.cm_setup_sample_nodes")
-            
-            row = box.row()
-            row.separator()"""
 
+            box = layout.box()
             row = box.row()
+            row.scale_y = 1.5
             row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
 
 class SCENE_PT_CrowdMasterAgents(Panel):
