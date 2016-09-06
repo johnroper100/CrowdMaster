@@ -50,7 +50,7 @@ class Path(Mc):
 
         return kd, bm, pathMatrixInverse, rotation
 
-    def followPath(self, bm, co, index, vel, co_find):
+    def followPath(self, bm, co, index, vel, co_find, radius):
         nVel = vel.normalized()
         lVel = vel.length
         next = index
@@ -78,6 +78,8 @@ class Path(Mc):
         lVel += ab.length * fac
         start = co + adjust
 
+        startDistFac = (co_find - start).length / radius
+
         # context.scene.objects["Empty.005"].location = start
 
         next = nextVert.index
@@ -91,6 +93,12 @@ class Path(Mc):
                 fac = lVel/length
                 target = currentVert * (1 - fac) + nextVert * fac
                 # context.scene.objects["Empty.003"].location = target
+                rCorrect = start - co_find
+                offTargetDist = rCorrect.length - radius
+                if offTargetDist > 0:
+                    rCorrect *= (offTargetDist / rCorrect.length)
+                    return target - start + rCorrect
+                    # TODO For variable radius add here AND BELOW!!!!!!!!!!
                 return target - start
             lVel -= length
 
@@ -108,13 +116,19 @@ class Path(Mc):
                         bestScore = score
                         nextVert = otherVert
             if endOfPath:
-                return bm.verts[next].co - start
+                rCorrect = start - co_find
+                offTargetDist = rCorrect.length - radius
+                if offTargetDist > 0:
+                    rCorrect *= (offTargetDist / rCorrect.length)
+                    return target - start + rCorrect
+                    # Also add here for variable length path
+                return target - start
 
             index = next
             next = nextVert.index
 
 
-    def calcRelativeTarget(self, pathObject, lookahead):
+    def calcRelativeTarget(self, pathObject, radius, lookahead):
         context = bpy.context
 
         kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject)
@@ -124,14 +138,14 @@ class Path(Mc):
         vel = vel * rotation
         co_find = pathMatrixInverse * context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
-        offset = self.followPath(bm, co, index, vel, co_find)
+        offset = self.followPath(bm, co, index, vel, co_find, radius)
 
         x, y, z = obj.rotation_euler
 
         if x != 0.0 or y != 0.0 or z != 0.0:
-            z = mathutils.Matrix.Rotation(-obj.rotation_euler[2], 4, 'Z')
-            y = mathutils.Matrix.Rotation(-obj.rotation_euler[1], 4, 'Y')
-            x = mathutils.Matrix.Rotation(-obj.rotation_euler[0], 4, 'X')
+            z = Rotation(-obj.rotation_euler[2], 4, 'Z')
+            y = Rotation(-obj.rotation_euler[1], 4, 'Y')
+            x = Rotation(-obj.rotation_euler[0], 4, 'X')
 
             rotation = x * y * z
             offset = offset * rotation
@@ -146,11 +160,11 @@ class Path(Mc):
 
         return offset
 
-    def rz(self, pathObject, lookahead=5):
+    def rz(self, pathObject, radius, lookahead=5):
         target = None
         if self.userid in self.resultsCache:
             target = self.resultsCache[self.userid]
-        target = self.calcRelativeTarget(pathObject, lookahead)
+        target = self.calcRelativeTarget(pathObject, radius, lookahead)
 
         ag = bpy.context.scene.objects[self.userid]
 
@@ -163,11 +177,11 @@ class Path(Mc):
 
         return math.atan2(relative[0], relative[1])/math.pi
 
-    def rx(self, pathObject, lookahead=5):
+    def rx(self, pathObject, radius, lookahead=5):
         target = None
         if self.userid in self.resultsCache:
             target = self.resultsCache[self.userid]
-        target = self.calcRelativeTarget(pathObject, lookahead)
+        target = self.calcRelativeTarget(pathObject, radius, lookahead)
 
         ag = bpy.context.scene.objects[self.userid]
 
