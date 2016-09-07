@@ -2,6 +2,7 @@ import bpy
 import mathutils
 from mathutils import Vector
 Rotation = mathutils.Matrix.Rotation
+Euler = mathutils.Euler
 import math
 import bmesh
 
@@ -80,19 +81,16 @@ class Path(Mc):
 
         startDistFac = (co_find - start).length / radius
 
-        # context.scene.objects["Empty.005"].location = start
-
-        next = nextVert.index
+        nextIndex = nextVert.index
 
         while True:
             currentVert = bm.verts[index].co
-            nextVert = bm.verts[next].co
+            nextVert = bm.verts[nextIndex].co
 
             length = (nextVert - currentVert).length
             if lVel < length:
                 fac = lVel/length
                 target = currentVert * (1 - fac) + nextVert * fac
-                # context.scene.objects["Empty.003"].location = target
                 rCorrect = start - co_find
                 offTargetDist = rCorrect.length - radius
                 if offTargetDist > 0:
@@ -104,28 +102,30 @@ class Path(Mc):
 
             edges = bm.verts[next].link_edges
             bestScore = -2  # scores in range -1 -> 1 (worst to best)
+            nextCo = nextVert
             nextVert = None
 
             endOfPath = True
             for e in edges:
                 if e.verts[0].index != index and e.verts[1].index != index:
                     endOfPath = False
-                    otherVert = e.verts[0] if e.verts[0].index != next else e.verts[1]
-                    score = (otherVert.co - bm.verts[next].co).normalized().dot(nVel)
+                    otherVert = e.verts[0] if e.verts[0].index != nextIndex else e.verts[1]
+                    score = (otherVert.co - bm.verts[nextIndex].co).normalized().dot(nVel)
                     if score > bestScore:
                         bestScore = score
                         nextVert = otherVert
             if endOfPath:
                 rCorrect = start - co_find
                 offTargetDist = rCorrect.length - radius
+                target = nextCo
                 if offTargetDist > 0:
                     rCorrect *= (offTargetDist / rCorrect.length)
                     return target - start + rCorrect
                     # Also add here for variable length path
                 return target - start
 
-            index = next
-            next = nextVert.index
+            index = nextIndex
+            nextIndex = nextVert.index
 
 
     def calcRelativeTarget(self, pathObject, radius, lookahead):
@@ -134,62 +134,31 @@ class Path(Mc):
         kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject)
 
         obj = context.scene.objects[pathObject]
-        vel = self.sim.agents[self.userid].globalVelocity
+        vel = self.sim.agents[self.userid].globalVelocity * lookahead
         vel = vel * rotation
         co_find = pathMatrixInverse * context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
         offset = self.followPath(bm, co, index, vel, co_find, radius)
 
-        x, y, z = obj.rotation_euler
+        offset = offset * pathMatrixInverse
 
-        if x != 0.0 or y != 0.0 or z != 0.0:
-            z = Rotation(-obj.rotation_euler[2], 4, 'Z')
-            y = Rotation(-obj.rotation_euler[1], 4, 'Y')
-            x = Rotation(-obj.rotation_euler[0], 4, 'X')
-
-            rotation = x * y * z
-            offset = offset * rotation
-
-        if x != 0.0 or y != 0.0 or z != 0.0:
-            z = Rotation(context.scene.objects[self.userid].rotation_euler[2], 4, 'Z')
-            y = Rotation(context.scene.objects[self.userid].rotation_euler[1], 4, 'Y')
-            x = Rotation(context.scene.objects[self.userid].rotation_euler[0], 4, 'X')
-
-            rotation = x * y * z
-            return offset * rotation
+        eul = Euler([-x for x in context.scene.objects[self.userid].rotation_euler], 'ZYX')
+        offset.rotate(eul)
 
         return offset
 
-    def rz(self, pathObject, radius, lookahead=5):
+    def rz(self, pathObject, radius, lookahead=25):
         target = None
         if self.userid in self.resultsCache:
             target = self.resultsCache[self.userid]
         target = self.calcRelativeTarget(pathObject, radius, lookahead)
 
-        ag = bpy.context.scene.objects[self.userid]
+        return math.atan2(target[0], target[1])/math.pi
 
-        z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
-        y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
-        x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
-
-        rotation = x * y * z
-        relative = target * rotation
-
-        return math.atan2(relative[0], relative[1])/math.pi
-
-    def rx(self, pathObject, radius, lookahead=5):
+    def rx(self, pathObject, radius, lookahead=25):
         target = None
         if self.userid in self.resultsCache:
             target = self.resultsCache[self.userid]
         target = self.calcRelativeTarget(pathObject, radius, lookahead)
 
-        ag = bpy.context.scene.objects[self.userid]
-
-        z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
-        y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
-        x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
-
-        rotation = x * y * z
-        relative = target * rotation
-
-        return math.atan2(relative[2], relative[1])/math.pi
+        return math.atan2(target[2], target[1])/math.pi
