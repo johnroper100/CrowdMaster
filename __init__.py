@@ -227,16 +227,16 @@ class SCENE_PT_CrowdMaster(Panel):
             row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
-            
+
         row = layout.row()
         row.separator()
-        
+
         row = layout.row()
         if context.scene.show_utilities == False:
             row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
-            
+
             box = layout.box()
             row = box.row()
             row.prop(scene, "nodeTreeType")
@@ -276,7 +276,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         row = layout.row()
         row.label("Group name")
         row.label("Number | origin")
@@ -291,7 +291,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             layout.prop(scene, "cm_view_details", icon='RIGHTARROW')
         else:
             layout.prop(scene, "cm_view_details", icon='TRIA_DOWN')
-            
+
             box = layout.box()
 
             index = scene.cm_groups_index
@@ -347,7 +347,18 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 def register():
     register_icons()
     addon_updater_ops.register(bl_info)
-    bpy.utils.register_module(__name__)
+    cm_prefs.register()
+
+    bpy.utils.register_class(SCENE_UL_group)
+    bpy.utils.register_class(SCENE_UL_agent_type)
+    bpy.utils.register_class(SCENE_OT_cm_groups_reset)
+    bpy.utils.register_class(SCENE_OT_cm_agent_add)
+    bpy.utils.register_class(SCENE_OT_cm_agent_add_selected)
+    bpy.utils.register_class(SCENE_OT_cm_start)
+    bpy.utils.register_class(SCENE_OT_cm_stop)
+    bpy.utils.register_class(SCENE_PT_CrowdMaster)
+    bpy.utils.register_class(SCENE_PT_CrowdMasterAgents)
+    bpy.utils.register_class(SCENE_PT_CrowdMasterManualAgents)
 
     global action_register
     from .cm_actions import action_register
@@ -369,7 +380,7 @@ def register():
     global cm_generation
     from . import cm_generation
     cm_generation.register()
-    
+
     global cm_utilities
     from . import cm_utilities
     cm_utilities.register()
@@ -385,7 +396,17 @@ def initialise():
 
 def unregister():
     unregister_icons()
-    bpy.utils.unregister_module(__name__)
+
+    bpy.utils.unregister_class(SCENE_UL_group)
+    bpy.utils.unregister_class(SCENE_UL_agent_type)
+    bpy.utils.unregister_class(SCENE_OT_cm_groups_reset)
+    bpy.utils.unregister_class(SCENE_OT_cm_agent_add)
+    bpy.utils.unregister_class(SCENE_OT_cm_agent_add_selected)
+    bpy.utils.unregister_class(SCENE_OT_cm_start)
+    bpy.utils.unregister_class(SCENE_OT_cm_stop)
+    bpy.utils.unregister_class(SCENE_PT_CrowdMaster)
+    bpy.utils.unregister_class(SCENE_PT_CrowdMasterAgents)
+    bpy.utils.unregister_class(SCENE_PT_CrowdMasterManualAgents)
 
     action_unregister()
     event_unregister()
@@ -396,6 +417,7 @@ def unregister():
     cm_bpyNodes.unregister()
     cm_generation.unregister()
     cm_utilities.unregister()
+    cm_prefs.unregister()
 
 if __name__ == "__main__":
     register()

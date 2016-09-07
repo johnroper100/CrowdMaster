@@ -53,7 +53,7 @@ def registerTypes():
 
 def unregisterAllTypes():
     bpy.utils.unregister_class(agent_entry)
-    bpy.utils.register_class(agent_type_entry)
+    bpy.utils.unregister_class(agent_type_entry)
     bpy.utils.unregister_class(group_entry)
 
     bpy.utils.unregister_class(manual_props)

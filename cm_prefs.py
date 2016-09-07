@@ -21,13 +21,13 @@ class CMPreferences(AddonPreferences):
     # bl_idname = "CrowdMaster"
     bl_idname = __package__
     scriptdir = bpy.path.abspath(os.path.dirname(__file__))
-    
+
     auto_check_update = BoolProperty(
         name = "Auto-check for Update",
         description = "If enabled, auto-check for updates using an interval",
         default = False,
         )
-    
+
     updater_intrval_months = IntProperty(
         name='Months',
         description = "Number of months between checking for updates",
@@ -54,25 +54,25 @@ class CMPreferences(AddonPreferences):
         min=0,
         max=59
         )
-    
+
     use_custom_icons = BoolProperty(
         name = "Use Custom Icons",
         description = "Chose whether to use the custom icons that come with the addon or not.",
         default = True,
         )
-    
+
     show_debug_options = BoolProperty(
         name = "Show Debug Options",
         description = "Chose whether to show the debug options in the interface. This also enables debug mode.",
         default = True,
         )
-    
+
     play_animation = BoolProperty(
         name = "Start Animation Automatically",
         description = "Start and stop the animation automatically when the start and stop sim buttons are pressed.",
         default = True,
         )
-    
+
     prefs_tab_items = [
         ("GEN", "General Settings", "General settings for the addon."),
         ("UPDATE", "Addon Update Settings", "Settings for the addon updater.") ]
@@ -85,7 +85,7 @@ class CMPreferences(AddonPreferences):
 
         row = layout.row()
         row.prop(preferences, "prefs_tab", expand = True)
-        
+
         if preferences.prefs_tab == "GEN":
             row = layout.row()
             row.prop(preferences, 'use_custom_icons', icon_value=cicon('plug'))
@@ -93,7 +93,7 @@ class CMPreferences(AddonPreferences):
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
-                
+
             row = layout.row()
             if preferences.use_custom_icons == True:
                 row.prop(preferences, 'play_animation', icon_value=cicon('shuffle'))
@@ -103,7 +103,15 @@ class CMPreferences(AddonPreferences):
         if preferences.prefs_tab == "UPDATE":
             row = layout.row()
             addon_updater_ops.update_settings_ui(self,context)
-        
+
         row = layout.row()
         row.scale_y = 1.25
         row.operator("scene.cm_save_prefs", icon='SAVE_PREFS')
+
+def register():
+    bpy.utils.register_class(CMSavePrefs)
+    bpy.utils.register_class(CMPreferences)
+
+def unregister():
+    bpy.utils.unregister_class(CMSavePrefs)
+    bpy.utils.unregister_class(CMPreferences)
