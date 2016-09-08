@@ -24,13 +24,15 @@ class Simulation():
         Crowd = chan.Crowd(self)
         Ground = chan.Ground(self)
         Formation = chan.Formation(self)
+        Path = chan.Path(self)
         self.lvars = {"Noise": wr(Noise),
                       "Sound": wr(Sound),
                       "State": wr(State),
                       "World": wr(World),
                       "Crowd": wr(Crowd),
                       "Ground": wr(Ground),
-                      "Formation": wr(Formation)}
+                      "Formation": wr(Formation),
+                      "Path": wr(Path)}
         if debugMode:
             self.totalTime = 0
             self.totalFrames = 0

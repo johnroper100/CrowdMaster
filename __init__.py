@@ -388,6 +388,10 @@ def register():
     action_register()
     event_register()
 
+    global cm_channels
+    from . import cm_channels
+    cm_channels.register()
+
 def initialise():
     sce = bpy.context.scene
 
@@ -418,6 +422,8 @@ def unregister():
     cm_generation.unregister()
     cm_utilities.unregister()
     cm_prefs.unregister()
+
+    cm_channels.unregister()
 
 if __name__ == "__main__":
     register()
