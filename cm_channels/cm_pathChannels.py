@@ -187,8 +187,8 @@ class Path(Mc):
 class path_entry(PropertyGroup):
     """For storing a single path"""
     # name - aliase given to the path
-    objectName = StringProperty()
-    radius = FloatProperty(min=0)
+    objectName = StringProperty(name="Object Name")
+    radius = FloatProperty(name="Radius", min=0)
 
 
 class paths_collection(PropertyGroup):
