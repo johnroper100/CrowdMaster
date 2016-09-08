@@ -87,6 +87,9 @@ class Simulation():
         if self.framelast+1 == bpy.context.scene.frame_current:
             self.framelast = bpy.context.scene.frame_current
             self.step(scene)
+
+    def frameChangeHighlight(self, scene):
+        """Not unregistered when simulation stopped"""
         if self.framelast >= bpy.context.scene.frame_current:
             active = bpy.context.active_object
             if active and active in self.agents:
@@ -101,6 +104,8 @@ class Simulation():
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
+        if self.frameChangeHighlight not in bpy.app.handlers.frame_change_post:
+            bpy.app.handlers.frame_change_post.append(self.frameChangeHighlight)
 
     def stopFrameHandler(self):
         """Remove self.frameChangeHandler from Blenders event handlers"""

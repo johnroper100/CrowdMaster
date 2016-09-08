@@ -425,5 +425,8 @@ def unregister():
 
     cm_channels.unregister()
 
+    if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
+        bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
+
 if __name__ == "__main__":
     register()
