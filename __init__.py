@@ -227,24 +227,24 @@ class SCENE_PT_CrowdMaster(Panel):
             row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
-            
+
         row = layout.row()
         row.separator()
-        
+
         row = layout.row()
         if context.scene.show_utilities == False:
             row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
-            
+
             box = layout.box()
-            
+
             """row = box.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
             else:
                 row.operator("scene.cm_setup_sample_nodes")
-            
+
             row = box.row()
             row.separator()"""
 
@@ -274,7 +274,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         row = layout.row()
         row.label("Group name")
         row.label("Number | origin")
@@ -289,7 +289,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             layout.prop(scene, "cm_view_details", icon='RIGHTARROW')
         else:
             layout.prop(scene, "cm_view_details", icon='TRIA_DOWN')
-            
+
             box = layout.box()
 
             index = scene.cm_groups_index
@@ -367,13 +367,17 @@ def register():
     global cm_generation
     from . import cm_generation
     cm_generation.register()
-    
+
     global cm_utilities
     from . import cm_utilities
     cm_utilities.register()
 
     action_register()
     event_register()
+
+    global cm_channels
+    from . import cm_channels
+    cm_channels.register()
 
 def initialise():
     sce = bpy.context.scene
@@ -394,6 +398,8 @@ def unregister():
     cm_bpyNodes.unregister()
     cm_generation.unregister()
     cm_utilities.unregister()
+
+    cm_channels.unregister()
 
 if __name__ == "__main__":
     register()
