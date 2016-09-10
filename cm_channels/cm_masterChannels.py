@@ -22,8 +22,6 @@ class MasterChannel:
     def setuser(self, userid):
         """Set up the channel to be used with a new agent"""
         self.userid = userid
-        self.randstate = hash(userid) + self.sim.framelast
-        random.seed(self.randstate)
 
 
 class Wrapper:

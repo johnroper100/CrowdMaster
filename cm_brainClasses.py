@@ -314,6 +314,8 @@ class Brain():
         actv = bpy.context.active_object
         self.isActiveSelection = actv is not None and actv.name == self.userid
         self.reset()
+        self.randstate = hash(self.userid) + self.sim.framelast
+        random.seed(self.randstate)
         for name, var in self.lvars.items():
             var.setuser(self.userid)
         for neur in self.neurons.values():
