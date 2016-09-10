@@ -92,7 +92,7 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         
-        ng = bpy.data.node_groups.new("SimpleRandomPositioning", "CrowdMasterAGenTreeType")
+        ng = bpy.data.node_groups.new("SimpleFormationPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-600, 0)
