@@ -48,6 +48,9 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
             
             row = layout.row()
             row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
+            
+            row = layout.row()
+            row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('array'))
 
         elif scene.nodeTreeType == "sim":
             row = layout.row()
@@ -100,7 +103,7 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
         
         template_node = ng.nodes.new("TemplateNodeType")
         template_node.location = (-400, 0)
-        template_node.brainType = "Sample Random"
+        template_node.brainType = "Sample Formation"
         
         form_node = ng.nodes.new("FormationPositionNodeType")
         form_node.location = (-200, 0)
@@ -116,6 +119,38 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
         link = links.new(object_node.outputs[0], template_node.inputs[0])
         link = links.new(template_node.outputs[0], form_node.inputs[0])
         link = links.new(form_node.outputs[0], gen_node.inputs[0])
+
+        return {'FINISHED'}
+
+class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
+    bl_idname = "scene.cm_gennodes_pos_target_simple"
+    bl_label = "Simple Target Positioning"
+
+    def execute(self, context):
+        scene = context.scene
+        
+        ng = bpy.data.node_groups.new("SimpleTargetPositioning", "CrowdMasterAGenTreeType")
+
+        object_node = ng.nodes.new("ObjectInputNodeType")
+        object_node.location = (-600, 0)
+        object_node.inputObject = "Cone"
+        
+        template_node = ng.nodes.new("TemplateNodeType")
+        template_node.location = (-400, 0)
+        template_node.brainType = "Sample Target"
+        
+        target_node = ng.nodes.new("TargetPositionNodeType")
+        target_node.location = (-200, 0)
+        target_node.targetType = "vertex"
+        target_node.targetObject = "Grid"
+        
+        gen_node = ng.nodes.new("GenerateNodeType")
+        gen_node.location = (0, 0)
+        
+        links = ng.links
+        link = links.new(object_node.outputs[0], template_node.inputs[0])
+        link = links.new(template_node.outputs[0], target_node.inputs[0])
+        link = links.new(target_node.outputs[0], gen_node.inputs[0])
 
         return {'FINISHED'}
 
@@ -143,12 +178,14 @@ def register():
     bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_random_simple)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_formation_simple)
+    bpy.utils.register_class(CrowdMaster_genNodes_pos_target_simple)
 
 def unregister():
     bpy.utils.unregister_class(CrowdMaster_setup_sample_nodes)
     bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_random_simple)
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_formation_simple)
+    bpy.utils.unregister_class(CrowdMaster_genNodes_pos_target_simple)
 
 if __name__ == "__main__":
     register()
