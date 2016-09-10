@@ -125,7 +125,7 @@ class Channel:
         :type frequency: String"""
         self.sim = sim
 
-        self.emitters = {}
+        self.emitters = []
         self.frequency = frequency
         # Temporary storage which is reset after each agents has used it
         self.store = {}
@@ -135,11 +135,12 @@ class Channel:
         self.predictNext = False
         self.steeringNext = False
 
-        self.octree = None
+        self.kdtree = None
+        self.maxVal = 0
 
     def register(self, objectid, val):
         """Add an object that emits sound"""
-        self.emitters[objectid] = val
+        self.emitters.append((objectid, val))
 
     def newuser(self, userid):
         self.userid = userid
@@ -152,9 +153,48 @@ class Channel:
         O = bpy.context.scene.objects
         userDim = self.sim.agents[self.userid].dimensions
 
+        if self.kdtree is None:
+            self.kdtree = mathutils.kdtree.KDTree(len(self.emitters))
+            for i, item in enumerate(self.emitters):
+                emitterid, val = item
+                self.maxVal = max(self.maxVal, val)
+                self.kdtree.insert(O[emitterid].location, i)
+
+            self.kdtree.balance()
+
+        ag = O[self.userid]
+
+        collisions = self.kdtree.find_range(ag.location, self.maxVal)
+
+        for (co, index, dist) in collisions:
+            emitterid, val = self.emitters[index]
+            if emitterid == self.userid:
+                continue
+            if dist <= val:
+                to = O[emitterid]
+
+                target = to.location - ag.location
+
+                z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+                y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+                x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+
+                rotation = x * y * z
+                relative = target * rotation
+
+                changez = math.atan2(relative[0], relative[1])/math.pi
+                changex = math.atan2(relative[2], relative[1])/math.pi
+                self.store[emitterid] = {"rz": changez,
+                                         "rx": changex,
+                                         "distProp": dist/(val)}
+
+        # Octree implementation
+        """O = bpy.context.scene.objects
+        userDim = self.sim.agents[self.userid].dimensions
+
         if self.octree is None:
             bss = []  # List of bounding spheres
-            for emitterid, val in self.emitters.items():
+            for emitterid, val in self.emitterDict.items():
                 emitDim = self.sim.agents[emitterid].dimensions
 
                 dim = (val + emitDim[a] + userDim[a] for a in range(3))
@@ -171,7 +211,7 @@ class Channel:
             if emitterid == self.userid:
                 continue
             to = O[emitterid]
-            val = self.emitters[emitterid]
+            val = self.emitterDict[emitterid]
 
             eDim = max(self.sim.agents[emitterid].dimensions)
             uDim = max(userDim)
@@ -194,7 +234,7 @@ class Channel:
             changex = math.atan2(relative[2], relative[1])/math.pi
             self.store[emitterid] = {"rz": changez,
                                      "rx": changex,
-                                     "distProp": dist/(val+eDim+uDim)}
+                                     "distProp": dist/(val+eDim+uDim)}"""
             # (z rot, x rot, dist proportion, time until prediction)"""
 
         # The old implementation not using octree
@@ -226,7 +266,7 @@ class Channel:
         """Called the first time an agent uses this frequency"""
         ag = O[self.userid]
         agSim = self.sim.agents[self.userid]
-        for emitterid, val in self.emitters.items():
+        for emitterid, val in self.emitters:
             if emitterid != self.userid:
                 to = O[emitterid]
                 toSim = self.sim.agents[emitterid]
