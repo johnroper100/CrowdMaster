@@ -1,7 +1,7 @@
 import os
 import bpy
 
-ICONS = 'minus_green minus_red node_tree_logo plus_green plus_yellow start_sim stop_sim agents reset instant_setup add_agents plug code shuffle'.split(' ')
+ICONS = 'minus_green minus_red node_tree_logo plus_green plus_yellow start_sim stop_sim agents reset instant_setup add_agents plug code shuffle array'.split(' ')
 icon_collection = {}
 
 def register_icons():

@@ -205,7 +205,7 @@ class SCENE_PT_CrowdMaster(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -264,7 +264,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -327,7 +327,7 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 

@@ -95,7 +95,7 @@ class SCENE_PT_action(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
+             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
