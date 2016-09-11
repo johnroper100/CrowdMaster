@@ -38,7 +38,7 @@ class GeoTemplate(Template):
     """Abstract super class.
     GeoTemplates are a description of how to create some arrangement of
      geometry"""
-    def build(self, parent):
+    def build(self, pos, rot, scale, group, deferGeo):
         """Called when this GeoTemplate is being used to modify the scene"""
         self.buildCount += 1
 
@@ -46,8 +46,14 @@ class GeoTemplate(Template):
 
 class GeoTemplateOBJECT(GeoTemplate):
     """For placing objects into the scene"""
-    def build(self, pos, rot, scale, group):
-        cp = bpy.context.scene.objects[self.settings["inputObject"]].copy()
+    def build(self, pos, rot, scale, group, deferGeo):
+        obj = bpy.context.scene.objects[self.settings["inputObject"]]
+        if deferGeo:
+            cp = bpy.ops.object.empty_add(type="PLAIN_AXES")
+            cp.matrix_world = obj.matrix_world
+            cp["cm_deferObj"] = {"objName": obj.name}
+        else:
+            cp = obj.copy()
         group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
         return cp
@@ -57,9 +63,22 @@ class GeoTemplateOBJECT(GeoTemplate):
 
 class GeoTemplateGROUP(GeoTemplate):
     """For placing groups into the scene"""
-    # TODO Meshes connected to armatures get very distorted
-    def build(self, pos, rot, scale, group):
+    def build(self, pos, rot, scale, group, deferGeo):
         dat = bpy.data
+
+        if deferGeo:
+            for obj in dat.groups[self.settings["inputGroup"]].objects:
+                if obj.type == 'ARMATURE':
+                    newObj = obj.copy()
+                    newObj.rotation_euler = rot
+                    newObj.scale = Vector((scale, scale, scale))
+                    newObj.location = pos
+                    group.objects.link(newObj)
+                    bpy.context.scene.objects.link(newObj)
+                    newObj["cm_deferGroup"] = {"group": self.settings["inputGroup"],
+                                               "aName": obj.name}
+                    return newObj
+
         gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
         group_objects = [o.copy() for o in gp]
 
@@ -69,14 +88,15 @@ class GeoTemplateGROUP(GeoTemplate):
             if obj.parent in gp:
                 obj.parent = group_objects[gp.index(obj.parent)]
             else:
-                self.rotation_euler = rot
-                self.scale = Vector((scale, scale, scale))
+                obj.rotation_euler = rot
+                obj.scale = Vector((scale, scale, scale))
                 obj.location = pos
 
             group.objects.link(obj)
             bpy.context.scene.objects.link(obj)
             if obj.type == 'ARMATURE':
                 aName = obj.name
+                # TODO what if there is more than one armature?
             if obj.type == 'MESH':
                 if len(obj.modifiers) > 0:
                     for mod in obj.modifiers:
@@ -94,11 +114,11 @@ class GeoTemplateGROUP(GeoTemplate):
 
 class GeoTemplateSWITCH(GeoTemplate):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
-    def build(self, pos, rot, scale, group):
+    def build(self, pos, rot, scale, group, deferGeo):
         if random.random() < self.settings["switchAmout"]:
-            return self.inputs["Object 1"].build(pos, rot, scale, group)
+            return self.inputs["Object 1"].build(pos, rot, scale, group, deferGeo)
         else:
-            return self.inputs["Object 2"].build(pos, rot, scale, group)
+            return self.inputs["Object 2"].build(pos, rot, scale, group, deferGeo)
 
     def check(self):
         if "Object 1" not in self.inputs:
@@ -113,9 +133,9 @@ class GeoTemplateSWITCH(GeoTemplate):
 
 class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
-    def build(self, pos, rot, scale, group):
-        parent = self.inputs["Parent Group"].build(pos, rot, scale, group)
-        child = self.inputs["Child Object"].build(pos, rot, scale, group)
+    def build(self, pos, rot, scale, group, deferGeo):
+        parent = self.inputs["Parent Group"].build(pos, rot, scale, group, deferGeo)
+        child = self.inputs["Child Object"].build(pos, rot, scale, group, deferGeo)
         con = child.constraints.new("CHILD_OF")
         con.target = parent
         con.subtarget = self.settings["parentTo"]
@@ -123,6 +143,7 @@ class GeoTemplatePARENT(GeoTemplate):
         con.inverse_matrix = bone.matrix.inverted()
         child.data.update()
         return parent
+        # TODO check if the object has an armature modifier
 
     def check(self):
         if not "Parent Group" in self.inputs:
@@ -171,7 +192,8 @@ class TemplateAGENT(Template):
     def build(self, pos, rot, scale, tags, cm_group):
         groupName = cm_group.name + "/" + self.settings["brainType"]
         new_group = bpy.data.groups.new(groupName)
-        topObj = self.inputs["Objects"].build(pos, rot, scale, new_group)
+        defG = self.settings["deferGeo"]
+        topObj = self.inputs["Objects"].build(pos, rot, scale, new_group, defG)
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
