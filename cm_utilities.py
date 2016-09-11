@@ -50,7 +50,7 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
             row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
             
             row = layout.row()
-            row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('array'))
+            row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('target'))
 
         elif scene.nodeTreeType == "sim":
             row = layout.row()
