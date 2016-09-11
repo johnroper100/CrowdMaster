@@ -236,6 +236,10 @@ class SCENE_PT_CrowdMaster(Panel):
             row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
+            
+            box = layout.box()
+            row = box.row()
+            row.operator("graph.simplify")
 
             box = layout.box()
             row = box.row()
