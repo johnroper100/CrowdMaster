@@ -41,32 +41,21 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
-<<<<<<< HEAD
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         if scene.nodeTreeType == "gen":
             row = layout.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_gennodes_pos_random_simple", icon_value=cicon('shuffle'))
             else:
                 row.operator("scene.cm_gennodes_pos_random_simple", icon="FILE_REFRESH")
-            
+
             row = layout.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
             else:
                 row.operator("scene.cm_gennodes_pos_formation_simple", icon="MOD_ARRAY")
-            
-=======
 
-        if scene.nodeTreeType == "gen":
-            row = layout.row()
-            row.operator("scene.cm_gennodes_pos_random_simple", icon_value=cicon('shuffle'))
-
-            row = layout.row()
-            row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
-
->>>>>>> defer_geo
             row = layout.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('target'))
