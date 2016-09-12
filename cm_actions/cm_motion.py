@@ -24,7 +24,7 @@ class Action:
             alen = arange[1] - arange[0] + 1
         else:
             self.action = None  # So that other code can do \- if action.action
-            alen = 0
+            alen = float("inf")
 
         self.motiondata = {}
 
@@ -44,9 +44,9 @@ class Action:
                     self.motiondata[c.data_path][-1].append(val)
         else:
             self.motion = None  # So that other code can do - if action.motion
-            mlen = 0
+            mlen = float("inf")
 
-        self.length = max(alen, mlen)
+        self.length = min(alen, mlen)
 
 
 def getmotions():
