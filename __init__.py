@@ -236,7 +236,7 @@ class SCENE_PT_CrowdMaster(Panel):
             row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
-            
+
             box = layout.box()
             row = box.row()
             row.label("You must have the Simplify Curves addon enabled.")
@@ -432,8 +432,9 @@ def unregister():
 
     cm_channels.unregister()
 
-    if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
-        bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
+    if "sim" in globals():
+        if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
+            bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
 if __name__ == "__main__":
     register()
