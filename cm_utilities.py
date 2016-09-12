@@ -48,19 +48,19 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_gennodes_pos_random_simple", icon_value=cicon('shuffle'))
             else:
-                row.operator("scene.cm_gennodes_pos_random_simple")
+                row.operator("scene.cm_gennodes_pos_random_simple", icon="FILE_REFRESH")
             
             row = layout.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
             else:
-                row.operator("scene.cm_gennodes_pos_formation_simple")
+                row.operator("scene.cm_gennodes_pos_formation_simple", icon="MOD_ARRAY")
             
             row = layout.row()
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('target'))
             else:
-                row.operator("scene.cm_gennodes_pos_target_simple")
+                row.operator("scene.cm_gennodes_pos_target_simple", icon="CURSOR")
 
         elif scene.nodeTreeType == "sim":
             row = layout.row()
