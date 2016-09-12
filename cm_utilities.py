@@ -41,6 +41,7 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     def draw(self, context):
         layout = self.layout
         scene = context.scene
+        preferences = context.user_preferences.addons[__package__].preferences
         
         if scene.nodeTreeType == "gen":
             row = layout.row()
