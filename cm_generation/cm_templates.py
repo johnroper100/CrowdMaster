@@ -51,7 +51,7 @@ class GeoTemplateOBJECT(GeoTemplate):
         if deferGeo:
             cp = bpy.ops.object.empty_add(type="PLAIN_AXES")
             cp.matrix_world = obj.matrix_world
-            cp["cm_deferObj"] = {"objName": obj.name}
+            cp["cm_deferObj"] = obj.name
         else:
             cp = obj.copy()
         group.objects.link(cp)

@@ -253,6 +253,11 @@ class SCENE_PT_CrowdMaster(Panel):
             row.scale_y = 1.5
             row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
 
+            box = layout.box()
+            row = box.row()
+            row.scale_y = 1.5
+            row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_VEC_HLT")
+
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
     bl_label = "Agents"
