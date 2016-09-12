@@ -239,6 +239,7 @@ class SCENE_PT_CrowdMaster(Panel):
             
             box = layout.box()
             row = box.row()
+            row.scale_y = 1.25
             row.operator("graph.simplify")
 
             box = layout.box()
