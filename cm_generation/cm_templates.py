@@ -49,7 +49,7 @@ class GeoTemplateOBJECT(GeoTemplate):
     def build(self, pos, rot, scale, group, deferGeo):
         obj = bpy.context.scene.objects[self.settings["inputObject"]]
         if deferGeo:
-            cp = bpy.ops.object.empty_add(type="PLAIN_AXES")
+            cp = bpy.data.objects.new("Empty", None)
             cp.matrix_world = obj.matrix_world
             cp["cm_deferObj"] = obj.name
         else:
@@ -141,7 +141,8 @@ class GeoTemplatePARENT(GeoTemplate):
         con.subtarget = self.settings["parentTo"]
         bone = parent.pose.bones[self.settings["parentTo"]]
         con.inverse_matrix = bone.matrix.inverted()
-        child.data.update()
+        if child.data:
+            child.data.update()
         return parent
         # TODO check if the object has an armature modifier
 

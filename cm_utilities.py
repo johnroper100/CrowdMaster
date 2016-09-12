@@ -183,22 +183,20 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
         for group in context.scene.cm_groups:
             for agentType in group.agentTypes:
                 for agent in agentType.agents:
-                    print("Placing", agent.name)
-                    toRemove = []
                     for obj in groups[agent.geoGroup].objects:
                         if "cm_deferObj" in obj:
-                            print("object")
                             newObj = objects[obj["cm_deferObj"]].copy()
                             for con in obj.constraints:
                                 if con.type == "CHILD_OF":
-                                    nCon = newObject.constraints.new("CHILD_OF")
+                                    nCon = newObj.constraints.new("CHILD_OF")
                                     nCon.target = con.target
                                     nCon.subtarget = con.subtarget
                                     nCon.inverse_matrix = con.inverse_matrix
                                     newObj.data.update()
-                            toRemove.append(obj.name)
+                            bpy.context.scene.objects.link(newObj)
+                            for user_group in obj.users_group:
+                                user_group.objects.link(newObj)
                         elif "cm_deferGroup" in obj:
-                            print("group")
                             df = obj["cm_deferGroup"]
                             originalGroup = df["group"]
                             aName = df["aName"]
@@ -217,17 +215,12 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                 if nObj.parent in gp:
                                     nObj.parent = newObjs[gp.index(nObj.parent)]
 
-                                print("geo group", agent.geoGroup)
-
                                 groups[agent.geoGroup].objects.link(nObj)
                                 bpy.context.scene.objects.link(nObj)
                                 if nObj.type == 'MESH' and len(nObj.modifiers) > 0:
                                     for mod in nObj.modifiers:
                                         if mod.type == "ARMATURE":
                                             mod.object = objects[agent.name]
-                            print("Done")
-                    for rem in toRemove:
-                        pass  # TODO
         return {'FINISHED'}
 
 def register():
