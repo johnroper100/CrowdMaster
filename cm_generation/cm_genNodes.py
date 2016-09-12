@@ -185,6 +185,9 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
 
     brainType = StringProperty(name="Brain Type")
+    deferGeo = BoolProperty(name="Defer Geo",
+                            description="Don't place geo until utility function is used",
+                            default=True)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
@@ -194,9 +197,11 @@ class TemplateNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "brainType")
+        layout.prop(self, "deferGeo")
 
     def getSettings(self):
-        return {"brainType": self.brainType}
+        return {"brainType": self.brainType,
+                "deferGeo": self.deferGeo}
 
 
 def updateRandomNode(self, context):
