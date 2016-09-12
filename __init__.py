@@ -213,8 +213,6 @@ class SCENE_PT_CrowdMaster(Panel):
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
-        
-        
 
         row = layout.row()
         row.scale_y = 1.5
