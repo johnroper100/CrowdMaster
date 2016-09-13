@@ -316,7 +316,7 @@ class CombineNode(CrowdMasterAGenTreeNode):
                        not inps[-2].is_linked):
                     inps.remove(inps[-1])
         if inps[-1].is_linked:
-            self.inputs.new("TemplateSocketType", "Template{}".format(len(inps)))
+            self.inputs.new("TemplateSocketType", "Template {}".format(len(inps)))
 
 class RandomPositionNode(CrowdMasterAGenTreeNode):
     '''The random positioing node'''
