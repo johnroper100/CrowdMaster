@@ -216,9 +216,9 @@ class OffsetNode(CrowdMasterAGenTreeNode):
     bl_label = 'Offset'
     bl_icon = 'SOUND'
 
-    offset = BoolProperty(name="Overwrite",
-                          description="Should the given location be added to the position requested or simply overwrite it?",
-                          default=True)
+    overwrite = BoolProperty(name="Overwrite",
+                             description="Should the given location be added to the position requested or simply overwrite it?",
+                             default=False)
     referenceObject = StringProperty(name="Location Object",
                                      description="An object in the scene from which to get the location")
     locationOffset = FloatVectorProperty(name="Location Offset",
@@ -235,13 +235,13 @@ class OffsetNode(CrowdMasterAGenTreeNode):
         self.outputs.new("TemplateSocketType", "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "offset")
+        layout.prop(self, "overwrite")
         layout.prop_search(self, "referenceObject", context.scene, "objects")
         layout.prop(self, "locationOffset")
         layout.prop(self, "rotationOffset")
 
     def getSettings(self):
-        return {"offset": self.offset,
+        return {"overwrite": self.overwrite,
                 "referenceObject": self.referenceObject,
                 "locationOffset": self.locationOffset,
                 "rotationOffset": self.rotationOffset}

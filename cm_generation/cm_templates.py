@@ -241,7 +241,7 @@ class TemplateOFFSET(Template):
     def build(self, pos, rot, scale, tags, cm_group):
         nPos = Vector()
         nRot = Vector()
-        if self.settings["offset"]:
+        if not self.settings["overwrite"]:
             nPos = Vector(pos)
             nRot = Vector(rot)
         if self.settings["referenceObject"] != "":
