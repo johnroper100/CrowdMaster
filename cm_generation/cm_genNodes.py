@@ -300,7 +300,7 @@ class CombineNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
 
     def init(self, context):
-        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs.new("TemplateSocketType", "Template 0")
         self.inputs[0].link_limit = 1
 
         self.outputs.new("TemplateSocketType", "Template")
