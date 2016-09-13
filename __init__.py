@@ -241,7 +241,7 @@ class SCENE_PT_CrowdMaster(Panel):
             row = box.row()
             row.label("You must have the Simplify Curves addon enabled.")
             row = box.row()
-            row.scale_y = 1.25
+            row.scale_y = 1.5
             row.operator("graph.simplify", icon="IPO")
 
             box = layout.box()
@@ -249,7 +249,7 @@ class SCENE_PT_CrowdMaster(Panel):
             row.prop(scene, "nodeTreeType")
 
             row = box.row()
-            row.scale_y = 1.25
+            row.scale_y = 1.5
             if preferences.use_custom_icons == True:
                 row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
             else:

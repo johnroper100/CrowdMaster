@@ -185,7 +185,7 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
 
 class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_idname = "scene.cm_place_deferred_geo"
-    bl_label = "Place geo that was deferred"
+    bl_label = "Place Deferred Geometry"
 
     def execute(self, context):
         groups = bpy.data.groups
