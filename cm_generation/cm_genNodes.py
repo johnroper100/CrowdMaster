@@ -185,8 +185,8 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
 
     brainType = StringProperty(name="Brain Type")
-    deferGeo = BoolProperty(name="Defer Geo",
-                            description="Don't place geo until utility function is used",
+    deferGeo = BoolProperty(name="Defer Geometry",
+                            description="Don't place geometry until the Place Deffered Geometry utility function is used",
                             default=True)
 
     def init(self, context):
