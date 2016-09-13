@@ -288,6 +288,13 @@ class TemplateRANDOM(Template):
             return False
         return True
 
+class TemplateCOMBINE(Template):
+    """Duplicate request to all inputs"""
+    def build(self, pos, rot, scale, tags, cm_group):
+        for name, inp in self.inputs.items():
+            print("name", name, inp.__class__.__name__)
+            inp.build(pos, rot, scale, tags, cm_group)
+
 class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -445,6 +452,7 @@ templates = OrderedDict([
     ("TemplateNodeType", TemplateAGENT),
     ("OffsetNodeType", TemplateOFFSET),
     ("RandomNodeType", TemplateRANDOM),
+    ("CombineNodeType", TemplateCOMBINE),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),

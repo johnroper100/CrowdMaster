@@ -293,6 +293,31 @@ class RandomNode(CrowdMasterAGenTreeNode):
                 "maxRandSz": self.maxRandSz,
                 "minRandSz": self.minRandSz}
 
+class CombineNode(CrowdMasterAGenTreeNode):
+    '''Duplicate request'''
+    bl_idname = 'CombineNodeType'
+    bl_label = 'Combine'
+    bl_icon = 'SOUND'
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template0")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def getSettings(self):
+        return {}
+
+    def update(self):
+        inps = self.inputs
+        if len(inps) > 1:
+            if not inps[-1].is_linked and not inps[-2].is_linked:
+                while (len(inps) > 1 and not inps[-1].is_linked and
+                       not inps[-2].is_linked):
+                    inps.remove(inps[-1])
+        if inps[-1].is_linked:
+            self.inputs.new("TemplateSocketType", "Template{}".format(len(inps)))
+
 class RandomPositionNode(CrowdMasterAGenTreeNode):
     '''The random positioing node'''
     bl_idname = 'RandomPositionNodeType'
@@ -496,6 +521,7 @@ agen_node_categories = [
         NodeItem("TemplateNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch"),
         NodeItem("RandomNodeType"),
+        NodeItem("CombineNodeType")
         ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("RandomPositionNodeType", label="Random"),
@@ -531,6 +557,7 @@ def register():
     bpy.utils.register_class(TemplateNode)
     bpy.utils.register_class(OffsetNode)
     bpy.utils.register_class(RandomNode)
+    bpy.utils.register_class(CombineNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
@@ -558,6 +585,7 @@ def unregister():
     bpy.utils.unregister_class(TemplateNode)
     bpy.utils.unregister_class(OffsetNode)
     bpy.utils.unregister_class(RandomNode)
+    bpy.utils.unregister_class(CombineNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
