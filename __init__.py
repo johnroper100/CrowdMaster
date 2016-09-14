@@ -13,6 +13,7 @@ bl_info = {
 
 import bpy
 import random
+import sys
 from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
@@ -240,6 +241,14 @@ class SCENE_PT_CrowdMaster(Panel):
             box = layout.box()
             row = box.row()
             row.scale_y = 1.5
+            if preferences.use_custom_icons == True:
+                row.operator("scene.cm_setup_agent", icon_value=cicon('setup'))
+            else:
+                row.operator("scene.cm_setup_agent", icon="MOD_REMESH")
+
+            box = layout.box()
+            row = box.row()
+            row.scale_y = 1.5
             row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_VEC_HLT")
 
             box = layout.box()
@@ -357,6 +366,9 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
         op.brainType = context.scene.cm_manual.brainType
 
 def register():
+    #import addon_utils
+    #addon_utils.enable("curve_simplify")
+
     register_icons()
     addon_updater_ops.register(bl_info)
     cm_prefs.register()

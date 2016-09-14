@@ -64,7 +64,7 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
 
         elif scene.nodeTreeType == "sim":
             row = layout.row()
-            row.operator("scene.cm_simnodes_mov_simple")
+            row.operator("scene.cm_simnodes_mov_simple", icon="MOD_OCEAN")
 
 class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
     bl_idname = "scene.cm_gennodes_pos_random_simple"
@@ -205,6 +205,19 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class CrowdMaster_setup_agent(bpy.types.Operator):
+    bl_idname = "scene.cm_setup_agent"
+    bl_label = "Setup Agent"
+
+    def execute(self, context):
+        scene = context.scene
+
+        selected = bpy.context.selected_objects
+        for obj in selected:
+            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+        return {'FINISHED'}
+
 class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_idname = "scene.cm_place_deferred_geo"
     bl_label = "Place Deferred Geometry"
@@ -257,20 +270,22 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
 
 def register():
     bpy.utils.register_class(CrowdMaster_setup_sample_nodes)
-    bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_random_simple)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_formation_simple)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_target_simple)
     bpy.utils.register_class(CrowdMaster_simNodes_mov_simple)
+    bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
+    bpy.utils.register_class(CrowdMaster_setup_agent)
     bpy.utils.register_class(Crowdmaster_place_deferred_geo)
 
 def unregister():
     bpy.utils.unregister_class(CrowdMaster_setup_sample_nodes)
-    bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_random_simple)
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_formation_simple)
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_target_simple)
     bpy.utils.unregister_class(CrowdMaster_simNodes_mov_simple)
+    bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
+    bpy.utils.unregister_class(CrowdMaster_setup_agent)
     bpy.utils.unregister_class(Crowdmaster_place_deferred_geo)
 
 if __name__ == "__main__":
