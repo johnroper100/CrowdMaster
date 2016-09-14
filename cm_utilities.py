@@ -164,38 +164,6 @@ class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
 
         return {'FINISHED'}
 
-class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
-    bl_idname = "scene.cm_gennodes_pos_random_simple"
-    bl_label = "Simple Random Positioning"
-
-    def execute(self, context):
-        scene = context.scene
-
-        ng = bpy.data.node_groups.new("SimpleRandomPositioning", "CrowdMasterAGenTreeType")
-
-        object_node = ng.nodes.new("ObjectInputNodeType")
-        object_node.location = (-600, 0)
-        object_node.inputObject = "Cone"
-
-        template_node = ng.nodes.new("TemplateNodeType")
-        template_node.location = (-400, 0)
-        template_node.brainType = "Sample Random"
-
-        rand_node = ng.nodes.new("RandomPositionNodeType")
-        rand_node.location = (-200, 0)
-        rand_node.noToPlace = 25
-        rand_node.radius = 25.00
-
-        gen_node = ng.nodes.new("GenerateNodeType")
-        gen_node.location = (0, 0)
-
-        links = ng.links
-        link = links.new(object_node.outputs[0], template_node.inputs[0])
-        link = links.new(template_node.outputs[0], rand_node.inputs[0])
-        link = links.new(rand_node.outputs[0], gen_node.inputs[0])
-
-        return {'FINISHED'}
-
 class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
     bl_idname = "scene.cm_simnodes_mov_simple"
     bl_label = "Simple Movement"
