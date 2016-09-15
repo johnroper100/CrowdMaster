@@ -23,12 +23,13 @@ bpy.types.Scene.append_to_tree = BoolProperty(
 bpy.types.Scene.node_tree_name = StringProperty(name="Node Tree")
 
 bpy.types.Scene.nodeTreeType = EnumProperty(
-        items = [("sim", "Simulation", "Simulation node setups"),
-                 ("gen", "Generation", "Generation node setups")],
-        name = "Node Tree Type",
-        description = "Which node tree setups to show",
-        default = "gen"
+        items=[("sim", "Simulation", "Simulation node setups"),
+               ("gen", "Generation", "Generation node setups")],
+        name="Node Tree Type",
+        description="Which node tree setups to show",
+        default="gen"
     )
+
 
 class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     bl_idname = "scene.cm_setup_sample_nodes"
@@ -54,21 +55,21 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
         if scene.nodeTreeType == "gen":
             row = layout.row()
             row.scale_y = 1.15
-            if preferences.use_custom_icons == True:
+            if preferences.use_custom_icons:
                 row.operator("scene.cm_gennodes_pos_random_simple", icon_value=cicon('shuffle'))
             else:
                 row.operator("scene.cm_gennodes_pos_random_simple", icon="FILE_REFRESH")
 
             row = layout.row()
             row.scale_y = 1.15
-            if preferences.use_custom_icons == True:
+            if preferences.use_custom_icons:
                 row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
             else:
                 row.operator("scene.cm_gennodes_pos_formation_simple", icon="MOD_ARRAY")
 
             row = layout.row()
             row.scale_y = 1.15
-            if preferences.use_custom_icons == True:
+            if preferences.use_custom_icons:
                 row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('target'))
             else:
                 row.operator("scene.cm_gennodes_pos_target_simple", icon="CURSOR")
@@ -76,10 +77,11 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
         elif scene.nodeTreeType == "sim":
             row = layout.row()
             row.scale_y = 1.15
-            if preferences.use_custom_icons == True:
+            if preferences.use_custom_icons:
                 row.operator("scene.cm_simnodes_mov_simple", icon_value=cicon('motion'))
             else:
                 row.operator("scene.cm_simnodes_mov_simple", icon="MOD_OCEAN")
+
 
 class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
     bl_idname = "scene.cm_gennodes_pos_random_simple"
@@ -116,6 +118,7 @@ class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
     bl_idname = "scene.cm_gennodes_pos_formation_simple"
     bl_label = "Simple Formation Positioning"
@@ -123,7 +126,6 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        
         if scene.append_to_tree:
             ng = bpy.data.node_groups[scene.node_tree_name]
         else:
@@ -153,6 +155,7 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
         link = links.new(form_node.outputs[0], gen_node.inputs[0])
 
         return {'FINISHED'}
+
 
 class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
     bl_idname = "scene.cm_gennodes_pos_target_simple"
@@ -189,6 +192,7 @@ class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
     bl_idname = "scene.cm_simnodes_mov_simple"
     bl_label = "Simple Movement"
@@ -214,6 +218,7 @@ class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
     bl_idname = "scene.cm_convert_to_bound_box"
     bl_label = "Convert Selected To Bounding Box"
@@ -233,6 +238,7 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class CrowdMaster_setup_agent(bpy.types.Operator):
     bl_idname = "scene.cm_setup_agent"
     bl_label = "Setup Agent"
@@ -245,6 +251,7 @@ class CrowdMaster_setup_agent(bpy.types.Operator):
             bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
         return {'FINISHED'}
+
 
 class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_idname = "scene.cm_place_deferred_geo"
@@ -296,6 +303,7 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                             mod.object = objects[agent.name]
         return {'FINISHED'}
 
+
 def register():
     bpy.utils.register_class(CrowdMaster_setup_sample_nodes)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_random_simple)
@@ -305,6 +313,7 @@ def register():
     bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.register_class(CrowdMaster_setup_agent)
     bpy.utils.register_class(Crowdmaster_place_deferred_geo)
+
 
 def unregister():
     bpy.utils.unregister_class(CrowdMaster_setup_sample_nodes)
