@@ -162,7 +162,7 @@ class State():
         self.currentFrame = 0
 
         self.bpyNode = bpyNode
-        self.resultLog = {0:(0, 0, 0), 1:(0, 0, 0)}
+        self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}
 
     def query(self):
         """If this state is a valid next move return float > 0"""
