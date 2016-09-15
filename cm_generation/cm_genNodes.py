@@ -4,11 +4,13 @@ from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from .. icon_load import cicon
 
+
 class CrowdMasterAGenTree(NodeTree):
     '''CrowdMaster agent generation node tree'''
     bl_idname = 'CrowdMasterAGenTreeType'
     bl_label = 'CrowdMaster Agent Generation'
     bl_icon = 'MOD_ARRAY'
+
 
 class GeoSocket(NodeSocket):
     '''Geo node socket type'''
@@ -20,6 +22,7 @@ class GeoSocket(NodeSocket):
 
     def draw_color(self, context, node):
         return (0.125, 0.125, 0.575, 1.0)
+
 
 class TemplateSocket(NodeSocket):
     '''Template node socket type'''
@@ -55,6 +58,7 @@ class GenerateNode(CrowdMasterAGenTreeNode):
                                icon_value=cicon('add_agents'))
         oper.nodeName = self.name
         oper.nodeTreeName = self.id_data.name
+
 
 class AddToGroupNode(CrowdMasterAGenTreeNode):
     '''The addToGroup node'''
