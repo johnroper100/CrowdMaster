@@ -66,8 +66,8 @@ class Channel:
         changez = math.atan2(relative[0], relative[1])/math.pi
         changex = math.atan2(relative[2], relative[1])/math.pi
         self.store = {"rz": changez,
-                                 "rx": changex,
-                                 "arrived": 1 if dist < (tDim + uDim) else 0}
+                      "rx": changex,
+                      "arrived": 1 if dist < (tDim + uDim) else 0}
 
         self.calcd = True
 
