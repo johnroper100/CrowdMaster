@@ -12,6 +12,7 @@ import bpy
 
 #  TODO use Vector for locations and dimensions
 
+
 def boundingBoxFromBPY(ob, overwriteRadii=None):
     corners = [ob.matrix_world * Vector(corner) for corner in ob.bound_box]
 
@@ -141,6 +142,7 @@ def createOctree(boundingBoxes):
 
     return ot
 
+
 def createOctreeFromBPYObjs(objs, allSpheres=True, radii=None):
     """The function you want to import from this module in most cases.
     If radii is left as default then the radius will be calculated from the
@@ -175,7 +177,7 @@ class Octree:
                       Leaf((px + hdx, py + hdy, pz      ), dims),
                       Leaf((px      , py      , pz      ), dims),
                       Leaf((px + hdx, py      , pz      ), dims)
-                     ]
+                      ]
         # 0: Top front left, 1: top front right,
         # 2: top back left, 3: top back right,
         # 4: bottom front left, 5: bottom front right,
@@ -308,7 +310,7 @@ class Leaf:
         for outer in self.contents:
             for inner in self.contents:
                 if outer != inner:
-                    f = lambda x : x.original
+                    f = lambda x: x.original
                     key = (min(outer, inner, key=f), max(outer, inner, key=f))
                     if key not in failed and key not in collided:
                         if outer.checkCollisionWithBB(inner):
@@ -320,7 +322,6 @@ class Leaf:
         print(depth*"--", [c.original for c in self.contents])
 
 
-
 if __name__ == "__main__":
     """
     bbs = []
@@ -330,17 +331,17 @@ if __name__ == "__main__":
 
     import time
     import random
-    
+
     constructTime = []
     check100Time = []
     checkNTime = []
     checkAllCollisions = []
-    
+
     bruteContructTime = []
     bruteCheck100Time = []
     bruteCheckNTime = []
     bruteCheckAllCollisions = []
-    
+
     for i in range(21):
         n = i*400
         t = time.time()
@@ -350,19 +351,19 @@ if __name__ == "__main__":
                 bbs.append(boundingSphereFromBPY(ob))
             O = createOctree(bbs)
         constructTime.append((time.time() - t)/5)
-            
+
         pos = [(random.random()*100-50, random.random()*100-50, random.random()*100-50) for x in range(10000)]
         # Done so that the random number generation time isn't included in the timings.
         t = time.time()
         for f in range(10000):
             O.checkPoint(pos[f])
         check100Time.append(((time.time() - t)))
-        
+
         t = time.time()
         for f in range(n):
             O.checkPoint(pos[f])
         checkNTime.append(time.time() - t)
-        
+
         t = time.time()
         for f in range(5):
             O.checkCollisions()
@@ -375,7 +376,7 @@ if __name__ == "__main__":
         for ob in bpy.context.scene.objects[:n]:
             bbs.append(boundingSphereFromBPY(ob))
         bruteContructTime.append(time.time() - t)
-        
+
         pos = [(random.random()*100-50, random.random()*100-50, random.random()*100-50) for x in range(10000)]
         t = time.time()
         result = []
@@ -384,7 +385,7 @@ if __name__ == "__main__":
                 if b.checkPoint(p):
                     result.append(b.original)
         bruteCheck100Time.append(time.time() - t)
-        
+
         t = time.time()
         result = []
         for f in range(n):
@@ -393,7 +394,7 @@ if __name__ == "__main__":
                 if b.checkPoint(p):
                     result.append(b.original)
         bruteCheckNTime.append(time.time() - t)
-        
+
         t = time.time()
         result = {}
         for a in bbs:
@@ -401,16 +402,16 @@ if __name__ == "__main__":
                 if a.checkCollisionWithBB(b):
                     result[a.original] = b.original
         bruteCheckAllCollisions.append(time.time() - t)"""
-            
+
     print("Construct time:")
     for f in constructTime:
-        print(f)    
+        print(f)
     print("Check 10000 time:")
     for f in check100Time:
-        print(f)    
+        print(f)
     print("Check N time")
     for f in checkNTime:
-        print(f)    
+        print(f)
     print("Check all collisions time:")
     for f in checkAllCollisions:
         print(f)
