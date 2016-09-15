@@ -11,8 +11,10 @@ Path = cm_pathChannels.Path
 
 from .cm_masterChannels import Wrapper
 
+
 def register():
     cm_pathChannels.register()
+
 
 def unregister():
     cm_pathChannels.unregister()
