@@ -4,6 +4,7 @@ import bpy
 ICONS = 'minus_green minus_red node_tree_logo plus_green plus_yellow start_sim stop_sim agents reset instant_setup add_agents plug code shuffle array target setup motion'.split(' ')
 icon_collection = {}
 
+
 def register_icons():
     import bpy.utils.previews
     pcoll = bpy.utils.previews.new()
@@ -13,10 +14,12 @@ def register_icons():
 
     icon_collection["main"] = pcoll
 
+
 def unregister_icons():
     for pcoll in icon_collection.values():
         bpy.utils.previews.remove(pcoll)
     icon_collection.clear()
+
 
 def cicon(name):
     pcoll = icon_collection["main"]
