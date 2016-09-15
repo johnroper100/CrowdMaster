@@ -155,7 +155,7 @@ class SCENE_OT_cm_start(Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
-        if (bpy.data.is_dirty) and (preferences.show_debug_options == False):
+        if (bpy.data.is_dirty) and not (preferences.show_debug_options):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
 
@@ -172,9 +172,11 @@ class SCENE_OT_cm_start(Operator):
 
         sim.startFrameHandler()
 
-        if preferences.play_animation == True:
+        if preferences.play_animation:
             bpy.ops.screen.animation_play()
+
         return {'FINISHED'}
+
 
 class SCENE_OT_cm_stop(Operator):
     bl_idname = "scene.cm_stop"
@@ -182,18 +184,20 @@ class SCENE_OT_cm_stop(Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
-        if preferences.play_animation == True:
-              bpy.ops.screen.animation_cancel()
+        if preferences.play_animation:
+            bpy.ops.screen.animation_cancel()
+
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
+
         return {'FINISHED'}
 
 # =============== SIMULATION END ===============#
 
-
 global initialised
 initialised = False
+
 
 class SCENE_PT_CrowdMaster(Panel):
     """Creates CrowdMaster Panel in the node editor."""
@@ -206,7 +210,7 @@ class SCENE_PT_CrowdMaster(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
+            return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -217,14 +221,14 @@ class SCENE_PT_CrowdMaster(Panel):
 
         row = layout.row()
         row.scale_y = 1.5
-        if preferences.use_custom_icons == True:
+        if preferences.use_custom_icons:
             row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))
         else:
             row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
 
         row = layout.row()
         row.scale_y = 1.25
-        if preferences.use_custom_icons == True:
+        if preferences.use_custom_icons:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
@@ -233,7 +237,7 @@ class SCENE_PT_CrowdMaster(Panel):
         row.separator()
 
         row = layout.row()
-        if context.scene.show_utilities == False:
+        if not context.scene.show_utilities:
             row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
@@ -241,7 +245,7 @@ class SCENE_PT_CrowdMaster(Panel):
             box = layout.box()
             row = box.row()
             row.scale_y = 1.5
-            if preferences.use_custom_icons == True:
+            if preferences.use_custom_icons:
                 row.operator("scene.cm_setup_agent", icon_value=cicon('setup'))
             else:
                 row.operator("scene.cm_setup_agent", icon="MOD_REMESH")
@@ -254,17 +258,17 @@ class SCENE_PT_CrowdMaster(Panel):
             box = layout.box()
             row = box.row()
             row.prop(scene, "nodeTreeType")
-            
+
             row = box.row()
             row.prop(scene, "append_to_tree")
-            
+
             if scene.append_to_tree:
                 row = box.row()
                 row.prop_search(scene, "node_tree_name", bpy.data, "node_groups")
 
             row = box.row()
             row.scale_y = 1.5
-            if preferences.use_custom_icons == True:
+            if preferences.use_custom_icons:
                 row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
             else:
                 row.operator("scene.cm_setup_sample_nodes", icon="NODETREE")
@@ -273,13 +277,14 @@ class SCENE_PT_CrowdMaster(Panel):
             row = box.row()
             row.scale_y = 1.5
             row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
-            
+
             box = layout.box()
             row = box.row()
             row.label("You must have the Simplify Curves addon enabled.")
             row = box.row()
             row.scale_y = 1.5
             row.operator("graph.simplify", icon="IPO")
+
 
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
@@ -292,7 +297,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
+            return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -327,14 +332,14 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 group = scene.cm_groups[index]
 
                 box.template_list("SCENE_UL_agent_type", "", group,
-                                     "agentTypes", scene, "cm_view_details_index")
+                                  "agentTypes", scene, "cm_view_details_index")
 
                 if group.name == "cm_allAgents":
                     box.label("cm_allAgents: To freeze use AddToGroup node")
                 else:
                     box.prop(group, "freezePlacement")
 
-                if preferences.use_custom_icons == True:
+                if preferences.use_custom_icons:
                     op = box.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
                 else:
                     op = box.operator(SCENE_OT_cm_groups_reset.bl_idname)
@@ -355,7 +360,7 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
+            return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -365,16 +370,17 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
         layout.prop(context.scene.cm_manual, "groupName")
         layout.prop(context.scene.cm_manual, "brainType")
-        if preferences.use_custom_icons == True:
+        if preferences.use_custom_icons:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         else:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
         op.groupName = "cm_" + context.scene.cm_manual.groupName
         op.brainType = context.scene.cm_manual.brainType
 
+
 def register():
-    #import addon_utils
-    #addon_utils.enable("curve_simplify")
+    # import addon_utils
+    # addon_utils.enable("curve_simplify")
 
     register_icons()
     addon_updater_ops.register(bl_info)
@@ -423,11 +429,13 @@ def register():
     from . import cm_channels
     cm_channels.register()
 
+
 def initialise():
     sce = bpy.context.scene
 
     global Simulation
     from .cm_simulate import Simulation
+
 
 def unregister():
     unregister_icons()
