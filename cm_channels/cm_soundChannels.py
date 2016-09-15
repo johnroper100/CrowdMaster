@@ -478,7 +478,6 @@ class Channel:
                                                  "cert": 0}
                 # (z rot, x rot, dist proportion, recommended acceleration)
 
-
     # TODO The following is extraordinary hacky... do something about it!
 
     @property
