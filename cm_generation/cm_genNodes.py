@@ -324,7 +324,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
 
-    noToPlace = IntProperty(name="Number Of Agents",
+    noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
                             default=1)
 
@@ -391,7 +391,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
 
-    noToPlace = IntProperty(name="Number Of Agents",
+    noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
                             default=1, min=1)
     ArrayRows = IntProperty(name="Rows",

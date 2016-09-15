@@ -254,6 +254,13 @@ class SCENE_PT_CrowdMaster(Panel):
             box = layout.box()
             row = box.row()
             row.prop(scene, "nodeTreeType")
+            
+            row = box.row()
+            row.prop(scene, "append_to_tree")
+            
+            if scene.append_to_tree:
+                row = box.row()
+                row.prop_search(scene, "node_tree_name", bpy.data, "node_groups")
 
             row = box.row()
             row.scale_y = 1.5

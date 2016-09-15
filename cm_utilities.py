@@ -14,6 +14,14 @@ bpy.types.Scene.show_utilities = BoolProperty(
         options={'HIDDEN'}
     )
 
+bpy.types.Scene.append_to_tree = BoolProperty(
+        name="Append To Tree",
+        description="Append the sample nodes to an existing node tree",
+        default=False
+    )
+
+bpy.types.Scene.node_tree_name = StringProperty(name="Node Tree")
+
 bpy.types.Scene.nodeTreeType = EnumProperty(
         items = [("sim", "Simulation", "Simulation node setups"),
                  ("gen", "Generation", "Generation node setups")],
@@ -80,7 +88,10 @@ class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        ng = bpy.data.node_groups.new("SimpleRandomPositioning", "CrowdMasterAGenTreeType")
+        if scene.append_to_tree:
+            ng = bpy.data.node_groups[scene.node_tree_name]
+        else:
+            ng = bpy.data.node_groups.new("SimpleRandomPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-600, 0)
@@ -112,7 +123,11 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        ng = bpy.data.node_groups.new("SimpleFormationPositioning", "CrowdMasterAGenTreeType")
+        
+        if scene.append_to_tree:
+            ng = bpy.data.node_groups[scene.node_tree_name]
+        else:
+            ng = bpy.data.node_groups.new("SimpleFormationPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-600, 0)
@@ -146,7 +161,10 @@ class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        ng = bpy.data.node_groups.new("SimpleTargetPositioning", "CrowdMasterAGenTreeType")
+        if scene.append_to_tree:
+            ng = bpy.data.node_groups[scene.node_tree_name]
+        else:
+            ng = bpy.data.node_groups.new("SimpleTargetPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-600, 0)
@@ -178,7 +196,10 @@ class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
 
-        ng = bpy.data.node_groups.new("SimpleMovement", "CrowdMasterTreeType")
+        if scene.append_to_tree:
+            ng = bpy.data.node_groups[scene.node_tree_name]
+        else:
+            ng = bpy.data.node_groups.new("SimpleMovement", "CrowdMasterTreeType")
 
         input_node = ng.nodes.new("InputNode")
         input_node.location = (-200, 0)
