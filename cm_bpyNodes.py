@@ -10,6 +10,7 @@ class CrowdMasterTree(NodeTree):
     bl_label = 'CrowdMaster Agent Simulation'
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
+
 class DefaultSocket(NodeSocket):
     # Description string
     """Default socket"""
@@ -90,6 +91,7 @@ class LogicNode(CrowdMasterNode):
 
 # ============ End of super classes ============
 
+
 class InputNode(LogicNode):
     """CrowdMaster input node"""
     bl_label = "Input"
@@ -102,6 +104,7 @@ class InputNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["Input"] = self.Input
+
 
 def update_properties(self, context):
     """Keeps the values in the graph node in the correct order"""
@@ -118,8 +121,8 @@ class GraphNode(LogicNode):
     bl_label = "Graph"
 
     Multiply = FloatProperty(name="Multiply", description="Multiply the outputted value by this number", default=1.0)
-    
-    CurveType = EnumProperty(name="Curve Type", 
+
+    CurveType = EnumProperty(name="Curve Type",
                              items=[("RBF", "RBF", "", 1),
                                     ("RANGE", "Range", "", 2)])
 
@@ -332,6 +335,7 @@ class OutputNode(LogicNode):
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
 
+
 class EventNode(LogicNode):
     """CrowdMaster Event node"""
     bl_label = "Event"
@@ -363,26 +367,25 @@ class PrintNode(LogicNode):
     """CrowdMaster Print Node"""
     bl_label = "Print"
 
-    Label = StringProperty(name="Label", description = "The label to append to each printed statement.", default="")
+    Label = StringProperty(name="Label", description="The label to append to each printed statement.", default="")
     save_to_file = BoolProperty(
-        name = "Save To File",
-        description = "Save the printed statements to a file for later viewing.",
-        default = False,
+        name="Save To File",
+        description="Save the printed statements to a file for later viewing.",
+        default=False,
         )
 
-    output_filepath = StringProperty \
-      (
-      name = "Output Filepath",
-      default = "",
-      description = "Define the output file path.",
-      subtype = 'DIR_PATH'
+    output_filepath = StringProperty(
+      name="Output Filepath",
+      default="",
+      description="Define the output file path.",
+      subtype='DIR_PATH'
       )
     # PrintSelected = BoolProperty(name="Print Selected", default=True)  # Not implemented
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Label")
         layout.prop(self, "save_to_file")
-        if self.save_to_file == True:
+        if self.save_to_file:
             layout.prop(self, "output_filepath")
 
     def getSettings(self, node):
@@ -552,6 +555,7 @@ node_categories = [
         NodeItem("LogicNoteNode")
         ])
     ]
+
 
 def register():
     bpy.utils.register_class(CrowdMasterTree)
