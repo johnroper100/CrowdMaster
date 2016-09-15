@@ -64,7 +64,10 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
 
         elif scene.nodeTreeType == "sim":
             row = layout.row()
-            row.operator("scene.cm_simnodes_mov_simple", icon="MOD_OCEAN")
+            if preferences.use_custom_icons == True:
+                row.operator("scene.cm_simnodes_mov_simple", icon_value=cicon('motion'))
+            else:
+                row.operator("scene.cm_simnodes_mov_simple", icon="MOD_OCEAN")
 
 class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
     bl_idname = "scene.cm_gennodes_pos_random_simple"
