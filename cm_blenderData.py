@@ -23,9 +23,8 @@ class group_entry(PropertyGroup):
     # name - The label given to this group
     agentTypes = CollectionProperty(type=agent_type_entry)
     totalAgents = IntProperty(default=0)
-    groupType = EnumProperty(items = [("auto", "Auto", "Created by nodes"),
-                                      ("manual", "Manual", "Manually added")],
-                                      default = "auto")
+    groupType = EnumProperty(items=[("auto", "Auto", "Created by nodes"),
+                                    ("manual", "Manual", "Manually added")], default "auto")
     freezePlacement = BoolProperty(name="Freeze Placement", default=False)
 
 
@@ -42,9 +41,9 @@ def registerTypes():
     bpy.types.Scene.cm_groups = CollectionProperty(type=group_entry)
     bpy.types.Scene.cm_groups_index = IntProperty()
 
-    bpy.types.Scene.cm_view_details = BoolProperty(name = "View group details",
-                                                   description = "Show a breakdown of the agents in the selected group",
-                                                   default = False)
+    bpy.types.Scene.cm_view_details = BoolProperty(name="View group details",
+                                                   description="Show a breakdown of the agents in the selected group",
+                                                   default=False)
     bpy.types.Scene.cm_view_details_index = IntProperty()
 
     bpy.utils.register_class(manual_props)
