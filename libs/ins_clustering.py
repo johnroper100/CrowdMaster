@@ -202,9 +202,7 @@ if __name__ == "__main__":
         def boundingRect(self):
             """sets the area that is updated by drawing"""
             adjust = 4.0
-            return QtCore.QRectF(-self.radius - adjust, -self.radius - adjust,
-                                 2 * self.radius + 2 * adjust, 2 * self.radius
-                                 + 2 * adjust)
+            return QtCore.QRectF(-self.radius - adjust, -self.radius - adjust, 2 * self.radius + 2 * adjust, 2 * self.radius + 2 * adjust)
 
         def paint(self, painter, option, widget):
             if self.isGroupMarker:
@@ -221,8 +219,7 @@ if __name__ == "__main__":
             self.update()
 
         def move(self):
-            self.setPos(self.pos().x() + randrange(-2, 2), self.pos().y()
-                        + randrange(-2, 2))
+            self.setPos(self.pos().x() + randrange(-2, 2), self.pos().y() + randrange(-2, 2))
             if self.pos().x() >= 600:
                 self.setPos(599, self.pos().y())
             elif self.pos().x() <= -600:
