@@ -13,6 +13,7 @@ from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from .cm_masterChannels import MasterChannel as Mc
 
+
 class Path(Mc):
     """Used to access data about paths in the scene"""
     def __init__(self, sim):
@@ -135,7 +136,6 @@ class Path(Mc):
             index = nextIndex
             nextIndex = nextVert.index
 
-
     def calcRelativeTarget(self, pathObject, radius, lookahead):
         context = bpy.context
 
@@ -181,7 +181,6 @@ class Path(Mc):
             target = self.calcRelativeTarget(pathObject, radius, lookahead)
             self.resultsCache[pathObject] = target
         return math.atan2(target[2], target[1])/math.pi
-
 
 
 class path_entry(PropertyGroup):
@@ -243,7 +242,7 @@ class SCENE_PT_path(Panel):
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
+            return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
@@ -272,6 +271,7 @@ def register():
     bpy.utils.register_class(SCENE_UL_cm_path)
     bpy.utils.register_class(SCENE_PT_path)
     bpy.types.Scene.cm_paths = PointerProperty(type=paths_collection)
+
 
 def unregister():
     bpy.utils.unregister_class(path_entry)
