@@ -13,6 +13,7 @@ from ..libs.ins_octree import createOctreeFromBPYObjs
 
 # ==================== Some base classes ====================
 
+
 class Template():
     """Abstract super class.
     Templates are a description of how to create some arrangement of agents"""
@@ -34,6 +35,7 @@ class Template():
         """Return true if the inputs and gettings are correct"""
         return True
 
+
 class GeoTemplate(Template):
     """Abstract super class.
     GeoTemplates are a description of how to create some arrangement of
@@ -43,6 +45,7 @@ class GeoTemplate(Template):
         self.buildCount += 1
 
 # ==================== End of base classes ====================
+
 
 class GeoTemplateOBJECT(GeoTemplate):
     """For placing objects into the scene"""
@@ -60,6 +63,7 @@ class GeoTemplateOBJECT(GeoTemplate):
 
     def check(self):
         return self.settings["inputObject"] in bpy.context.scene.objects
+
 
 class GeoTemplateGROUP(GeoTemplate):
     """For placing groups into the scene"""
@@ -112,6 +116,7 @@ class GeoTemplateGROUP(GeoTemplate):
     def check(self):
         return self.settings["inputGroup"] in bpy.data.groups
 
+
 class GeoTemplateSWITCH(GeoTemplate):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
     def build(self, pos, rot, scale, group, deferGeo):
@@ -130,6 +135,7 @@ class GeoTemplateSWITCH(GeoTemplate):
         if not isinstance(self.inputs["Object 2"], GeoTemplate):
             return False
         return True
+
 
 class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
@@ -157,6 +163,7 @@ class GeoTemplatePARENT(GeoTemplate):
             return False
         # TODO check that object is in parent group
         return True
+
 
 class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
@@ -188,6 +195,7 @@ class TemplateADDTOGROUP(Template):
             return False
         return True
 
+
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -200,9 +208,9 @@ class TemplateAGENT(Template):
         topObj.scale = Vector((scale, scale, scale))
 
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
-                                    brainType=self.settings["brainType"],
-                                    groupName=cm_group.name,
-                                    geoGroupName=new_group.name)
+                                   brainType=self.settings["brainType"],
+                                   groupName=cm_group.name,
+                                   geoGroupName=new_group.name)
         # TODO set tags
 
     def check(self):
@@ -211,6 +219,7 @@ class TemplateAGENT(Template):
         if not isinstance(self.inputs["Objects"], GeoTemplate):
             return False
         return True
+
 
 class TemplateSWITCH(Template):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
@@ -288,12 +297,14 @@ class TemplateRANDOM(Template):
             return False
         return True
 
+
 class TemplateCOMBINE(Template):
     """Duplicate request to all inputs"""
     def build(self, pos, rot, scale, tags, cm_group):
         for name, inp in self.inputs.items():
             print("name", name, inp.__class__.__name__)
             inp.build(pos, rot, scale, tags, cm_group)
+
 
 class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
@@ -320,6 +331,7 @@ class TemplateRANDOMPOSITIONING(Template):
             return False
         return True
 
+
 class TemplateFORMATION(Template):
     """Place in a row"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -332,13 +344,12 @@ class TemplateFORMATION(Template):
         diffCol *= scale
         number = self.settings["noToPlace"]
         rows = self.settings["ArrayRows"]
-        for fullcols in range(number//rows):
+        for fullcols in range(number // rows):
             for row in range(rows):
                 self.inputs["Template"].build(placePos + fullcols*diffCol +
                                               row*diffRow, rot, scale, tags, cm_group)
-        for leftOver in range(number%rows):
-            self.inputs["Template"].build(placePos + (number//rows)*diffCol
-                                          + leftOver*diffRow, rot, scale, tags, cm_group)
+        for leftOver in range(number % rows):
+            self.inputs["Template"].build(placePos + (number//rows)*diffCol + leftOver*diffRow, rot, scale, tags, cm_group)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -348,6 +359,7 @@ class TemplateFORMATION(Template):
         if isinstance(self.inputs["Template"], GeoTemplate):
             return False
         return True
+
 
 class TemplateTARGET(Template):
     """Place based on the positions of vertices"""
@@ -399,6 +411,7 @@ class TemplateTARGET(Template):
                 return False
         return True
 
+
 class TemplateOBSTACLE(Template):
     """Refuse any requests that are withing the bounding box of an obstacle"""
     def __init__(self, inputs, settings, bpyName):
@@ -427,6 +440,7 @@ class TemplateOBSTACLE(Template):
         if self.settings["obstacleGroup"] not in bpy.data.groups:
             return False
         return True
+
 
 class TemplateSETTAG(Template):
     """Set a tag for an agent to start with"""
