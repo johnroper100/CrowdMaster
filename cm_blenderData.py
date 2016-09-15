@@ -24,7 +24,7 @@ class group_entry(PropertyGroup):
     agentTypes = CollectionProperty(type=agent_type_entry)
     totalAgents = IntProperty(default=0)
     groupType = EnumProperty(items=[("auto", "Auto", "Created by nodes"),
-                                    ("manual", "Manual", "Manually added")], default "auto")
+                                    ("manual", "Manual", "Manually added")], default="auto")
     freezePlacement = BoolProperty(name="Freeze Placement", default=False)
 
 
