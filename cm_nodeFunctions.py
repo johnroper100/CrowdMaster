@@ -29,6 +29,7 @@ class LogicINPUT(Neuron):
         result = eval(settings["Input"], lvars)
         return result
 
+
 class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
@@ -278,7 +279,6 @@ class LogicFILTER(Neuron):
         return result
 
 
-
 class LogicMAP(Neuron):
     """Map the input from the input range to the output range
     (extrapolates outside of input range)"""
@@ -373,7 +373,7 @@ class LogicPRIORITY(Neuron):
                     else:
                         result[i.key] = i.val
                         remaining[i.key] = 0
-            #print("resultPartial", result)
+            # print("resultPartial", result)
         for key, rem in remaining.items():
             if rem != 0:
                 result[key] += settings["defaultValue"] * rem
@@ -401,10 +401,11 @@ class LogicEVENT(Neuron):
                         if not (l.x-(d.x/2) <= pt.x <= l.x+(d.x/2) and
                                 l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
                                 l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
-                             result = 0
+                            result = 0
                 if result:
                     return result
         return 0
+
 
 class LogicPYTHON(Neuron):
     """execute a python expression"""
