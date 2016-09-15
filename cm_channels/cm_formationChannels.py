@@ -152,8 +152,7 @@ class Channel:
         if fixedPoint < len(self.targets):
             to = self.targets[fixedPoint]
             loc = objs[self.userid].location
-            return math.sqrt((loc[0] - to[0])**2 + (loc[1] - to[1])**2
-                             + (loc[2] - to[2])**2)
+            return math.sqrt((loc[0] - to[0])**2 + (loc[1] - to[1])**2 + (loc[2] - to[2])**2)
         else:
             return None
 
@@ -165,8 +164,7 @@ class Channel:
 
         if to:
             loc = objs[self.userid].location
-            return math.sqrt((loc[0] - to[0])**2 + (loc[1] - to[1])**2
-                             + (loc[2] - to[2])**2)
+            return math.sqrt((loc[0] - to[0])**2 + (loc[1] - to[1])**2 + (loc[2] - to[2])**2)
         else:
             return None
 
@@ -237,7 +235,6 @@ class Channel:
             relative = target * rotation
 
             return math.atan2(relative[2], relative[1])/math.pi
-
 
     @property
     def rx(self):
