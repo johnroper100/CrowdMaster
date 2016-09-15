@@ -4,6 +4,7 @@ import math
 from .cm_masterChannels import MasterChannel as Mc
 from mathutils import Vector
 
+
 class Crowd(Mc):
     """Used to access the data of other agents"""
     def __init__(self, sim):
@@ -26,7 +27,7 @@ class Crowd(Mc):
     def _hashSet(self, s):
         s = 1
         for item in s:
-            s *= hash(item)%(10**25) + 1
+            s *= hash(item) % (10**25) + 1
         return s
 
     def calcSeparate(self, localArea):
@@ -46,7 +47,7 @@ class Crowd(Mc):
         rotation = x * y * z
         relative = sepVec * rotation
         return relative
-        #self.separateCache[localArea] = relative
+        # self.separateCache[localArea] = relative
 
     def calcAlign(self, localArea):
         alnVec = Vector([0, 0, 0])
@@ -80,7 +81,7 @@ class Crowd(Mc):
         else:
             alnVec.z = -2 + alnVec.z/math.pi
         return alnVec
-        #self.alignCache[localArea] = (changez, changex)
+        # self.alignCache[localArea] = (changez, changex)
 
     def calcCohere(self, localArea):
         cohVec = Vector([0, 0, 0])
@@ -103,16 +104,16 @@ class Crowd(Mc):
         rotation = x * y * z
         relative = cohVec * rotation
         return relative
-        #self.alignCache[localArea] = cohVec
+        # self.alignCache[localArea] = cohVec
 
     def separateTx(self, inputs):
         inSet = set()
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.separateCache:
+        # if inSet not in self.separateCache:
         #    self.calcSeparate(inSet)
-        #sepVec = self.separateCache[inSet]
+        # sepVec = self.separateCache[inSet]
         if len(inSet) == 0:
             return None
         sepVec = self.calcSeparate(inSet)
@@ -123,9 +124,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.separateCache:
+        # if inSet not in self.separateCache:
         #    self.calcSeparate(inSet)
-        #sepVec = self.separateCache[inSet]
+        # sepVec = self.separateCache[inSet]
         if len(inSet) == 0:
             return None
         sepVec = self.calcSeparate(inSet)
@@ -136,9 +137,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.separateCache:
+        # if inSet not in self.separateCache:
         #    self.calcSeparate(inSet)
-        #sepVec = self.separateCache[inSet]
+        # sepVec = self.separateCache[inSet]
         if len(inSet) == 0:
             return None
         sepVec = self.calcSeparate(inSet)
@@ -149,9 +150,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.alignCache:
+        # if inSet not in self.alignCache:
         #    self.calcSeparate(inSet)
-        #alnVec = self.alignCache[inSet]
+        # alnVec = self.alignCache[inSet]
         if len(inSet) == 0:
             return None
         alnVec = self.calcAlign(inSet)
@@ -162,9 +163,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.alignCache:
+        # if inSet not in self.alignCache:
         #    self.calcAlign(inSet)
-        #alnVec = self.AlignCache[inSet]
+        # alnVec = self.AlignCache[inSet]
         if len(inSet) == 0:
             return None
         alnVec = self.calcAlign(inSet)
@@ -175,9 +176,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.cohereCache:
+        # if inSet not in self.cohereCache:
         #    self.calcSeparate(inSet)
-        #cohVec = self.cohereCache[inSet]
+        # cohVec = self.cohereCache[inSet]
         if len(inSet) == 0:
             return None
         cohVec = self.calcCohere(inSet)
@@ -188,9 +189,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.cohereCache:
+        # if inSet not in self.cohereCache:
         #    self.calcSeparate(inSet)
-        #cohVec = self.cohereCache[inSet]
+        # cohVec = self.cohereCache[inSet]
         if len(inSet) == 0:
             return None
         cohVec = self.calcCohere(inSet)
@@ -201,9 +202,9 @@ class Crowd(Mc):
         for into in inputs:
             for i in into:
                 inSet.add(i.key)
-        #if inSet not in self.cohereCache:
+        # if inSet not in self.cohereCache:
         #    self.calcSeparate(inSet)
-        #cohVec = self.cohereCache[inSet]
+        # cohVec = self.cohereCache[inSet]
         if len(inSet) == 0:
             return None
         cohVec = self.calcCohere(inSet)
