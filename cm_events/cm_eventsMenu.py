@@ -99,11 +99,11 @@ class SCENE_PT_event(Panel):
     bl_region_type = 'TOOLS'
     bl_category = "CrowdMaster"
     bl_options = {'DEFAULT_CLOSED'}
-    
+
     @classmethod
     def poll(self, context):
         try:
-             return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
+            return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
