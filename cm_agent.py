@@ -64,7 +64,7 @@ class Agent:
         self.sz = 0
         self.apzKey = True  # True if a keyframe was set last frame
 
-        self.globalVelocity = mathutils.Vector([0,0,0])
+        self.globalVelocity = mathutils.Vector([0, 0, 0])
 
         """Clear out the nla"""
         objs = bpy.data.objects
@@ -174,7 +174,6 @@ class Agent:
                                 frame=bpy.context.scene.frame_current)
         else:
             self.arzKey = False
-
 
         if abs(self.apx - obj.location[0]) > 0.000001:
             if not self.apxKey:
