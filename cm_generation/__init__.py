@@ -6,6 +6,7 @@ from ..libs.ins_vector import Vector
 
 from .cm_templates import templates
 
+
 class SCENE_OT_agent_nodes_generate(Operator):
     bl_idname = "scene.cm_agent_nodes_generate"
     bl_label = "Generate Agents"
@@ -80,9 +81,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 tipNode = space.from_node
                 if tipNode.bl_idname == "NodeReroute":
                     tipNode = self.getInput(tipNode.inputs[0])
-                genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)),
-                                                1, {},
-                                                context.scene.cm_groups["cm_allAgents"])
+                genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)), 1, {}, context.scene.cm_groups["cm_allAgents"])
         else:
             return {'CANCELLED'}
         return {'FINISHED'}
@@ -90,9 +89,11 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
 from . import cm_genNodes
 
+
 def register():
     bpy.utils.register_class(SCENE_OT_agent_nodes_generate)
     cm_genNodes.register()
+
 
 def unregister():
     bpy.utils.unregister_class(SCENE_OT_agent_nodes_generate)
