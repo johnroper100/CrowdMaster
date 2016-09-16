@@ -492,6 +492,25 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
         return {"obstacleGroup": self.obstacleGroup,
                 "margin": self.margin}
 
+class GroundNode(CrowdMasterAGenTreeNode):
+    '''The ground node'''
+    bl_idname = 'GroundNodeType'
+    bl_label = 'Ground'
+    bl_icon = 'SOUND'
+
+    groundMesh = StringProperty(name="Ground")
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "groundMesh", context.scene, "objects")
+
+    def getSettings(self):
+        return {"groundMesh": self.groundMesh}
 
 class NoteNode(CrowdMasterAGenTreeNode):
     """For keeping the graph well organised"""
@@ -533,6 +552,7 @@ agen_node_categories = [
         NodeItem("TargetPositionNodeType", label="Target"),
         NodeItem("ObstacleNodeType"),
         NodeItem("OffsetNodeType"),
+        NodeItem("GroundNodeType"),
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
@@ -566,6 +586,7 @@ def register():
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
     bpy.utils.register_class(ObstacleNode)
+    bpy.utils.register_class(GroundNode)
 
     bpy.utils.register_class(NoteNode)
 
@@ -594,6 +615,7 @@ def unregister():
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
     bpy.utils.unregister_class(ObstacleNode)
+    bpy.utils.unregister_class(GroundNode)
 
     bpy.utils.unregister_class(NoteNode)
 

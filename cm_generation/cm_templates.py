@@ -1,5 +1,6 @@
 import bpy
 import mathutils
+BVHTree = mathutils.bvhtree.BVHTree
 
 from collections import OrderedDict
 
@@ -442,6 +443,44 @@ class TemplateOBSTACLE(Template):
         return True
 
 
+class TemplateGROUND(Template):
+    """Adjust the position of requests onto a ground mesh"""
+    def __init__(self, inputs, settings, bpyName):
+        Template.__init__(self, inputs, settings, bpyName)
+        self.bvhtree = None
+
+    def build(self, pos, rot, scale, tags, cm_group):
+        sce = bpy.context.scene
+        gnd = sce.objects[self.settings["groundMesh"]]
+        if self.bvhtree is None:
+            self.bvhtree = BVHTree.FromObject(gnd, sce)
+        point = pos - gnd.location
+        hitA, normA, indA, distA = self.bvhtree.ray_cast(point, (0, 0, -1))
+        hitB, normB, indB, distB = self.bvhtree.ray_cast(point, (0, 0, 1))
+        if hitA and hitB:
+            if distA <= distB:
+                hitA += gnd.location
+                self.inputs["Template"].build(hitA, rot, scale, tags, cm_group)
+            else:
+                hitB += gnd.location
+                self.inputs["Template"].build(hitB, rot, scale, tags, cm_group)
+        elif hitA:
+            hitA += gnd.location
+            self.inputs["Template"].build(hitA, rot, scale, tags, cm_group)
+        elif hitB:
+            hitB += gnd.location
+            self.inputs["Template"].build(hitB, rot, scale, tags, cm_group)
+
+    def check(self):
+        if self.settings["groundMesh"] not in bpy.context.scene.objects:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
+
+
 class TemplateSETTAG(Template):
     """Set a tag for an agent to start with"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -470,5 +509,6 @@ templates = OrderedDict([
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),
-    ("ObstacleNodeType", TemplateOBSTACLE)
+    ("ObstacleNodeType", TemplateOBSTACLE),
+    ("GroundNodeType", TemplateGROUND)
 ])
