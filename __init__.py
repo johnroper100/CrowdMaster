@@ -5,7 +5,7 @@ bl_info = {
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
-    "warning": "This is still a work in progress. Make sure to save often.",
+    "warning": "",
     "wiki_url": "http://jmroper.com/crowdmaster/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
     "category": "Simulation"

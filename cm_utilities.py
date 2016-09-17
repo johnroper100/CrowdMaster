@@ -82,6 +82,13 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
             else:
                 row.operator("scene.cm_simnodes_mov_simple", icon="MOD_OCEAN")
 
+            row = layout.row()
+            row.scale_y = 1.15
+            if preferences.use_custom_icons:
+                row.operator("scene.cm_simnodes_action_random", icon_value=cicon('dice'))
+            else:
+                row.operator("scene.cm_simnodes_action_random", icon="FILE_REFRESH")
+
 
 class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
     bl_idname = "scene.cm_gennodes_pos_random_simple"
@@ -219,6 +226,56 @@ class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class CrowdMaster_simNodes_action_random(bpy.types.Operator):
+    bl_idname = "scene.cm_simnodes_action_random"
+    bl_label = "Random Actions"
+
+    def execute(self, context):
+        scene = context.scene
+
+        if scene.append_to_tree:
+            ng = bpy.data.node_groups[scene.node_tree_name]
+        else:
+            ng = bpy.data.node_groups.new("RandomActions", "CrowdMasterTreeType")
+
+        start_node = ng.nodes.new("StartState")
+        start_node.location = (-250, -50)
+        
+        input1_node = ng.nodes.new("InputNode")
+        input1_node.location = (-75, 150)
+        input1_node.Input = "Noise.agentMultiRandom(0)"
+        
+        input2_node = ng.nodes.new("InputNode")
+        input2_node.location = (-75, -25)
+        input2_node.Input = "Noise.agentMultiRandom(1)"
+        
+        input3_node = ng.nodes.new("InputNode")
+        input3_node.location = (-75, -250)
+        input3_node.Input = "Noise.agentMultiRandom(2)"
+        
+        action1_node = ng.nodes.new("ActionState")
+        action1_node.location = (100, 200)
+        action1_node.actionName = "action1"
+        
+        action2_node = ng.nodes.new("ActionState")
+        action2_node.location = (100, 0)
+        action2_node.actionName = "action2"
+        
+        action3_node = ng.nodes.new("ActionState")
+        action3_node.location = (100, -200)
+        action3_node.actionName = "action3"
+
+        links = ng.links
+        link = links.new(start_node.outputs[0], action1_node.inputs[0])
+        link = links.new(start_node.outputs[0], action2_node.inputs[0])
+        link = links.new(start_node.outputs[0], action3_node.inputs[0])
+        link = links.new(input1_node.outputs[0], action1_node.inputs[1])
+        link = links.new(input2_node.outputs[0], action2_node.inputs[1])
+        link = links.new(input3_node.outputs[0], action3_node.inputs[1])
+
+        return {'FINISHED'}
+
+
 class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
     bl_idname = "scene.cm_convert_to_bound_box"
     bl_label = "Convert Selected To Bounding Box"
@@ -310,6 +367,7 @@ def register():
     bpy.utils.register_class(CrowdMaster_genNodes_pos_formation_simple)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_target_simple)
     bpy.utils.register_class(CrowdMaster_simNodes_mov_simple)
+    bpy.utils.register_class(CrowdMaster_simNodes_action_random)
     bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.register_class(CrowdMaster_setup_agent)
     bpy.utils.register_class(Crowdmaster_place_deferred_geo)
@@ -321,6 +379,7 @@ def unregister():
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_formation_simple)
     bpy.utils.unregister_class(CrowdMaster_genNodes_pos_target_simple)
     bpy.utils.unregister_class(CrowdMaster_simNodes_mov_simple)
+    bpy.utils.unregister_class(CrowdMaster_simNodes_action_random)
     bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.unregister_class(CrowdMaster_setup_agent)
     bpy.utils.unregister_class(Crowdmaster_place_deferred_geo)
