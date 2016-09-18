@@ -32,17 +32,17 @@ class DefaultSocket(NodeSocket):
     def draw(self, context, layout, node, text):
         preferences = context.user_preferences.addons[__package__].preferences
         if not self.is_output and node.bl_idname == "ActionState":
+            row = layout.row(align=True)
             if self.is_linked:
-                layout.prop(self, "filterProperty", text=text)
+                row.prop(self, "filterProperty", text=text)
             else:
-                row = layout.row(align=True)
                 row.prop(self, "defaultValueProperty", text="")
-                if preferences.use_custom_icons:
-                    row.prop(self, "randomInputValue",
-                             icon_value=cicon('dice'), icon_only=True)
-                else:
-                    row.prop(self, "randomInputValue", icon="FILE_REFRESH",
-                             icon_only=True)
+            if preferences.use_custom_icons:
+                row.prop(self, "randomInputValue", icon_value=cicon('dice'),
+                         icon_only=True)
+            else:
+                row.prop(self, "randomInputValue", icon="FILE_REFRESH",
+                         icon_only=True)
         else:
             layout.label(text)
 
@@ -525,7 +525,7 @@ class NoteNode(CrowdMasterNode):
     text = StringProperty(name='Note Text', description="Text to show, if set will overide file")
 
     text_file = StringProperty(description="Textfile to show")
-    
+
     def format_text(self):
         global TW
         out = []
@@ -545,7 +545,7 @@ class NoteNode(CrowdMasterNode):
             out.extend(TW.wrap(t))
             out.append("")
         return out
-    
+
     def init(self, context):
         self.width = 400
         self.color = (0.5, 0.5, 0.5)
@@ -565,7 +565,7 @@ class NoteNode(CrowdMasterNode):
         else:
             col = layout.column()
             col.prop(self, "text")
-            
+
             col = layout.column(align=True)
             col.operator("node.sim_note_from_clipboard", icon="TEXT")
             col.operator("node.sim_note_clear", icon="X_VEC")

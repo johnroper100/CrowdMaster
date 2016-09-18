@@ -213,6 +213,8 @@ class State():
         elif self.settings["ValueFilter"] == "MIN":
             result = min(vals)
         self.finalValue = result
+        if self.settings["RandomInput"]:
+            self.finalValue += random.random()
 
     def evaluateState(self):
         """Return the state to move to (allowed to return itself)
