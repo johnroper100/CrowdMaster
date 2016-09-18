@@ -498,11 +498,12 @@ class ActionState(StateNode):
         item.useValueOfSpeed = self.useValueOfSpeed
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "stateLength")
+        if self.actionName == "":
+            layout.prop(self, "stateLength")
         layout.prop(self, "cycleState")
         row = layout.row()
         row.prop(self, "actionName", text="")
-        row.prop(self, "useValueOfSpeed", text="")
+        # row.prop(self, "useValueOfSpeed", text="")
 
 
 class NoteNode(CrowdMasterNode):
