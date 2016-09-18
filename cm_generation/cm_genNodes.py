@@ -4,6 +4,7 @@ from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from .. icon_load import cicon
 
+
 class CrowdMasterAGenTree(NodeTree):
     '''CrowdMaster agent generation node tree'''
     bl_idname = 'CrowdMasterAGenTreeType'
@@ -80,6 +81,7 @@ class AddToGroupNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"groupName": "cm_" + self.groupName}
 
+
 class ObjectInputNode(CrowdMasterAGenTreeNode):
     '''The object input node'''
     bl_idname = 'ObjectInputNodeType'
@@ -97,6 +99,7 @@ class ObjectInputNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"inputObject": self.inputObject}
+
 
 class GroupInputNode(CrowdMasterAGenTreeNode):
     '''The group input node'''
