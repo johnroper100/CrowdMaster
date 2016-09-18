@@ -184,6 +184,8 @@ class State():
         self.finalValueCalcd = True
         if len(self.valueInputs) == 0:
             self.finalValue = self.settings["ValueDefault"]
+            if self.settings["RandomInput"]:
+                self.finalValue += random.random()
             return
         values = []
         for inp in self.valueInputs:

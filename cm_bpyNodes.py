@@ -3,6 +3,8 @@ from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 
+from . import icon_load
+from . icon_load import cicon
 
 class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes"""
@@ -24,14 +26,23 @@ class DefaultSocket(NodeSocket):
                                          ("MIN", "Min", "", 3)
                                          ])
     defaultValueProperty = FloatProperty(default=1.0)
+    randomInputValue = BoolProperty(default=False)
 
     # Optional function for drawing the socket input value
     def draw(self, context, layout, node, text):
+        preferences = context.user_preferences.addons[__package__].preferences
         if not self.is_output and node.bl_idname == "ActionState":
             if self.is_linked:
                 layout.prop(self, "filterProperty", text=text)
             else:
-                layout.prop(self, "defaultValueProperty", text=text)
+                row = layout.row(align=True)
+                row.prop(self, "defaultValueProperty", text="")
+                if preferences.use_custom_icons:
+                    row.prop(self, "randomInputValue",
+                             icon_value=cicon('dice'), icon_only=True)
+                else:
+                    row.prop(self, "randomInputValue", icon="FILE_REFRESH",
+                             icon_only=True)
         else:
             layout.label(text)
 
@@ -480,6 +491,7 @@ class ActionState(StateNode):
         val = self.inputs['Value']
         item.settings["ValueFilter"] = val.filterProperty
         item.settings["ValueDefault"] = val.defaultValueProperty
+        item.settings["RandomInput"] = val.randomInputValue
         item.length = self.stateLength
         item.cycleState = self.cycleState
         item.actionName = self.actionName
