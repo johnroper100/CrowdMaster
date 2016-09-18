@@ -4,7 +4,6 @@ from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from .. icon_load import cicon
 
-
 class CrowdMasterAGenTree(NodeTree):
     '''CrowdMaster agent generation node tree'''
     bl_idname = 'CrowdMasterAGenTreeType'
@@ -512,17 +511,111 @@ class GroundNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"groundMesh": self.groundMesh}
 
+import textwrap
+import importlib
+
+TEXT_WIDTH = 6
+TW = textwrap.TextWrapper()
+
+
+def get_lines(text_file):
+    for line in text_file.lines:
+        yield line.body
+
 class NoteNode(CrowdMasterAGenTreeNode):
     """For keeping the graph well organised"""
     bl_label = 'Note'
 
-    noteText = StringProperty(default="Enter text here")
+    text = StringProperty(name='Note Text', description="Text to show, if set will overide file")
+
+    text_file = StringProperty(description="Textfile to show")
+    
+    def format_text(self):
+        global TW
+        out = []
+        if self.text:
+            lines = self.text.splitlines()
+        elif self.text_file:
+            text_file = bpy.data.texts.get(self.text_file)
+            if text_file:
+                lines = get_lines(text_file)
+            else:
+                return []
+        else:
+            return []
+        width = self.width
+        TW.width = int(width) // TEXT_WIDTH
+        for t in lines:
+            out.extend(TW.wrap(t))
+            out.append("")
+        return out
+    
+    def init(self, context):
+        self.width = 400
+        self.color = (0.5, 0.5, 0.5)
+        self.use_custom_color = True
 
     def draw_buttons(self, context, layout):
-        layout.label(self.noteText)
+        has_text = self.text or self.text_file
+        if has_text:
+            col = layout.column(align=True)
+            text_lines = self.format_text()
+            for l in text_lines:
+                if l:
+                    col.label(text=l)
+            col = layout.column()
+            col.operator("node.gen_note_clear", icon="X_VEC")
+
+        else:
+            col = layout.column()
+            col.prop(self, "text")
+            
+            col = layout.column(align=True)
+            col.operator("node.gen_note_from_clipboard", icon="TEXT")
+            col.operator("node.gen_note_clear", icon="X_VEC")
 
     def draw_buttons_ext(self, context, layout):
-        layout.prop(self, "noteText")
+        layout.prop(self, "text", text="Text")
+        layout.operator("node.gen_note_from_clipboard", icon="TEXT")
+        layout.operator("node.gen_note_clear", icon="X_VEC")
+
+    def clear(self):
+        self.text = ""
+        self.text_file = ""
+
+    def to_text(self):
+        text_name = "Note Text"
+        text = bpy.data.texts.get(text_name)
+        if not text:
+            text = bpy.data.texts.new(text_name)
+        text.clear()
+        text.write(self.text)
+
+class GenNoteTextFromClipboard(bpy.types.Operator):
+    """Grab whatever text is in the clipboard"""
+    bl_idname = "node.gen_note_from_clipboard"
+    bl_label = "Grab Text From Clipboard"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        text = bpy.context.window_manager.clipboard
+        if not text:
+            self.report({"INFO"}, "No text selected")
+            return {'CANCELLED'}
+        node = context.node
+        node.text = text
+        return {'FINISHED'}
+
+class GenNoteClear(bpy.types.Operator):
+    """Clear Note Node"""
+    bl_idname = "node.gen_note_clear"
+    bl_label = "Clear Text"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        node = context.node
+        node.clear()
+        return {'FINISHED'}
 
 
 import nodeitems_utils
@@ -589,6 +682,8 @@ def register():
     bpy.utils.register_class(GroundNode)
 
     bpy.utils.register_class(NoteNode)
+    bpy.utils.register_class(GenNoteTextFromClipboard)
+    bpy.utils.register_class(GenNoteClear)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
 
@@ -618,6 +713,9 @@ def unregister():
     bpy.utils.unregister_class(GroundNode)
 
     bpy.utils.unregister_class(NoteNode)
+    bpy.utils.unregister_class(GenNoteTextFromClipboard)
+    bpy.utils.unregister_class(GenNoteClear)
+
 
 if __name__ == "__main__":
     register()
