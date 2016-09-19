@@ -9,8 +9,8 @@ class action_entry(PropertyGroup):
     """The data structure for the action entries"""
     action = StringProperty()
     motion = StringProperty()
-    # subtracted = BoolProperty()
-    index = IntProperty(min=0)
+    groups = StringProperty()
+    index = IntProperty(min=0)  # TODO Is this actually used?
 
 
 class actions_collection(PropertyGroup):
@@ -72,16 +72,10 @@ class SCENE_UL_action(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            # layout.label(text=str(item.name))
-            layout.prop(item, "name", text="Name")
+            layout.prop(item, "name", text="")
             layout.prop_search(item, "action", bpy.data, "actions", text="")
             layout.prop_search(item, "motion", bpy.data, "actions", text="")
-            # layout.prop(item, "subtracted", text="")
-            # this draws each row in the list. Each line is a widget
-        elif self.layout_type in {'GRID'}:
-            layout.alignment = 'CENTER'
-            layout.label(text="", icon_value=icon)
-            # no idea when this is actually used
+            layout.prop(item, "groups", text="")
 
 
 class SCENE_PT_action(Panel):
@@ -104,7 +98,10 @@ class SCENE_PT_action(Panel):
         sce = context.scene
 
         row = layout.row()
-        row.label("Actions must have location and rotation but not scale")
+        row.label("Name")
+        row.label("Armature action")
+        row.label("Motion action")
+        row.label("Groups")
 
         row = layout.row()
 
