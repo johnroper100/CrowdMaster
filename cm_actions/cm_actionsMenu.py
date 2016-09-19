@@ -10,7 +10,6 @@ class action_entry(PropertyGroup):
     action = StringProperty()
     motion = StringProperty()
     groups = StringProperty()
-    index = IntProperty(min=0)  # TODO Is this actually used?
 
 
 class actions_collection(PropertyGroup):

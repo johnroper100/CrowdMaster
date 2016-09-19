@@ -7,6 +7,7 @@ from .cm_pythonEmbededInterpreter import Interpreter
 import copy
 import bpy
 import os
+import random
 
 
 """
@@ -556,7 +557,88 @@ class StateAction(State):
 
         return False, None
 
+
+class StateActionGroup(State):
+    """A state in a state machine containing a group of actions"""
+    def moveTo(self):
+        State.moveTo(self)
+
+        actGp = self.brain.sim.actionGroups[self.settings["GroupName"]]
+
+        self.actionName = random.choice(actGp)
+
+        act = self.actionName
+        if act in self.brain.sim.actions:
+            actionobj = self.brain.sim.actions[act]  # from .cm_motion.py
+            obj = bpy.context.scene.objects[self.brain.userid]  # bpy object
+
+            tr = obj.animation_data.nla_tracks.new()  # NLA track
+            action = actionobj.action  # bpy action
+            if action:
+                currentFrame = bpy.context.scene.frame_current
+                strip = tr.strips.new("", currentFrame, action)
+                strip.extrapolation = 'NOTHING'
+                strip.use_auto_blend = True
+            self.length = actionobj.length
+
+    def evaluateState(self):
+        self.currentFrame += 1
+
+        """Check to see if the current state is still playing an animation"""
+        # The proportion of the way through the state
+        if self.length == 0:
+            complete = 1
+        else:
+            complete = self.currentFrame/self.length
+            complete = 0.5 + complete/2
+        currentFrame = bpy.context.scene.frame_current
+        self.resultLog[currentFrame] = ((0.15, 0.4, complete))
+
+        if self.actionName in self.brain.sim.actions:
+            actionobj = self.brain.sim.actions[self.actionName]
+
+            for data_path, data in actionobj.motiondata.items():
+                x = data[0][self.currentFrame] - data[0][self.currentFrame - 1]
+                y = data[1][self.currentFrame] - data[1][self.currentFrame - 1]
+                z = data[2][self.currentFrame] - data[2][self.currentFrame - 1]
+                if data_path == "location":
+                    self.brain.outvars["px"] += x
+                    self.brain.outvars["py"] += y
+                    self.brain.outvars["pz"] += z
+                elif data_path == "rotation_euler":
+                    self.brain.outvars["rx"] += x
+                    self.brain.outvars["ry"] += y
+                    self.brain.outvars["rz"] += z
+
+        if self.currentFrame < self.length - 1:
+            return False, self.name
+
+        # ==== Will stop here is this state hasn't reached its end ====
+
+        options = []
+        for con in self.outputs:
+            val = self.neurons[con].query()
+            if val is not None:
+                options.append((con, val))
+
+        # If the cycleState button is checked then add a contection back to
+        #    this state again.
+        if self.cycleState and self.name not in self.outputs:
+            val = self.neurons[self.name].query()
+            if val is not None:
+                options.append((self.name, val))
+
+        if len(options) > 0:
+            if len(options) == 1:
+                return True, options[0][0]
+            else:
+                return True, max(options, key=lambda v: v[1])[0]
+
+        return False, None
+
+
 statetypes = OrderedDict([
     ("StartState", StateSTART),
-    ("ActionState", StateAction)
+    ("ActionState", StateAction),
+    ("ActionGroupState", StateActionGroup)
 ])

@@ -53,6 +53,12 @@ def getmotions():
     """Turn all the entries for actions into action objects"""
     sce = bpy.context.scene
     result = {}
+    groups = {}
     for m in sce.cm_actions.coll:
         result[m.name] = Action(m.name, m.action, m.motion)
-    return result
+        for gp in m.groups.split(","):
+            gpName = gp.strip()
+            if gpName not in groups:
+                groups[gpName] = []
+            groups[gpName].append(m.name)
+    return result, groups

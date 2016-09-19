@@ -31,7 +31,7 @@ class DefaultSocket(NodeSocket):
     # Optional function for drawing the socket input value
     def draw(self, context, layout, node, text):
         preferences = context.user_preferences.addons[__package__].preferences
-        if not self.is_output and node.bl_idname == "ActionState":
+        if not self.is_output and isinstance(node, StateNode):
             row = layout.row(align=True)
             if self.is_linked:
                 row.prop(self, "filterProperty", text=text)
@@ -506,6 +506,33 @@ class ActionState(StateNode):
         # row.prop(self, "useValueOfSpeed", text="")
 
 
+class ActionGroupState(StateNode):
+    """CrowdMaster Action Group State"""
+    bl_label = "Action Group"
+
+    cycleState = BoolProperty(name="Cycle State", default=False)
+    groupName = StringProperty(name="Action Group Name", default="")
+    useValueOfSpeed = BoolProperty(name=" Use Value of Speed", default=True)
+
+    def init(self, context):
+        StateNode.init(self, context)
+
+    def getSettings(self, item):
+        val = self.inputs['Value']
+        item.settings["ValueFilter"] = val.filterProperty
+        item.settings["ValueDefault"] = val.defaultValueProperty
+        item.settings["RandomInput"] = val.randomInputValue
+        item.settings["GroupName"] = self.groupName
+        item.cycleState = self.cycleState
+        item.useValueOfSpeed = self.useValueOfSpeed
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "cycleState")
+        row = layout.row()
+        row.prop(self, "groupName", text="")
+        # row.prop(self, "useValueOfSpeed", text="")
+
+
 import textwrap
 import importlib
 
@@ -647,7 +674,8 @@ node_categories = [
         ]),
     MyNodeCategory("STATE", "State", items=[
         NodeItem("StartState"),
-        NodeItem("ActionState")
+        NodeItem("ActionState"),
+        NodeItem("ActionGroupState")
         ]),
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("QueryTagNode"),
@@ -671,6 +699,7 @@ def register():
     bpy.utils.register_class(DependanceSocket)
     bpy.utils.register_class(LogicNode)
     bpy.utils.register_class(StateNode)
+    bpy.utils.register_class(ActionGroupState)
 
     bpy.utils.register_class(InputNode)
     bpy.utils.register_class(GraphNode)
@@ -708,6 +737,7 @@ def unregister():
     bpy.utils.unregister_class(DependanceSocket)
     bpy.utils.unregister_class(LogicNode)
     bpy.utils.unregister_class(StateNode)
+    bpy.utils.unregister_class(ActionGroupState)
 
     bpy.utils.unregister_class(InputNode)
     bpy.utils.unregister_class(GraphNode)

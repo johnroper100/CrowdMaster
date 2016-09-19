@@ -40,7 +40,7 @@ class Simulation():
 
     def actions(self):
         """Set up the actions"""
-        self.actions = getmotions()
+        self.actions, self.actionGroups = getmotions()
 
     def newagent(self, name, brain):
         """Set up an agent"""
