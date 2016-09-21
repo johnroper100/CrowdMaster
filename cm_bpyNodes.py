@@ -653,6 +653,9 @@ class MyNodeCategory(NodeCategory):
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("InputNode"),
+        NodeItem("InputNode", label="World Time", settings={
+            "Input": repr("World.time")
+            }),
         NodeItem("PythonNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
