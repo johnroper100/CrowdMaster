@@ -242,13 +242,13 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
 
-            box = layout.box()
-            row = box.row()
-            row.scale_y = 1.5
-            if preferences.use_custom_icons:
-                row.operator("scene.cm_setup_agent", icon_value=cicon('setup'))
-            else:
-                row.operator("scene.cm_setup_agent", icon="MOD_REMESH")
+            #box = layout.box()
+            #row = box.row()
+            #row.scale_y = 1.5
+            #if preferences.use_custom_icons:
+                #row.operator("scene.cm_setup_agent", icon_value=cicon('setup'))
+            #else:
+                #row.operator("scene.cm_setup_agent", icon="MOD_REMESH")
 
             box = layout.box()
             row = box.row()
