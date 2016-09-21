@@ -239,39 +239,27 @@ class CrowdMaster_simNodes_action_random(bpy.types.Operator):
             ng = bpy.data.node_groups.new("RandomActions", "CrowdMasterTreeType")
 
         start_node = ng.nodes.new("StartState")
-        start_node.location = (-250, -50)
-        
-        input1_node = ng.nodes.new("InputNode")
-        input1_node.location = (-75, 150)
-        input1_node.Input = "Noise.agentMultiRandom(0)"
-        
-        input2_node = ng.nodes.new("InputNode")
-        input2_node.location = (-75, -25)
-        input2_node.Input = "Noise.agentMultiRandom(1)"
-        
-        input3_node = ng.nodes.new("InputNode")
-        input3_node.location = (-75, -250)
-        input3_node.Input = "Noise.agentMultiRandom(2)"
+        start_node.location = (-125, -75)
         
         action1_node = ng.nodes.new("ActionState")
         action1_node.location = (100, 200)
         action1_node.actionName = "action1"
+        action1_node.randomInputValue = True
         
         action2_node = ng.nodes.new("ActionState")
         action2_node.location = (100, 0)
         action2_node.actionName = "action2"
+        action2_node.randomInputValue = True
         
         action3_node = ng.nodes.new("ActionState")
         action3_node.location = (100, -200)
         action3_node.actionName = "action3"
+        action3_node.randomInputValue = True
 
         links = ng.links
         link = links.new(start_node.outputs[0], action1_node.inputs[0])
         link = links.new(start_node.outputs[0], action2_node.inputs[0])
         link = links.new(start_node.outputs[0], action3_node.inputs[0])
-        link = links.new(input1_node.outputs[0], action1_node.inputs[1])
-        link = links.new(input2_node.outputs[0], action2_node.inputs[1])
-        link = links.new(input3_node.outputs[0], action3_node.inputs[1])
 
         return {'FINISHED'}
 
