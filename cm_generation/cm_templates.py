@@ -1,6 +1,7 @@
 import bpy
 import mathutils
 BVHTree = mathutils.bvhtree.BVHTree
+KDTree = mathutils.kdtree.KDTree
 
 from collections import OrderedDict
 
@@ -310,6 +311,7 @@ class TemplateCOMBINE(Template):
 class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
     def build(self, pos, rot, scale, tags, cm_group):
+        positions = []
         for a in range(self.settings["noToPlace"]):
             if self.settings["locationType"] == "radius":
                 angle = random.uniform(-math.pi, math.pi)
@@ -321,7 +323,25 @@ class TemplateRANDOMPOSITIONING(Template):
                 diff = Vector((x, y, 0))
                 diff.rotate(mathutils.Euler(rot))
                 newPos = Vector(pos) + diff
-                self.inputs["Template"].build(newPos, rot, scale, tags, cm_group)
+                positions.append(newPos)
+        if self.settings["relax"]:
+            radius = self.settings["relaxRadius"]
+            for i in range(self.settings["relaxIterations"]):
+                kd = KDTree(len(positions))
+                for n, p in enumerate(positions):
+                    kd.insert(p, n)
+                kd.balance()
+                for n, p in enumerate(positions):
+                    adjust = Vector()
+                    localPoints = kd.find_range(p, radius*2)
+                    for (co, ind, dist) in localPoints:
+                        if ind != n:
+                            v = p - co
+                            adjust += v * ((2*radius - v.length)/v.length)
+                    if len(localPoints) > 0:
+                        positions[n] += adjust/len(localPoints)
+        for newPos in positions:
+            self.inputs["Template"].build(newPos, rot, scale, tags, cm_group)
 
     def check(self):
         if "Template" not in self.inputs:

@@ -345,6 +345,16 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                            description="The distance from the requested position to place",
                            default=5, min=0)
 
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+    relaxIterations = IntProperty(name="Relax iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+    relaxRadius = FloatProperty(name="Relax radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
     MaxX = FloatProperty(name="Max X",
                          description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.",
                          default = 50.0)
@@ -371,6 +381,10 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
         row.alignment = 'EXPAND'
         if self.locationType == "radius":
             row.prop(self, "radius")
+            layout.prop(self, "relax")
+            if self.relax:
+                layout.prop(self, "relaxIterations")
+                layout.prop(self, "relaxRadius")
         elif self.locationType == "vector":
             row.prop(self, "MaxX")
             row.prop(self, "MaxY")
@@ -389,7 +403,10 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                 "MinX": self.MinX,
                 "MinY": self.MinY,
                 "noToPlace": self.noToPlace,
-                "radius": self.radius}
+                "radius": self.radius,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
     '''The formation positioing node'''
@@ -532,7 +549,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
     text = StringProperty(name='Note Text', description="Text to show, if set will overide file")
 
     text_file = StringProperty(description="Textfile to show")
-    
+
     def format_text(self):
         global TW
         out = []
@@ -552,7 +569,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
             out.extend(TW.wrap(t))
             out.append("")
         return out
-    
+
     def init(self, context):
         self.width = 400
         self.color = (0.5, 0.5, 0.5)
@@ -572,7 +589,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
         else:
             col = layout.column()
             col.prop(self, "text")
-            
+
             col = layout.column(align=True)
             col.operator("node.gen_note_from_clipboard", icon="TEXT")
             col.operator("node.gen_note_clear", icon="X_VEC")
