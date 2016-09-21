@@ -66,12 +66,18 @@ class CMPreferences(AddonPreferences):
     show_debug_options = BoolProperty(
         name="Show Debug Options",
         description="Chose whether to show the debug options in the interface. This also enables debug mode.",
-        default=True,
+        default=False,
         )
 
     play_animation = BoolProperty(
         name="Start Animation Automatically",
         description="Start and stop the animation automatically when the start and stop sim buttons are pressed.",
+        default=True,
+        )
+    
+    ask_to_save = BoolProperty(
+        name="Ask To Save",
+        description="Chose whether the current file has to be saved or not before simulating or generating.",
         default=True,
         )
 
@@ -91,16 +97,21 @@ class CMPreferences(AddonPreferences):
         if preferences.prefs_tab == "GEN":
             row = layout.row()
             row.prop(preferences, 'use_custom_icons', icon_value=cicon('plug'))
+            
+            if preferences.use_custom_icons:
+                row.prop(preferences, 'play_animation', icon_value=cicon('shuffle'))
+            else:
+                row.prop(preferences, 'play_animation', icon='ACTION')
+            
+
+            row = layout.row()
+            row.prop(preferences, 'ask_to_save', icon='SAVE_COPY')
+
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
 
-            row = layout.row()
-            if preferences.use_custom_icons:
-                row.prop(preferences, 'play_animation', icon_value=cicon('shuffle'))
-            else:
-                row.prop(preferences, 'play_animation', icon='ACTION')
 
         if preferences.prefs_tab == "UPDATE":
             row = layout.row()

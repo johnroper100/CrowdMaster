@@ -155,7 +155,7 @@ class SCENE_OT_cm_start(Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
-        if (bpy.data.is_dirty) and not (preferences.show_debug_options):
+        if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
 
