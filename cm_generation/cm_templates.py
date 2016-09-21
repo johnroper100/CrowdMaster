@@ -317,7 +317,10 @@ class TemplateRANDOMPOSITIONING(Template):
                 angle = random.uniform(-math.pi, math.pi)
                 x = math.sin(angle)
                 y = math.cos(angle)
-                length = random.random() * self.settings["radius"]
+                length = random.random() + random.random()
+                if length > 1:
+                    length = 2 - length
+                length *= self.settings["radius"]
                 x *= length
                 y *= length
                 diff = Vector((x, y, 0))
