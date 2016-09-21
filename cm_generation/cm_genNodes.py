@@ -348,10 +348,10 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     relax = BoolProperty(name="Relax",
                          description="Relax the points to avoid overlap",
                          default=True)
-    relaxIterations = IntProperty(name="Relax iterations",
+    relaxIterations = IntProperty(name="Relax Iterations",
                                   description="Number of relax iterations to use",
                                   default=1, min=1, max=10)
-    relaxRadius = FloatProperty(name="Relax radius",
+    relaxRadius = FloatProperty(name="Relax Radius",
                                 description="Maximum radius for relax interactions",
                                 default=1, min=0)
 
