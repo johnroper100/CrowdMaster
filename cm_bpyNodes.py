@@ -127,6 +127,155 @@ def update_properties(self, context):
         self.LowerZero = self.LowerOne
 
 
+class NewInputNode(LogicNode):
+    """CrowdMaster input node"""
+    bl_label = "New Input"
+
+    InputSource = EnumProperty(name="Input Channel",
+                               items=[("CONSTANT", "Constant", "", 1),
+                                      ("CROWD", "Crowd", "", 2),
+                                      ("FORMATION", "Formation", "", 3),
+                                      ("GROUND", "Ground", "", 4),
+                                      ("NOISE", "Noise", "", 5),
+                                      ("PATH", "Path", "", 6),
+                                      ("SOUND", "Sound", "", 7),
+                                      ("STATE", "State", "", 8),
+                                      ("WORLD", "World", "", 9)])
+
+    Constant = FloatProperty(name="Constant")
+
+    Flocking = EnumProperty(name="Flocking input",
+                            items=[("SEPARATE", "Separate", "", 1),
+                                   ("ALIGN", "Align", "", 2),
+                                   ("COHERE", "Cohere", "", 3)])
+    RotationAxis = EnumProperty(name="Rotation Axis",
+                                items=[("RZ", "rz", "", 1),
+                                       ("RX", "rx", "", 2)])
+    TranslationAxis = EnumProperty(name="Translation Axis",
+                                   items=[("TX", "tx", "", 1),
+                                          ("TY", "ty", "", 2),
+                                          ("TZ", "tz", "", 3)])
+
+    FormationGroup = StringProperty(name="Formation Group")
+    FormationOptions = EnumProperty(name="Formation Options",
+                                    items=[("RZ", "rz", "", 1),
+                                           ("RX", "rx", "", 2),
+                                           ("DIST", "dist", "", 3)])
+
+    GroundGroup = StringProperty(name="Ground Group")
+
+    NoiseOptions = EnumProperty(name="Noise Options",
+                                items=[("RANDOM", "Random", "", 1),
+                                       ("AGENTRANDOM", "Agent Random", "", 2)])
+
+    PathObject = StringProperty(name="Path Object")
+    PathOptions = EnumProperty(name="Path options",
+                               items=[("RZ", "rz", "", 1),
+                                      ("RX", "rx", "", 2)])
+
+    SoundFrequency = StringProperty(name="Sound Frequency")
+    SoundMode = EnumProperty(name="Sound mode",
+                             items=[("BASIC", "Basic", "", 1),
+                                    ("PREDICTION", "Prediction", "", 2),
+                                    ("STEERING", "Steering", "", 3)])
+    SoundOptions = EnumProperty(name="Sound Options",
+                                items=[("RZ", "rz", "", 1),
+                                       ("RX", "rx", "", 2),
+                                       ("DIST", "dist", "", 3),
+                                       ("CLOSE", "close", "", 4),
+                                       ("DB", "db", "", 5),
+                                       ("CERT", "cert", "", 6),
+                                       ("ACC", "acc", "", 7),
+                                       ("OVER", "over", "", 8)])
+
+    StateOptions = EnumProperty(name="State Options",
+                                items=[("RADIUS", "Radius", "", 1),
+                                       ("SPEED", "Speed", "", 2),
+                                       ("GLOBALVELX", "Global Vel X", "", 3),
+                                       ("GLOBALVELY", "Global Vel Y", "", 4),
+                                       ("GLOBALVELZ", "Global Vel Z", "", 5)])
+
+    WorldOptions = EnumProperty(name="World Options",
+                                items=[("TIME", "Time", "", 1),
+                                       ("TARGET", "Target", "", 2)])
+    TargetObject = StringProperty(name="Target Object")
+    TargetOptions = EnumProperty(name="Target Options",
+                                 items=[("RZ", "rz", "", 1),
+                                        ("RX", "rx", "", 2),
+                                        ("ARRIVED", "Arrived", "", 3)])
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "InputSource", text="Input")
+        if self.InputSource == "CONSTANT":
+            layout.prop(self, "Constant")
+        elif self.InputSource == "CROWD":
+            layout.prop(self, "Flocking")
+            if self.Flocking == "SEPARATE" or self.Flocking == "COHERE":
+                layout.prop(self, "TranslationAxis")
+            else:  # ie. self.Flocking == "ALIGN"
+                layout.prop(self, "RotationAxis")
+        elif self.InputSource == "FORMATION":
+            layout.prop_search(self, "FormationGroup", bpy.data, "groups")
+            # TODO  Add fixed formations
+            if self.FormationGroup != "":
+                layout.prop(self, "FormationOptions")
+        elif self.InputSource == "GROUND":
+            layout.prop_search(self, "GroundGroup", bpy.data, "groups")
+        elif self.InputSource == "NOISE":
+            layout.prop(self, "NoiseOptions")
+        elif self.InputSource == "PATH":
+            layout.prop_search(self, "PathObject", context.scene, "objects")
+            if self.Pathobject != "":
+                layout.prop(self, "PathOptions")
+        elif self.InputSource == "SOUND":
+            layout.prop(self, "SoundFrequency", text="Frequency")
+            layout.prop(self, "SoundMode", expand=True)
+            layout.prop(self, "SoundOptions", text="Options")
+        elif self.InputSource == "STATE":
+            layout.prop(self, "StateOptions")
+        elif self.InputSource == "WORLD":
+            layout.prop(self, "WorldOptions"),
+            if self.WorldOptions == "TARGET":
+                layout.prop_search(self, "TargetObject", context.scene, "objects")
+                if self.TargetObject != "":
+                    layout.prop(self, "TargetOptions")
+
+    def getSettings(self, node):
+        node.settings["InputSource"] = self.InputSource
+        if self.InputSource == "CONSTANT":
+            node.settings["Constant"] = self.Constant
+        elif self.InputSource == "CROWD":
+            node.settings["Flocking"] = self.Flocking
+            if self.Flocking == "SEPARATE" or self.Flocking == "COHERE":
+                node.settings["TranslationAxis"] = self.TranslationAxis
+            else:  # ie. self.Flocking == "ALIGN"
+                node.settings["RotationAxis"] = self.RotationAxis
+        elif self.InputSource == "FORMATION":
+            node.settings["FormationGroup"] = self.FormationGroup
+            # TODO  Add fixed formations
+            if self.FormationGroup != "":
+                node.settings["FormationOptions"] = self.FormationOptions
+        elif self.InputSource == "GROUND":
+            node.settings["GroundGroup"] = self.GroundGroup
+        elif self.InputSource == "NOISE":
+            node.settings["NoiseOptions"] = self.NoiseOptions
+        elif self.InputSource == "PATH":
+            node.settings["PathObject"] = self.PathObject
+            node.settings["PathOptions"] = self.PathOptions
+        elif self.InputSource == "SOUND":
+            node.settings["SoundFrequency"] = self.SoundFrequency
+            node.settings["SoundMode"] = self.SoundMode
+            node.settings["SoundOptions"] = self.SoundOptions
+        elif self.InputSource == "STATE":
+            node.settings["StateOptions"] = self.StateOptions
+        elif self.InputSource == "WORLD":
+            node.settings["WorldOptions"] = self.WorldOptions
+            if self.WorldOptions == "TARGET":
+                node.settings["TargetObject"] = self.TargetObject
+                if self.TargetObject != "":
+                    node.settings["TargetOptions"] = self.TargetOptions
+
+
 class GraphNode(LogicNode):
     """CrowdMaster graph node"""
     bl_label = "Graph"
@@ -652,6 +801,7 @@ class MyNodeCategory(NodeCategory):
 
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
+        NodeItem("NewInputNode"),
         NodeItem("InputNode"),
         NodeItem("PythonNode")
         ]),
@@ -702,6 +852,7 @@ def register():
     bpy.utils.register_class(ActionGroupState)
 
     bpy.utils.register_class(InputNode)
+    bpy.utils.register_class(NewInputNode)
     bpy.utils.register_class(GraphNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
@@ -740,6 +891,7 @@ def unregister():
     bpy.utils.unregister_class(ActionGroupState)
 
     bpy.utils.unregister_class(InputNode)
+    bpy.utils.unregister_class(NewInputNode)
     bpy.utils.unregister_class(GraphNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
