@@ -62,13 +62,24 @@ class LogicNEWINPUT(Neuron):
 
         elif settings["InputSource"] == "FORMATION":
             fChan = channels["Formation"].retrieve(settings["FormationGroup"])
+            if fChan is None:
+                return None
             # TODO  Add fixed formations
             if settings["FormationOptions"] == "RZ":
-                return {"None": fChan.rz()}
+                rz = fChan.rz
+                if rz is None:
+                    return None
+                return {"None": rz}
             elif settings["FormationOptions"] == "RX":
-                return {"None": fChan.rx()}
+                rx = fChan.rx
+                if rx is None:
+                    return None
+                return {"None": rx}
             elif settings["FormationOptions"] == "DIST":
-                return {"None": fChan.dist()}
+                dist = fChan.dist
+                if dist is None:
+                    return None
+                return {"None": dist}
 
         elif settings["InputSource"] == "GROUND":
             gChan = channels["Ground"].retrieve(settings["GroundGroup"])
@@ -132,6 +143,7 @@ class LogicNEWINPUT(Neuron):
                 return {"None": state.velocity.z}
 
         elif settings["InputSource"] == "WORLD":
+            world = channels["World"]
             if settings["WorldOptions"] == "TARGET":
                 if settings["TargetOptions"] == "RZ":
                     tgt = world.target(settings["TargetObject"])

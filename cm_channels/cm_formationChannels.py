@@ -82,8 +82,7 @@ class Channel:
         self.inpBuffer = []
 
         self.targets = []
-        for t in self.targetObjects:
-            ob = objs[t]
+        for ob in self.targetObjects:
             wrld = ob.matrix_world
             self.targets += [wrld*v.co for v in ob.data.vertices]
 
