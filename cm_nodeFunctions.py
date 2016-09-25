@@ -102,53 +102,21 @@ class LogicNEWINPUT(Neuron):
                 ch.predictNext = False
                 ch.steeringNext = True
             if settings["SoundOptions"] == "RZ":
-                rz = ch.rz
-                if rz:
-                    return {"None": rz}
-                else:
-                    return None
+                return ch.rz
             elif settings["SoundOptions"] == "RX":
-                rx = ch.rx
-                if rx:
-                    return {"None": rx}
-                else:
-                    return None
+                return ch.rx
             elif settings["SoundOptions"] == "DIST":
-                dist = ch.dist
-                if dist:
-                    return {"None": dist}
-                else:
-                    return None
+                return ch.dist
             elif settings["SoundOptions"] == "CLOSE":
-                close = ch.close
-                if close:
-                    return {"None": close}
-                else:
-                    return None
+                return ch.close
             elif settings["SoundOptions"] == "DB":
-                db = ch.db
-                if db:
-                    return {"None": db}
-                else:
-                    return None
+                return ch.db
             elif settings["SoundOptions"] == "CERT":
-                cert = ch.cert
-                if cert:
-                    return {"None": cert}
-                else:
-                    return None
+                return ch.cert
             elif settings["SoundOptions"] == "ACC":
-                acc = ch.acc
-                if acc:
-                    return {"None": acc}
-                else:
-                    return None
+                return ch.acc
             elif settings["SoundOptions"] == "OVER":
-                over = ch.over
-                if over:
-                    return {"None": over}
-                else:
-                    return None
+                return ch.over
 
         elif settings["InputSource"] == "STATE":
             state = channels["State"]
@@ -261,13 +229,16 @@ class LogicOR(Neuron):
 
     def core(self, inps, settings):
         if settings["SingleOutput"]:
-            total = 1
+            if settings["Method"] == "MUL":
+                total = 1
+            else:
+                total = 0
             for into in inps:
                 if settings["Method"] == "MUL":
                     for i in [i.val for i in into]:
                         total *= (1-i)
                 else:  # Method == "MAX"
-                    total = max(into.values())
+                    total = max(list(into.values()) + [total])
             if settings["Method"] == "MUL":
                 total = 1 - total
             return total
