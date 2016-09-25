@@ -23,7 +23,7 @@ class Formation(Mc):
             chan.newuser(userid)
         Mc.setuser(self, userid)
 
-    def register(self, agent, formID, val):
+    def registerOld(self, agent, formID, val):
         """Adds an object that is a formation target"""
         if formID in dir(self):
             print("""Formation ID must not be an attribute of this
@@ -36,23 +36,12 @@ class Formation(Mc):
 
     def retrieve(self, formID):
         """Dynamic properties"""
-        if (formID in self.formations):
-            return self.formations[formID]
-        else:
-            return EmptyChannel()
-            # TODO this is really hacky...
-
-
-class EmptyChannel():
-    # TODO Way too hacky... need to think of another way of stopping crashes
-    #   if the channel doesn't exist.
-    def __getattr__(self, attr):
-        if attr in ("dist", "rz", "rx"):
-            return 0
-        return self
-
-    def __call__(self, *args, **kwargs):
-        return None
+        if formID not in self.formations:
+            ch = Channel(formID, self.sim)
+            ch.register(bpy.data.groups[formID].objects)
+            ch.newuser(self.userid)
+            self.formations[formID] = ch
+        return self.formations[formID]
 
 
 class Channel:
@@ -68,9 +57,9 @@ class Channel:
         self.calcd = {}  # {str: Vector()}
         self.lastCalcd = None  # Store from last frame to reduce jittering
 
-    def register(self, agentID, val):
+    def register(self, objs):
         """Add a formation target object"""
-        self.targetObjects.add(agentID)
+        self.targetObjects = objs
 
     def newuser(self, userid):
         """Called when a new agent is using this channel"""

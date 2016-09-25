@@ -31,6 +31,153 @@ class LogicINPUT(Neuron):
         return result
 
 
+class LogicNEWINPUT(Neuron):
+    """Retrieve information from the scene or about the agent"""
+
+    def core(self, inps, settings):
+        channels = self.brain.sim.lvars
+        if settings["InputSource"] == "CONSTANT":
+            return {"None": settings["Constant"]}
+
+        elif settings["InputSource"] == "CROWD":
+            if settings["Flocking"] == "SEPARATE":
+                if settings["TranslationAxis"] == "TX":
+                    return {"None": channels["Crowd"].separateTx(inps)}
+                elif settings["TranslationAxis"] == "TY":
+                    return {"None": channels["Crowd"].separateTy(inps)}
+                elif settings["TranslationAxis"] == "TZ":
+                    return {"None": channels["Crowd"].separateTz(inps)}
+            elif settings["Flocking"] == "COHERE":
+                if settings["TranslationAxis"] == "TX":
+                    return {"None": channels["Crowd"].cohereTx(inps)}
+                elif settings["TranslationAxis"] == "TY":
+                    return {"None": channels["Crowd"].cohereTy(inps)}
+                elif settings["TranslationAxis"] == "TZ":
+                    return {"None": channels["Crowd"].cohereTz(inps)}
+            else:  # ie. settings["Flocking"] == "ALIGN"
+                if settings["RotationAxis"] == "RZ":
+                    return {"None": channels["Crowd"].alignRz(inps)}
+                elif settings["RotationAxis"] == "RX":
+                    return {"None": channels["Crowd"].alignRx(inps)}
+
+        elif settings["InputSource"] == "FORMATION":
+            fChan = channels["Formation"].retrieve(settings["FormationGroup"])
+            # TODO  Add fixed formations
+            if settings["FormationOptions"] == "RZ":
+                return {"None": fChan.rz()}
+            elif settings["FormationOptions"] == "RX":
+                return {"None": fChan.rx()}
+            elif settings["FormationOptions"] == "DIST":
+                return {"None": fChan.dist()}
+
+        elif settings["InputSource"] == "GROUND":
+            gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+            return {"None": gChan.dh()}
+
+        elif settings["InputSource"] == "NOISE":
+            noise = channels["Noise"]
+            if settings["NoiseOptions"] == "RANDOM":
+                return {"None": noise.random()}
+            elif settings["NoiseOptions"] == "AGENTRANDOM":
+                return {"None": noise.agentRandon(offset=hash(self))}
+
+        elif settings["InputSource"] == "PATH":
+            if settings["PathOptions"] == "RZ":
+                return {"None": channels["Path"].rz(settings["PathObject"])}
+            elif settings["PathOptions"] == "RX":
+                return {"None": channels["Path"].rx(settings["PathObject"])}
+
+        elif settings["InputSource"] == "SOUND":
+            sound = channels["Sound"]
+            ch = sound.retrieve(settings["SoundFrequency"])
+            if ch is None:
+                return None
+            if settings["SoundMode"] == "BASIC":
+                ch.predictNext = False
+                ch.steeringNext = False
+            elif settings["SoundMode"] == "PREDICTION":
+                ch.predictNext = True
+                ch.steeringNext = False
+            elif settings["SoundMode"] == "STEERING":
+                ch.predictNext = False
+                ch.steeringNext = True
+            if settings["SoundOptions"] == "RZ":
+                rz = ch.rz
+                if rz:
+                    return {"None": rz}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "RX":
+                rx = ch.rx
+                if rx:
+                    return {"None": rx}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "DIST":
+                dist = ch.dist
+                if dist:
+                    return {"None": dist}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "CLOSE":
+                close = ch.close
+                if close:
+                    return {"None": close}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "DB":
+                db = ch.db
+                if db:
+                    return {"None": db}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "CERT":
+                cert = ch.cert
+                if cert:
+                    return {"None": cert}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "ACC":
+                acc = ch.acc
+                if acc:
+                    return {"None": acc}
+                else:
+                    return None
+            elif settings["SoundOptions"] == "OVER":
+                over = ch.over
+                if over:
+                    return {"None": over}
+                else:
+                    return None
+
+        elif settings["InputSource"] == "STATE":
+            state = channels["State"]
+            if settings["StateOptions"] == "RADIUS":
+                return {"None": state.radius}
+            elif settings["StateOptions"] == "SPEED":
+                return {"None": state.speed}
+            elif settings["StateOptions"] == "GLOBALVELX":
+                return {"None": state.velocity.x}
+            elif settings["StateOptions"] == "GLOBALVELY":
+                return {"None": state.velocity.y}
+            elif settings["StateOptions"] == "GLOBALVELZ":
+                return {"None": state.velocity.z}
+
+        elif settings["InputSource"] == "WORLD":
+            if settings["WorldOptions"] == "TARGET":
+                if settings["TargetOptions"] == "RZ":
+                    tgt = world.target(settings["TargetObject"])
+                    return {"None": tgt.rz}
+                elif settings["TargetOptions"] == "RX":
+                    tgt = world.target(settings["TargetObject"])
+                    return {"None": tgt.rx}
+                elif settings["TargetOptions"] == "ARRIVED":
+                    tgt = world.target(settings["TargetObject"])
+                    return {"None": tgt.arrived}
+            elif settings["WorldOptions"] == "TIME":
+                return {"None": channels["World"].time}
+
+
 class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
@@ -448,6 +595,7 @@ class LogicAction(Neuron):
 
 logictypes = OrderedDict([
     ("InputNode", LogicINPUT),
+    ("NewInputNode", LogicNEWINPUT),
     ("GraphNode", LogicGRAPH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
