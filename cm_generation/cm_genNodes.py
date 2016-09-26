@@ -299,6 +299,33 @@ class RandomNode(CrowdMasterAGenTreeNode):
                 "maxRandSz": self.maxRandSz,
                 "minRandSz": self.minRandSz}
 
+
+class PointTowardsNode(CrowdMasterAGenTreeNode):
+    '''The Point Towards node'''
+    bl_idname = 'PointTowardsNodeType'
+    bl_label = 'Point Towards'
+    bl_icon = 'SOUND'
+
+    PointObject = StringProperty(name="Point to object")
+    PointType = EnumProperty(name="Point Type",
+                             items=[("OBJECT", "Object", "", 1),
+                                    ("MESH", "Mesh", "", 2)])
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "PointObject", context.scene, "objects")
+        layout.prop(self, "PointType")
+
+    def getSettings(self):
+        return {"PointObject": self.PointObject,
+                "PointType": self.PointType}
+
+
 class CombineNode(CrowdMasterAGenTreeNode):
     '''Duplicate request'''
     bl_idname = 'CombineNodeType'
@@ -657,6 +684,7 @@ agen_node_categories = [
         NodeItem("TemplateNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch"),
         NodeItem("RandomNodeType"),
+        NodeItem("PointTowardsNodeType"),
         NodeItem("CombineNodeType")
         ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
@@ -694,6 +722,7 @@ def register():
     bpy.utils.register_class(TemplateNode)
     bpy.utils.register_class(OffsetNode)
     bpy.utils.register_class(RandomNode)
+    bpy.utils.register_class(PointTowardsNode)
     bpy.utils.register_class(CombineNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(FormationPositionNode)
@@ -725,6 +754,7 @@ def unregister():
     bpy.utils.unregister_class(TemplateNode)
     bpy.utils.unregister_class(OffsetNode)
     bpy.utils.unregister_class(RandomNode)
+    bpy.utils.unregister_class(PointTowardsNode)
     bpy.utils.unregister_class(CombineNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)

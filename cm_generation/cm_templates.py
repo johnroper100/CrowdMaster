@@ -300,6 +300,42 @@ class TemplateRANDOM(Template):
         return True
 
 
+class TemplatePOINTTOWARDS(Template):
+    """Rotate to point towards object or closest point on mesh"""
+    def __init__(self, inputs, settings, bpyName):
+        Template.__init__(self, inputs, settings, bpyName)
+        self.kdtree = None
+
+    def build(self, pos, rot, scale, tags, cm_group):
+        ob = bpy.context.scene.objects[self.settings["PointObject"]]
+        if self.settings["PointType"] == "OBJECT":
+            point = ob.location
+        else:  # self.settings["PointObject"] == "MESH":
+            if self.kdtree is None:
+                mesh = ob.data
+                self.kdtree = KDTree(len(mesh.vertices))
+                for i, v in enumerate(mesh.vertices):
+                    self.kdtree.insert(v.co, i)
+                self.kdtree.balance()
+            co, ind, dist = self.kdtree.find(ob.matrix_world.inverted() * pos)
+            point = ob.matrix_world * co
+        direc = point - pos
+        rotQuat = direc.to_track_quat('Y', 'Z')
+        self.inputs["Template"].build(pos, rotQuat.to_euler(), scale, tags, cm_group)
+
+    def check(self):
+        if self.settings["PointObject"] not in bpy.context.scene.objects:
+            return False
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
+
+
+
 class TemplateCOMBINE(Template):
     """Duplicate request to all inputs"""
     def build(self, pos, rot, scale, tags, cm_group):
@@ -528,6 +564,7 @@ templates = OrderedDict([
     ("TemplateNodeType", TemplateAGENT),
     ("OffsetNodeType", TemplateOFFSET),
     ("RandomNodeType", TemplateRANDOM),
+    ("PointTowardsNodeType", TemplatePOINTTOWARDS),
     ("CombineNodeType", TemplateCOMBINE),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("FormationPositionNodeType", TemplateFORMATION),
