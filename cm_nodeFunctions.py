@@ -118,9 +118,9 @@ class LogicNEWINPUT(Neuron):
 
         elif settings["InputSource"] == "PATH":
             if settings["PathOptions"] == "RZ":
-                return {"None": channels["Path"].rz(settings["PathObject"])}
+                return {"None": channels["Path"].rz(settings["PathName"])}
             elif settings["PathOptions"] == "RX":
-                return {"None": channels["Path"].rx(settings["PathObject"])}
+                return {"None": channels["Path"].rx(settings["PathName"])}
 
         elif settings["InputSource"] == "SOUND":
             sound = channels["Sound"]

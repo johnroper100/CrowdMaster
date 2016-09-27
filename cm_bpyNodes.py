@@ -168,7 +168,7 @@ class NewInputNode(LogicNode):
                                 items=[("RANDOM", "Random", "", 1),
                                        ("AGENTRANDOM", "Agent Random", "", 2)])
 
-    PathObject = StringProperty(name="Path Object")
+    PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path options",
                                items=[("RZ", "rz", "", 1),
                                       ("RX", "rx", "", 2)])
@@ -224,8 +224,8 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
         elif self.InputSource == "PATH":
-            layout.prop_search(self, "PathObject", context.scene, "objects")
-            if self.Pathobject != "":
+            layout.prop_search(self, "PathName", context.scene.cm_paths, "coll")
+            if self.PathName != "":
                 layout.prop(self, "PathOptions")
         elif self.InputSource == "SOUND":
             layout.prop(self, "SoundFrequency", text="Frequency")
@@ -260,7 +260,7 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
         elif self.InputSource == "PATH":
-            node.settings["PathObject"] = self.PathObject
+            node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
         elif self.InputSource == "SOUND":
             node.settings["SoundFrequency"] = self.SoundFrequency
