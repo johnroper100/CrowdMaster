@@ -306,7 +306,7 @@ class PointTowardsNode(CrowdMasterAGenTreeNode):
     bl_label = 'Point Towards'
     bl_icon = 'SOUND'
 
-    PointObject = StringProperty(name="Point to object")
+    PointObject = StringProperty(name="Point to Object")
     PointType = EnumProperty(name="Point Type",
                              items=[("OBJECT", "Object", "", 1),
                                     ("MESH", "Mesh", "", 2)])
