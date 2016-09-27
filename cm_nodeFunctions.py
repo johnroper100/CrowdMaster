@@ -42,23 +42,47 @@ class LogicNEWINPUT(Neuron):
         elif settings["InputSource"] == "CROWD":
             if settings["Flocking"] == "SEPARATE":
                 if settings["TranslationAxis"] == "TX":
-                    return {"None": channels["Crowd"].separateTx(inps)}
+                    separateTx = channels["Crowd"].separateTx(inps)
+                    if separateTx is None:
+                        return None
+                    return {"None": separateTx}
                 elif settings["TranslationAxis"] == "TY":
-                    return {"None": channels["Crowd"].separateTy(inps)}
+                    separateTy = channels["Crowd"].separateTy(inps)
+                    if separateTy is None:
+                        return None
+                    return {"None": separateTy}
                 elif settings["TranslationAxis"] == "TZ":
-                    return {"None": channels["Crowd"].separateTz(inps)}
+                    separateTz = channels["Crowd"].separateTz(inps)
+                    if separateTz is None:
+                        return None
+                    return {"None": separateTz}
             elif settings["Flocking"] == "COHERE":
                 if settings["TranslationAxis"] == "TX":
-                    return {"None": channels["Crowd"].cohereTx(inps)}
+                    cohereTx = channels["Crowd"].cohereTx(inps)
+                    if cohereTx is None:
+                        return None
+                    return {"None": cohereTx}
                 elif settings["TranslationAxis"] == "TY":
-                    return {"None": channels["Crowd"].cohereTy(inps)}
+                    cohereTy = channels["Crowd"].cohereTy(inps)
+                    if cohereTy is None:
+                        return None
+                    return {"None": cohereTy}
                 elif settings["TranslationAxis"] == "TZ":
-                    return {"None": channels["Crowd"].cohereTz(inps)}
+                    cohereTz = channels["Crowd"].cohereTz(inps)
+                    if cohereTz is None:
+                        return None
+                    return {"None": cohereTz}
             else:  # ie. settings["Flocking"] == "ALIGN"
                 if settings["RotationAxis"] == "RZ":
-                    return {"None": channels["Crowd"].alignRz(inps)}
+                    alignRz = channels["Crowd"].alignRz(inps)
+                    if alignRz is None:
+                        return None
+                    return {"None": alignRz}
                 elif settings["RotationAxis"] == "RX":
-                    return {"None": channels["Crowd"].alignRx(inps)}
+                    alignRx = channels["Crowd"].alignRx(inps)
+                    if alignRx is None:
+                        return None
+                    return {"None": alignRx}
 
         elif settings["InputSource"] == "FORMATION":
             fChan = channels["Formation"].retrieve(settings["FormationGroup"])
