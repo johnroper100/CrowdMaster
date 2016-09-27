@@ -5,13 +5,13 @@ import copy
 import math
 
 from .cm_compileBrain import compileBrain
-from .cm_debuggingMode import debugMode
 
 
 class Agent:
     """Represents each of the agents in the scene"""
     def __init__(self, blenderid, nodeGroup, sim):
-        if debugMode:
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.show_debug_options:
             print("Blender id", blenderid)
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
@@ -75,10 +75,11 @@ class Agent:
 
     def step(self):
         objs = bpy.data.objects
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
 
         self.brain.execute()
         if objs[self.id].select:
-            if debugMode:
+            if preferences.show_debug_options:
                 print("ID: ", self.id, "Tags: ", self.brain.tags,
                       "outvars: ", self.brain.outvars)
             # TODO show this in the UI

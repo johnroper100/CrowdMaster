@@ -6,7 +6,6 @@ from . import addon_updater_ops
 from . import icon_load
 from . icon_load import cicon
 
-
 class CMSavePrefs(bpy.types.Operator):
     """Save the CrowdMaster preferences """
     bl_idname = "scene.cm_save_prefs"

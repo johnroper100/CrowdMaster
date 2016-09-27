@@ -6,12 +6,11 @@ import bpy
 
 import mathutils
 
-from .cm_debuggingMode import debugMode
-
 
 class Impulse():
     def __init__(self, tup):
-        if debugMode:
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.show_debug_options:
             assert isinstance(tup[0], str), "Impulse key should be type str"
             assert isinstance(tup[1], int) or isinstance(tup[1], float), \
                 "Impulse value should be type int or float"
@@ -65,6 +64,7 @@ class Neuron():
 
     def evaluate(self):
         """Called by any neurons that take this neuron as an input"""
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
         if self.result:
             # Return a cached version of the answer if possible
             return self.result
@@ -84,7 +84,7 @@ class Neuron():
             if isinstance(im, dict):
                 output = ImpulseContainer(im)
             elif isinstance(im, ImpulseContainer):
-                if debugMode:
+                if preferences.show_debug_options:
                     print("cm_brainClasses.py - This should not be allowed")
                 output = im
             elif im is None:

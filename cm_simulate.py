@@ -3,7 +3,6 @@ from collections import OrderedDict
 
 import sys
 import time
-from .cm_debuggingMode import debugMode
 
 from . import cm_channels as chan
 wr = chan.Wrapper
@@ -15,6 +14,7 @@ from .cm_actions import getmotions
 class Simulation():
     """The object that contains everything once the simulation starts"""
     def __init__(self):
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
         self.agents = {}
         self.framelast = 1
         self.compbrains = {}
@@ -34,7 +34,7 @@ class Simulation():
                       "Ground": wr(Ground),
                       "Formation": wr(Formation),
                       "Path": wr(Path)}
-        if debugMode:
+        if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0
 
@@ -59,9 +59,10 @@ class Simulation():
 
     def step(self, scene):
         """Called when the next frame is moved to"""
-        if debugMode:
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.show_debug_options:
             t = time.time()
-        print("NEWFRAME", bpy.context.scene.frame_current)
+            print("NEWFRAME", bpy.context.scene.frame_current)
         for agent in self.agents.values():
             for tag in agent.access["tags"]:
                 for channel in self.lvars:
@@ -76,7 +77,7 @@ class Simulation():
             a.apply()
         for chan in self.lvars.values():
             chan.newframe()
-        if debugMode:
+        if preferences.show_debug_options:
             newT = time.time()
             print("time", newT - t)
             self.totalTime += newT - t
@@ -98,7 +99,8 @@ class Simulation():
 
     def startFrameHandler(self):
         """Add self.frameChangeHandler to the Blender event handlers"""
-        if debugMode:
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0
         print("Registering frame change handler")
