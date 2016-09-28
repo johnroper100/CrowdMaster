@@ -9,8 +9,6 @@ from .cm_pathChannels import Path
 from . import cm_pathChannels
 Path = cm_pathChannels.Path
 
-from .cm_masterChannels import Wrapper
-
 
 def register():
     cm_pathChannels.register()
