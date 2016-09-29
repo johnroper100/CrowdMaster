@@ -94,9 +94,9 @@ class GeoTemplateGROUP(GeoTemplate):
             if obj.parent in gp:
                 obj.parent = group_objects[gp.index(obj.parent)]
             else:
-                obj.rotation_euler = rot
+                obj.rotation_euler = Vector(obj.rotation_euler) + rot
                 obj.scale = Vector((scale, scale, scale))
-                obj.location = pos
+                obj.location += pos
 
             group.objects.link(obj)
             bpy.context.scene.objects.link(obj)
@@ -113,6 +113,16 @@ class GeoTemplateGROUP(GeoTemplate):
             if obj.type == 'ARMATURE':
                 topObj = obj
 
+        if topObj is None:  # For if there is no armature object in the group
+            zaxis = lambda x: x.location[2]
+            bpy.ops.object.add(type='EMPTY',
+                               location=min(group_objects, key=zaxis).location)
+            e = bpy.context.object
+            for obj in group_objects:
+                if obj.parent not in group_objects:
+                    obj.location -= pos
+                    obj.parent = e
+            topObj = e
         return topObj
 
     def check(self):
