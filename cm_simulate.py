@@ -5,7 +5,6 @@ import sys
 import time
 
 from . import cm_channels as chan
-wr = chan.Wrapper
 
 from .cm_agent import Agent
 from .cm_actions import getmotions
@@ -26,14 +25,14 @@ class Simulation():
         Ground = chan.Ground(self)
         Formation = chan.Formation(self)
         Path = chan.Path(self)
-        self.lvars = {"Noise": wr(Noise),
-                      "Sound": wr(Sound),
-                      "State": wr(State),
-                      "World": wr(World),
-                      "Crowd": wr(Crowd),
-                      "Ground": wr(Ground),
-                      "Formation": wr(Formation),
-                      "Path": wr(Path)}
+        self.lvars = {"Noise": Noise,
+                      "Sound": Sound,
+                      "State": State,
+                      "World": World,
+                      "Crowd": Crowd,
+                      "Ground": Ground,
+                      "Formation": Formation,
+                      "Path": Path}
         if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0

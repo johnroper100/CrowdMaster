@@ -31,6 +31,157 @@ class LogicINPUT(Neuron):
         return result
 
 
+class LogicNEWINPUT(Neuron):
+    """Retrieve information from the scene or about the agent"""
+
+    def core(self, inps, settings):
+        channels = self.brain.sim.lvars
+        if settings["InputSource"] == "CONSTANT":
+            return {"None": settings["Constant"]}
+
+        elif settings["InputSource"] == "CROWD":
+            if settings["Flocking"] == "SEPARATE":
+                if settings["TranslationAxis"] == "TX":
+                    separateTx = channels["Crowd"].separateTx(inps)
+                    if separateTx is None:
+                        return None
+                    return {"None": separateTx}
+                elif settings["TranslationAxis"] == "TY":
+                    separateTy = channels["Crowd"].separateTy(inps)
+                    if separateTy is None:
+                        return None
+                    return {"None": separateTy}
+                elif settings["TranslationAxis"] == "TZ":
+                    separateTz = channels["Crowd"].separateTz(inps)
+                    if separateTz is None:
+                        return None
+                    return {"None": separateTz}
+            elif settings["Flocking"] == "COHERE":
+                if settings["TranslationAxis"] == "TX":
+                    cohereTx = channels["Crowd"].cohereTx(inps)
+                    if cohereTx is None:
+                        return None
+                    return {"None": cohereTx}
+                elif settings["TranslationAxis"] == "TY":
+                    cohereTy = channels["Crowd"].cohereTy(inps)
+                    if cohereTy is None:
+                        return None
+                    return {"None": cohereTy}
+                elif settings["TranslationAxis"] == "TZ":
+                    cohereTz = channels["Crowd"].cohereTz(inps)
+                    if cohereTz is None:
+                        return None
+                    return {"None": cohereTz}
+            else:  # ie. settings["Flocking"] == "ALIGN"
+                if settings["RotationAxis"] == "RZ":
+                    alignRz = channels["Crowd"].alignRz(inps)
+                    if alignRz is None:
+                        return None
+                    return {"None": alignRz}
+                elif settings["RotationAxis"] == "RX":
+                    alignRx = channels["Crowd"].alignRx(inps)
+                    if alignRx is None:
+                        return None
+                    return {"None": alignRx}
+
+        elif settings["InputSource"] == "FORMATION":
+            fChan = channels["Formation"].retrieve(settings["FormationGroup"])
+            if fChan is None:
+                return None
+            # TODO  Add fixed formations
+            if settings["FormationOptions"] == "RZ":
+                rz = fChan.rz
+                if rz is None:
+                    return None
+                return {"None": rz}
+            elif settings["FormationOptions"] == "RX":
+                rx = fChan.rx
+                if rx is None:
+                    return None
+                return {"None": rx}
+            elif settings["FormationOptions"] == "DIST":
+                dist = fChan.dist
+                if dist is None:
+                    return None
+                return {"None": dist}
+
+        elif settings["InputSource"] == "GROUND":
+            gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+            return {"None": gChan.dh()}
+
+        elif settings["InputSource"] == "NOISE":
+            noise = channels["Noise"]
+            if settings["NoiseOptions"] == "RANDOM":
+                return {"None": noise.random()}
+            elif settings["NoiseOptions"] == "AGENTRANDOM":
+                return {"None": noise.agentRandom(offset=hash(self))}
+
+        elif settings["InputSource"] == "PATH":
+            if settings["PathOptions"] == "RZ":
+                return {"None": channels["Path"].rz(settings["PathName"])}
+            elif settings["PathOptions"] == "RX":
+                return {"None": channels["Path"].rx(settings["PathName"])}
+
+        elif settings["InputSource"] == "SOUND":
+            sound = channels["Sound"]
+            ch = sound.retrieve(settings["SoundFrequency"])
+            if ch is None:
+                return None
+            if settings["SoundMode"] == "BASIC":
+                ch.predictNext = False
+                ch.steeringNext = False
+            elif settings["SoundMode"] == "PREDICTION":
+                ch.predictNext = True
+                ch.steeringNext = False
+            elif settings["SoundMode"] == "STEERING":
+                ch.predictNext = False
+                ch.steeringNext = True
+            if settings["SoundOptions"] == "RZ":
+                return ch.rz
+            elif settings["SoundOptions"] == "RX":
+                return ch.rx
+            elif settings["SoundOptions"] == "DIST":
+                return ch.dist
+            elif settings["SoundOptions"] == "CLOSE":
+                return ch.close
+            elif settings["SoundOptions"] == "DB":
+                return ch.db
+            elif settings["SoundOptions"] == "CERT":
+                return ch.cert
+            elif settings["SoundOptions"] == "ACC":
+                return ch.acc
+            elif settings["SoundOptions"] == "OVER":
+                return ch.over
+
+        elif settings["InputSource"] == "STATE":
+            state = channels["State"]
+            if settings["StateOptions"] == "RADIUS":
+                return {"None": state.radius}
+            elif settings["StateOptions"] == "SPEED":
+                return {"None": state.speed}
+            elif settings["StateOptions"] == "GLOBALVELX":
+                return {"None": state.velocity.x}
+            elif settings["StateOptions"] == "GLOBALVELY":
+                return {"None": state.velocity.y}
+            elif settings["StateOptions"] == "GLOBALVELZ":
+                return {"None": state.velocity.z}
+
+        elif settings["InputSource"] == "WORLD":
+            world = channels["World"]
+            if settings["WorldOptions"] == "TARGET":
+                if settings["TargetOptions"] == "RZ":
+                    tgt = world.target(settings["TargetObject"])
+                    return {"None": tgt.rz}
+                elif settings["TargetOptions"] == "RX":
+                    tgt = world.target(settings["TargetObject"])
+                    return {"None": tgt.rx}
+                elif settings["TargetOptions"] == "ARRIVED":
+                    tgt = world.target(settings["TargetObject"])
+                    return {"None": tgt.arrived}
+            elif settings["WorldOptions"] == "TIME":
+                return {"None": channels["World"].time}
+
+
 class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
@@ -114,13 +265,16 @@ class LogicOR(Neuron):
 
     def core(self, inps, settings):
         if settings["SingleOutput"]:
-            total = 1
+            if settings["Method"] == "MUL":
+                total = 1
+            else:
+                total = 0
             for into in inps:
                 if settings["Method"] == "MUL":
                     for i in [i.val for i in into]:
                         total *= (1-i)
                 else:  # Method == "MAX"
-                    total = max(into.values())
+                    total = max(list(into.values()) + [total])
             if settings["Method"] == "MUL":
                 total = 1 - total
             return total
@@ -448,6 +602,7 @@ class LogicAction(Neuron):
 
 logictypes = OrderedDict([
     ("InputNode", LogicINPUT),
+    ("NewInputNode", LogicNEWINPUT),
     ("GraphNode", LogicGRAPH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),

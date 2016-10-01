@@ -5,72 +5,7 @@ Vector = mathutils.Vector
 
 from ..libs import ins_octree as ot
 
-if __name__ != "__main__":
-    import bpy
-
-else:
-    import unittest
-
-    from .cm_masterChannels import Wrapper as wr
-
-    class FakeObject():
-        """Impersonate bpy.context.scene.objects[n]"""
-        def __init__(self, location, rotation):
-            self.location = mathutils.Vector(location)
-            self.rotation_euler = mathutils.Euler(rotation)
-
-    class FakeAgent():
-        """Impersonate Simulation.agents[n]"""
-        def __init__(self, bid):
-            self.id = bid
-
-    class FakeSimulation():
-        """Impersonate the Simulation object"""
-        def __init__(self):
-            self.framelast = 1
-
-    class Test(unittest.TestCase):
-        def setUp(self):
-            O = bpy.context.scene.objects
-            # Impersonate bpy.context.scene.objects
-            # These are the objects that can be used to emit and hear sounds
-            O = {"OB1": FakeObject([0, 0, 0], [0, 0, 0]),
-                 "OB2": FakeObject([1, 0, 0], [0, 0, 0]),
-                 "OB3": FakeObject([0, 1, 0], [0, 0, 0]),
-                 "OB4": FakeObject([0, -1, 0], [0, 0, 0]),
-                 "OB5": FakeObject([-0.1, -1, 0], [0, 0, 0])}
-
-            self.FSim = FakeSimulation()
-
-            self.sound = wr(Sound(self.FSim))
-
-        def testOne(self):
-            """Some simple test cases"""
-            self.sound.register(FakeAgent("OB1", "A", 1))
-            self.sound.register(FakeAgent("OB2", "A", 1))
-            self.sound.register(FakeAgent("OB3", "A", 1))
-
-            self.sound.setuser("OB1")
-            self.assertEqual(self.sound.A.rz, {"OB2": 0.5,
-                                               "OB3": 0})
-            self.assertEqual(self.sound.A.db, {"OB2": 0,
-                                               "OB3": 0})
-
-        def testBoundryRotations(self):
-            """Testing the extremes of the rotation"""
-            self.sound.register(FakeAgent("OB1", "A", 1))
-            self.sound.register(FakeAgent("OB4", "A", 1))
-            self.sound.register(FakeAgent("OB5", "A", 1))
-
-            self.sound.setuser("OB1")
-            self.assertEqual(self.sound.A.rz["OB4"], 1)
-            self.assertTrue(-1 < self.sound.A.rz["OB5"] < -0.75)
-
-        def tearDown(self):
-            self.sound.newFrame()
-
-    # Run unit test
-    unittest.main()
+import bpy
 
 
 class Sound(Mc):
@@ -82,22 +17,17 @@ class Sound(Mc):
 
     def register(self, agent, frequency, val):
         """Adds an object that is emitting a sound"""
-        if frequency in dir(self):
-            print("""frequency must not be an attribute of this
-                  python object""")
-        else:
-            if frequency not in self.channels:
-                ch = Channel(frequency, self.sim)
-                self.channels[frequency] = ch
-            self.channels[frequency].register(agent.id, val)
+        if frequency not in self.channels:
+            ch = Channel(frequency, self.sim)
+            self.channels[frequency] = ch
+        self.channels[frequency].register(agent.id, val)
 
     def retrieve(self, freq):
-        """Dynamic properties"""
-        if (freq in self.channels):
+        """Get sound channel"""
+        if freq in self.channels:
             return self.channels[freq]
         else:
-            return EmptyChannel()
-            # TODO this is really hacky...
+            return None
 
     def newframe(self):
         self.channels = {}
@@ -106,14 +36,6 @@ class Sound(Mc):
         for chan in self.channels.values():
             chan.newuser(userid)
         Mc.setuser(self, userid)
-
-
-class EmptyChannel():
-    def __getattr__(self, attr):
-        if attr == "pred" or attr == "steer":
-            return self
-        else:
-            return None
 
 
 class Channel:
@@ -478,20 +400,6 @@ class Channel:
                                                  "cert": 0}
                 # (z rot, x rot, dist proportion, recommended acceleration)
 
-    # TODO The following is extraordinary hacky... do something about it!
-
-    @property
-    def steer(self):
-        self.steeringNext = True
-        self.predictNext = False  # So you can't do Sound.A.pred.steer...
-        return self
-
-    @property
-    def pred(self):
-        self.predictNext = True
-        self.steeringNext = False  # So you can't do Sound.A.steer.pred...
-        return self
-
     def calcAndGetItems(self):
         # TODO this gets called for both the sender and the receiver but I
         #   think it always calculates the same results...
@@ -499,8 +407,6 @@ class Channel:
         correct values to use"""
         pre = self.predictNext
         ste = self.steeringNext
-        self.predictNext = False
-        self.steeringNext = False
         if pre:
             # TODO if the dictionary is empty then this evaluates to false
             if not self.storePrediction:
