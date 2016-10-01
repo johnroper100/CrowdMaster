@@ -87,6 +87,7 @@ class ObjectInputNode(CrowdMasterAGenTreeNode):
     bl_idname = 'ObjectInputNodeType'
     bl_label = 'Object'
     bl_icon = 'SOUND'
+    bl_width_default = 200.0
 
     inputObject = StringProperty(name="Object")
 
@@ -106,6 +107,7 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
     bl_idname = 'GroupInputNodeType'
     bl_label = 'Group'
     bl_icon = 'SOUND'
+    bl_width_default = 200.0
 
     inputGroup = StringProperty(name="Group")
 
@@ -167,6 +169,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
     bl_idname = 'ParentNodeType'
     bl_label = 'Parent'
     bl_icon = 'SOUND'
+    bl_width_default = 350.0
 
     parentTo = StringProperty(name="Parent To (Bone)", description="The bone you want to parent to")
 
@@ -189,6 +192,7 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     bl_idname = 'TemplateNodeType'
     bl_label = 'Template'
     bl_icon = 'SOUND'
+    bl_width_default = 325.0
 
     brainType = StringProperty(name="Brain Type")
     deferGeo = BoolProperty(name="Defer Geometry",
@@ -209,18 +213,12 @@ class TemplateNode(CrowdMasterAGenTreeNode):
         return {"brainType": self.brainType,
                 "deferGeo": self.deferGeo}
 
-
-def updateRandomNode(self, context):
-    if self.minRandRot > self.maxRandRot:
-        self.maxRandRot = self.minRandRot
-    if self.minRandSz > self.maxRandSz:
-        self.maxRandSz = self.minRandSz
-
 class OffsetNode(CrowdMasterAGenTreeNode):
     '''The offset node'''
     bl_idname = 'OffsetNodeType'
     bl_label = 'Offset'
     bl_icon = 'SOUND'
+    bl_width_default = 450.0
 
     overwrite = BoolProperty(name="Overwrite",
                              description="Should the given location be added to the position requested or simply overwrite it?",
@@ -252,11 +250,18 @@ class OffsetNode(CrowdMasterAGenTreeNode):
                 "locationOffset": self.locationOffset,
                 "rotationOffset": self.rotationOffset}
 
+def updateRandomNode(self, context):
+    if self.minRandRot > self.maxRandRot:
+        self.maxRandRot = self.minRandRot
+    if self.minRandSz > self.maxRandSz:
+        self.maxRandSz = self.minRandSz
+
 class RandomNode(CrowdMasterAGenTreeNode):
     '''The random node'''
     bl_idname = 'RandomNodeType'
     bl_label = 'Random'
     bl_icon = 'SOUND'
+    bl_width_default = 400.0
 
     minRandRot = FloatProperty(name="Min Rand Rotation",
                                description="The minimum random rotation in the Z axis for each agent.",
@@ -305,6 +310,7 @@ class PointTowardsNode(CrowdMasterAGenTreeNode):
     bl_idname = 'PointTowardsNodeType'
     bl_label = 'Point Towards'
     bl_icon = 'SOUND'
+    bl_width_default = 350.0
 
     PointObject = StringProperty(name="Point to Object")
     PointType = EnumProperty(name="Point Type",
@@ -356,6 +362,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'RandomPositionNodeType'
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
+    bl_width_default = 300.0
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -440,6 +447,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'FormationPositionNodeType'
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
+    bl_width_default = 400.0
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -478,6 +486,7 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'TargetPositionNodeType'
     bl_label = 'Target Positioning'
     bl_icon = 'SOUND'
+    bl_width_default = 300.0
 
     targetType = EnumProperty(
         items = [("object", "Object", "Use the locations of each object in a group"),
@@ -520,6 +529,7 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
     bl_idname = 'ObstacleNodeType'
     bl_label = 'Obstacle'
     bl_icon = 'SOUND'
+    bl_width_default = 210.0
 
     obstacleGroup = StringProperty(name="Obstacles")
     margin = FloatProperty(name="Margin", precision=3)
@@ -543,6 +553,7 @@ class GroundNode(CrowdMasterAGenTreeNode):
     bl_idname = 'GroundNodeType'
     bl_label = 'Ground'
     bl_icon = 'SOUND'
+    bl_width_default = 200.0
 
     groundMesh = StringProperty(name="Ground")
 

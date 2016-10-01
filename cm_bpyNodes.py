@@ -105,7 +105,8 @@ class LogicNode(CrowdMasterNode):
 
 class InputNode(LogicNode):
     """CrowdMaster input node"""
-    bl_label = "Input"
+    bl_label = "Old Input !UNSTABLE!"
+    bl_width_default = 200.0
 
     Input = StringProperty(name="Input", default="Noise.random")
 
@@ -130,6 +131,7 @@ def update_properties(self, context):
 class NewInputNode(LogicNode):
     """CrowdMaster input node"""
     bl_label = "New Input"
+    bl_width_default = 200.0
 
     InputSource = EnumProperty(name="Input Channel",
                                items=[("CONSTANT", "Constant", "", 1),
@@ -279,6 +281,7 @@ class NewInputNode(LogicNode):
 class GraphNode(LogicNode):
     """CrowdMaster graph node"""
     bl_label = "Graph"
+    bl_width_default = 200.0
 
     Multiply = FloatProperty(name="Multiply", description="Multiply the outputted value by this number", default=1.0)
 
@@ -385,6 +388,7 @@ class QueryTagNode(LogicNode):
 class SetTagNode(LogicNode):
     """CrowdMaster Set Tag node"""
     bl_label = "Set Tag"
+    bl_width_default = 200.0
 
     Tag = StringProperty(name="Tag", default="default")
     UseThreshold = BoolProperty(name="Use Threshold", default=True)
@@ -411,6 +415,7 @@ class SetTagNode(LogicNode):
 class VariableNode(LogicNode):
     """CrowdMaster Variable node"""
     bl_label = "Variable"
+    bl_width_default = 200.0
 
     Variable = StringProperty(name="Variable", default="None")
 
@@ -424,6 +429,7 @@ class VariableNode(LogicNode):
 class FilterNode(LogicNode):
     """CrowdMaster Filter node"""
     bl_label = "Filter"
+    bl_width_default = 250.0
 
     Operation = EnumProperty(name="Operation",
                              items=[("EQUAL", "Equal", "", 1),
@@ -449,6 +455,7 @@ class FilterNode(LogicNode):
 class MapNode(LogicNode):
     """CrowdMaster Map node"""
     bl_label = "Map"
+    bl_width_default = 200.0
 
     LowerInput = FloatProperty(name="Lower Input", default=0.0)
     UpperInput = FloatProperty(name="Upper Input", default=1.0)
@@ -471,6 +478,7 @@ class MapNode(LogicNode):
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
+    bl_width_default = 300.0
 
     Output = EnumProperty(name="Output",
                           items=[("rz", "rz", "", 3),
@@ -499,6 +507,7 @@ class OutputNode(LogicNode):
 class EventNode(LogicNode):
     """CrowdMaster Event node"""
     bl_label = "Event"
+    bl_width_default = 250.0
 
     EventName = StringProperty(name="Event Name", default="default")
 
@@ -512,6 +521,7 @@ class EventNode(LogicNode):
 class PythonNode(LogicNode):
     """CrowdMaster Python node"""
     bl_label = "Python"
+    bl_width_default = 300.0
 
     Expression = StringProperty(name="Expression", default="output = Noise.random")
     # This really needs to link to a text block
@@ -526,6 +536,7 @@ class PythonNode(LogicNode):
 class PrintNode(LogicNode):
     """CrowdMaster Print Node"""
     bl_label = "Print"
+    bl_width_default = 300.0
 
     Label = StringProperty(name="Label", description="The label to append to each printed statement.", default="")
     save_to_file = BoolProperty(
@@ -557,6 +568,7 @@ class PrintNode(LogicNode):
 class PriorityNode(LogicNode):
     """CrowdMaster Priority node"""
     bl_label = "Priority"
+    bl_width_default = 175.0
 
     defaultValue = FloatProperty(name="Default Value", default=0)
 
@@ -803,9 +815,6 @@ node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("NewInputNode"),
         NodeItem("InputNode"),
-        NodeItem("InputNode", label="World Time", settings={
-            "Input": repr("World.time")
-            }),
         NodeItem("PythonNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
