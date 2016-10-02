@@ -6,6 +6,7 @@ from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from . import icon_load
 from . icon_load import cicon
 
+
 class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes"""
     bl_idname = 'CrowdMasterTreeType'
@@ -443,8 +444,7 @@ class FilterNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Operation")
-        if (self.Operation == "EQUAL" or self.Operation == "NOT EQUAL" or
-            self.Operation == "LESS" or self.Operation == "GREATER"):
+        if (self.Operation == "EQUAL" or self.Operation == "NOT EQUAL" or self.Operation == "LESS" or self.Operation == "GREATER"):
             layout.prop(self, "Value")
 
     def getSettings(self, node):
@@ -705,6 +705,7 @@ def get_lines(text_file):
     for line in text_file.lines:
         yield line.body
 
+
 class NoteNode(CrowdMasterNode):
     """For keeping the graph well organised"""
     bl_idname = 'LogicNoteNode'
@@ -775,6 +776,7 @@ class NoteNode(CrowdMasterNode):
         text.clear()
         text.write(self.text)
 
+
 class SimNoteTextFromClipboard(bpy.types.Operator):
     """Grab whatever text is in the clipboard"""
     bl_idname = "node.sim_note_from_clipboard"
@@ -789,6 +791,7 @@ class SimNoteTextFromClipboard(bpy.types.Operator):
         node = context.node
         node.text = text
         return {'FINISHED'}
+
 
 class SimNoteClear(bpy.types.Operator):
     """Clear Note Node"""
