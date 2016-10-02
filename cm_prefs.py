@@ -6,6 +6,7 @@ from . import addon_updater_ops
 from . import icon_load
 from . icon_load import cicon
 
+
 class CMSavePrefs(bpy.types.Operator):
     """Save the CrowdMaster preferences """
     bl_idname = "scene.cm_save_prefs"
@@ -73,13 +74,13 @@ class CMPreferences(AddonPreferences):
         description="Start and stop the animation automatically when the start and stop sim buttons are pressed.",
         default=True,
         )
-    
+
     ask_to_save = BoolProperty(
         name="Ask To Save",
         description="Chose whether the current file has to be saved or not before simulating or generating.",
         default=True,
         )
-    
+
     use_node_color = BoolProperty(
         name="Use Node Color",
         description="Choose whether or not to show the node info colors while simulating.",
@@ -102,7 +103,7 @@ class CMPreferences(AddonPreferences):
         if preferences.prefs_tab == "GEN":
             row = layout.row()
             row.prop(preferences, 'use_custom_icons', icon_value=cicon('plug'))
-            
+
             if preferences.use_custom_icons:
                 row.prop(preferences, 'play_animation', icon_value=cicon('shuffle'))
             else:
