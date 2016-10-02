@@ -280,7 +280,7 @@ class SCENE_PT_CrowdMaster(Panel):
 
             box = layout.box()
             row = box.row()
-            row.label("You must have the Simplify Curves addon enabled.")
+            row.label("You must have the Simplify Curves addon enabled and an agent selected.")
             row = box.row()
             row.scale_y = 1.5
             row.operator("graph.simplify", icon="IPO")

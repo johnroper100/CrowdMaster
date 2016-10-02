@@ -110,7 +110,7 @@ class CMPreferences(AddonPreferences):
                 row.prop(preferences, 'play_animation', icon='ACTION')
 
             row = layout.row()
-            row.prop(preferences, 'ask_to_save', icon='SAVE_COPY')
+            row.prop(preferences, 'ask_to_save', icon='SAVE_AS')
             row.prop(preferences, 'use_node_color', icon='COLOR')
 
             row = layout.row()
