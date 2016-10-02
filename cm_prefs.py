@@ -79,6 +79,12 @@ class CMPreferences(AddonPreferences):
         description="Chose whether the current file has to be saved or not before simulating or generating.",
         default=True,
         )
+    
+    use_node_color = BoolProperty(
+        name="Use Node Color",
+        description="Choose whether or not to show the node info colors while simulating.",
+        default=True,
+        )
 
     prefs_tab_items = [
         ("GEN", "General Settings", "General settings for the addon."),
@@ -101,16 +107,16 @@ class CMPreferences(AddonPreferences):
                 row.prop(preferences, 'play_animation', icon_value=cicon('shuffle'))
             else:
                 row.prop(preferences, 'play_animation', icon='ACTION')
-            
 
             row = layout.row()
             row.prop(preferences, 'ask_to_save', icon='SAVE_COPY')
+            row.prop(preferences, 'use_node_color', icon='COLOR')
 
+            row = layout.row()
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
-
 
         if preferences.prefs_tab == "UPDATE":
             row = layout.row()

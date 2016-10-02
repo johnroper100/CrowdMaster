@@ -134,13 +134,15 @@ class Neuron():
 
     def highLight(self, frame):
         """Colour the nodes in the interface to reflect the output"""
-        hue, sat, val = self.resultLog[frame]
-        self.bpyNode.use_custom_color = True
-        c = mathutils.Color()
-        c.hsv = hue, sat, val
-        self.bpyNode.color = c
-        self.bpyNode.keyframe_insert("color")
-        # self.bpyNode.update()
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.use_node_color:
+            hue, sat, val = self.resultLog[frame]
+            self.bpyNode.use_custom_color = True
+            c = mathutils.Color()
+            c.hsv = hue, sat, val
+            self.bpyNode.color = c
+            self.bpyNode.keyframe_insert("color")
+            # self.bpyNode.update()
 
 
 class State():
@@ -269,17 +271,19 @@ class State():
         self.finalValueCalcd = False
 
     def highLight(self, frame):
-        if frame in self.resultLog:
-            hue, sat, val = self.resultLog[frame]
-        else:
-            hue = 0.0
-            sat = 0.0
-            val = 1.0
-        self.bpyNode.use_custom_color = True
-        c = mathutils.Color()
-        c.hsv = hue, sat, val
-        self.bpyNode.color = c
-        self.bpyNode.keyframe_insert("color")
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.use_node_color:
+            if frame in self.resultLog:
+                hue, sat, val = self.resultLog[frame]
+            else:
+                hue = 0.0
+                sat = 0.0
+                val = 1.0
+            self.bpyNode.use_custom_color = True
+            c = mathutils.Color()
+            c.hsv = hue, sat, val
+            self.bpyNode.color = c
+            self.bpyNode.keyframe_insert("color")
 
 
 class Brain():

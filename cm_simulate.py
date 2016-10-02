@@ -102,7 +102,7 @@ class Simulation():
         if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0
-        print("Registering frame change handler")
+            print("Registering frame change handler")
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
@@ -111,6 +111,8 @@ class Simulation():
 
     def stopFrameHandler(self):
         """Remove self.frameChangeHandler from Blenders event handlers"""
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
-            print("Unregistering frame change handler")
+            if preferences.show_debug_options:
+                print("Unregistering frame change handler")
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
