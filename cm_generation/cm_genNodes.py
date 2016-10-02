@@ -377,7 +377,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                             default=1)
 
     locationType = EnumProperty(
-        item=[("radius", "Radius", "Within radius of requested")],
+        items=[("radius", "Radius", "Within radius of requested")],
         name="Location Type",
         description="Which location type to use",
         default="radius"
