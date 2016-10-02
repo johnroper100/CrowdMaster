@@ -22,6 +22,7 @@ from . import cm_prefs
 from . import icon_load
 from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
+from . cm_graphics import cm_nodeHUD
 
 # =============== GROUPS LIST START ===============#
 
@@ -385,6 +386,8 @@ def register():
     register_icons()
     addon_updater_ops.register(bl_info)
     cm_prefs.register()
+    
+    cm_nodeHUD.register()
 
     bpy.utils.register_class(SCENE_UL_group)
     bpy.utils.register_class(SCENE_UL_agent_type)
@@ -450,6 +453,8 @@ def unregister():
     bpy.utils.unregister_class(SCENE_PT_CrowdMaster)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterAgents)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterManualAgents)
+    
+    cm_nodeHUD.unregister()
 
     action_unregister()
     event_unregister()
