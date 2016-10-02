@@ -240,17 +240,17 @@ class CrowdMaster_simNodes_action_random(bpy.types.Operator):
 
         start_node = ng.nodes.new("StartState")
         start_node.location = (-125, -75)
-        
+
         action1_node = ng.nodes.new("ActionState")
         action1_node.location = (100, 200)
         action1_node.actionName = "action1"
         action1_node.randomInputValue = True
-        
+
         action2_node = ng.nodes.new("ActionState")
         action2_node.location = (100, 0)
         action2_node.actionName = "action2"
         action2_node.randomInputValue = True
-        
+
         action3_node = ng.nodes.new("ActionState")
         action3_node.location = (100, -200)
         action3_node.actionName = "action3"
