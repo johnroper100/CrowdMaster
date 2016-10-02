@@ -120,13 +120,14 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"inputGroup": self.inputGroup}
 
+
 class GeoSwitchNode(CrowdMasterAGenTreeNode):
     '''The geo switch node'''
     bl_idname = 'GeoSwitchNodeType'
     bl_label = 'Geo Switch'
     bl_icon = 'SOUND'
 
-    switchAmount = FloatProperty(name="Amount", default = 0.5, min=0.0, max=1.0, precision=0)
+    switchAmount = FloatProperty(name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Object 1")
@@ -142,13 +143,14 @@ class GeoSwitchNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"switchAmout": self.switchAmount}
 
+
 class TemplateSwitchNode(CrowdMasterAGenTreeNode):
     '''The template switch node'''
     bl_idname = 'TemplateSwitchNodeType'
     bl_label = 'Template Switch'
     bl_icon = 'SOUND'
 
-    switchAmount = FloatProperty(name="Amount", default = 0.5, min=0.0, max=1.0, precision=0)
+    switchAmount = FloatProperty(name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template 1")
@@ -163,6 +165,7 @@ class TemplateSwitchNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"switchAmout": self.switchAmount}
+
 
 class ParentNode(CrowdMasterAGenTreeNode):
     '''The parent node'''
@@ -186,6 +189,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"parentTo": self.parentTo}
+
 
 class TemplateNode(CrowdMasterAGenTreeNode):
     '''The template node'''
@@ -213,6 +217,7 @@ class TemplateNode(CrowdMasterAGenTreeNode):
         return {"brainType": self.brainType,
                 "deferGeo": self.deferGeo}
 
+
 class OffsetNode(CrowdMasterAGenTreeNode):
     '''The offset node'''
     bl_idname = 'OffsetNodeType'
@@ -227,10 +232,10 @@ class OffsetNode(CrowdMasterAGenTreeNode):
                                      description="An object in the scene from which to get the location")
     locationOffset = FloatVectorProperty(name="Location Offset",
                                          description="Also add this to the location",
-                                         default = [0, 0, 0], subtype = "XYZ")
+                                         default=[0, 0, 0], subtype="XYZ")
     rotationOffset = FloatVectorProperty(name="Rotation Offset",
                                          description="Also add this to the rotation",
-                                         default = [0, 0, 0], subtype = "XYZ")
+                                         default=[0, 0, 0], subtype="XYZ")
 
     def init(self, context):
         self.inputs.new("TemplateSocketType", "Template")
@@ -250,11 +255,13 @@ class OffsetNode(CrowdMasterAGenTreeNode):
                 "locationOffset": self.locationOffset,
                 "rotationOffset": self.rotationOffset}
 
+
 def updateRandomNode(self, context):
     if self.minRandRot > self.maxRandRot:
         self.maxRandRot = self.minRandRot
     if self.minRandSz > self.maxRandSz:
         self.maxRandSz = self.minRandSz
+
 
 class RandomNode(CrowdMasterAGenTreeNode):
     '''The random node'''
@@ -265,20 +272,20 @@ class RandomNode(CrowdMasterAGenTreeNode):
 
     minRandRot = FloatProperty(name="Min Rand Rotation",
                                description="The minimum random rotation in the Z axis for each agent.",
-                               default = -10, min=-360.0, max=360,
+                               default=-10, min=-360.0, max=360,
                                update=updateRandomNode)
     maxRandRot = FloatProperty(name="Max Rand Rotation",
                                description="The maximum random rotation in the Z axis for each agent.",
-                               default = 10, min=-360, max=360.0,
+                               default=10, min=-360, max=360.0,
                                update=updateRandomNode)
 
     minRandSz = FloatProperty(name="Min Rand Scale",
                               description="The minimum random scale for each agent.",
-                              default = 1.0, min=0, precision=3,
+                              default=1.0, min=0, precision=3,
                               update=updateRandomNode)
     maxRandSz = FloatProperty(name="Max Rand Scale",
                               description="The maximum random scale for each agent.",
-                              default = 1.0, min=0, precision=3,
+                              default=1.0, min=0, precision=3,
                               update=updateRandomNode)
 
     def init(self, context):
@@ -357,6 +364,7 @@ class CombineNode(CrowdMasterAGenTreeNode):
         if inps[-1].is_linked:
             self.inputs.new("TemplateSocketType", "Template {}".format(len(inps)))
 
+
 class RandomPositionNode(CrowdMasterAGenTreeNode):
     '''The random positioing node'''
     bl_idname = 'RandomPositionNodeType'
@@ -369,10 +377,10 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                             default=1)
 
     locationType = EnumProperty(
-        items = [("radius", "Radius", "Within radius of requested")],
-        name = "Location Type",
-        description = "Which location type to use",
-        default = "radius"
+        item=[("radius", "Radius", "Within radius of requested")],
+        name="Location Type",
+        description="Which location type to use",
+        default="radius"
     )
 
     radius = FloatProperty(name="Radius",
@@ -391,16 +399,16 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 
     MaxX = FloatProperty(name="Max X",
                          description="The maximum distance in the X direction around the center point where the agents will be randomly spawned.",
-                         default = 50.0)
+                         default=50.0)
     MaxY = FloatProperty(name="Max Y",
                          description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.",
-                         default = 50.0)
+                         default=50.0)
     MinX = FloatProperty(name="Min X",
                          description="The minimum distance in the X direction around the center point where the agents will be randomly spawned.",
-                         default = -50.0)
+                         default=-50.0)
     MinY = FloatProperty(name="Min Y",
                          description="The minimum distance in the Y direction around the center point where the agents will be randomly spawned.",
-                         default = -50.0)
+                         default=-50.0)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
@@ -442,6 +450,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                 "relaxIterations": self.relaxIterations,
                 "relaxRadius": self.relaxRadius}
 
+
 class FormationPositionNode(CrowdMasterAGenTreeNode):
     '''The formation positioing node'''
     bl_idname = 'FormationPositionNodeType'
@@ -481,6 +490,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
                 "ArrayRowMargin": self.ArrayRowMargin,
                 "ArrayColumnMargin": self.ArrayColumnMargin}
 
+
 class TargetPositionNode(CrowdMasterAGenTreeNode):
     '''The target positioing node'''
     bl_idname = 'TargetPositionNodeType'
@@ -489,11 +499,11 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
     bl_width_default = 300.0
 
     targetType = EnumProperty(
-        items = [("object", "Object", "Use the locations of each object in a group"),
-                 ("vertex", "Vertex", "Use the location of each vertex on an object")],
-        name = "Target Type",
-        description = "Which target type to use",
-        default = "object"
+        items=[("object", "Object", "Use the locations of each object in a group"),
+               ("vertex", "Vertex", "Use the location of each vertex on an object")],
+        name="Target Type",
+        description="Which target type to use",
+        default="object"
     )
 
     targetObject = StringProperty(name="Target Object",
@@ -524,6 +534,7 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
                 "targetGroups": self.targetGroups,
                 "overwritePosition": self.overwritePosition}
 
+
 class ObstacleNode(CrowdMasterAGenTreeNode):
     '''The obstacle node'''
     bl_idname = 'ObstacleNodeType'
@@ -547,6 +558,7 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"obstacleGroup": self.obstacleGroup,
                 "margin": self.margin}
+
 
 class GroundNode(CrowdMasterAGenTreeNode):
     '''The ground node'''
@@ -579,6 +591,7 @@ TW = textwrap.TextWrapper()
 def get_lines(text_file):
     for line in text_file.lines:
         yield line.body
+
 
 class NoteNode(CrowdMasterAGenTreeNode):
     """For keeping the graph well organised"""
@@ -649,6 +662,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
         text.clear()
         text.write(self.text)
 
+
 class GenNoteTextFromClipboard(bpy.types.Operator):
     """Grab whatever text is in the clipboard"""
     bl_idname = "node.gen_note_from_clipboard"
@@ -664,6 +678,7 @@ class GenNoteTextFromClipboard(bpy.types.Operator):
         node.text = text
         return {'FINISHED'}
 
+
 class GenNoteClear(bpy.types.Operator):
     """Clear Note Node"""
     bl_idname = "node.gen_note_clear"
@@ -678,6 +693,7 @@ class GenNoteClear(bpy.types.Operator):
 
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
+
 
 class CrowdMasterAGenCategories(NodeCategory):
     @classmethod
@@ -717,6 +733,7 @@ agen_node_categories = [
     ])
     ]
 
+
 def register():
     bpy.utils.register_class(CrowdMasterAGenTree)
     bpy.utils.register_class(GeoSocket)
@@ -746,6 +763,7 @@ def register():
     bpy.utils.register_class(GenNoteClear)
 
     nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
+
 
 def unregister():
     nodeitems_utils.unregister_node_categories("AGEN_CUSTOM_NODES")
