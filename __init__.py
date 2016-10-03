@@ -24,7 +24,7 @@ from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
 from . cm_graphics . cm_nodeHUD import cm_hudText, draw_hud, draw_handler
-from . cm_graphics . utils import cm_redrawAll as cm_redrawAll
+from . cm_graphics . utils import cm_redrawAll, update_hud_text
 
 # =============== GROUPS LIST START ===============#
 
@@ -165,7 +165,8 @@ class SCENE_OT_cm_start(Operator):
     def execute(self, context):
         scene = context.scene
 
-        cm_hudText = "Simulation Running!"
+        newhudText = "Simulation Running!"
+        update_hud_text(newhudText)
         cm_redrawAll()
 
         preferences = context.user_preferences.addons[__package__].preferences

@@ -2,6 +2,10 @@ import bpy
 import textwrap
 from mathutils import Vector
 
+def update_hud_text(new_text):
+    global cm_hudText
+    cm_hudText = new_text
+
 def iterActiveSpacesByType(type):
     for space in iterActiveSpaces():
         if space.type == type:
