@@ -206,8 +206,6 @@ class SCENE_OT_cm_stop(Operator):
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
-        
-        cm_hudText = "Simulation Finished!"
 
         return {'FINISHED'}
 
