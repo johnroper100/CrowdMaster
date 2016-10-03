@@ -16,6 +16,7 @@ def draw_hud():
             draw_object_status(object, dpi_factor)
 
 def draw_object_status(object, dpi_factor):
+    print("Is it working?")
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
         text1 = "CrowdMaster Simulation Info: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
