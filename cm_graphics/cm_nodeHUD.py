@@ -2,7 +2,7 @@ import bpy
 from . drawing2d import *
 from . utils import get_dpi, get_dpi_factor, get_3d_view_tools_panel_overlay_width
 
-cm_hudText = "Press the Start Simulation button to get started simulating"
+cm_hudText = "Setup Your Node Tree to Get Started"
 
 def update_hud_text(new_text):
     global cm_hudText
@@ -20,12 +20,11 @@ def draw_hud():
             draw_object_status(object, dpi_factor)
 
 def draw_object_status(object, dpi_factor):
-    print("Is it working?")
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
         text1 = "CrowdMaster Simulation: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
         text1 = "CrowdMaster Agent Generation: {}".format(cm_hudText)
-    text2 = "For more info go to http://jmroper.com/crowdmaster"
+    text2 = "For more info or help go to http://jmroper.com/crowdmaster"
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
     y2 = bpy.context.region.height - get_vertical_offset() - 25 * dpi_factor

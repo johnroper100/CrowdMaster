@@ -160,19 +160,19 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
 class SCENE_OT_cm_start(Operator):
     bl_idname = "scene.cm_start"
-    bl_label = "Start simulation"
+    bl_label = "Start Simulation"
 
     def execute(self, context):
         scene = context.scene
-
-        newhudText = "Simulation Running!"
-        update_hud_text(newhudText)
-        cm_redrawAll()
 
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
+        
+        newhudText = "Simulation Running!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
         scene.frame_current = scene.frame_start
 
