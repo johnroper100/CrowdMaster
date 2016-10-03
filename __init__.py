@@ -55,15 +55,17 @@ class SCENE_OT_cm_groups_reset(Operator):
     groupName = StringProperty()
 
     def execute(self, context):
-        group = context.scene.cm_groups.get(self.groupName)
+        scene = context.scene
+        
+        group = scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
             obj.select = False
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
                     if group.freezePlacement:
-                        if agent.name in context.scene.objects:
-                            context.scene.objects[agent.name].animation_data_clear()
+                        if agent.name in scene.objects:
+                            scene.objects[agent.name].animation_data_clear()
                     else:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
@@ -71,12 +73,12 @@ class SCENE_OT_cm_groups_reset(Operator):
                             bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
                                                    do_unlink=True)
                 elif group.groupType == "manual":
-                    if agent.name in context.scene.objects:
-                        context.scene.objects[agent.name].animation_data_clear()
+                    if agent.name in scene.objects:
+                        scene.objects[agent.name].animation_data_clear()
         if not group.freezePlacement:
             bpy.ops.object.delete(use_global=True)
-            groupIndex = context.scene.cm_groups.find(self.groupName)
-            context.scene.cm_groups.remove(groupIndex)
+            groupIndex = scene.cm_groups.find(self.groupName)
+            scene.cm_groups.remove(groupIndex)
         return {'FINISHED'}
 
 
@@ -95,11 +97,13 @@ class SCENE_OT_cm_agent_add(Operator):
     geoGroupName = StringProperty()
 
     def execute(self, context):
-        if context.scene.cm_groups.find(self.groupName) == -1:
-            newGroup = context.scene.cm_groups.add()
+        scene = context.scene
+
+        if scene.cm_groups.find(self.groupName) == -1:
+            newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "auto"
-        group = context.scene.cm_groups.get(self.groupName)
+        group = scene.cm_groups.get(self.groupName)
         if group.groupType == "manual" or group.freezePlacement:
             return {'CANCELLED'}
         ty = group.agentTypes.find(self.brainType)
@@ -123,13 +127,15 @@ class SCENE_OT_cm_agent_add_selected(Operator):
     brainType = StringProperty(name="Brain Type")
 
     def execute(self, context):
+        scene = context.scene
+
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}
-        if context.scene.cm_groups.find(self.groupName) == -1:
-            newGroup = context.scene.cm_groups.add()
+        if scene.cm_groups.find(self.groupName) == -1:
+            newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "manual"
-        group = context.scene.cm_groups.get(self.groupName)
+        group = scene.cm_groups.get(self.groupName)
         if group.groupType == "auto":
             return {'CANCELLED'}
         ty = group.agentTypes.find(self.brainType)
@@ -157,13 +163,16 @@ class SCENE_OT_cm_start(Operator):
 
     def execute(self, context):
         scene = context.scene
+
         cm_hudText = "Simulation Running!"
+
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
 
-        context.scene.frame_current = context.scene.frame_start
+        scene.frame_current = scene.frame_start
+
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
@@ -171,7 +180,7 @@ class SCENE_OT_cm_start(Operator):
         sim = Simulation()
         sim.actions()
 
-        for group in context.scene.cm_groups:
+        for group in scene.cm_groups:
             sim.createAgents(group)
 
         sim.startFrameHandler()
@@ -194,6 +203,8 @@ class SCENE_OT_cm_stop(Operator):
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
+        
+        cm_hudText = "Simulation Finished!"
 
         return {'FINISHED'}
 
@@ -241,10 +252,10 @@ class SCENE_PT_CrowdMaster(Panel):
         row.separator()
 
         row = layout.row()
-        if not context.scene.show_utilities:
-            row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
+        if not scene.show_utilities:
+            row.prop(scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
-            row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
+            row.prop(scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
 
             #box = layout.box()
             #row = box.row()
@@ -370,16 +381,17 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
     def draw(self, context):
         layout = self.layout
+        scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
-        layout.prop(context.scene.cm_manual, "groupName")
-        layout.prop(context.scene.cm_manual, "brainType")
+        layout.prop(scene.cm_manual, "groupName")
+        layout.prop(scene.cm_manual, "brainType")
         if preferences.use_custom_icons:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         else:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
-        op.groupName = "cm_" + context.scene.cm_manual.groupName
-        op.brainType = context.scene.cm_manual.brainType
+        op.groupName = "cm_" + scene.cm_manual.groupName
+        op.brainType = scene.cm_manual.brainType
 
 
 def register():

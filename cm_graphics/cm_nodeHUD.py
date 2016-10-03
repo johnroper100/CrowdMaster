@@ -2,7 +2,7 @@ import bpy
 from . drawing2d import *
 from . utils import get_dpi, get_dpi_factor, get_3d_view_tools_panel_overlay_width
 
-cm_hudText = "This is info."
+cm_hudText = "Press the Start Simulation button to get started simulating"
 
 def draw_hud():
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") not in ("CrowdMasterTreeType", "CrowdMasterAGenTreeType"): 
@@ -17,12 +17,15 @@ def draw_hud():
 
 def draw_object_status(object, dpi_factor):
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
-        text = "CrowdMaster Simulation Info: {}".format(cm_hudText)
+        text1 = "CrowdMaster Simulation Info: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
-        text = "CrowdMaster Agent Generation Info: {}".format(cm_hudText)
+        text1 = "CrowdMaster Agent Generation Info: {}".format(cm_hudText)
+    text2 = "For more info go to http://jmroper.com/crowdmaster"
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
-    y = bpy.context.region.height - get_vertical_offset() * dpi_factor
-    draw_text(text, x, y, size = 17, color = (0.8, 0.5, 0.0, 1.0))
+    y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
+    y2 = bpy.context.region.height - get_vertical_offset() - 25 * dpi_factor
+    draw_text(text1, x, y1, size = 15, color = (0.8, 0.5, 0.0, 1.0))
+    draw_text(text2, x, y2, size = 12, color = (1.0, 1.0, 1.0, 0.5))
 
 def get_vertical_offset():
     if bpy.context.scene.unit_settings.system == "NONE":
