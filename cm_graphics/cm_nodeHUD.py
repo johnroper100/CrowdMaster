@@ -22,9 +22,9 @@ def draw_hud():
 def draw_object_status(object, dpi_factor):
     print("Is it working?")
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
-        text1 = "CrowdMaster Simulation Info: {}".format(cm_hudText)
+        text1 = "CrowdMaster Simulation: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
-        text1 = "CrowdMaster Agent Generation Info: {}".format(cm_hudText)
+        text1 = "CrowdMaster Agent Generation: {}".format(cm_hudText)
     text2 = "For more info go to http://jmroper.com/crowdmaster"
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
