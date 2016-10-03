@@ -309,12 +309,15 @@ class GraphNode(LogicNode):
             raise NameError("Cannot load image %s" % cm_tex1Path)
             raise NameError("Cannot load image %s" % cm_tex2Path)
         
-        if "CrowdMaster-Graph-Range-Do-Not-Delete" not in bpy.data.textures:
-            cm_tex1 = bpy.data.textures.new('CrowdMaster-Graph-Range-Do-Not-Delete', type='IMAGE')
+        cm_tex1Name = 'CrowdMaster-Graph-Range-Do-Not-Delete'
+        cm_tex2Name = 'CrowdMaster-Graph-RBF-Do-Not-Delete'
+        
+        if cm_tex1Name not in bpy.data.textures:
+            cm_tex1 = bpy.data.textures.new(cm_tex1Name, type='IMAGE')
             cm_tex1.image = cm_tex1Img
         
-        if "CrowdMaster-Graph-RBF-Do-Not-Delete" not in bpy.data.textures:
-            cm_tex2 = bpy.data.textures.new('CrowdMaster-Graph-RBF-Do-Not-Delete', type='IMAGE')
+        if cm_tex2Name not in bpy.data.textures:
+            cm_tex2 = bpy.data.textures.new(cm_tex2Name, type='IMAGE')
             cm_tex2.image = cm_tex2Img
 
     def draw_buttons(self, context, layout):
