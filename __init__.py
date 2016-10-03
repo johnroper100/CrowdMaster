@@ -23,8 +23,8 @@ from . import icon_load
 from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
-from . cm_graphics . cm_nodeHUD import cm_hudText, draw_hud, draw_handler
-from . cm_graphics . utils import cm_redrawAll, update_hud_text
+from . cm_graphics . cm_nodeHUD import cm_hudText, draw_hud, draw_handler, update_hud_text
+from . cm_graphics . utils import cm_redrawAll
 
 # =============== GROUPS LIST START ===============#
 

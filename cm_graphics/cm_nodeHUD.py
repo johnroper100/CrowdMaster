@@ -4,6 +4,10 @@ from . utils import get_dpi, get_dpi_factor, get_3d_view_tools_panel_overlay_wid
 
 cm_hudText = "Press the Start Simulation button to get started simulating"
 
+def update_hud_text(new_text):
+    global cm_hudText
+    cm_hudText = new_text
+
 def draw_hud():
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") not in ("CrowdMasterTreeType", "CrowdMasterAGenTreeType"): 
         return
