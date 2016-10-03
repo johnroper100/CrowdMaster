@@ -80,6 +80,11 @@ class SCENE_OT_cm_groups_reset(Operator):
             bpy.ops.object.delete(use_global=True)
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
+        
+        newhudText = "Group {} reset!".format(self.groupName)
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         return {'FINISHED'}
 
 
@@ -149,6 +154,11 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             newAgent = agentType.agents.add()
             newAgent.name = obj.name
             group.totalAgents += 1
+        
+        newhudText = "Manual Agents {} Created!".format(self.groupName)
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         return {'FINISHED'}
 
 
@@ -355,7 +365,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                                   "agentTypes", scene, "cm_view_details_index")
 
                 if group.name == "cm_allAgents":
-                    box.label("cm_allAgents: To freeze use AddToGroup node")
+                    box.label("cm_allAgents: To freeze use Add To Group node")
                 else:
                     box.prop(group, "freezePlacement")
 
@@ -389,8 +399,8 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
-        layout.prop(scene.cm_manual, "groupName")
-        layout.prop(scene.cm_manual, "brainType")
+        layout.prop(scene.cm_manual, "groupName", text="Group Name")
+        layout.prop(scene.cm_manual, "brainType", text="Brain Type")
         if preferences.use_custom_icons:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         else:

@@ -7,6 +7,9 @@ from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from . import icon_load
 from . icon_load import cicon
 
+from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
+from . cm_graphics . utils import cm_redrawAll
+
 bpy.types.Scene.show_utilities = BoolProperty(
         name="Show or hide the utilities",
         description="Show/hide the utilities",
@@ -303,6 +306,10 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_label = "Place Deferred Geometry"
 
     def execute(self, context):
+        newhudText = "Placing Deferred Geometry!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         groups = bpy.data.groups
         objects = context.scene.objects
         for group in context.scene.cm_groups:
@@ -346,6 +353,11 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                     for mod in nObj.modifiers:
                                         if mod.type == "ARMATURE":
                                             mod.object = objects[agent.name]
+        
+        newhudText = "Done Placing Deferred Geometry!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         return {'FINISHED'}
 
 
