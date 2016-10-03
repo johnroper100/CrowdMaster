@@ -4,12 +4,15 @@ from . utils import get_dpi, get_dpi_factor, get_3d_view_tools_panel_overlay_wid
 
 
 def draw_hud():
-    set_drawing_dpi(get_dpi())
-    dpi_factor = get_dpi_factor()
+    if getattr(bpy.context.space_data.node_tree, "bl_idname", "") not in ("CrowdMasterTreeType", "CrowdMasterAGenTreeType"): 
+        return
+    else:
+        set_drawing_dpi(get_dpi())
+        dpi_factor = get_dpi_factor()
 
-    object = bpy.context.active_object
-    if object is not None:
-        draw_object_status(object, dpi_factor)
+        object = bpy.context.active_object
+        if object is not None:
+            draw_object_status(object, dpi_factor)
 
 def draw_object_status(object, dpi_factor):
     text = "CrowdMaster Info"
