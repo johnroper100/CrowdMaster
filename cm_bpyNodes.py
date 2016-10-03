@@ -1,4 +1,5 @@
 import bpy
+import os
 from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
@@ -117,16 +118,6 @@ class InputNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["Input"] = self.Input
-
-
-def update_properties(self, context):
-    """Keeps the values in the graph node in the correct order"""
-    if self.UpperZero < self.UpperOne:
-        self.UpperOne = self.UpperZero
-    if self.UpperOne < self.LowerOne:
-        self.LowerOne = self.UpperOne
-    if self.LowerOne < self.LowerZero:
-        self.LowerZero = self.LowerOne
 
 
 class NewInputNode(LogicNode):
@@ -279,6 +270,16 @@ class NewInputNode(LogicNode):
                     node.settings["TargetOptions"] = self.TargetOptions
 
 
+def update_properties(self, context):
+    """Keeps the values in the graph node in the correct order"""
+    if self.UpperZero < self.UpperOne:
+        self.UpperOne = self.UpperZero
+    if self.UpperOne < self.LowerOne:
+        self.LowerOne = self.UpperOne
+    if self.LowerOne < self.LowerZero:
+        self.LowerZero = self.LowerOne
+
+
 class GraphNode(LogicNode):
     """CrowdMaster graph node"""
     bl_label = "Graph"
@@ -297,8 +298,34 @@ class GraphNode(LogicNode):
 
     RBFMiddle = FloatProperty(default=0.0)
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
+    
+    def init(self, context):
+        cm_tex1Path = os.path.dirname(__file__) + "/cm_graphics/images/range_function.jpg"
+        cm_tex2Path = os.path.dirname(__file__) + "/cm_graphics/images/rbf_function.jpg"
+        try:
+            cm_tex1Img = bpy.data.images.load(cm_tex1Path)
+            cm_tex2Img = bpy.data.images.load(cm_tex2Path)
+        except:
+            raise NameError("Cannot load image %s" % cm_tex1Path)
+            raise NameError("Cannot load image %s" % cm_tex2Path)
+ 
+        cm_tex1 = bpy.data.textures.new('CrowdMaster-Graph-Range-Do-Not-Delete', type='IMAGE')
+        cm_tex1.image = cm_tex1Img
+        
+        cm_tex2 = bpy.data.textures.new('CrowdMaster-Graph-RBF-Do-Not-Delete', type='IMAGE')
+        cm_tex2.image = cm_tex2Img
 
     def draw_buttons(self, context, layout):
+        if self.CurveType == "RANGE":
+            row = layout.row()
+            split = row.split(1000 / (context.region.width - 50))
+            split.template_preview(bpy.data.textures['CrowdMaster-Graph-Range-Do-Not-Delete'], show_buttons=False)
+        
+        elif self.CurveType == "RBF":
+            row = layout.row()
+            split = row.split(1000 / (context.region.width - 50))
+            split.template_preview(bpy.data.textures['CrowdMaster-Graph-RBF-Do-Not-Delete'], show_buttons=False)
+
         layout.prop(self, "Multiply")
         layout.prop(self, "CurveType", expand=True)
         if self.CurveType == "RBF":
