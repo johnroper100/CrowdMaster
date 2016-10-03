@@ -21,7 +21,7 @@ def draw_object_status(object, dpi_factor):
         text = "CrowdMaster Agent Generation Info:"
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y = bpy.context.region.height - get_vertical_offset() * dpi_factor
-    draw_text(text, x, y, size = 15, color = (1, 1, 1, 0.5))
+    draw_text(text, x, y, size = 15, color = (0.8, 0.5, 0.0, 0.5))
 
 def get_vertical_offset():
     if bpy.context.scene.unit_settings.system == "NONE":
