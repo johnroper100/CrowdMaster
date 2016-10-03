@@ -66,11 +66,11 @@ def write_text(layout, text, width = 30, icon = "NONE"):
 
 mouse_position = Vector((0, 0))
 def get_mouse_position_in_current_region():
-    bpy.ops.hops.store_mouse_position("INVOKE_DEFAULT")
+    bpy.ops.cm_store_mouse_position("INVOKE_DEFAULT")
     return mouse_position.copy()
 
 class StoreMousePosition(bpy.types.Operator):
-    bl_idname = "hops.store_mouse_position"
+    bl_idname = "cm_store_mouse_position"
     bl_label = "Store Mouse Position"
     bl_options = {"REGISTER", "INTERNAL"}
 
