@@ -380,6 +380,7 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
 
 def register():
+    bpy.types.Scene.cm_hudText = "This is info about the simulation."
     # import addon_utils
     # addon_utils.enable("curve_simplify")
 
