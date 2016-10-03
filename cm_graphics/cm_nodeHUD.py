@@ -15,10 +15,13 @@ def draw_hud():
             draw_object_status(object, dpi_factor)
 
 def draw_object_status(object, dpi_factor):
-    text = "CrowdMaster Info"
+    if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
+        text = "CrowdMaster Simulation Info:"
+    elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
+        text = "CrowdMaster Agent Generation Info:"
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y = bpy.context.region.height - get_vertical_offset() * dpi_factor
-    draw_text(text, x, y, size = 25, color = (1, 1, 1, 0.5))
+    draw_text(text, x, y, size = 15, color = (1, 1, 1, 0.5))
 
 def get_vertical_offset():
     if bpy.context.scene.unit_settings.system == "NONE":
