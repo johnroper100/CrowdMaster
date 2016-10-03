@@ -24,6 +24,7 @@ from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
 from . cm_graphics . cm_nodeHUD import cm_hudText, draw_hud, draw_handler
+from . cm_graphics . utils import cm_redrawAll as cm_redrawAll
 
 # =============== GROUPS LIST START ===============#
 
@@ -165,6 +166,7 @@ class SCENE_OT_cm_start(Operator):
         scene = context.scene
 
         cm_hudText = "Simulation Running!"
+        cm_redrawAll()
 
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
