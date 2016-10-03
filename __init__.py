@@ -23,6 +23,7 @@ from . import icon_load
 from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
+from . cm_graphics . cm_nodeHUD import cm_hudText
 
 # =============== GROUPS LIST START ===============#
 
@@ -155,6 +156,8 @@ class SCENE_OT_cm_start(Operator):
     bl_label = "Start simulation"
 
     def execute(self, context):
+        scene = context.scene
+        cm_hudText = "Simulation Running!"
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
@@ -380,7 +383,7 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
 
 def register():
-    bpy.types.Scene.cm_hudText = "This is info about the simulation."
+    cm_hudText = "This is info about the simulation."
     # import addon_utils
     # addon_utils.enable("curve_simplify")
 
