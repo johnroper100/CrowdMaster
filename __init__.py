@@ -416,10 +416,10 @@ def register():
     # addon_utils.enable("curve_simplify")
 
     register_icons()
+    cm_nodeHUD.register()
+
     addon_updater_ops.register(bl_info)
     cm_prefs.register()
-    
-    cm_nodeHUD.register()
 
     bpy.utils.register_class(SCENE_UL_group)
     bpy.utils.register_class(SCENE_UL_agent_type)
@@ -485,8 +485,6 @@ def unregister():
     bpy.utils.unregister_class(SCENE_PT_CrowdMaster)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterAgents)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterManualAgents)
-    
-    cm_nodeHUD.unregister()
 
     action_unregister()
     event_unregister()
@@ -498,6 +496,8 @@ def unregister():
     cm_generation.unregister()
     cm_utilities.unregister()
     cm_prefs.unregister()
+    
+    cm_nodeHUD.unregister()
 
     cm_channels.unregister()
 
