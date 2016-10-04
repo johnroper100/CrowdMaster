@@ -37,7 +37,7 @@ def draw_object_status(object, dpi_factor):
     size2 = bpy.context.region.width / 40
     font_file1 = os.path.dirname(__file__) + "/fonts/BebasNeue.otf"
     font_file2 = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
-    draw_text_custom(text1, x, y1, font_file1, "ON", size=int(size1), color=(0.8, 0.5, 0.0, 1.0))s
+    draw_text_custom(text1, x, y1, font_file1, "ON", size=int(size1), color=(0.8, 0.5, 0.0, 1.0))
     draw_text_custom(text2, x, y2, font_file2, "OFF", size=int(size2), color=(0.7, 0.7, 0.7, 1.0))
 
 
