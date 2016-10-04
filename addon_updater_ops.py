@@ -581,11 +581,6 @@ def register(bl_info):
     # instead of auto-reload which can cause issues
     updater.auto_reload_post_update = False # False is the default value
 
-    #preferences = context.user_preferences.addons[__package__].preferences
-    #if preferences.show_debug_options == True:
-        #updater.verbose = True # optional, consider turning off for production or allow as option
-    #else:
-        #updater.verbose = False
     updater.verbose = False
     updater.backup_current = True # True by default
     updater.fake_install = False # Set to true to test callback/reloading
