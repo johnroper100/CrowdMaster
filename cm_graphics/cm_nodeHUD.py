@@ -43,9 +43,9 @@ def draw_object_status(object, dpi_factor):
 
 def get_vertical_offset():
     if bpy.context.scene.unit_settings.system == "NONE":
-        return 40
+        return 45
     else:
-        return 60
+        return 65
 
 draw_handler = None
 
