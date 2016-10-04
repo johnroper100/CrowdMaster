@@ -24,7 +24,7 @@ def draw_hud():
 
 def draw_object_status(object, dpi_factor):
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
-        text1 = "CrowdMaster Simulation: {}".format(cm_hudText)
+        text1 = "CrowdMaster Agent Simulation: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
         text1 = "CrowdMaster Agent Generation: {}".format(cm_hudText)
     text2 = "For more info or help go to http://jmroper.com/crowdmaster"
@@ -32,8 +32,8 @@ def draw_object_status(object, dpi_factor):
     y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
     y2 = bpy.context.region.height - get_vertical_offset() - 25 * dpi_factor
     font_file = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
-    draw_text_custom(text1, x, y1, font_file, size=25, color=(0.8, 0.5, 0.0, 1.0))
-    draw_text_custom(text2, x, y2, font_file, size=22, color=(0.7, 0.7, 0.7, 1.0))
+    draw_text_custom(text1, x, y1, font_file, "yes",  size=25, color=(0.8, 0.5, 0.0, 1.0))
+    draw_text_custom(text2, x, y2, font_file, "no", size=22, color=(0.7, 0.7, 0.7, 1.0))
 
 
 def get_vertical_offset():

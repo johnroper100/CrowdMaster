@@ -7,12 +7,15 @@ from . utils import get_dpi_factor
 
 dpi = 72
 
+
 def set_drawing_dpi(new_dpi):
     global dpi
     dpi = new_dpi
 
+
 def draw_horizontal_line(x, y, length, color, width):
     draw_line(x, y, x + length, y, color, width)
+
 
 def draw_line(x1, y1, x2, y2, color, width):
     glLineWidth(width)
@@ -24,6 +27,7 @@ def draw_line(x1, y1, x2, y2, color, width):
     glEnd()
     glLineWidth(1)
 
+
 def draw_boolean(state, x, y, size = 12, alpha = 1):
     if state:
         draw_text("ON", x, y, align = "LEFT", size = size,
@@ -31,6 +35,7 @@ def draw_boolean(state, x, y, size = 12, alpha = 1):
     else:
         draw_text("OFF", x, y, align = "LEFT", size = size,
                   color = (1, 0.8, 0.8, alpha))
+
 
 def draw_text_default(text, x, y, align = "LEFT", size = 12, color = (1.0, 1.0, 1.0, 1.0)):
     font = 0
@@ -47,14 +52,17 @@ def draw_text_default(text, x, y, align = "LEFT", size = 12, color = (1.0, 1.0, 
 
     blf.draw(font, text)
 
-def draw_text_custom(text, x, y, font_file_path, align = "LEFT", size = 12, color = (1.0, 1.0, 1.0, 1.0)):
-    #font_path = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+
+def draw_text_custom(text, x, y, font_file_path, shadow_on, align = "LEFT", size = 12, color = (1.0, 1.0, 1.0, 1.0)):
     font_path = font_file_path
     font_id = blf.load(font_path)
     font = font_id
 
     blf.size(font, size, int(dpi))
     glColor4f(*color)
+    
+    if shadow_on == "yes":
+        blf.shadow(font, 5, 0.0, 0.0, 0.0, 1.0)
 
     if align == "LEFT":
         blf.position(font, x, y, 0)
@@ -64,6 +72,7 @@ def draw_text_custom(text, x, y, font_file_path, align = "LEFT", size = 12, colo
             blf.position(font, x - width, y, 0)
 
     blf.draw(font, text)
+
 
 def draw_box(x0, y0, width, height, color):
 
