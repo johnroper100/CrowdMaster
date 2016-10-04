@@ -2,6 +2,7 @@ import blf
 import bgl
 from bgl import *
 import bpy
+import os
 from . utils import get_dpi_factor
 
 dpi = 72
@@ -32,7 +33,10 @@ def draw_boolean(state, x, y, size = 12, alpha = 1):
                   color = (1, 0.8, 0.8, alpha))
 
 def draw_text(text, x, y, align = "LEFT", size = 12, color = (1, 1, 1, 1)):
-    font = 0
+    font_path = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+    font_id = blf.load(font_path)
+    font = font_id
+
     blf.size(font, size, int(dpi))
     glColor4f(*color)
 

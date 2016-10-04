@@ -14,6 +14,8 @@ bl_info = {
 import bpy
 import random
 import sys
+import os
+import blf
 from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
@@ -471,6 +473,9 @@ def initialise():
 
 
 def unregister():
+    font_path_unload = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+    blf.unload(font_path_unload)
+
     unregister_icons()
 
     bpy.utils.unregister_class(SCENE_UL_group)
