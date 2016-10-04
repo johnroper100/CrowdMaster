@@ -299,6 +299,7 @@ class GraphNode(LogicNode):
     RBFMiddle = FloatProperty(default=0.0)
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
     
+    """Testing to see if this would work, currently it breaks the texture preivew in the properties editor
     def init(self, context):
         cm_tex1Path = os.path.dirname(__file__) + "/cm_graphics/images/range_function.jpg"
         cm_tex2Path = os.path.dirname(__file__) + "/cm_graphics/images/rbf_function.jpg"
@@ -319,6 +320,7 @@ class GraphNode(LogicNode):
         if cm_tex2Name not in bpy.data.textures:
             cm_tex2 = bpy.data.textures.new(cm_tex2Name, type='IMAGE')
             cm_tex2.image = cm_tex2Img
+    """
 
     def draw_buttons(self, context, layout):
         if self.CurveType == "RANGE":
