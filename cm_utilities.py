@@ -40,6 +40,10 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
+        
+        newhudText = "Sample Node Setups Created!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
         return {'FINISHED'}
 
