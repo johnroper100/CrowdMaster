@@ -283,6 +283,10 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
             bound_box.location = obj.location
             bound_box.rotation_euler = obj.rotation_euler
             bound_box.select = True
+        
+        newhudText = "Done Converting to Bounding Boxes!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
         return {'FINISHED'}
 
