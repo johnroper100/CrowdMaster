@@ -73,6 +73,10 @@ def draw_text_custom(text, x, y, font_file_path, shadow_on, align="LEFT", size=1
 
     blf.draw(font, text)
 
+def unload_custom_font(font_file_path):
+    font_path = font_file_path
+    font_id = blf.unload(font_path)
+
 
 def draw_box(x0, y0, width, height, color):
 

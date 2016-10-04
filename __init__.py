@@ -473,9 +473,6 @@ def initialise():
 
 
 def unregister():
-    font_path_unload = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
-    blf.unload(font_path_unload)
-
     unregister_icons()
 
     bpy.utils.unregister_class(SCENE_UL_group)

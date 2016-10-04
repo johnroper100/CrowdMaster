@@ -1,6 +1,6 @@
 import bpy
 from . drawing2d import *
-from . utils import get_dpi, get_dpi_factor, get_3d_view_tools_panel_overlay_width
+from . utils import *
 
 cm_hudText = "Setup Your Node Tree to Get Started"
 
@@ -51,6 +51,9 @@ def register():
 
 
 def unregister():
+    font_file = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+    unload_custom_font(font_file)
+
     global draw_handler
     bpy.types.SpaceNodeEditor.draw_handler_remove(draw_handler, "WINDOW")
     draw_handler = None
