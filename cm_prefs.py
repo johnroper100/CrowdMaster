@@ -70,11 +70,11 @@ class CMPreferences(AddonPreferences):
         default=False,
         )
     
-    show_node_hud = BoolProperty(
-        name="Show Node Editor HUD",
-        description="Chose whether to show the CrowdMaster teaxt HUD in the node editor.",
-        default=True,
-        )
+    #show_node_hud = BoolProperty(
+        #name="Show Node Editor HUD",
+        #description="Chose whether to show the CrowdMaster teaxt HUD in the node editor.",
+        #default=True,
+        #)
 
     play_animation = BoolProperty(
         name="Start Animation Automatically",
@@ -121,7 +121,7 @@ class CMPreferences(AddonPreferences):
             row.prop(preferences, 'use_node_color', icon='COLOR')
 
             row = layout.row()
-            row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
+            #row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
