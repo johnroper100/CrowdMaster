@@ -32,8 +32,24 @@ def draw_boolean(state, x, y, size = 12, alpha = 1):
         draw_text("OFF", x, y, align = "LEFT", size = size,
                   color = (1, 0.8, 0.8, alpha))
 
-def draw_text(text, x, y, align = "LEFT", size = 12, color = (1, 1, 1, 1)):
-    font_path = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+def draw_text_default(text, x, y, align = "LEFT", size = 12, color = (1.0, 1.0, 1.0, 1.0)):
+    font = 0
+
+    blf.size(font, size, int(dpi))
+    glColor4f(*color)
+
+    if align == "LEFT":
+        blf.position(font, x, y, 0)
+    else:
+        width, height = blf.dimensions(font, text)
+        if align == "RIGHT":
+            blf.position(font, x - width, y, 0)
+
+    blf.draw(font, text)
+
+def draw_text_custom(text, x, y, font_file_path, align = "LEFT", size = 12, color = (1.0, 1.0, 1.0, 1.0)):
+    #font_path = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+    font_path = font_file_path
     font_id = blf.load(font_path)
     font = font_id
 

@@ -28,19 +28,15 @@ def draw_object_status(object, dpi_factor):
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
     y2 = bpy.context.region.height - get_vertical_offset() - 25 * dpi_factor
-    draw_text(text1, x, y1, size = 25, color = (0.8, 0.5, 0.0, 1.0))
-    draw_text(text2, x, y2, size = 22, color = (0.7, 0.7, 0.7, 1.0))
+    font_file = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
+    draw_text_custom(text1, x, y1, font_file, size = 25, color = (0.8, 0.5, 0.0, 1.0))
+    draw_text_custom(text2, x, y2, font_file, size = 22, color = (0.7, 0.7, 0.7, 1.0))
 
 def get_vertical_offset():
     if bpy.context.scene.unit_settings.system == "NONE":
         return 40
     else:
         return 60
-
-
-
-# Register
-################################################################################
 
 draw_handler = None
 
