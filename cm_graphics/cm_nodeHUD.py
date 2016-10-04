@@ -11,6 +11,8 @@ def update_hud_text(new_text):
 
 
 def draw_hud():
+    #preferences = bpy.context.user_preferences.addons[__package__].preferences
+    #if preferences.show_node_hud:
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") not in ("CrowdMasterTreeType", "CrowdMasterAGenTreeType"):
         return
     else:
@@ -23,8 +25,6 @@ def draw_hud():
 
 
 def draw_object_status(object, dpi_factor):
-    #preferences = bpy.context.user_preferences.addons[__package__].preferences
-    #if preferences.show_node_hud:
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
         text1 = "CrowdMaster Agent Simulation: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
