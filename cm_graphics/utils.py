@@ -39,7 +39,7 @@ def iterActiveScreens():
 
 def cm_redrawAll():
     for area in iterAreas():
-        area.tag_redraw()
+        area.tag_redraw()        
 
 
 def get_dpi_factor():

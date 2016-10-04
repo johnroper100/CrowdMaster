@@ -5,6 +5,7 @@ from bpy.props import *
 from . import addon_updater_ops
 from . import icon_load
 from . icon_load import cicon
+from . cm_graphics import cm_nodeHUD
 
 
 class CMSavePrefs(bpy.types.Operator):
@@ -68,6 +69,12 @@ class CMPreferences(AddonPreferences):
         description="Chose whether to show the debug options in the interface. This also enables debug mode.",
         default=False,
         )
+    
+    show_node_hud = BoolProperty(
+        name="Show Node Editor HUD",
+        description="Chose whether to show the CrowdMaster teaxt HUD in the node editor.",
+        default=True,
+        )
 
     play_animation = BoolProperty(
         name="Start Animation Automatically",
@@ -114,6 +121,7 @@ class CMPreferences(AddonPreferences):
             row.prop(preferences, 'use_node_color', icon='COLOR')
 
             row = layout.row()
+            row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
