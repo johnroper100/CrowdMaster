@@ -78,7 +78,7 @@ class CMPreferences(AddonPreferences):
     
     show_sim_data = BoolProperty(
         name="Show Detailed Simulation Data",
-        description="Chose whether to show detailed data while running a simulation or operator in the node tree hud. Warning, this makes each opertor take longer.",
+        description="Chose whether to show detailed data while running a simulation or operator in the node tree hud. Warning, this makes each operator take longer.",
         default=False,
         )
 
