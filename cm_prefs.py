@@ -142,12 +142,9 @@ class CMPreferences(AddonPreferences):
             row = layout.row()
             addon_updater_ops.update_settings_ui(self, context)
 
-        row = layout.row()
+        row = layout.row(align=True)
         row.scale_y = 1.25
         row.operator("scene.cm_save_prefs", icon='SAVE_PREFS')
-        
-        row = layout.row()
-        row.scale_y = 1.25
         row.operator("wm.url_open", text="Email Us", icon='URL',).url = "mailto:crowdmaster@jmroper.com"
 
 
