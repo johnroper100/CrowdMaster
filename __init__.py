@@ -14,6 +14,8 @@ bl_info = {
 import bpy
 import random
 import sys
+import os
+import blf
 from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
@@ -22,6 +24,9 @@ from . import cm_prefs
 from . import icon_load
 from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
+from . cm_graphics import cm_nodeHUD
+from . cm_graphics . cm_nodeHUD import cm_hudText, draw_hud, draw_handler, update_hud_text
+from . cm_graphics . utils import cm_redrawAll
 
 # =============== GROUPS LIST START ===============#
 
@@ -53,15 +58,17 @@ class SCENE_OT_cm_groups_reset(Operator):
     groupName = StringProperty()
 
     def execute(self, context):
-        group = context.scene.cm_groups.get(self.groupName)
+        scene = context.scene
+        
+        group = scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
             obj.select = False
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
                     if group.freezePlacement:
-                        if agent.name in context.scene.objects:
-                            context.scene.objects[agent.name].animation_data_clear()
+                        if agent.name in scene.objects:
+                            scene.objects[agent.name].animation_data_clear()
                     else:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
@@ -69,12 +76,17 @@ class SCENE_OT_cm_groups_reset(Operator):
                             bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
                                                    do_unlink=True)
                 elif group.groupType == "manual":
-                    if agent.name in context.scene.objects:
-                        context.scene.objects[agent.name].animation_data_clear()
+                    if agent.name in scene.objects:
+                        scene.objects[agent.name].animation_data_clear()
         if not group.freezePlacement:
             bpy.ops.object.delete(use_global=True)
-            groupIndex = context.scene.cm_groups.find(self.groupName)
-            context.scene.cm_groups.remove(groupIndex)
+            groupIndex = scene.cm_groups.find(self.groupName)
+            scene.cm_groups.remove(groupIndex)
+        
+        newhudText = "Group {} reset!".format(self.groupName)
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         return {'FINISHED'}
 
 
@@ -93,11 +105,13 @@ class SCENE_OT_cm_agent_add(Operator):
     geoGroupName = StringProperty()
 
     def execute(self, context):
-        if context.scene.cm_groups.find(self.groupName) == -1:
-            newGroup = context.scene.cm_groups.add()
+        scene = context.scene
+
+        if scene.cm_groups.find(self.groupName) == -1:
+            newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "auto"
-        group = context.scene.cm_groups.get(self.groupName)
+        group = scene.cm_groups.get(self.groupName)
         if group.groupType == "manual" or group.freezePlacement:
             return {'CANCELLED'}
         ty = group.agentTypes.find(self.brainType)
@@ -121,13 +135,15 @@ class SCENE_OT_cm_agent_add_selected(Operator):
     brainType = StringProperty(name="Brain Type")
 
     def execute(self, context):
+        scene = context.scene
+
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}
-        if context.scene.cm_groups.find(self.groupName) == -1:
-            newGroup = context.scene.cm_groups.add()
+        if scene.cm_groups.find(self.groupName) == -1:
+            newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "manual"
-        group = context.scene.cm_groups.get(self.groupName)
+        group = scene.cm_groups.get(self.groupName)
         if group.groupType == "auto":
             return {'CANCELLED'}
         ty = group.agentTypes.find(self.brainType)
@@ -140,6 +156,11 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             newAgent = agentType.agents.add()
             newAgent.name = obj.name
             group.totalAgents += 1
+        
+        newhudText = "Manual Agents {} Created!".format(self.groupName)
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         return {'FINISHED'}
 
 
@@ -151,15 +172,22 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
 class SCENE_OT_cm_start(Operator):
     bl_idname = "scene.cm_start"
-    bl_label = "Start simulation"
+    bl_label = "Start Simulation"
 
     def execute(self, context):
+        scene = context.scene
+
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
+        
+        newhudText = "Simulation Running!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
-        context.scene.frame_current = context.scene.frame_start
+        scene.frame_current = scene.frame_start
+
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
@@ -167,7 +195,7 @@ class SCENE_OT_cm_start(Operator):
         sim = Simulation()
         sim.actions()
 
-        for group in context.scene.cm_groups:
+        for group in scene.cm_groups:
             sim.createAgents(group)
 
         sim.startFrameHandler()
@@ -190,6 +218,10 @@ class SCENE_OT_cm_stop(Operator):
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
+        
+        newhudText = "Simulation Stopped!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -237,10 +269,10 @@ class SCENE_PT_CrowdMaster(Panel):
         row.separator()
 
         row = layout.row()
-        if not context.scene.show_utilities:
-            row.prop(context.scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
+        if not scene.show_utilities:
+            row.prop(scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
         else:
-            row.prop(context.scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
+            row.prop(scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
 
             #box = layout.box()
             #row = box.row()
@@ -335,7 +367,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                                   "agentTypes", scene, "cm_view_details_index")
 
                 if group.name == "cm_allAgents":
-                    box.label("cm_allAgents: To freeze use AddToGroup node")
+                    box.label("cm_allAgents: To freeze use Add To Group node")
                 else:
                     box.prop(group, "freezePlacement")
 
@@ -366,16 +398,17 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
     def draw(self, context):
         layout = self.layout
+        scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
-        layout.prop(context.scene.cm_manual, "groupName")
-        layout.prop(context.scene.cm_manual, "brainType")
+        layout.prop(scene.cm_manual, "groupName", text="Group Name")
+        layout.prop(scene.cm_manual, "brainType", text="Brain Type")
         if preferences.use_custom_icons:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         else:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
-        op.groupName = "cm_" + context.scene.cm_manual.groupName
-        op.brainType = context.scene.cm_manual.brainType
+        op.groupName = "cm_" + scene.cm_manual.groupName
+        op.brainType = scene.cm_manual.brainType
 
 
 def register():
@@ -383,6 +416,8 @@ def register():
     # addon_utils.enable("curve_simplify")
 
     register_icons()
+    cm_nodeHUD.register()
+
     addon_updater_ops.register(bl_info)
     cm_prefs.register()
 
@@ -461,6 +496,8 @@ def unregister():
     cm_generation.unregister()
     cm_utilities.unregister()
     cm_prefs.unregister()
+    
+    cm_nodeHUD.unregister()
 
     cm_channels.unregister()
 

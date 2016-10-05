@@ -8,6 +8,8 @@ from . import cm_channels as chan
 
 from .cm_agent import Agent
 from .cm_actions import getmotions
+from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
+from . cm_graphics . utils import cm_redrawAll
 
 
 class Simulation():

@@ -7,6 +7,9 @@ from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from . import icon_load
 from . icon_load import cicon
 
+from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
+from . cm_graphics . utils import cm_redrawAll
+
 bpy.types.Scene.show_utilities = BoolProperty(
         name="Show or hide the utilities",
         description="Show/hide the utilities",
@@ -37,6 +40,10 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
+        
+        newhudText = "Sample Node Setups Created!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -280,6 +287,10 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
             bound_box.location = obj.location
             bound_box.rotation_euler = obj.rotation_euler
             bound_box.select = True
+        
+        newhudText = "Done Converting to Bounding Boxes!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -303,12 +314,22 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_label = "Place Deferred Geometry"
 
     def execute(self, context):
+        newhudText = "Placing Deferred Geometry!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
+        preferences = context.user_preferences.addons[__package__].preferences
         groups = bpy.data.groups
         objects = context.scene.objects
         for group in context.scene.cm_groups:
             for agentType in group.agentTypes:
                 for agent in agentType.agents:
                     for obj in groups[agent.geoGroup].objects:
+                        if preferences.show_sim_data:
+                            newhudText = "Placing Object {}".format(obj.name)
+                            update_hud_text(newhudText)
+                            cm_redrawAll()
+                            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
                             for con in obj.constraints:
@@ -346,6 +367,11 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                     for mod in nObj.modifiers:
                                         if mod.type == "ARMATURE":
                                             mod.object = objects[agent.name]
+        
+        newhudText = "Done Placing Deferred Geometry!"
+        update_hud_text(newhudText)
+        cm_redrawAll()
+
         return {'FINISHED'}
 
 

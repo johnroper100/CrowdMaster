@@ -5,6 +5,7 @@ from bpy.props import *
 from . import addon_updater_ops
 from . import icon_load
 from . icon_load import cicon
+from . cm_graphics import cm_nodeHUD
 
 
 class CMSavePrefs(bpy.types.Operator):
@@ -68,6 +69,18 @@ class CMPreferences(AddonPreferences):
         description="Chose whether to show the debug options in the interface. This also enables debug mode.",
         default=False,
         )
+    
+    show_node_hud = BoolProperty(
+        name="Show Node Editor HUD",
+        description="Chose whether to show the CrowdMaster teaxt HUD in the node editor.",
+        default=True,
+        )
+    
+    show_sim_data = BoolProperty(
+        name="Show Detailed Simulation Data",
+        description="Chose whether to show detailed data while running a simulation or operator in the node tree hud. Warning, this makes each opertor take longer.",
+        default=False,
+        )
 
     play_animation = BoolProperty(
         name="Start Animation Automatically",
@@ -114,6 +127,12 @@ class CMPreferences(AddonPreferences):
             row.prop(preferences, 'use_node_color', icon='COLOR')
 
             row = layout.row()
+            row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
+            
+            if preferences.show_node_hud:
+                row.prop(preferences, 'show_sim_data', icon='OUTLINER_DATA_FONT')
+                row = layout.row()
+    
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
@@ -123,13 +142,10 @@ class CMPreferences(AddonPreferences):
             row = layout.row()
             addon_updater_ops.update_settings_ui(self, context)
 
-        row = layout.row()
+        row = layout.row(align=True)
         row.scale_y = 1.25
         row.operator("scene.cm_save_prefs", icon='SAVE_PREFS')
-        
-        row = layout.row()
-        row.scale_y = 1.25
-        row.operator("wm.url_open", text="Email Us", icon='URL',).url = "mailto:crowdmaster@jmroper.com"
+        row.operator("wm.url_open", text="Email Us", icon='URL').url = "mailto:crowdmaster@jmroper.com"
 
 
 def register():

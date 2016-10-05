@@ -2,9 +2,11 @@ import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty
 
-from ..libs.ins_vector import Vector
+from .. libs.ins_vector import Vector
 
-from .cm_templates import templates
+from . cm_templates import templates
+from .. cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
+from .. cm_graphics . utils import cm_redrawAll
 
 
 class SCENE_OT_agent_nodes_generate(Operator):
@@ -84,6 +86,16 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)), 1, {}, context.scene.cm_groups["cm_allAgents"])
         else:
             return {'CANCELLED'}
+        
+        if allSuccess:
+            newhudText = "Agents Generated!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
+        else:
+            newhudText = "Agents Generated With Errors!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
+
         return {'FINISHED'}
 
 
