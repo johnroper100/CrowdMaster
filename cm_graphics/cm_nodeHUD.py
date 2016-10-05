@@ -11,17 +11,17 @@ def update_hud_text(new_text):
 
 
 def draw_hud():
-    #preferences = bpy.context.user_preferences.addons[__package__].preferences
-    #if preferences.show_node_hud:
-    if getattr(bpy.context.space_data.node_tree, "bl_idname", "") not in ("CrowdMasterTreeType", "CrowdMasterAGenTreeType"):
-        return
-    else:
-        set_drawing_dpi(get_dpi())
-        dpi_factor = get_dpi_factor()
+    preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+    if preferences.show_node_hud:
+        if getattr(bpy.context.space_data.node_tree, "bl_idname", "") not in ("CrowdMasterTreeType", "CrowdMasterAGenTreeType"):
+            return
+        else:
+            set_drawing_dpi(get_dpi())
+            dpi_factor = get_dpi_factor()
 
-        object = bpy.context.active_object
-        if object is not None:
-            draw_object_status(object, dpi_factor)
+            object = bpy.context.active_object
+            if object is not None:
+                draw_object_status(object, dpi_factor)
 
 
 def draw_object_status(object, dpi_factor):
