@@ -138,7 +138,7 @@ class NewInputNode(LogicNode):
 
     Constant = FloatProperty(name="Constant")
 
-    Flocking = EnumProperty(name="Flocking input",
+    Flocking = EnumProperty(name="Flocking Input",
                             items=[("SEPARATE", "Separate", "", 1),
                                    ("ALIGN", "Align", "", 2),
                                    ("COHERE", "Cohere", "", 3)])
