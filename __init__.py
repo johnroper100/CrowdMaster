@@ -171,6 +171,7 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
 
 class SCENE_OT_cm_start(Operator):
+    """Start the CrowdMaster agent simulation."""
     bl_idname = "scene.cm_start"
     bl_label = "Start Simulation"
 
@@ -207,6 +208,7 @@ class SCENE_OT_cm_start(Operator):
 
 
 class SCENE_OT_cm_stop(Operator):
+    """Stop the CrowdMaster agent simulation."""
     bl_idname = "scene.cm_stop"
     bl_label = "Stop Simulation"
 
