@@ -163,7 +163,7 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2)])
 
     PathName = StringProperty(name="Path Name")
-    PathOptions = EnumProperty(name="Path options",
+    PathOptions = EnumProperty(name="Path Options",
                                items=[("RZ", "rz", "", 1),
                                       ("RX", "rx", "", 2)])
 
