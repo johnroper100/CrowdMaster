@@ -75,6 +75,12 @@ class CMPreferences(AddonPreferences):
         description="Chose whether to show the CrowdMaster teaxt HUD in the node editor.",
         default=True,
         )
+    
+    show_sim_data = BoolProperty(
+        name="Show Detailed Simulation Data",
+        description="Chose whether to show detailed data while running a simulation or operator in the node tree hud. Warning, this makes each opertor take longer.",
+        default=False,
+        )
 
     play_animation = BoolProperty(
         name="Start Animation Automatically",
@@ -122,6 +128,11 @@ class CMPreferences(AddonPreferences):
 
             row = layout.row()
             row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
+            
+            if preferences.show_node_hud:
+                row.prop(preferences, 'show_sim_data', icon='OUTLINER_DATA_FONT')
+                row = layout.row()
+    
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:

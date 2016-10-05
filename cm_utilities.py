@@ -318,12 +318,18 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
         update_hud_text(newhudText)
         cm_redrawAll()
 
+        preferences = context.user_preferences.addons[__package__].preferences
         groups = bpy.data.groups
         objects = context.scene.objects
         for group in context.scene.cm_groups:
             for agentType in group.agentTypes:
                 for agent in agentType.agents:
                     for obj in groups[agent.geoGroup].objects:
+                        if preferences.show_sim_data:
+                            newhudText = "Placing Object {}".format(obj.name)
+                            update_hud_text(newhudText)
+                            cm_redrawAll()
+                            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
                             for con in obj.constraints:
