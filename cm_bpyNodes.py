@@ -122,7 +122,7 @@ class InputNode(LogicNode):
 
 class NewInputNode(LogicNode):
     """CrowdMaster input node"""
-    bl_label = "New Input"
+    bl_label = "Input"
     bl_width_default = 200.0
 
     InputSource = EnumProperty(name="Input Channel",
@@ -851,7 +851,7 @@ class MyNodeCategory(NodeCategory):
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("NewInputNode"),
-        NodeItem("InputNode"),
+        #NodeItem("InputNode"),
         NodeItem("PythonNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
