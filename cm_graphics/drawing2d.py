@@ -1,8 +1,8 @@
+import bpy
+import os
 import blf
 import bgl
 from bgl import *
-import bpy
-import os
 from . utils import get_dpi_factor
 
 dpi = 72
