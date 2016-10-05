@@ -40,8 +40,8 @@ def draw_object_status(object, dpi_factor):
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
     y2 = bpy.context.region.height - get_vertical_offset() - 30 * dpi_factor
-    size1 = bpy.context.region.width / 30
-    size2 = bpy.context.region.width / 40
+    size1 = bpy.context.region.width / 40
+    size2 = bpy.context.region.width / 50
     font_file1 = os.path.dirname(__file__) + "/fonts/BebasNeue.otf"
     font_file2 = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
     draw_text_custom(text1, x, y1, font_file1, "ON", size=int(size1), color=(0.8, 0.5, 0.0, 1.0))
