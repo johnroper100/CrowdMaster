@@ -110,15 +110,15 @@ class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
             ng = bpy.data.node_groups.new("SimpleRandomPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
-        object_node.location = (-600, 0)
-        object_node.inputObject = "Cone"
+        object_node.location = (-1200, 0)
+        object_node.inputObject = "Cube"
 
         template_node = ng.nodes.new("TemplateNodeType")
-        template_node.location = (-400, 0)
+        template_node.location = (-800, 0)
         template_node.brainType = "Sample Random"
 
         rand_node = ng.nodes.new("RandomPositionNodeType")
-        rand_node.location = (-200, 0)
+        rand_node.location = (-400, 0)
         rand_node.noToPlace = 25
         rand_node.radius = 25.00
 
@@ -146,15 +146,15 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
             ng = bpy.data.node_groups.new("SimpleFormationPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
-        object_node.location = (-600, 0)
-        object_node.inputObject = "Cone"
+        object_node.location = (-1200, 0)
+        object_node.inputObject = "Cube"
 
         template_node = ng.nodes.new("TemplateNodeType")
-        template_node.location = (-400, 0)
+        template_node.location = (-925, 0)
         template_node.brainType = "Sample Formation"
 
         form_node = ng.nodes.new("FormationPositionNodeType")
-        form_node.location = (-200, 0)
+        form_node.location = (-550, 0)
         form_node.noToPlace = 25
         form_node.ArrayRows = 5
         form_node.ArrayRowMargin = 5.00
@@ -184,15 +184,15 @@ class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
             ng = bpy.data.node_groups.new("SimpleTargetPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
-        object_node.location = (-600, 0)
-        object_node.inputObject = "Cone"
+        object_node.location = (-1050, 0)
+        object_node.inputObject = "Cube"
 
         template_node = ng.nodes.new("TemplateNodeType")
-        template_node.location = (-400, 0)
+        template_node.location = (-800, 0)
         template_node.brainType = "Sample Target"
 
         target_node = ng.nodes.new("TargetPositionNodeType")
-        target_node.location = (-200, 0)
+        target_node.location = (-400, 0)
         target_node.targetType = "vertex"
         target_node.targetObject = "Grid"
 
@@ -219,9 +219,10 @@ class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
         else:
             ng = bpy.data.node_groups.new("SimpleMovement", "CrowdMasterTreeType")
 
-        input_node = ng.nodes.new("InputNode")
-        input_node.location = (-200, 0)
-        input_node.Input = "0.1"
+        input_node = ng.nodes.new("NewInputNode")
+        input_node.location = (-300, 0)
+        input_node.InputSource = "CONSTANT"
+        input_node.Constant = 0.1
 
         output_node = ng.nodes.new("OutputNode")
         output_node.location = (0, 0)
