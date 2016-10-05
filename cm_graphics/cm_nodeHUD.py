@@ -3,7 +3,7 @@ from . drawing2d import *
 from . utils import *
 
 cm_hudText = "Setup Your Node Tree to Get Started"
-cm_hudText2 = "Time taken: None yet"
+cm_hudText2 = "Time taken: 0 seconds"
 
 
 def update_hud_text(new_text):
