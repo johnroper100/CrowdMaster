@@ -1,11 +1,12 @@
 import bpy
+import time
 from bpy.types import Operator
 from bpy.props import StringProperty
 
 from .. libs.ins_vector import Vector
 
 from . cm_templates import templates
-from .. cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
+from .. cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text, update_hud_text2
 from .. cm_graphics . utils import cm_redrawAll
 
 
@@ -55,6 +56,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             return False, None
 
     def execute(self, context):
+        startT = time.time()
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
 
@@ -90,11 +92,17 @@ class SCENE_OT_agent_nodes_generate(Operator):
         if allSuccess:
             newhudText = "Agents Generated!"
             update_hud_text(newhudText)
-            cm_redrawAll()
+
         else:
             newhudText = "Agents Generated With Errors!"
             update_hud_text(newhudText)
-            cm_redrawAll()
+        
+        endT = time.time() - startT
+        
+        newhudText2 = "Time taken: {} seconds".format(str(endT))
+        update_hud_text2(newhudText2)
+
+        cm_redrawAll()
 
         return {'FINISHED'}
 
