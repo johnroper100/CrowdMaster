@@ -323,7 +323,7 @@ class GraphNode(LogicNode):
     """
 
     def draw_buttons(self, context, layout):
-        if self.CurveType == "RANGE":
+        """if self.CurveType == "RANGE":
             row = layout.row()
             split = row.split(1000 / (context.region.width - 50))
             split.template_preview(bpy.data.textures['CrowdMaster-Graph-Range-Do-Not-Delete'], show_buttons=False)
@@ -331,7 +331,7 @@ class GraphNode(LogicNode):
         elif self.CurveType == "RBF":
             row = layout.row()
             split = row.split(1000 / (context.region.width - 50))
-            split.template_preview(bpy.data.textures['CrowdMaster-Graph-RBF-Do-Not-Delete'], show_buttons=False)
+            split.template_preview(bpy.data.textures['CrowdMaster-Graph-RBF-Do-Not-Delete'], show_buttons=False)"""
 
         layout.prop(self, "Multiply")
         layout.prop(self, "CurveType", expand=True)
