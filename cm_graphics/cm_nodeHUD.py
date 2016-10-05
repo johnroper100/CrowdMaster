@@ -35,7 +35,7 @@ def draw_object_status(object, dpi_factor):
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":
         text1 = "CrowdMaster Agent Simulation: {}".format(cm_hudText)
     elif getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterAGenTreeType":
-        text1 = cm_hudText2 + " CrowdMaster Agent Generation: {}".format(cm_hudText)
+        text1 = "CrowdMaster Agent Generation: {}".format(cm_hudText)
     text2 = "Show Debug Options is currently set to: {} | {}".format(preferences.show_debug_options, cm_hudText2)
     x = get_3d_view_tools_panel_overlay_width(bpy.context.area) + 20 * dpi_factor
     y1 = bpy.context.region.height - get_vertical_offset() * dpi_factor
