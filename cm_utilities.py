@@ -1,5 +1,6 @@
 import bpy
 import os
+import time
 from bpy.types import Panel, Operator
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
@@ -7,7 +8,7 @@ from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from . import icon_load
 from . icon_load import cicon
 
-from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
+from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text, update_hud_text2
 from . cm_graphics . utils import cm_redrawAll
 
 bpy.types.Scene.show_utilities = BoolProperty(
@@ -278,6 +279,7 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
+        startT = time.time()
 
         selected = bpy.context.selected_objects
         for obj in selected:
@@ -289,8 +291,14 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
             bound_box.rotation_euler = obj.rotation_euler
             bound_box.select = True
         
+        endT = time.time() - startT
+        
         newhudText = "Done Converting to Bounding Boxes!"
         update_hud_text(newhudText)
+        
+        newhudText2 = "Time taken: {} seconds".format(str(endT))
+        update_hud_text2(newhudText2)
+
         cm_redrawAll()
 
         return {'FINISHED'}
