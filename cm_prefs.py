@@ -73,7 +73,7 @@ class CMPreferences(AddonPreferences):
     show_node_hud = BoolProperty(
         name="Show Node Editor HUD",
         description="Chose whether to show the CrowdMaster text HUD in the node editor.",
-        default=True,
+        default=False,
         )
     
     show_sim_data = BoolProperty(
