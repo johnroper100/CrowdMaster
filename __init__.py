@@ -12,20 +12,14 @@ bl_info = {
 }
 
 import bpy
-import random
-import sys
-import os
-import blf
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from . import cm_prefs
-from . import icon_load
 from . icon_load import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
-from . cm_graphics . cm_nodeHUD import cm_hudText, draw_hud, draw_handler, update_hud_text, update_hud_text2
+from . cm_graphics . cm_nodeHUD import update_hud_text
 from . cm_graphics . utils import cm_redrawAll
 
 # =============== GROUPS LIST START ===============#
@@ -276,14 +270,6 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.prop(scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
 
-            #box = layout.box()
-            #row = box.row()
-            #row.scale_y = 1.5
-            #if preferences.use_custom_icons:
-                #row.operator("scene.cm_setup_agent", icon_value=cicon('setup'))
-            #else:
-                #row.operator("scene.cm_setup_agent", icon="MOD_REMESH")
-
             box = layout.box()
             row = box.row()
             row.scale_y = 1.5
@@ -362,7 +348,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             box = layout.box()
 
             index = scene.cm_groups_index
-            if index >= 0 and index < len(scene.cm_groups):
+            if 0 <= index < len(scene.cm_groups):
                 group = scene.cm_groups[index]
 
                 box.template_list("SCENE_UL_agent_type", "", group,
@@ -414,9 +400,6 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
 
 
 def register():
-    # import addon_utils
-    # addon_utils.enable("curve_simplify")
-
     register_icons()
     cm_nodeHUD.register()
 
@@ -437,12 +420,10 @@ def register():
     global action_register
     from .cm_actions import action_register
     global action_unregister
-    from .cm_actions import action_unregister
 
     global event_register
     from .cm_events import event_register
     global event_unregister
-    from .cm_events import event_unregister
 
     from . import cm_blenderData
     cm_blenderData.registerTypes()
@@ -468,10 +449,7 @@ def register():
 
 
 def initialise():
-    sce = bpy.context.scene
-
     global Simulation
-    from .cm_simulate import Simulation
 
 
 def unregister():
