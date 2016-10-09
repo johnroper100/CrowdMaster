@@ -41,7 +41,7 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
 
     def execute(self, context):
         scene = context.scene
-        
+
         newhudText = "Sample Node Setups Created!"
         update_hud_text(newhudText)
         cm_redrawAll()
@@ -290,12 +290,12 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
             bound_box.location = obj.location
             bound_box.rotation_euler = obj.rotation_euler
             bound_box.select = True
-        
+
         endT = time.time() - startT
-        
+
         newhudText = "Done Converting to Bounding Boxes!"
         update_hud_text(newhudText)
-        
+
         newhudText2 = "Time taken: {} seconds".format(str(endT))
         update_hud_text2(newhudText2)
 
@@ -341,6 +341,7 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                             bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
+                            newObj.matrix_world = obj.matrix_world
                             for con in obj.constraints:
                                 if con.type == "CHILD_OF":
                                     nCon = newObj.constraints.new("CHILD_OF")
@@ -376,7 +377,7 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                     for mod in nObj.modifiers:
                                         if mod.type == "ARMATURE":
                                             mod.object = objects[agent.name]
-        
+
         newhudText = "Done Placing Deferred Geometry!"
         update_hud_text(newhudText)
         cm_redrawAll()
