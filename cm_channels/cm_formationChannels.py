@@ -1,6 +1,5 @@
 from .cm_masterChannels import MasterChannel as Mc
 import mathutils
-from mathutils import Vector
 import math
 
 from ..libs.ins_clustering import clusterMatch
@@ -55,7 +54,7 @@ class Channel:
         self.inpBuffer = []
         self.priority = []
         self.calcd = {}  # {str: Vector()}
-        self.lastCalcd = None  # Store from last frame to reduce jittering
+        self.lastCalcd = None  # Store from last frame to reduce jitter
 
     def register(self, objs):
         """Add a formation target object"""
@@ -63,12 +62,11 @@ class Channel:
 
     def newuser(self, userid):
         """Called when a new agent is using this channel"""
-        self.userid = userid
+        self.userid = userid  # should be defined in __init__!
 
     def newFrame(self):
         """Called at the beginning of each new frame.
         (see def checkCalcd for description of how this is used)"""
-        objs = bpy.data.objects
 
         self.calcd = {}
         new = []
@@ -96,7 +94,7 @@ class Channel:
         setOfTargets = set([tgAccess(x) for x in self.targets])
         if self.lastCalcd:
             # TODO if the same agents are inputed the same result as last time
-            #  will be returned. This prevents jittering but may result in
+            #  will be returned. This prevents jitter but may result in
             #  problems in the future.
             if self.lastCalcd[0] == set(self.priority[:len(self.targets)]) and\
                     self.lastCalcd[1] == setOfTargets:

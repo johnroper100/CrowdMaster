@@ -1,5 +1,4 @@
 import bpy
-import random
 from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
@@ -28,7 +27,7 @@ class SCENE_OT_cm_events_populate(Operator):
     bl_label = "Populate cm events list"
 
     def execute(self, context):
-        item = context.scene.cm_events.coll.add()
+        item = context.scene.cm_events.coll.add()  # item is not used...
         return {'FINISHED'}
 
 
@@ -74,10 +73,8 @@ class SCENE_OT_event_move(Operator):
 
 class SCENE_UL_event(UIList):
     """for drawing each row"""
-    def draw_item(self, context, layout, data, item, icon, active_data,
-                  active_propname):
+    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            # layout.label(text=str(item.name))
             layout.prop(item, "eventname", text="")
             layout.prop(item, "category", text="")
             if item.category == "Time" or item.category == "Time+Volume":
@@ -109,7 +106,6 @@ class SCENE_PT_event(Panel):
 
     def draw(self, context):
         layout = self.layout
-        sce = context.scene
 
         row = layout.row()
 

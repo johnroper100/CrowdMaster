@@ -1,6 +1,5 @@
 import bpy
 import mathutils
-from mathutils import Vector
 Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
 import math
@@ -88,8 +87,6 @@ class Path(Mc):
         lVel += ab.length * fac
         start = co + adjust
 
-        startDistFac = (co_find - start).length / radius
-
         nextIndex = nextVert.index
 
         while True:
@@ -144,7 +141,6 @@ class Path(Mc):
         else:
             kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject)
 
-        obj = context.scene.objects[pathObject]
         vel = self.sim.agents[self.userid].globalVelocity * lookahead
         vel = vel * rotation
         co_find = pathMatrixInverse * context.scene.objects[self.userid].location

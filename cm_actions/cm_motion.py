@@ -1,5 +1,4 @@
 import bpy
-import math
 
 
 class ActionManager:

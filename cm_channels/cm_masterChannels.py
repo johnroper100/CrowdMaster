@@ -1,6 +1,3 @@
-import random
-
-
 class MasterChannel:
     """The parent class for all the channels"""
     def __init__(self, sim):
@@ -21,4 +18,4 @@ class MasterChannel:
 
     def setuser(self, userid):
         """Set up the channel to be used with a new agent"""
-        self.userid = userid
+        self.userid = userid  # should be defined in __init__

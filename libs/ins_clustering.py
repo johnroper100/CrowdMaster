@@ -1,4 +1,3 @@
-import math
 from random import randrange, choice
 
 try:
@@ -172,14 +171,12 @@ if __name__ == "__main__":
                                  2 * self.radius + 2 * adjust)
 
         def paint(self, painter, option, widget):
-            # painter.setPen(QtCore.Qt.NoPen)
             if self.isGroupMarker:
                 painter.setPen(QtGui.QPen(QtCore.Qt.black, 10))
             elif self.inGroup1:
                 painter.setPen(QtGui.QPen(QtCore.Qt.blue, 1))
             else:
                 painter.setPen(QtGui.QPen(QtCore.Qt.red, 1))
-            # painter.setBrush(QtGui.QBrush(QtCore.Qt.yellow))
             bounding = QtCore.QRect(-self.radius, -self.radius,
                                     2 * self.radius, 2 * self.radius)
             painter.drawEllipse(bounding)
@@ -211,7 +208,6 @@ if __name__ == "__main__":
                 painter.setPen(QtGui.QPen(QtCore.Qt.magenta, 1))
             else:
                 painter.setPen(QtGui.QPen(QtCore.Qt.yellow, 1))
-            # painter.setBrush(QtGui.QBrush(QtCore.Qt.yellow))
             bounding = QtCore.QRect(-self.radius,
                                     -self.radius, 2 * self.radius,
                                     2 * self.radius)

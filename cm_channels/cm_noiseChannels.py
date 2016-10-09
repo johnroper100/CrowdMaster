@@ -1,4 +1,3 @@
-import bpy
 from .cm_masterChannels import MasterChannel as Mc
 import random
 

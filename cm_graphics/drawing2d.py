@@ -1,9 +1,6 @@
-import bpy
-import os
 import blf
 import bgl
 from bgl import *
-from . utils import get_dpi_factor
 
 dpi = 72
 
@@ -72,6 +69,7 @@ def draw_text_custom(text, x, y, font_file_path, shadow_on, align="LEFT", size=1
             blf.position(font, x - width, y, 0)
 
     blf.draw(font, text)
+
 
 def unload_custom_font(font_file_path):
     font_path = font_file_path

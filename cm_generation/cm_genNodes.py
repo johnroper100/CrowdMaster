@@ -3,17 +3,20 @@ from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 from .. icon_load import cicon
+import textwrap
+import nodeitems_utils
+from nodeitems_utils import NodeCategory, NodeItem
 
 
 class CrowdMasterAGenTree(NodeTree):
-    '''CrowdMaster agent generation node tree'''
+    """CrowdMaster agent generation node tree"""
     bl_idname = 'CrowdMasterAGenTreeType'
     bl_label = 'CrowdMaster Agent Generation'
     bl_icon = 'MOD_ARRAY'
 
 
 class GeoSocket(NodeSocket):
-    '''Geo node socket type'''
+    """Geo node socket type"""
     bl_idname = 'GeoSocketType'
     bl_label = 'Geo Node Socket'
 
@@ -25,7 +28,7 @@ class GeoSocket(NodeSocket):
 
 
 class TemplateSocket(NodeSocket):
-    '''Template node socket type'''
+    """Template node socket type"""
     bl_idname = 'TemplateSocketType'
     bl_label = 'Template Node Socket'
 
@@ -43,7 +46,7 @@ class CrowdMasterAGenTreeNode(Node):
 
 
 class GenerateNode(CrowdMasterAGenTreeNode):
-    '''The generate node'''
+    """The generate node"""
     bl_idname = 'GenerateNodeType'
     bl_label = 'Generate'
     bl_icon = 'SOUND'
@@ -61,7 +64,7 @@ class GenerateNode(CrowdMasterAGenTreeNode):
 
 
 class AddToGroupNode(CrowdMasterAGenTreeNode):
-    '''The addToGroup node'''
+    """The addToGroup node"""
     bl_idname = 'AddToGroupNodeType'
     bl_label = 'Add To Group'
     bl_icon = 'SOUND'
@@ -103,7 +106,7 @@ class ObjectInputNode(CrowdMasterAGenTreeNode):
 
 
 class GroupInputNode(CrowdMasterAGenTreeNode):
-    '''The group input node'''
+    """The group input node"""
     bl_idname = 'GroupInputNodeType'
     bl_label = 'Group'
     bl_icon = 'SOUND'
@@ -122,7 +125,7 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
 
 
 class GeoSwitchNode(CrowdMasterAGenTreeNode):
-    '''The geo switch node'''
+    """The geo switch node"""
     bl_idname = 'GeoSwitchNodeType'
     bl_label = 'Geo Switch'
     bl_icon = 'SOUND'
@@ -145,7 +148,7 @@ class GeoSwitchNode(CrowdMasterAGenTreeNode):
 
 
 class TemplateSwitchNode(CrowdMasterAGenTreeNode):
-    '''The template switch node'''
+    """The template switch node"""
     bl_idname = 'TemplateSwitchNodeType'
     bl_label = 'Template Switch'
     bl_icon = 'SOUND'
@@ -168,7 +171,7 @@ class TemplateSwitchNode(CrowdMasterAGenTreeNode):
 
 
 class ParentNode(CrowdMasterAGenTreeNode):
-    '''The parent node'''
+    """The parent node"""
     bl_idname = 'ParentNodeType'
     bl_label = 'Parent'
     bl_icon = 'SOUND'
@@ -192,7 +195,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
 
 
 class TemplateNode(CrowdMasterAGenTreeNode):
-    '''The template node'''
+    """The template node"""
     bl_idname = 'TemplateNodeType'
     bl_label = 'Template'
     bl_icon = 'SOUND'
@@ -219,7 +222,7 @@ class TemplateNode(CrowdMasterAGenTreeNode):
 
 
 class OffsetNode(CrowdMasterAGenTreeNode):
-    '''The offset node'''
+    """The offset node"""
     bl_idname = 'OffsetNodeType'
     bl_label = 'Offset'
     bl_icon = 'SOUND'
@@ -264,7 +267,7 @@ def updateRandomNode(self, context):
 
 
 class RandomNode(CrowdMasterAGenTreeNode):
-    '''The random node'''
+    """The random node"""
     bl_idname = 'RandomNodeType'
     bl_label = 'Random'
     bl_icon = 'SOUND'
@@ -313,7 +316,7 @@ class RandomNode(CrowdMasterAGenTreeNode):
 
 
 class PointTowardsNode(CrowdMasterAGenTreeNode):
-    '''The Point Towards node'''
+    """The Point Towards node"""
     bl_idname = 'PointTowardsNodeType'
     bl_label = 'Point Towards'
     bl_icon = 'SOUND'
@@ -340,7 +343,7 @@ class PointTowardsNode(CrowdMasterAGenTreeNode):
 
 
 class CombineNode(CrowdMasterAGenTreeNode):
-    '''Duplicate request'''
+    """Duplicate request"""
     bl_idname = 'CombineNodeType'
     bl_label = 'Combine'
     bl_icon = 'SOUND'
@@ -366,7 +369,7 @@ class CombineNode(CrowdMasterAGenTreeNode):
 
 
 class RandomPositionNode(CrowdMasterAGenTreeNode):
-    '''The random positioing node'''
+    """The random positioing node"""
     bl_idname = 'RandomPositionNodeType'
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
@@ -452,7 +455,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
-    '''The formation positioing node'''
+    """The formation positioing node"""
     bl_idname = 'FormationPositionNodeType'
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
@@ -492,7 +495,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
 
 
 class TargetPositionNode(CrowdMasterAGenTreeNode):
-    '''The target positioing node'''
+    """The target positioing node"""
     bl_idname = 'TargetPositionNodeType'
     bl_label = 'Target Positioning'
     bl_icon = 'SOUND'
@@ -536,7 +539,7 @@ class TargetPositionNode(CrowdMasterAGenTreeNode):
 
 
 class ObstacleNode(CrowdMasterAGenTreeNode):
-    '''The obstacle node'''
+    """The obstacle node"""
     bl_idname = 'ObstacleNodeType'
     bl_label = 'Obstacle'
     bl_icon = 'SOUND'
@@ -561,7 +564,7 @@ class ObstacleNode(CrowdMasterAGenTreeNode):
 
 
 class GroundNode(CrowdMasterAGenTreeNode):
-    '''The ground node'''
+    """The ground node"""
     bl_idname = 'GroundNodeType'
     bl_label = 'Ground'
     bl_icon = 'SOUND'
@@ -580,9 +583,6 @@ class GroundNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"groundMesh": self.groundMesh}
-
-import textwrap
-import importlib
 
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
@@ -621,7 +621,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
             out.append("")
         return out
 
-    def init(self, context):
+    def init(self, context):  # shouldn't this be the __init__ method?
         self.width = 400
         self.color = (0.5, 0.5, 0.5)
         self.use_custom_color = True
@@ -689,10 +689,6 @@ class GenNoteClear(bpy.types.Operator):
         node = context.node
         node.clear()
         return {'FINISHED'}
-
-
-import nodeitems_utils
-from nodeitems_utils import NodeCategory, NodeItem
 
 
 class CrowdMasterAGenCategories(NodeCategory):

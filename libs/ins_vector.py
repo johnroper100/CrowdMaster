@@ -72,7 +72,6 @@ except:
         def __eq__(self, eq):
             if not isinstance(eq, Vector) or (self.length() != eq.length()):
                 return False
-            result = True
             for d1, d2 in zip(self._vec, eq._vec):
                 if d1 != d2:
                     return False

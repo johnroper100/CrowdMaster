@@ -6,7 +6,6 @@ KDTree = mathutils.kdtree.KDTree
 from collections import OrderedDict
 
 import random
-import time
 import math
 from math import radians
 
@@ -165,9 +164,9 @@ class GeoTemplatePARENT(GeoTemplate):
         # TODO check if the object has an armature modifier
 
     def check(self):
-        if not "Parent Group" in self.inputs:
+        if "Parent Group" not in self.inputs:
             return False
-        if not "Child Object" in self.inputs:
+        if "Child Object" not in self.inputs:
             return False
         if not isinstance(self.inputs["Parent Group"], GeoTemplate):
             return False
