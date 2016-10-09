@@ -1,14 +1,11 @@
 import bpy
-import os
 import time
-from bpy.types import Panel, Operator
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 
-from . import icon_load
 from . icon_load import cicon
 
-from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text, update_hud_text2
+from . cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
 from . cm_graphics . utils import cm_redrawAll
 
 bpy.types.Scene.show_utilities = BoolProperty(

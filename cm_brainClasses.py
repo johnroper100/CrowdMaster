@@ -1,6 +1,4 @@
-from . import cm_channels as chan
 import random
-import functools
 
 import bpy
 
@@ -142,10 +140,9 @@ class Neuron():
             c.hsv = hue, sat, val
             self.bpyNode.color = c
             self.bpyNode.keyframe_insert("color")
-            # self.bpyNode.update()
 
 
-class State():
+class State:
     """The basic element of the state machine. Abstract class"""
     def __init__(self, brain, bpyNode, name):
         """A lot of the fields are modified by the compileBrain function"""
@@ -170,12 +167,10 @@ class State():
         """If this state is a valid next move return float > 0"""
         if not self.finalValueCalcd:
             self.evaluate()
-        # print("query", self.name, self.finalValue)
         return self.finalValue
 
     def moveTo(self):
         """Called when the current state moves to this node"""
-        # print("Moving to a new state:", self.name)
         self.currentFrame = 0
         self.isCurrent = True
 
@@ -225,10 +220,6 @@ class State():
         :rtype: bool, string | None
         """
         self.currentFrame += 1
-
-        """Check to see if the current state is still playing an animation"""
-        # print("currentFrame", self.currentFrame, "length", self.length)
-        # print("Value compared", self.length - 2 - self.settings["Fade out"])
 
         # The proportion of the way through the state
         if self.length == 0:
@@ -314,7 +305,6 @@ class Brain():
         self.outvars = {"rx": 0, "ry": 0, "rz": 0,
                         "px": 0, "py": 0, "pz": 0}
         self.tags = self.sim.agents[self.userid].access["tags"]
-        # self.tags = {}
         self.agvars = self.sim.agents[self.userid].agvars
 
     def execute(self):
@@ -322,7 +312,7 @@ class Brain():
         actv = bpy.context.active_object
         self.isActiveSelection = actv is not None and actv.name == self.userid
         self.reset()
-        self.randstate = hash(self.userid) + self.sim.framelast
+        self.randstate = hash(self.userid) + self.sim.framelast  # randstate should be defined in __init__!
         random.seed(self.randstate)
         for name, var in self.lvars.items():
             var.setuser(self.userid)

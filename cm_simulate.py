@@ -1,18 +1,14 @@
 import bpy
-from collections import OrderedDict
 
-import sys
 import time
 
 from . import cm_channels as chan
 
 from .cm_agent import Agent
 from .cm_actions import getmotions
-from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
-from . cm_graphics . utils import cm_redrawAll
 
 
-class Simulation():
+class Simulation:
     """The object that contains everything once the simulation starts"""
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
@@ -41,7 +37,7 @@ class Simulation():
 
     def actions(self):
         """Set up the actions"""
-        self.actions, self.actionGroups = getmotions()
+        self.actions, self.actionGroups = getmotions()  # these should both be defined in __init__
 
     def newagent(self, name, brain):
         """Set up an agent"""

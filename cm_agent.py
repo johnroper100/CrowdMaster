@@ -1,8 +1,6 @@
 import bpy
-import time
 import mathutils
 import copy
-import math
 
 from .cm_compileBrain import compileBrain
 
@@ -16,7 +14,6 @@ class Agent:
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
-        # print(self, self.brain.type)
         self.external = {"id": self.id, "tags": {}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by

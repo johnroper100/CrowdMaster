@@ -1,9 +1,5 @@
-import bpy
-
 from .cm_nodeFunctions import logictypes, statetypes
-from collections import OrderedDict
-from .cm_brainClasses import Neuron, Brain, State
-import functools
+from .cm_brainClasses import Brain
 
 
 def getInputs(inp):

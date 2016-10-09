@@ -3,9 +3,7 @@ import os
 from bpy.types import AddonPreferences
 from bpy.props import *
 from . import addon_updater_ops
-from . import icon_load
 from . icon_load import cicon
-from . cm_graphics import cm_nodeHUD
 
 
 class CMSavePrefs(bpy.types.Operator):
@@ -21,7 +19,6 @@ class CMSavePrefs(bpy.types.Operator):
 
 
 class CMPreferences(AddonPreferences):
-    # bl_idname = "CrowdMaster"
     bl_idname = __package__
     scriptdir = bpy.path.abspath(os.path.dirname(__file__))
 
@@ -139,7 +136,7 @@ class CMPreferences(AddonPreferences):
                 row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
 
         if preferences.prefs_tab == "UPDATE":
-            row = layout.row()
+            layout.row()
             addon_updater_ops.update_settings_ui(self, context)
 
         row = layout.row(align=True)

@@ -9,6 +9,7 @@ addonname = "crowdmaster"  # more consistent than using updater.addon.lower()
 # Example operators utilizing Updater
 # -----------------------------------------------------------------------------
 
+
 # simple popup for prompting checking for update & allowing to install if available
 class addon_updater_install_popup(bpy.types.Operator):
     """Check and install update if available"""
@@ -21,14 +22,14 @@ class addon_updater_install_popup(bpy.types.Operator):
 
     def draw(self, context):
         layout = self.layout
-        if updater.update_ready == True:
+        if updater.update_ready:
             layout.label("Update ready! Press OK to install v"+str(updater.update_version))
             # could offer to remove popups here, but window will not close or redraw
             # so may be confusing to the user/look like a bug
             # row = layout.row()
             # row.label("Prevent future popups:")
             # row.operator(addon_updater_ignore.bl_idname,text="Ignore update")
-        elif updater.update_ready == False:
+        elif not updater.update_ready:
             layout.label("No updates available")
             layout.label("Press okay to dismiss dialog")
             # add option to force install
@@ -40,22 +41,22 @@ class addon_updater_install_popup(bpy.types.Operator):
         # potentially in future, could have UI for 'check to select old version'
         # to revert back to.
 
-    def execute(self,context):
+    def execute(self, context):
 
-        if updater.update_ready == True:
+        if updater.update_ready:
             res = updater.run_update(force=False, callback=post_update_callback)
             # should return 0, if not something happened
             if updater.verbose:
-                if res==0: print("Updater returned successful")
+                if res == 0: print("Updater returned successful")
                 else: print("Updater returned "+str(res)+", error occured")
 
-        elif updater.update_ready == None:
+        elif updater.update_ready is None:
+            # none of these variables are used!
             (update_ready, version, link) = updater.check_for_update(now=True)
             
             # re-launch this dialog
             atr = addon_updater_install_popup.bl_idname.split(".")
-            getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
-            #bpy.ops.retopoflow.updater_install_popup('INVOKE_DEFAULT')
+            getattr(getattr(bpy.ops, atr[0]), atr[1])('INVOKE_DEFAULT')
 
         else:
             print("Doing nothing, not ready for update")
@@ -69,9 +70,9 @@ class addon_updater_check_now(bpy.types.Operator):
     bl_description = "Check now for an update to the {x} addon".format(
                                                         x=updater.addon)
 
-    def execute(self,context):
+    def execute(self, context):
 
-        if updater.async_checking == True:
+        if updater.async_checking:
             # Check already happened
             # Used here to just avoid constant applying settings below
             return 
@@ -79,11 +80,11 @@ class addon_updater_check_now(bpy.types.Operator):
         # apply the UI settings
         settings = context.user_preferences.addons[__package__].preferences
         updater.set_check_interval(enable=settings.auto_check_update,
-                    months=settings.updater_intrval_months,
-                    days=settings.updater_intrval_days,
-                    hours=settings.updater_intrval_hours,
-                    minutes=settings.updater_intrval_minutes
-                    ) # optional, if auto_check_update 
+                                   months=settings.updater_intrval_months,
+                                   days=settings.updater_intrval_days,
+                                   hours=settings.updater_intrval_hours,
+                                   minutes=settings.updater_intrval_minutes
+                                   )  # optional, if auto_check_update
         
         # input is an optional callback function
         # this function should take a bool input, if true: update ready
@@ -92,35 +93,34 @@ class addon_updater_check_now(bpy.types.Operator):
 
         return {'FINISHED'}
 
+
 class addon_updater_update_now(bpy.types.Operator):
     bl_label = "Update "+updater.addon+" addon now"
     bl_idname = addonname+".updater_update_now"
     bl_description = "Update to the latest verison of the {x} addon".format(
                                                         x=updater.addon)
 
+    def execute(self, context):
 
-    def execute(self,context):
-
-        if updater.update_ready == True:
+        if updater.update_ready:
             # if it fails, offer to open the website instead
             try:
-                #updater.run_update(force=False)
                 res = updater.run_update(force=False, callback=post_update_callback)
                 # should return 0, if not something happened
                 if updater.verbose:
-                    if res==0: print("Updater returned successful")
+                    if res == 0: print("Updater returned successful")
                     else: print("Updater returned "+str(res)+", error occured")
             except:
                 atr = addon_updater_install_manually.bl_idname.split(".")
                 getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
-        elif updater.update_ready == None:
+        elif updater.update_ready is None:
+            # none of these variables are used!
             (update_ready, version, link) = updater.check_for_update(now=True)
             # re-launch this dialog
             atr = addon_updater_install_popup.bl_idname.split(".")
-            getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
+            getattr(getattr(bpy.ops, atr[0]), atr[1])('INVOKE_DEFAULT')
             
-            #bpy.ops.retopoflow.updater_install_popup('INVOKE_DEFAULT')
-        elif updater.update_ready == False:
+        elif not updater.update_ready:
             self.report({'INFO'}, "Nothing to update")
         else:
             self.report({'ERROR'}, "Encountered problem while trying to update")
@@ -136,12 +136,10 @@ class addon_updater_update_target(bpy.types.Operator):
 
     def target_version(self, context):
         ret = []
-        i=0
-        #print(len(updater.tags))
+        i = 0
         for tag in updater.tags:
-            #print(tag)
-            ret.append( (tag,tag,"Select to install version "+tag) )
-            i+=1
+            ret.append((tag, tag, "Select to install version " + tag))
+            i += 1
             print(tag)
         return ret
 
@@ -153,7 +151,7 @@ class addon_updater_update_target(bpy.types.Operator):
 
     @classmethod
     def poll(cls, context):
-        return updater.update_ready != None
+        return updater.update_ready is not None
 
     def invoke(self, context, event):
         return context.window_manager.invoke_props_dialog(self)
@@ -166,18 +164,12 @@ class addon_updater_update_target(bpy.types.Operator):
         subcol = split.column()
         subcol.prop(self, "target", text="")
 
-
     def execute(self,context):
-
-        res = updater.run_update(force=False,revert_tag=self.target, callback=post_update_callback)
+        res = updater.run_update(force=False, revert_tag=self.target, callback=post_update_callback)
         # should return 0, if not something happened
         if updater.verbose:
-            if res==0: print("Updater returned successful")
+            if res == 0: print("Updater returned successful")
             else: print("Updater returned "+str(res)+", error occured")
-        # try:
-        # 	updater.run_update(force=False,revert_tag=self.target)
-        # except:
-        # 	self.report({'ERROR'}, "Problem installing target version")
 
         return {'FINISHED'}
 
@@ -207,17 +199,17 @@ class addon_updater_install_manually(bpy.types.Operator):
 
         row = layout.row()
 
-        if updater.update_link != None:
-            row.operator("wm.url_open",text="Direct download").url=updater.update_link
+        if updater.update_link is not None:
+            row.operator("wm.url_open", text="Direct download").url=updater.update_link
         else:
-            row.operator("wm.url_open",text="(failed to retreive)")
+            row.operator("wm.url_open", text="(failed to retreive)")
             row.enabled = False
 
-            if updater.website != None:
+            if updater.website is not None:
                 row = layout.row()
                 row.label("Grab update from account")
 
-                row.operator("wm.url_open",text="Open website").url=updater.website
+                row.operator("wm.url_open", text="Open website").url=updater.website
             else:
                 row = layout.row()
 
@@ -243,7 +235,7 @@ class addon_updater_updated_successful(bpy.types.Operator):
         layout = self.layout
         # use a "failed flag"? it show this label if the case failed.
         saved = updater.json
-        if updater.auto_reload_post_update == False:
+        if not updater.auto_reload_post_update:
             # tell user to restart blender
             if "just_restored" in saved and saved["just_restored"] == True:
                 layout.label("Addon restored")
@@ -295,7 +287,7 @@ class addon_updater_ignore(bpy.types.Operator):
     # not an "okay" to execut, but just oeprators
     @classmethod
     def poll(cls, context):
-        if updater.update_ready == True:
+        if updater.update_ready:
             return True
         else:
             return False
@@ -317,7 +309,7 @@ ran_update_sucess_popup = False
 ran_background_check = False
 
 @persistent
-def updater_run_success_popup_handler(scene):
+def updater_run_success_popup_handler(scene):  # "scene" is never used!
     global ran_update_sucess_popup
     ran_update_sucess_popup = True
     try:
@@ -326,11 +318,11 @@ def updater_run_success_popup_handler(scene):
         pass
 
     atr = addon_updater_updated_successful.bl_idname.split(".")
-    getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
+    getattr(getattr(bpy.ops, atr[0]), atr[1])('INVOKE_DEFAULT')
 
 
 @persistent
-def updater_run_install_popup_handler(scene):
+def updater_run_install_popup_handler(scene):  # "scene" is never used!
     global ran_autocheck_install_popup
     ran_autocheck_install_popup = True
     try:
@@ -339,26 +331,25 @@ def updater_run_install_popup_handler(scene):
         pass
 
     if "ignore" in updater.json and updater.json["ignore"] == True:
-        return # don't do popup if ignore pressed
+        return  # don't do popup if ignore pressed
     atr = addon_updater_install_popup.bl_idname.split(".")
-    getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
+    getattr(getattr(bpy.ops, atr[0]), atr[1])('INVOKE_DEFAULT')
     
 
 # passed into the updater, background thread updater
 def background_update_callback(update_ready):
     global ran_autocheck_install_popup
 
-    if update_ready != True:
+    if not update_ready:
         return
-
-
     
     if updater_run_install_popup_handler not in \
-                bpy.app.handlers.scene_update_post and \
-                ran_autocheck_install_popup==False:
+            bpy.app.handlers.scene_update_post and \
+            not ran_autocheck_install_popup:
         bpy.app.handlers.scene_update_post.append(updater_run_install_popup_handler)
         
         ran_autocheck_install_popup = True
+
 
 # a callback for once the updater has completed
 # Only makes sense to use this if "auto_reload_post_update" == False,
@@ -367,25 +358,22 @@ def post_update_callback():
     # this is the same code as in conditional at the end of the register function
     # ie if "auto_reload_post_update" == True, comment out this code
     if updater.verbose: print("Running post update callback")
-    #bpy.app.handlers.scene_update_post.append(updater_run_success_popup_handler)
 
     atr = addon_updater_updated_successful.bl_idname.split(".")
-    getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
+    getattr(getattr(bpy.ops, atr[0]), atr[1])('INVOKE_DEFAULT')
     global ran_update_sucess_popup
     ran_update_sucess_popup = True
     return
 
 
-
 # function for asynchronous background check, which *could* be called on register
 def check_for_update_background(context):
 
-    
     global ran_background_check
-    if ran_background_check == True:
+    if ran_background_check:
         # Global var ensures check only happens once
         return
-    elif updater.update_ready != None or updater.async_checking == True:
+    elif updater.update_ready is not None or updater.async_checking:
         # Check already happened
         # Used here to just avoid constant applying settings below
         return 
@@ -393,11 +381,11 @@ def check_for_update_background(context):
     # apply the UI settings
     settings = context.user_preferences.addons[__package__].preferences
     updater.set_check_interval(enable=settings.auto_check_update,
-                months=settings.updater_intrval_months,
-                days=settings.updater_intrval_days,
-                hours=settings.updater_intrval_hours,
-                minutes=settings.updater_intrval_minutes
-                ) # optional, if auto_check_update 
+                               months=settings.updater_intrval_months,
+                               days=settings.updater_intrval_days,
+                               hours=settings.updater_intrval_hours,
+                               minutes=settings.updater_intrval_minutes
+                               )  # optional, if auto_check_update
     
     # input is an optional callback function
     # this function should take a bool input, if true: update ready
@@ -415,16 +403,16 @@ def check_for_update_nonthreaded(self, context):
 
     settings = context.user_preferences.addons[__package__].preferences
     updater.set_check_interval(enable=settings.auto_check_update,
-                months=settings.updater_intrval_months,
-                days=settings.updater_intrval_days,
-                hours=settings.updater_intrval_hours,
-                minutes=settings.updater_intrval_minutes
-                ) # optional, if auto_check_update 
+                               months=settings.updater_intrval_months,
+                               days=settings.updater_intrval_days,
+                               hours=settings.updater_intrval_hours,
+                               minutes=settings.updater_intrval_minutes
+                               )  # optional, if auto_check_update
 
     (update_ready, version, link) = updater.check_for_update(now=False)
-    if update_ready == True:
+    if update_ready:
         atr = addon_updater_install_popup.bl_idname.split(".")
-        getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
+        getattr(getattr(bpy.ops, atr[0]), atr[1])('INVOKE_DEFAULT')
         # or manually update the name of the operator bl_label
         #bpy.ops.{the updater.addon+".updater_install_popup" text}('INVOKE_DEFAULT')
     else:
@@ -438,32 +426,27 @@ def check_for_update_nonthreaded(self, context):
 
 # UI to place e.g. at the end of a UI panel where to notify update available
 def update_notice_box_ui(self, context):
-    if updater.update_ready != True: return
+    if not updater.update_ready: return
     saved_state = updater.json
-    if updater.auto_reload_post_update == False:
+    if not updater.auto_reload_post_update:
         if "just_updated" in saved_state and saved_state["just_updated"] == True:
             layout = self.layout
             layout.label("Restart blender", icon="ERROR")
             layout.label("to complete update")
             return
 
-    settings = context.user_preferences.addons[__package__].preferences
     layout = self.layout
     box = layout.box()
     col = box.column(align=True)
     col.label("Update ready!",icon="ERROR")
     col.operator("wm.url_open", text="Open website").url = updater.website
-    #col.operator("wm.url_open",text="Direct download").url=updater.update_link
-    # atr = addon_updater_install_manually.bl_idname.split(".")
-    # 			getattr(getattr(bpy.ops, atr[0]),atr[1])('INVOKE_DEFAULT')
     col.operator(addon_updater_install_manually.bl_idname, "Install manually")
     col.operator(addon_updater_update_now.bl_idname,
-                    "Update now", icon="LOOP_FORWARDS") # could also do popup instead
-    if "ignore" in saved_state and saved_state["ignore"] == True:
+                 "Update now", icon="LOOP_FORWARDS")  # could also do popup instead
+    if "ignore" in saved_state and saved_state["ignore"]:
         col.label("Popups ignored")
     else:
         col.operator(addon_updater_ignore.bl_idname,icon="X")
-
 
 
 # create a function that can be run inside of a user preferences panel for prefs UI
@@ -480,7 +463,7 @@ def update_settings_ui(self, context):
     row = box.row()
 
     # special case to tell user to restart blender, if set that way
-    if updater.auto_reload_post_update == False:
+    if not updater.auto_reload_post_update:
         saved_state = updater.json
         if "just_updated" in saved_state and saved_state["just_updated"] == True:
             row.label("Restart blender to complete update", icon="ERROR")
@@ -491,36 +474,35 @@ def update_settings_ui(self, context):
     subcol.prop(settings, "auto_check_update")
     subcol = split.column()
 
-    if settings.auto_check_update==False: subcol.enabled = False
+    if not settings.auto_check_update: subcol.enabled = False
     subrow = subcol.row()
     subrow.label("Interval between checks")
     subrow = subcol.row(align=True)
     checkcol = subrow.column(align=True)
-    checkcol.prop(settings,"updater_intrval_months")
+    checkcol.prop(settings, "updater_intrval_months")
     checkcol = subrow.column(align=True)
-    checkcol.prop(settings,"updater_intrval_days")
+    checkcol.prop(settings, "updater_intrval_days")
     checkcol = subrow.column(align=True)
-    checkcol.prop(settings,"updater_intrval_hours")
+    checkcol.prop(settings, "updater_intrval_hours")
     checkcol = subrow.column(align=True)
-    checkcol.prop(settings,"updater_intrval_minutes")
-
+    checkcol.prop(settings, "updater_intrval_minutes")
 
     # checking / managing updates
     row = box.row()
     col = row.column()
     movemosue = False
-    if updater.update_ready == None and updater.async_checking == False:
+    if updater.update_ready is None and not updater.async_checking:
         col.scale_y = 2
         col.operator(addon_updater_check_now.bl_idname)
-    elif updater.update_ready == None: # async is running
+    elif updater.update_ready is None:  # async is running
         col.scale_y = 2
         col.enabled = False
         col.operator(addon_updater_check_now.bl_idname, "Checking for update....")
-        movemosue = True # tell user to move mouse, trigger re-draw on background check
-    elif updater.update_ready == True and updater.update_version != updater.current_version:
+        movemosue = True  # tell user to move mouse, trigger re-draw on background check
+    elif updater.update_ready and updater.update_version != updater.current_version:
         col.scale_y = 2
         col.operator(addon_updater_update_now.bl_idname,
-                    "Update now to "+str(updater.update_version))
+                     "Update now to "+str(updater.update_version))
     else:
         subcol = col.row(align=True)
         subcol.scale_y = 1
@@ -528,16 +510,15 @@ def update_settings_ui(self, context):
         split.enabled = False
         split.scale_y = 2
         split.operator(addon_updater_check_now.bl_idname,
-                        "Addon is up to date")
+                       "Addon is up to date")
         split = subcol.split(align=True)
         split.scale_y = 2
         split.operator(addon_updater_check_now.bl_idname,
-                        text = "", icon="FILE_REFRESH")
-
+                       text="", icon="FILE_REFRESH")
 
     col = row.column(align=True)
     col.operator(addon_updater_update_target.bl_idname,
-                "Reinstall / install old verison")
+                 "Reinstall / install old verison")
     lastdate = "none found"
     backuppath = os.path.join(updater.stage_path,"backup")
     if "backup_date" in updater.json and os.path.isdir(backuppath):
@@ -550,15 +531,13 @@ def update_settings_ui(self, context):
 
     row = box.row()
     lastcheck = updater.json["last_check"]
-    if movemosue == True:
+    if movemosue:
         row.label("Move mouse if button doesn't update")
-    elif lastcheck != "" and lastcheck != None:
-        lastcheck = lastcheck[0: lastcheck.index(".") ]
+    elif lastcheck != "" and lastcheck is not None:
+        lastcheck = lastcheck[0: lastcheck.index(".")]
         row.label("Last update check: " + lastcheck)
     else:
         row.label("Last update check: None")
-
-
 
 
 # -----------------------------------------------------------------------------
@@ -572,20 +551,19 @@ def register(bl_info):
 
     updater.user = "johnroper100"
     updater.repo = "CrowdMaster"
-    updater.addon =  "CrowdMaster" # optional, default gets from __package__ name
+    updater.addon = "CrowdMaster"  # optional, default gets from __package__ name
     updater.website = "https://github.com/johnroper100/CrowdMaster" # optional
-    updater.use_releases = True # ie use tags instead of releases, default True
+    updater.use_releases = True  # ie use tags instead of releases, default True
     updater.current_version = bl_info["version"]
 
     # Below: ie  make users restart blender to load
     # instead of auto-reload which can cause issues
-    updater.auto_reload_post_update = False # False is the default value
+    updater.auto_reload_post_update = False  # False is the default value
 
     updater.verbose = False
-    updater.backup_current = True # True by default
-    updater.fake_install = False # Set to true to test callback/reloading
+    updater.backup_current = True  # True by default
+    updater.fake_install = False  # Set to true to test callback/reloading
 
-    
     # best practice to ensure failing doesn't create issue with register,
     # always enclose in try/except in production
     
@@ -593,7 +571,6 @@ def register(bl_info):
     #	updater.check_for_update_async()
     # except:
     # 	print("Failed to check for update")
-
 
     bpy.utils.register_class(addon_updater_install_popup)
     bpy.utils.register_class(addon_updater_check_now)
@@ -603,20 +580,18 @@ def register(bl_info):
     bpy.utils.register_class(addon_updater_updated_successful)
     bpy.utils.register_class(addon_updater_restore_backup)
     bpy.utils.register_class(addon_updater_ignore)
-    
 
     # special situation: we JUST updated the addon, show a popup
     # to tell the user it worked
     # shoudl be enclosed in try/catch in case other issues arise
     saved_state = updater.json
     global ran_update_sucess_popup
-    if saved_state != None and "just_updated" in saved_state and saved_state["just_updated"] == True:
-        updater.json_reset_postupdate() # so this only runs once
-        if updater.auto_reload_post_update == False: return # no handlers in this case
-        if updater_run_success_popup_handler not in bpy.app.handlers.scene_update_post and ran_update_sucess_popup==False:   
+    if saved_state is not None and "just_updated" in saved_state and saved_state["just_updated"]:
+        updater.json_reset_postupdate()  # so this only runs once
+        if not updater.auto_reload_post_update: return  # no handlers in this case
+        if updater_run_success_popup_handler not in bpy.app.handlers.scene_update_post and not ran_update_sucess_popup:
             bpy.app.handlers.scene_update_post.append(updater_run_success_popup_handler)
             ran_update_sucess_popup = True
-
 
 
 def unregister():

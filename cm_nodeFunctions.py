@@ -1,8 +1,6 @@
 from collections import OrderedDict
 import math
-from . import cm_brainClasses
 from .cm_brainClasses import Neuron, State
-from . import cm_pythonEmbededInterpreter
 from .cm_pythonEmbededInterpreter import Interpreter
 import copy
 import bpy
@@ -370,9 +368,9 @@ class LogicVARIABLE(Neuron):
         if count:
             self.brain.agvars[settings["Variable"]] /= count
         if settings["Variable"] in self.brain.agvars:
-            out = self.brain.agvars[settings["Variable"]]
+            out = self.brain.agvars[settings["Variable"]]  # out is not actually used!
         else:
-            out = 0
+            out = 0  # out is not actually used!
         # TODO Doesn't work
         return self.brain.agvars[settings["Variable"]]
 
@@ -700,7 +698,6 @@ class StateAction(State):
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
             val = self.neurons[self.name].query()
-            # print(con, val)
             if val is not None:
                 options.append((self.name, val))
 
