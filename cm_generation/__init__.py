@@ -6,7 +6,7 @@ from bpy.props import StringProperty
 from .. libs.ins_vector import Vector
 
 from . cm_templates import templates
-from .. cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text, update_hud_text2
+from .. cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
 from .. cm_graphics . utils import cm_redrawAll
 
 

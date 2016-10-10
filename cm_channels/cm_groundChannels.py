@@ -1,12 +1,9 @@
 import bpy
 
-from math import *
 from mathutils import *
 BVHTree = bvhtree.BVHTree
 
 from .cm_masterChannels import MasterChannel as Mc
-
-import time
 
 
 class Ground(Mc):
@@ -14,6 +11,7 @@ class Ground(Mc):
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.channels = {}
+        self.calced = False
 
     def newframe(self):
         for ch in self.channels.values():
@@ -40,6 +38,8 @@ class Channel:
         self.groundTrees = {}
         self.store = {}
 
+        self.userid = ""
+
     def newuser(self, userid):
         """Called when a new agent is using this channel"""
         self.userid = userid
@@ -58,7 +58,7 @@ class Channel:
         for gnd in self.groupObjects:
             if gnd.name not in self.groundTrees:
                 r = gnd.rotation_euler
-                if (r[0] or r[1] or r[2]):
+                if r[0] or r[1] or r[2]:
                     print(gnd.name, "rotation must be applied")
                     # TODO make ray_cast work with rotation
                 sce = bpy.context.scene

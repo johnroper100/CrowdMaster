@@ -231,8 +231,8 @@ class Octree:
 
     def checkPoint(self, point):
         """Which subtrees in the point in"""
-        #  TODO can't one subtree just be chosen if the point is on the edge.
-        #      does acuracy really matter that much?
+        #  TODO - can't one subtree just be chosen if the point is on the edge.
+        #  Does accuracy really matter that much?
         gtx, ltx = self.isIn(point, (0, 0, 0), 0)
         gty, lty = self.isIn(point, (0, 0, 0), 1)
         gtz, ltz = self.isIn(point, (0, 0, 0), 2)
@@ -357,7 +357,7 @@ if __name__ == "__main__":
         t = time.time()
         for f in range(10000):
             O.checkPoint(pos[f])
-        check100Time.append(((time.time() - t)))
+        check100Time.append(time.time() - t)
 
         t = time.time()
         for f in range(n):

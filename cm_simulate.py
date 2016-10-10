@@ -1,18 +1,14 @@
 import bpy
-from collections import OrderedDict
 
-import sys
 import time
 
 from . import cm_channels as chan
 
 from .cm_agent import Agent
 from .cm_actions import getmotions
-from . cm_graphics . cm_nodeHUD import cm_hudText, update_hud_text
-from . cm_graphics . utils import cm_redrawAll
 
 
-class Simulation():
+class Simulation:
     """The object that contains everything once the simulation starts"""
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
@@ -38,6 +34,9 @@ class Simulation():
         if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0
+
+        self.actions = {}
+        self.actionGroups = {}
 
     def actions(self):
         """Set up the actions"""

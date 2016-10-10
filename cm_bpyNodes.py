@@ -1,10 +1,11 @@
 import bpy
-import os
 from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
+import textwrap
+import nodeitems_utils
+from nodeitems_utils import NodeCategory, NodeItem
 
-from . import icon_load
 from . icon_load import cicon
 
 
@@ -114,7 +115,6 @@ class InputNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Input")
-        # layout.prop(self, "fillOutput")
 
     def getSettings(self, node):
         node.settings["Input"] = self.Input
@@ -299,7 +299,7 @@ class GraphNode(LogicNode):
     RBFMiddle = FloatProperty(default=0.0)
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
     
-    """Testing to see if this would work, currently it breaks the texture preivew in the properties editor
+    """Testing to see if this would work, currently it breaks the texture preview in the properties editor
     def init(self, context):
         cm_tex1Path = os.path.dirname(__file__) + "/cm_graphics/images/range_function.jpg"
         cm_tex2Path = os.path.dirname(__file__) + "/cm_graphics/images/rbf_function.jpg"
@@ -478,7 +478,7 @@ class FilterNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Operation")
-        if (self.Operation == "EQUAL" or self.Operation == "NOT EQUAL" or self.Operation == "LESS" or self.Operation == "GREATER"):
+        if self.Operation in {"EQUAL", "NOT EQUAL", "LESS", "GREATER"}:
             layout.prop(self, "Value")
 
     def getSettings(self, node):
@@ -727,10 +727,6 @@ class ActionGroupState(StateNode):
         row.prop(self, "groupName", text="")
         # row.prop(self, "useValueOfSpeed", text="")
 
-
-import textwrap
-import importlib
-
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
@@ -838,11 +834,6 @@ class SimNoteClear(bpy.types.Operator):
         node.clear()
         return {'FINISHED'}
 
-
-import nodeitems_utils
-from nodeitems_utils import NodeCategory, NodeItem
-
-
 class MyNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
@@ -851,7 +842,6 @@ class MyNodeCategory(NodeCategory):
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("NewInputNode"),
-        #NodeItem("InputNode"),
         NodeItem("PythonNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[

@@ -10,6 +10,7 @@ def update_hud_text(new_text):
     global cm_hudText
     cm_hudText = new_text
 
+
 def update_hud_text2(new_text):
     global cm_hudText2
     cm_hudText2 = new_text
@@ -29,7 +30,7 @@ def draw_hud():
                 draw_object_status(object, dpi_factor)
 
 
-def draw_object_status(object, dpi_factor):
+def draw_object_status(obj, dpi_factor):
     preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
 
     if getattr(bpy.context.space_data.node_tree, "bl_idname", "") in "CrowdMasterTreeType":

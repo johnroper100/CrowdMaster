@@ -1,10 +1,8 @@
-import random
-
-
 class MasterChannel:
     """The parent class for all the channels"""
     def __init__(self, sim):
         self.sim = sim
+        self.userid = ""
 
     def newframe(self):
         """Override this in child classes if they store data"""

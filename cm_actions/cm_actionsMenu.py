@@ -1,5 +1,4 @@
 import bpy
-import random
 from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
@@ -94,7 +93,6 @@ class SCENE_PT_action(Panel):
 
     def draw(self, context):
         layout = self.layout
-        sce = context.scene
 
         row = layout.row()
         row.label("Name")
@@ -124,7 +122,6 @@ class SCENE_PT_action(Panel):
 
 
 def action_register():
-    # bpy.utils.register_module(__name__)
     bpy.utils.register_class(action_entry)
     bpy.utils.register_class(SCENE_OT_cm_actions_populate)
     bpy.utils.register_class(SCENE_OT_action_remove)
@@ -133,12 +130,9 @@ def action_register():
     bpy.utils.register_class(SCENE_UL_action)
     bpy.utils.register_class(SCENE_PT_action)
     bpy.types.Scene.cm_actions = PointerProperty(type=actions_collection)
-    # bpy.utils.register_class(SCENE_UL_action)
 
 
 def action_unregister():
-    # bpy.utils.unregister_module(__name__)
-    # del bpy.types.Scene.cm_actions
     bpy.utils.unregister_class(SCENE_UL_action)
     bpy.utils.unregister_class(SCENE_PT_action)
     bpy.utils.unregister_class(SCENE_OT_agent_move)

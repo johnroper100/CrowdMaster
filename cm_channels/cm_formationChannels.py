@@ -1,6 +1,5 @@
 from .cm_masterChannels import MasterChannel as Mc
 import mathutils
-from mathutils import Vector
 import math
 
 from ..libs.ins_clustering import clusterMatch
@@ -57,6 +56,8 @@ class Channel:
         self.calcd = {}  # {str: Vector()}
         self.lastCalcd = None  # Store from last frame to reduce jittering
 
+        self.userid = ""  # see "newuser" method
+
     def register(self, objs):
         """Add a formation target object"""
         self.targetObjects = objs
@@ -68,7 +69,6 @@ class Channel:
     def newFrame(self):
         """Called at the beginning of each new frame.
         (see def checkCalcd for description of how this is used)"""
-        objs = bpy.data.objects
 
         self.calcd = {}
         new = []
