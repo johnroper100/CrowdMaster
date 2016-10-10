@@ -1,11 +1,4 @@
-import bpy
-import time
-from bpy.types import Operator
-from bpy.props import StringProperty
-
-from .. libs.ins_vector import Vector
-
-# Copyright 2016 CrowdMaster Development Team
+# Copyright 2016 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -23,6 +16,13 @@ from .. libs.ins_vector import Vector
 # You should have received a copy of the GNU General Public License
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
+
+import bpy
+import time
+from bpy.types import Operator
+from bpy.props import StringProperty
+
+from .. libs.ins_vector import Vector
 
 from . cm_templates import templates
 from .. cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
