@@ -621,7 +621,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
             out.append("")
         return out
 
-    def init(self, context):  # shouldn't this be the __init__ method?
+    def init(self, context):
         self.width = 400
         self.color = (0.5, 0.5, 0.5)
         self.use_custom_color = True

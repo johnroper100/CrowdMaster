@@ -109,6 +109,63 @@ class Channel:
                                          "rx": changex,
                                          "distProp": dist/val}
 
+    # Octree implementation
+    """O = bpy.context.scene.objects
+    userDim = self.sim.agents[self.userid].dimensions
+    if self.octree is None:
+        bss = []  # List of bounding spheres
+        for emitterid, val in self.emitterDict.items():
+            emitDim = self.sim.agents[emitterid].dimensions
+            dim = (val + emitDim[a] + userDim[a] for a in range(3))
+            bss.append(ot.boundingSphereFromBPY(O[emitterid], dim))
+        self.octree = ot.createOctree(bss)
+    ag = O[self.userid]
+    collisions = self.octree.checkPoint(ag.location.to_tuple())
+    for emitterid in collisions:
+        if emitterid == self.userid:
+            continue
+        to = O[emitterid]
+        val = self.emitterDict[emitterid]
+        eDim = max(self.sim.agents[emitterid].dimensions)
+        uDim = max(userDim)
+        difx = to.location.x - ag.location.x
+        dify = to.location.y - ag.location.y
+        difz = to.location.z - ag.location.z
+        dist = math.sqrt(difx**2 + dify**2 + difz**2)
+        target = to.location - ag.location
+        z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+        y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+        x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+        rotation = x * y * z
+        relative = target * rotation
+        changez = math.atan2(relative[0], relative[1])/math.pi
+        changex = math.atan2(relative[2], relative[1])/math.pi
+        self.store[emitterid] = {"rz": changez,
+                                 "rx": changex,
+                                 "distProp": dist/(val+eDim+uDim)}"""
+        # (z rot, x rot, dist proportion, time until prediction)"""
+
+    # The old implementation not using octree
+    """ag = O[self.userid]
+    for emitterid, val in self.emitters.items():
+        if emitterid != self.userid:
+            to = O[emitterid]
+            difx = to.location.x - ag.location.x
+            dify = to.location.y - ag.location.y
+            difz = to.location.z - ag.location.z
+            dist = math.sqrt(difx**2 + dify**2 + difz**2)
+            if dist <= val:
+                target = to.location - ag.location
+                z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+                y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+                x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+                rotation = x * y * z
+                relative = target * rotation
+                changez = math.atan2(relative[0], relative[1])/math.pi
+                changex = math.atan2(relative[2], relative[1])/math.pi
+                self.store[emitterid] = (changez, changex, 1-(dist/val), 1)
+                # (z rot, x rot, dist proportion, time until prediction)"""
+
     def calculatePrediction(self):
         """Called the first time an agent uses this frequency"""
         ag = O[self.userid]

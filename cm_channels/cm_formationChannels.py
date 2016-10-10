@@ -54,7 +54,7 @@ class Channel:
         self.inpBuffer = []
         self.priority = []
         self.calcd = {}  # {str: Vector()}
-        self.lastCalcd = None  # Store from last frame to reduce jitter
+        self.lastCalcd = None  # Store from last frame to reduce jittering
 
     def register(self, objs):
         """Add a formation target object"""
@@ -94,7 +94,7 @@ class Channel:
         setOfTargets = set([tgAccess(x) for x in self.targets])
         if self.lastCalcd:
             # TODO if the same agents are inputed the same result as last time
-            #  will be returned. This prevents jitter but may result in
+            #  will be returned. This prevents jittering but may result in
             #  problems in the future.
             if self.lastCalcd[0] == set(self.priority[:len(self.targets)]) and\
                     self.lastCalcd[1] == setOfTargets:
