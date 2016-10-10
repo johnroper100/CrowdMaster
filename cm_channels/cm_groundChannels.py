@@ -11,13 +11,14 @@ class Ground(Mc):
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.channels = {}
+        self.calced = False
 
     def newframe(self):
         for ch in self.channels.values():
             ch.newFrame()
 
     def setuser(self, userid):
-        self.calced = False  # should be defined in __init__
+        self.calced = False
         Mc.setuser(self, userid)
 
     def retrieve(self, groundGroup):
@@ -37,9 +38,11 @@ class Channel:
         self.groundTrees = {}
         self.store = {}
 
+        self.userid = ""
+
     def newuser(self, userid):
         """Called when a new agent is using this channel"""
-        self.userid = userid  # should be defined in __init__
+        self.userid = userid
         self.calcd = False
 
     def newFrame(self):

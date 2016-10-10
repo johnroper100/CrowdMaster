@@ -478,7 +478,7 @@ class FilterNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Operation")
-        if self.Operation in ["EQUAL", "NOT EQUAL", "LESS", "GREATER"]:
+        if self.Operation in {"EQUAL", "NOT EQUAL", "LESS", "GREATER"}:
             layout.prop(self, "Value")
 
     def getSettings(self, node):

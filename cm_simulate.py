@@ -35,9 +35,12 @@ class Simulation:
             self.totalTime = 0
             self.totalFrames = 0
 
+        self.actions = {}
+        self.actionGroups = {}
+
     def actions(self):
         """Set up the actions"""
-        self.actions, self.actionGroups = getmotions()  # these should both be defined in __init__
+        self.actions, self.actionGroups = getmotions()
 
     def newagent(self, name, brain):
         """Set up an agent"""

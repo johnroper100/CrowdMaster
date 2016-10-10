@@ -56,13 +56,15 @@ class Channel:
         self.calcd = {}  # {str: Vector()}
         self.lastCalcd = None  # Store from last frame to reduce jittering
 
+        self.userid = ""  # see "newuser" method
+
     def register(self, objs):
         """Add a formation target object"""
         self.targetObjects = objs
 
     def newuser(self, userid):
         """Called when a new agent is using this channel"""
-        self.userid = userid  # should be defined in __init__!
+        self.userid = userid
 
     def newFrame(self):
         """Called at the beginning of each new frame.

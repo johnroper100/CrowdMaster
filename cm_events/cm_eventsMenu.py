@@ -27,7 +27,7 @@ class SCENE_OT_cm_events_populate(Operator):
     bl_label = "Populate cm events list"
 
     def execute(self, context):
-        item = context.scene.cm_events.coll.add()  # item is not used...
+        context.scene.cm_events.coll.add()
         return {'FINISHED'}
 
 
