@@ -37,7 +37,6 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     bl_label = "Sample Node Setups"
 
     def execute(self, context):
-        scene = context.scene
 
         newhudText = "Sample Node Setups Created!"
         update_hud_text(newhudText)
@@ -50,7 +49,6 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
         return wm.invoke_props_dialog(self, width=600)
 
     def check(self, context):
-        scene = context.scene
 
     def draw(self, context):
         layout = self.layout
@@ -124,9 +122,9 @@ class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
         gen_node.location = (0, 0)
 
         links = ng.links
-        link = links.new(object_node.outputs[0], template_node.inputs[0])
-        link = links.new(template_node.outputs[0], rand_node.inputs[0])
-        link = links.new(rand_node.outputs[0], gen_node.inputs[0])
+        links.new(object_node.outputs[0], template_node.inputs[0])
+        links.new(template_node.outputs[0], rand_node.inputs[0])
+        links.new(rand_node.outputs[0], gen_node.inputs[0])
 
         return {'FINISHED'}
 
@@ -162,9 +160,9 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
         gen_node.location = (0, 0)
 
         links = ng.links
-        link = links.new(object_node.outputs[0], template_node.inputs[0])
-        link = links.new(template_node.outputs[0], form_node.inputs[0])
-        link = links.new(form_node.outputs[0], gen_node.inputs[0])
+        links.new(object_node.outputs[0], template_node.inputs[0])
+        links.new(template_node.outputs[0], form_node.inputs[0])
+        links.new(form_node.outputs[0], gen_node.inputs[0])
 
         return {'FINISHED'}
 
@@ -198,9 +196,9 @@ class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
         gen_node.location = (0, 0)
 
         links = ng.links
-        link = links.new(object_node.outputs[0], template_node.inputs[0])
-        link = links.new(template_node.outputs[0], target_node.inputs[0])
-        link = links.new(target_node.outputs[0], gen_node.inputs[0])
+        links.new(object_node.outputs[0], template_node.inputs[0])
+        links.new(template_node.outputs[0], target_node.inputs[0])
+        links.new(target_node.outputs[0], gen_node.inputs[0])
 
         return {'FINISHED'}
 
@@ -227,7 +225,7 @@ class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
         output_node.Output = 'py'
 
         links = ng.links
-        link = links.new(input_node.outputs[0], output_node.inputs[0])
+        links.new(input_node.outputs[0], output_node.inputs[0])
 
         return {'FINISHED'}
 
@@ -263,9 +261,9 @@ class CrowdMaster_simNodes_action_random(bpy.types.Operator):
         action3_node.randomInputValue = True
 
         links = ng.links
-        link = links.new(start_node.outputs[0], action1_node.inputs[0])
-        link = links.new(start_node.outputs[0], action2_node.inputs[0])
-        link = links.new(start_node.outputs[0], action3_node.inputs[0])
+        links.new(start_node.outputs[0], action1_node.inputs[0])
+        links.new(start_node.outputs[0], action2_node.inputs[0])
+        links.new(start_node.outputs[0], action3_node.inputs[0])
 
         return {'FINISHED'}
 
@@ -275,7 +273,6 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
     bl_label = "Convert Selected To Bounding Box"
 
     def execute(self, context):
-        scene = context.scene
         startT = time.time()
 
         selected = bpy.context.selected_objects
@@ -306,10 +303,9 @@ class CrowdMaster_setup_agent(bpy.types.Operator):
     bl_label = "Setup Agent"
 
     def execute(self, context):
-        scene = context.scene
 
         selected = bpy.context.selected_objects
-        for obj in selected:
+        for _ in selected:
             bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
 
         return {'FINISHED'}
