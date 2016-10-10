@@ -48,8 +48,6 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
         wm = context.window_manager
         return wm.invoke_props_dialog(self, width=600)
 
-    def check(self, context):
-
     def draw(self, context):
         layout = self.layout
         scene = context.scene
