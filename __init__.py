@@ -72,7 +72,7 @@ class SCENE_OT_cm_groups_reset(Operator):
 
     def execute(self, context):
         scene = context.scene
-        
+
         group = scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
             obj.select = False
@@ -95,7 +95,7 @@ class SCENE_OT_cm_groups_reset(Operator):
             bpy.ops.object.delete(use_global=True)
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
-        
+
         newhudText = "Group {} reset!".format(self.groupName)
         update_hud_text(newhudText)
         cm_redrawAll()
@@ -169,7 +169,7 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             newAgent = agentType.agents.add()
             newAgent.name = obj.name
             group.totalAgents += 1
-        
+
         newhudText = "Manual Agents {} Created!".format(self.groupName)
         update_hud_text(newhudText)
         cm_redrawAll()
@@ -195,7 +195,7 @@ class SCENE_OT_cm_start(Operator):
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
-        
+
         newhudText = "Simulation Running!"
         update_hud_text(newhudText)
         cm_redrawAll()
@@ -207,7 +207,7 @@ class SCENE_OT_cm_start(Operator):
             sim.stopFrameHandler()
             del sim
         sim = Simulation()
-        sim.actions()
+        sim.setupActions()
 
         for group in scene.cm_groups:
             sim.createAgents(group)
@@ -233,7 +233,7 @@ class SCENE_OT_cm_stop(Operator):
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
-        
+
         newhudText = "Simulation Stopped!"
         update_hud_text(newhudText)
         cm_redrawAll()
@@ -469,6 +469,7 @@ def register():
 
 def initialise():
     global Simulation
+    from .cm_simulate import Simulation
 
 
 def unregister():
@@ -495,7 +496,7 @@ def unregister():
     cm_generation.unregister()
     cm_utilities.unregister()
     cm_prefs.unregister()
-    
+
     cm_nodeHUD.unregister()
 
     cm_channels.unregister()

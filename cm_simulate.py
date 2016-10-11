@@ -57,7 +57,7 @@ class Simulation:
         self.actions = {}
         self.actionGroups = {}
 
-    def actions(self):
+    def setupActions(self):
         """Set up the actions"""
         self.actions, self.actionGroups = getmotions()
 
