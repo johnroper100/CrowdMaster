@@ -462,6 +462,10 @@ def register():
     from . import cm_channels
     cm_channels.register()
 
+    global cm_tests
+    from . import cm_tests
+    cm_tests.register()
+
 
 def unregister():
     unregister_icons()
@@ -491,6 +495,8 @@ def unregister():
     cm_nodeHUD.unregister()
 
     cm_channels.unregister()
+
+    cm_tests.unregister()
 
     if "sim" in globals():
         if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
