@@ -96,7 +96,8 @@ class Channel:
             self.store["normal"] = norm
             self.store["index"] = ind
             self.store["distance"] = dist * direc  # direc is +/-1
-
+        else:
+            self.store["distance"] = 0
         self.calcd = True
 
     def dh(self):
