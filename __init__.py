@@ -242,9 +242,6 @@ class SCENE_OT_cm_stop(Operator):
 
 # =============== SIMULATION END ===============#
 
-global initialised
-initialised = False
-
 
 class SCENE_PT_CrowdMaster(Panel):
     """Creates CrowdMaster Panel in the node editor."""
@@ -341,10 +338,6 @@ class SCENE_PT_CrowdMasterAgents(Panel):
             return False
 
     def draw(self, context):
-        global initialised
-        if not initialised:
-            initialised = True
-            initialise()
         layout = self.layout
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
@@ -436,6 +429,9 @@ def register():
     bpy.utils.register_class(SCENE_PT_CrowdMasterAgents)
     bpy.utils.register_class(SCENE_PT_CrowdMasterManualAgents)
 
+    global Simulation
+    from .cm_simulate import Simulation
+
     global action_register
     from .cm_actions import action_register
     global action_unregister
@@ -465,11 +461,6 @@ def register():
     global cm_channels
     from . import cm_channels
     cm_channels.register()
-
-
-def initialise():
-    global Simulation
-    from .cm_simulate import Simulation
 
 
 def unregister():
