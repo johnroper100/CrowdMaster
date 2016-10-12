@@ -118,7 +118,8 @@ class CMPreferences(AddonPreferences):
 
     prefs_tab_items = [
         ("GEN", "General Settings", "General settings for the addon."),
-        ("UPDATE", "Addon Update Settings", "Settings for the addon updater.")]
+        ("UPDATE", "Addon Update Settings", "Settings for the addon updater."),
+        ("DEBUG", "Debug Options", "Debug settings and utilities.")]
 
     prefs_tab = EnumProperty(name="Options Set", items=prefs_tab_items)
 
@@ -157,6 +158,25 @@ class CMPreferences(AddonPreferences):
         if preferences.prefs_tab == "UPDATE":
             layout.row()
             addon_updater_ops.update_settings_ui(self, context)
+        
+        if preferences.prefs_tab == "DEBUG":
+            if preferences.show_debug_options:
+                row = layout.row()
+                row.scale_y = 1.25
+                row.operator("scene.cm_run_short_tests", icon='CONSOLE')
+                
+                row = layout.row()
+                row.scale_y = 1.25
+                row.operator("scene.cm_run_long_tests", icon='QUIT')
+            else:
+                row = layout.row()
+                row.label("Enable Show Debug Options to access these settings (only for developers).")
+                
+                row = layout.row()
+                if preferences.use_custom_icons:
+                    row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
+                else:
+                    row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
 
         row = layout.row(align=True)
         row.scale_y = 1.25
