@@ -21,6 +21,8 @@ import bpy
 from . drawing2d import *
 from . utils import *
 
+import os
+
 cm_hudText = "Setup Your Node Tree to Get Started"
 cm_hudText2 = "Time taken: 0 seconds"
 
@@ -85,7 +87,7 @@ def register():
 def unregister():
     font_file1 = os.path.dirname(__file__) + "/fonts/BebasNeue.otf"
     unload_custom_font(font_file1)
-    
+
     font_file2 = os.path.dirname(__file__) + "/fonts/AGENCYB.TTF"
     unload_custom_font(font_file2)
 

@@ -435,10 +435,12 @@ def register():
     global action_register
     from .cm_actions import action_register
     global action_unregister
+    from .cm_actions import action_unregister
 
     global event_register
     from .cm_events import event_register
     global event_unregister
+    from .cm_events import event_unregister
 
     from . import cm_blenderData
     cm_blenderData.registerTypes()
