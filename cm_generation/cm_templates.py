@@ -391,6 +391,13 @@ class TemplateRANDOMPOSITIONING(Template):
                 diff.rotate(mathutils.Euler(rot))
                 newPos = Vector(pos) + diff
                 positions.append(newPos)
+            elif self.settings["locationType"] == "sector":
+                x = random.uniform(0, self.settings["MaxX"])
+                y = random.uniform(0, self.settings["MaxY"])
+                diff = Vector((x, y, 0))
+                diff.rotate(mathutils.Euler(rot))
+                newPos = Vector(pos) + diff
+                positions.append(newPos)
         if self.settings["relax"]:
             radius = self.settings["relaxRadius"]
             for i in range(self.settings["relaxIterations"]):

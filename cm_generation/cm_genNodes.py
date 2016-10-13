@@ -399,7 +399,8 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                             default=1)
 
     locationType = EnumProperty(
-        items=[("radius", "Radius", "Within radius of requested")],
+        items=[("radius", "Radius", "Within radius of requested"),
+               ("sector", "Sector", "Within a minimum and maximum rande in the x and y directions")],
         name="Location Type",
         description="Which location type to use",
         default="radius"
@@ -425,12 +426,6 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     MaxY = FloatProperty(name="Max Y",
                          description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.",
                          default=50.0)
-    MinX = FloatProperty(name="Min X",
-                         description="The minimum distance in the X direction around the center point where the agents will be randomly spawned.",
-                         default=-50.0)
-    MinY = FloatProperty(name="Min Y",
-                         description="The minimum distance in the Y direction around the center point where the agents will be randomly spawned.",
-                         default=-50.0)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
@@ -445,27 +440,20 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
         row.alignment = 'EXPAND'
         if self.locationType == "radius":
             row.prop(self, "radius")
-            layout.prop(self, "relax")
-            if self.relax:
-                layout.prop(self, "relaxIterations")
-                layout.prop(self, "relaxRadius")
-        elif self.locationType == "vector":
+
+        elif self.locationType == "sector":
             row.prop(self, "MaxX")
             row.prop(self, "MaxY")
-        elif self.locationType == "scene":
-            row.prop(self, "MinX")
-            row.prop(self, "MaxX")
-            row = layout.row(align=True)
-            row.alignment = 'EXPAND'
-            row.prop(self, "MinY")
-            row.prop(self, "MaxY")
+        
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
 
     def getSettings(self):
         return {"locationType": self.locationType,
                 "MaxX": self.MaxX,
                 "MaxY": self.MaxY,
-                "MinX": self.MinX,
-                "MinY": self.MinY,
                 "noToPlace": self.noToPlace,
                 "radius": self.radius,
                 "relax": self.relax,
