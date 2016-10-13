@@ -230,14 +230,14 @@ class LogicGRAPH(Neuron):
         output = {}
         for into in inps:
             for i in into:
-                if i.key in output:
+                if i in output:
                     print("""LogicGRAPH data lost due to multiple inputs
                              with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
-                        output[i.key] = (RBF(i.val)*settings["Multiply"])
+                        output[i] = (RBF(into[i])*settings["Multiply"])
                     elif settings["CurveType"] == "RANGE":
-                        output[i.key] = (linear(i.val)*settings["Multiply"])
+                        output[i] = (linear(into[i])*settings["Multiply"])
                     # cubic bezier could also be an option here (1/2 sided)
         return output
 
@@ -249,18 +249,18 @@ class LogicAND(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                if i.key in results:
+                if i in results:
                     if settings["Method"] == "MUL":
-                        results[i.key] *= i.val
+                        results[i] *= into[i]
                     else:  # Method == "MIN"
-                        results[i.key] = min(results[i.key], i.val)
+                        results[i] = min(results[i], into[i])
                 else:
                     inAll = True
                     if settings["IncludeAll"]:
                         for intoB in inps:
-                            inAll &= i.key in intoB
+                            inAll &= i in intoB
                     if inAll:
-                        results[i.key] = i.val
+                        results[i] = into[i]
 
         if settings["SingleOutput"]:
             total = 1
@@ -288,7 +288,7 @@ class LogicOR(Neuron):
                 total = 0
             for into in inps:
                 if settings["Method"] == "MUL":
-                    for i in [i.val for i in into]:
+                    for i in [into[i] for i in into]:
                         total *= (1-i)
                 else:  # Method == "MAX"
                     total = max(list(into.values()) + [total])
@@ -299,13 +299,13 @@ class LogicOR(Neuron):
             results = {}
             for into in inps:
                 for i in into:
-                    if i.key in results:
+                    if i in results:
                         if settings["Method"] == "MUL":
-                            results[i.key] *= (1-i.val)
+                            results[i] *= (1-into[i])
                         else:  # Method == "MAX"
-                            results[i.key] = min(1-results[i.key], 1-i.val)
+                            results[i] = min(1-results[i], 1-into[i])
                     else:
-                        results[i.key] = (1-i.val)
+                        results[i] = (1-into[i])
             results.update((k, 1-v) for k, v in results.items())
             return results
 
@@ -318,7 +318,7 @@ class LogicSTRONG(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                results[i.key] = i.val**2 * (-2*i.val + 3)
+                results[i] = into[i]**2 * (-2*into[i] + 3)
         return results
 
 
@@ -330,7 +330,7 @@ class LogicWEAK(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                results[i.key] = 2*i.val - (i.val**2 * (-2*i.val + 3))
+                results[i] = 2*into[i] - (into[i]**2 * (-2*into[i] + 3))
         return results
 
 
@@ -355,9 +355,9 @@ class LogicSETTAG(Neuron):
         count = 0
         for into in inps:
             for i in into:
-                if i.val > settings["Threshold"]:
+                if into[i] > settings["Threshold"]:
                     condition = True
-                total += i.val
+                total += into[i]
                 count += 1
         if settings["UseThreshold"]:
             if condition:
@@ -382,7 +382,7 @@ class LogicVARIABLE(Neuron):
         count = 0
         for into in inps:
             for i in into:
-                self.brain.agvars[settings["Variable"]] += i.val
+                self.brain.agvars[settings["Variable"]] += into[i]
                 count += 1
         if count:
             self.brain.agvars[settings["Variable"]] /= count
@@ -404,47 +404,47 @@ class LogicFILTER(Neuron):
         if self.settings["Operation"] == "EQUAL":
             for into in inps:
                 for i in into:
-                    if i.val == self.settings["Value"]:
-                        result[i.key] = i.val
+                    if into[i] == self.settings["Value"]:
+                        result[i] = into[i]
         elif self.settings["Operation"] == "NOT EQUAL":
             for into in inps:
                 for i in into:
-                    if i.val != self.settings["Value"]:
-                        result[i.key] = i.val
+                    if into[i] != self.settings["Value"]:
+                        result[i] = into[i]
         elif self.settings["Operation"] == "LESS":
             for into in inps:
                 for i in into:
-                    if i.val <= self.settings["Value"]:
-                        result[i.key] = i.val
+                    if into[i] <= self.settings["Value"]:
+                        result[i] = into[i]
         elif self.settings["Operation"] == "GREATER":
             for into in inps:
                 for i in into:
-                    if i.val > self.settings["Value"]:
-                        result[i.key] = i.val
+                    if into[i] > self.settings["Value"]:
+                        result[i] = into[i]
         elif self.settings["Operation"] == "LEAST":
             leastVal = -float("inf")
             leastName = "None"
             for into in inps:
                 for i in into:
-                    if i.val < leastVal:
-                        leastVal = i.val
-                        leastName = i.key
+                    if into[i] < leastVal:
+                        leastVal = into[i]
+                        leastName = i
             result = {leastName: leastVal}
         elif self.settings["Operation"] == "MOST":
             mostVal = -float("inf")
             mostName = "None"
             for into in inps:
                 for i in into:
-                    if i.val > mostVal:
-                        mostVal = i.val
-                        mostName = i.key
+                    if into[i] > mostVal:
+                        mostVal = into[i]
+                        mostName = i
             result = {mostName: mostVal}
         elif self.settings["Operation"] == "AVERAGE":
             total = 0
             count = 0
             for into in inps:
                 for i in into:
-                    total += i.val
+                    total += into[i]
                     count += 1
             if count != 0:
                 result = {"None": total/count}
@@ -460,12 +460,12 @@ class LogicMAP(Neuron):
         if settings["LowerInput"] != settings["UpperInput"]:
             for into in inps:
                 for i in into:
-                    num = i.val
+                    num = into[i]
                     li = settings["LowerInput"]
                     ui = settings["UpperInput"]
                     lo = settings["LowerOutput"]
                     uo = settings["UpperOutput"]
-                    result[i.key] = ((uo - lo) / (ui - li)) * (num - li) + lo
+                    result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
         return result
 
 
@@ -478,15 +478,15 @@ class LogicOUTPUT(Neuron):
             count = 0
             for into in inps:
                 for i in into:
-                    val += i.val
+                    val += into[i]
                     count += 1
             out = val/(max(1, count))
         elif settings["MultiInputType"] == "MAX":
             out = 0
             for into in inps:
                 for i in into:
-                    if abs(i.val) > abs(out):
-                        out = i.val
+                    if abs(into[i]) > abs(out):
+                        out = into[i]
         elif settings["MultiInputType"] == "SIZEAVERAGE":
             """Takes a weighed average of the inputs where smaller values have
             less of an impact on the final result"""
@@ -494,9 +494,9 @@ class LogicOUTPUT(Neuron):
             SmSquared = 0
             for into in inps:
                 for i in into:
-                    print("Val:", i.val)
-                    Sm += i.val
-                    SmSquared += i.val * abs(i.val)  # To retain sign
+                    print("Val:", into[i])
+                    Sm += into[i]
+                    SmSquared += into[i] * abs(into[i])  # To retain sign
             # print(Sm, SmSquared)
             if Sm == 0:
                 out = 0
@@ -506,7 +506,7 @@ class LogicOUTPUT(Neuron):
             out = 0
             for into in inps:
                 for i in into:
-                    out += i.val
+                    out += into[i]
         self.brain.outvars[settings["Output"]] = out
         return out
 
@@ -528,23 +528,23 @@ class LogicPRIORITY(Neuron):
                 usesPriority = False
             # print("priority", priority)
             for i in into:
-                if i.key in priority:
-                    # TODO what if priority[i.key] < 0?
-                    if i.key in result:
-                        contribution = priority[i.key].val * remaining[i.key]
-                        result[i.key] += i.val * contribution
-                        remaining[i.key] -= contribution
+                if i in priority:
+                    # TODO what if priority[i] < 0?
+                    if i in result:
+                        contribution = priority[i] * remaining[i]
+                        result[i] += into[i] * contribution
+                        remaining[i] -= contribution
                     else:
-                        result[i.key] = i.val * priority[i.key].val
-                        remaining[i.key] = 1 - priority[i.key].val
+                        result[i] = into[i] * priority[i]
+                        remaining[i] = 1 - priority[i]
                 elif not usesPriority:
-                    if i.key in result:
-                        contribution = remaining[i.key]
-                        result[i.key] += i.val * contribution
-                        remaining[i.key] -= 0
+                    if i in result:
+                        contribution = remaining[i]
+                        result[i] += into[i] * contribution
+                        remaining[i] -= 0
                     else:
-                        result[i.key] = i.val
-                        remaining[i.key] = 0
+                        result[i] = into[i]
+                        remaining[i] = 0
             # print("resultPartial", result)
         for key, rem in remaining.items():
             if rem != 0:
@@ -606,10 +606,10 @@ class LogicPRINT(Neuron):
                 for i in into:
                     if settings["save_to_file"] == True:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            message = settings["Label"] + " >> " + str(i.key) + " " + str(i.val) + "\n"
+                            message = settings["Label"] + " >> " + str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
-                        print(settings["Label"], ">>", i.key, i.val)
+                        print(settings["Label"], ">>", i, into[i])
         return 0
 
 

@@ -97,17 +97,9 @@ class Neuron():
                 input in not a dictionary then it is made into one"""
                 if got is not None:
                     inps.append(got)
-            im = self.core(inps, self.settings)
-            if isinstance(im, dict):
-                output = ImpulseContainer(im)
-            elif isinstance(im, ImpulseContainer):
-                if preferences.show_debug_options:
-                    print("cm_brainClasses.py - This should not be allowed")
-                output = im
-            elif im is None:
-                output = im
-            else:
-                output = ImpulseContainer({"None": im})
+            output = self.core(inps, self.settings)
+            if not (isinstance(output, dict) or output is None):
+                output = {"None": output}
         else:
             output = None
         self.result = output
