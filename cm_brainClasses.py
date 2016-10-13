@@ -24,48 +24,6 @@ import bpy
 import mathutils
 
 
-class Impulse():
-    def __init__(self, tup):
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
-        if preferences.show_debug_options:
-            assert isinstance(tup[0], str), "Impulse key should be type str"
-            assert isinstance(tup[1], int) or isinstance(tup[1], float), \
-                "Impulse value should be type int or float"
-        self.key = tup[0]
-        self.val = tup[1]
-
-
-class ImpulseContainer():
-    # TODO Isn't this just a dictionary?!?!?!
-    def __init__(self, cont):
-        self.cont = cont
-
-    def __getitem__(self, key):
-        if key in self.cont:
-            if isinstance(self.cont[key], Impulse):
-                return self.cont[key]
-            else:
-                return Impulse((key, self.cont[key]))
-
-    def __iter__(self):
-        return iter([Impulse(x) for x in self.cont.items()])
-        # This gets calculated every time the input is looked at
-        # Better to calculate in __init__?
-        # Do iter objects need making each time
-
-    def __contains__(self, item):
-        return item in self.cont
-
-    def __len__(self):
-        return len(self.cont)
-
-    def values(self):
-        return self.cont.values()
-
-    def __repr__(self):
-        return "Impusle container(" + str(self.cont) + ")"
-
-
 class Neuron():
     """The representation of the nodes. Not to be used on own"""
     def __init__(self, brain, bpyNode):
