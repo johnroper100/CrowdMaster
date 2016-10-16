@@ -912,7 +912,6 @@ node_categories = [
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("QueryTagNode"),
         NodeItem("SetTagNode"),
-        NodeItem("MathNode"),
         NodeItem("VariableNode"),
         NodeItem("FilterNode"),
         NodeItem("EventNode")
