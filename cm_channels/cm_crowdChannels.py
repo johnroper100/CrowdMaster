@@ -126,7 +126,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         sepVec = self.calcSeparate(inSet)
@@ -136,7 +136,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         sepVec = self.calcSeparate(inSet)
@@ -146,7 +146,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         sepVec = self.calcSeparate(inSet)
@@ -156,7 +156,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         alnVec = self.calcAlign(inSet)
@@ -166,7 +166,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         alnVec = self.calcAlign(inSet)
@@ -176,7 +176,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         cohVec = self.calcCohere(inSet)
@@ -186,7 +186,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         cohVec = self.calcCohere(inSet)
@@ -196,7 +196,7 @@ class Crowd(Mc):
         inSet = set()
         for into in inputs:
             for i in into:
-                inSet.add(i.key)
+                inSet.add(i)
         if len(inSet) == 0:
             return None
         cohVec = self.calcCohere(inSet)
