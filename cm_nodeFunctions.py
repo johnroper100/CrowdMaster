@@ -241,6 +241,23 @@ class LogicGRAPH(Neuron):
                     # cubic bezier could also be an option here (1/2 sided)
         return output
 
+class LogicMATH(Neuron):
+    """returns the values added/subtracted/multiplied/divided together"""
+    
+    def core(self, inps, settings):
+        result = {}
+        for into in inps:
+            for i in into:
+                if settings["operation"] == "add":
+                    result[i] = into[i] + settings["num1"]
+                elif settings["operation"] == "sub":
+                    result[i] = into[i] - settings["num1"]
+                elif settings["operation"] == "mul":
+                    result[i] = into[i] * settings["num1"]
+                elif settings["operation"] == "div":
+                    result[i] = into[i] / settings["num1"]
+        return result
+
 
 class LogicAND(Neuron):
     """returns the values multiplied together"""
@@ -621,6 +638,7 @@ logictypes = OrderedDict([
     ("InputNode", LogicINPUT),
     ("NewInputNode", LogicNEWINPUT),
     ("GraphNode", LogicGRAPH),
+    ("MathNode", LogicMATH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
     ("StrongNode", LogicSTRONG),

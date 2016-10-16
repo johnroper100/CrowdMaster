@@ -377,6 +377,7 @@ class GraphNode(LogicNode):
 class MathNode(LogicNode):
     """CrowdMaster math node"""
     bl_label = "Math"
+    bl_width_default = 150.0
 
     operation = EnumProperty(name="Operation", items=[
                              ("add", "Add", "Add the two numbers together"),
@@ -385,17 +386,14 @@ class MathNode(LogicNode):
                              ("div", "Divide", "Divide the two numbers")], default="add")
 
     num1 = FloatProperty(name="Number 1", default=1.0)
-    num2 = FloatProperty(name="Number 2", default=1.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation")
         layout.prop(self, "num1")
-        layout.prop(self, "num2")
 
     def getSettings(self, node):
         node.settings["operation"] = self.operation
         node.settings["num1"] = self.num1
-        node.settings["num2"] = self.num2
 
 
 class AndNode(LogicNode):
@@ -912,6 +910,7 @@ node_categories = [
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("QueryTagNode"),
         NodeItem("SetTagNode"),
+        NodeItem("MathNode"),
         NodeItem("VariableNode"),
         NodeItem("FilterNode"),
         NodeItem("EventNode")
