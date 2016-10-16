@@ -127,7 +127,7 @@ class LogicNode(CrowdMasterNode):
 
 class InputNode(LogicNode):
     """CrowdMaster input node"""
-    bl_label = "Old Input !UNSTABLE!"
+    bl_label = "Old Input Node !UNSTABLE!"
     bl_width_default = 200.0
 
     Input = StringProperty(name="Input", default="Noise.random")
@@ -372,6 +372,30 @@ class GraphNode(LogicNode):
         node.settings["UpperZero"] = self.UpperZero
         node.settings["RBFMiddle"] = self.RBFMiddle
         node.settings["RBFTenPP"] = self.RBFTenPP
+
+
+class MathNode(LogicNode):
+    """CrowdMaster math node"""
+    bl_label = "Math"
+
+    operation = EnumProperty(name="Operation", items=[
+                             ("add", "Add", "Add the two numbers together"),
+                             ("sub", "Subtract", "Subtract the two numbers from each other"),
+                             ("mul", "Multiply", "Multiply the two numbers"),
+                             ("div", "Divide", "Divide the two numbers")], default="add")
+
+    num1 = FloatProperty(name="Number 1", default=1.0)
+    num2 = FloatProperty(name="Number 2", default=1.0)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "operation")
+        layout.prop(self, "num1")
+        layout.prop(self, "num2")
+
+    def getSettings(self, node):
+        node.settings["operation"] = self.operation
+        node.settings["num1"] = self.num1
+        node.settings["num2"] = self.num2
 
 
 class AndNode(LogicNode):
@@ -888,6 +912,7 @@ node_categories = [
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("QueryTagNode"),
         NodeItem("SetTagNode"),
+        NodeItem("MathNode"),
         NodeItem("VariableNode"),
         NodeItem("FilterNode"),
         NodeItem("EventNode")
@@ -912,6 +937,7 @@ def register():
     bpy.utils.register_class(InputNode)
     bpy.utils.register_class(NewInputNode)
     bpy.utils.register_class(GraphNode)
+    bpy.utils.register_class(MathNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
     bpy.utils.register_class(StrongNode)
@@ -951,6 +977,7 @@ def unregister():
     bpy.utils.unregister_class(InputNode)
     bpy.utils.unregister_class(NewInputNode)
     bpy.utils.unregister_class(GraphNode)
+    bpy.utils.unregister_class(MathNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
     bpy.utils.unregister_class(StrongNode)
