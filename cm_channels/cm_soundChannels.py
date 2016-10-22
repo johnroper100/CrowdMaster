@@ -257,7 +257,7 @@ class Channel:
         ag = O[self.userid]
         agSim = self.sim.agents[self.userid]
 
-        for emitterid, val in self.emitters.items():
+        for emitterid, val in self.emitters:
             if emitterid == self.userid:
                 continue
             to = O[emitterid]
