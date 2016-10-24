@@ -20,6 +20,7 @@
 import unittest
 import bpy
 
+from . cm_syncManager import SyncManagerTestCase
 
 class AddonRegisterTestCase(unittest.TestCase):
     def setUp(self):
@@ -61,6 +62,7 @@ def createShortTestSuite():
     """Gather all the short tests from this module in a test suite"""
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(AddonRegisterTestCase))
+    test_suite.addTest(unittest.makeSuite(SyncManagerTestCase))
     return test_suite
 
 def createLongTestSuite():
