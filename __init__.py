@@ -150,25 +150,32 @@ class SCENE_OT_cm_agent_add_selected(Operator):
     def execute(self, context):
         scene = context.scene
 
+        print("Calling")
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}
         if scene.cm_groups.find(self.groupName) == -1:
             newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "manual"
+        print("Calling1")
         group = scene.cm_groups.get(self.groupName)
         if group.groupType == "auto":
             return {'CANCELLED'}
+        print("Calling2")
         ty = group.agentTypes.find(self.brainType)
         if ty == -1:
             at = group.agentTypes.add()
             at.name = self.brainType
             ty = group.agentTypes.find(at.name)
+        print("Calling3")
         agentType = group.agentTypes[ty]
         for obj in context.selected_objects:
-            newAgent = agentType.agents.add()
-            newAgent.name = obj.name
-            group.totalAgents += 1
+            inGroup = agentType.agents.find(obj.name)
+            print("inGroup", inGroup)
+            if inGroup == -1:
+                newAgent = agentType.agents.add()
+                newAgent.name = obj.name
+                group.totalAgents += 1
 
         newhudText = "Manual Agents {} Created!".format(self.groupName)
         update_hud_text(newhudText)
