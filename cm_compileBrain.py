@@ -77,11 +77,11 @@ def compileBrain(nodeGroup, sim, userid):
             item = statetypes[node.bl_idname](result, node, node.name)
             node.getSettings(item)
             item.outputs = getOutputs(node.outputs["To"])
-            print(node.name, "outputs", item.outputs)
             if node.bl_idname == "StartState":
                 result.setStartState(node.name)
             else:
                 item.valueInputs = getInputs(node.inputs["Value"])
+                item.inputs = getInputs(node.inputs["From"])
                 if len(item.valueInputs) != 0:
                     result.outputs.append(node.name)
             result.neurons[node.name] = item

@@ -243,7 +243,7 @@ class LogicGRAPH(Neuron):
 
 class LogicMATH(Neuron):
     """returns the values added/subtracted/multiplied/divided together"""
-    
+
     def core(self, inps, settings):
         result = {}
         for into in inps:

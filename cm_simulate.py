@@ -25,6 +25,7 @@ from . import cm_channels as chan
 
 from .cm_agent import Agent
 from .cm_actions import getmotions
+from .cm_syncManager import syncManager
 
 
 class Simulation:
@@ -56,6 +57,8 @@ class Simulation:
 
         self.actions = {}
         self.actionGroups = {}
+
+        self.syncManager = syncManager()
 
     def setupActions(self):
         """Set up the actions"""
