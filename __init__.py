@@ -202,10 +202,14 @@ class SCENE_OT_cm_start(Operator):
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
-
-        newhudText = "Simulation Running!"
-        update_hud_text(newhudText)
-        cm_redrawAll()
+        
+        if bpy.context.scene.sync_mode == 'AUDIO_SYNC':
+            bpy.context.scene.sync_mode = 'NONE'
+        
+        if preferences.show_node_hud:
+            newhudText = "Simulation Running!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
 
         scene.frame_current = scene.frame_start
 
@@ -241,9 +245,10 @@ class SCENE_OT_cm_stop(Operator):
         if "sim" in globals():
             sim.stopFrameHandler()
 
-        newhudText = "Simulation Stopped!"
-        update_hud_text(newhudText)
-        cm_redrawAll()
+        if preferences.show_node_hud:
+            newhudText = "Simulation Stopped!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
 
         return {'FINISHED'}
 
