@@ -344,11 +344,12 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
             for agentType in group.agentTypes:
                 for agent in agentType.agents:
                     for obj in groups[agent.geoGroup].objects:
-                        if preferences.show_sim_data:
-                            newhudText = "Placing Object {}".format(obj.name)
-                            update_hud_text(newhudText)
-                            cm_redrawAll()
-                            bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+                        if preferences.show_node_hud:
+                            if preferences.show_sim_data:
+                                newhudText = "Placing Object {}".format(obj.name)
+                                update_hud_text(newhudText)
+                                cm_redrawAll()
+                                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
                             newObj.matrix_world = obj.matrix_world
@@ -388,9 +389,10 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                         if mod.type == "ARMATURE":
                                             mod.object = objects[agent.name]
 
-        newhudText = "Done Placing Deferred Geometry!"
-        update_hud_text(newhudText)
-        cm_redrawAll()
+        if preferences.show_node_hud:
+            newhudText = "Done Placing Deferred Geometry!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
 
         return {'FINISHED'}
 
