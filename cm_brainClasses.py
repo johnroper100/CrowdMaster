@@ -129,6 +129,8 @@ class State:
         self.cycleState = False
         self.currentFrame = 0
 
+        self.syncState = False  # Set during compileBrain
+
         self.bpyNode = bpyNode
         self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}
 
@@ -148,49 +150,39 @@ class State:
         if self.finalValueCalcd:
             return
         self.finalValueCalcd = True
-        if self.syncState:
-            if len(self.valueInputs) == 0:
-                self.finalValue = 0
-                return
-
-            # TODO register "tell" with syncManager
-
-            # TODO get results for last frame from syncManager
-
-        else:
-            if len(self.valueInputs) == 0:
-                self.finalValue = self.settings["ValueDefault"]
-                if self.settings["RandomInput"]:
-                    self.finalValue += random.random()
-                return
-            values = []
-            for inp in self.valueInputs:
-                values.append(self.neurons[inp].evaluate())
-
-            total = 0
-            num = 0
-            vals = []
-
-            for v in values:
-                if v is not None:
-                    if self.settings["ValueFilter"] == "AVERAGE":
-                        for i in v.values():
-                            total += i
-                            num += 1
-                    vals += v.values()
-            if num == 0:
-                num = 1
-            if len(vals) == 0:
-                result = 0
-            elif self.settings["ValueFilter"] == "AVERAGE":
-                result = total / num
-            elif self.settings["ValueFilter"] == "MAX":
-                result = max(vals)
-            elif self.settings["ValueFilter"] == "MIN":
-                result = min(vals)
-            self.finalValue = result
+        if len(self.valueInputs) == 0:
+            self.finalValue = self.settings["ValueDefault"]
             if self.settings["RandomInput"]:
                 self.finalValue += random.random()
+            return
+        values = []
+        for inp in self.valueInputs:
+            values.append(self.neurons[inp].evaluate())
+
+        total = 0
+        num = 0
+        vals = []
+
+        for v in values:
+            if v is not None:
+                if self.settings["ValueFilter"] == "AVERAGE":
+                    for i in v.values():
+                        total += i
+                        num += 1
+                vals += v.values()
+        if num == 0:
+            num = 1
+        if len(vals) == 0:
+            result = 0
+        elif self.settings["ValueFilter"] == "AVERAGE":
+            result = total / num
+        elif self.settings["ValueFilter"] == "MAX":
+            result = max(vals)
+        elif self.settings["ValueFilter"] == "MIN":
+            result = min(vals)
+        self.finalValue = result
+        if self.settings["RandomInput"]:
+            self.finalValue += random.random()
 
     def evaluateState(self):
         """Return the state to move to (allowed to return itself)

@@ -27,6 +27,7 @@ class syncManager:
         # {"Source action": {"Target action"}}
 
     def newFrame(self):
+        self.lastFrame = self.resolveSync()
         self.messages = {}
 
     def actionPair(self, action0, action1):
@@ -84,7 +85,7 @@ class syncManager:
                                     if score > bestScore:
                                         bestState = s
                                         bestScore = score
-                            if bestState is not None and bestScore > 0:
+                            if bestScore > 0:
                                 # All possible pairings get to this point
                                 pairs.append(((s0, state), (s1, bestState),
                                               bestScore))
@@ -99,6 +100,12 @@ class syncManager:
                 seenPairs.add(pair[0][0])
                 seenPairs.add(pair[1][0])
         return agentActions
+
+    def getResult(self, agentName):
+        if agentName in self.lastFrame:
+            return self.lastFrame[agentName]
+        else:
+            return None, None
 
 
 class SyncManagerTestCase(unittest.TestCase):

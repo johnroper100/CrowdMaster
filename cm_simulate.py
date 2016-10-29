@@ -63,6 +63,8 @@ class Simulation:
     def setupActions(self):
         """Set up the actions"""
         self.actions, self.actionGroups = getmotions()
+        for m in bpy.context.scene.cm_action_pairs.coll:
+            self.syncManager.actionPair(m.source, m.target)
 
     def newagent(self, name, brain):
         """Set up an agent"""
@@ -93,6 +95,9 @@ class Simulation:
                                                      agent.access["tags"][tag])
         # TODO registering channels would be much more efficient if done
         # straight after the agent is evaluated.
+
+        self.syncManager.newFrame()
+
         for a in self.agents.values():
             a.step()
         for a in self.agents.values():

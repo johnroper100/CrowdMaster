@@ -687,6 +687,36 @@ class StateAction(State):
                 strip.use_auto_blend = False
                 strip.blend_type = 'ADD'"""
 
+    def evaluate(self):
+        if self.syncState:
+            possible = False
+            for sInp in self.inputs:
+                if self.neurons[sInp].isCurrent:
+                    possible = True
+                    break
+
+            if len(self.valueInputs) == 0:
+                self.finalValue = 0
+                return
+
+            sm = self.brain.sim.syncManager
+            userid = self.brain.userid
+
+            for inp in self.valueInputs:
+                vals = self.neurons[inp].evaluate()
+                for k, v in vals.items():
+                    sm.tell(userid, k, self.actionName, v, self.name)
+
+            state, pairedAgent = sm.getResult(userid)
+
+            if state == self.name:
+                self.finalValue = 1
+            else:
+                self.finalValue = 0
+            self.finalValueCalcd = True
+        else:
+            State.evaluate(self)
+
     def evaluateState(self):
         self.currentFrame += 1
 
