@@ -749,6 +749,23 @@ class StateAction(State):
                     self.brain.outvars["ry"] += y
                     self.brain.outvars["rz"] += z
 
+        # Check to see if there is a valid sync state to move to
+
+        syncOptions = []
+        for con in self.outputs:
+            if self.neurons[con].syncState:
+                val = self.neurons[con].query()
+                if val is not None and val > 0:
+                    syncOptions.append((con, val))
+
+                    if len(syncOptions) > 0:
+                        if len(syncOptions) == 1:
+                            return True, syncOptions[0][0]
+                        else:
+                            return True, max(syncOptions, key=lambda v: v[1])[0]
+
+        # ==== Will stop here if there is a valid sync state ====
+
         if self.currentFrame < self.length - 1:
             return False, self.name
 
