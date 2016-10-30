@@ -228,7 +228,7 @@ class TemplateADDTOGROUP(Template):
 
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
-    def build(self, pos, rot, scale, tags, cm_group):
+    def build(self, pos, rot, scale, tags, cm_group, material="none"):
         groupName = cm_group.name + "/" + self.settings["brainType"]
         new_group = bpy.data.groups.new(groupName)
         defG = self.settings["deferGeo"]
@@ -236,6 +236,10 @@ class TemplateAGENT(Template):
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
+        
+        if material != "none":
+            topObj.material_slots[0].link = 'OBJECT'
+            topObj.material_slots[0].material = bpy.data.materials[material]
 
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
@@ -316,7 +320,20 @@ class TemplateRANDOM(Template):
         scaleDiff = random.uniform(self.settings["minRandSz"],
                                    self.settings["maxRandSz"])
         newScale = scale * scaleDiff
-        self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group)
+        
+        allMats = []
+        if self.settings["randMat"]:
+            if self.settings["randMatPrefix"]:
+                for mat in bpy.data.materials:
+                    if self.settings["randMatPrefix"] in mat.name:
+                        allMats.append(mat.name)
+                newMat = random.choice(allMats)
+            else:
+                print("You must enter a prefix!")
+                newMat = "none"
+        else:
+            newMat = "none"
+        self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group, material=newMat)
 
     def check(self):
         if "Template" not in self.inputs:

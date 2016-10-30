@@ -250,11 +250,14 @@ class OffsetNode(CrowdMasterAGenTreeNode):
     overwrite = BoolProperty(name="Overwrite",
                              description="Should the given location be added to the position requested or simply overwrite it?",
                              default=False)
+
     referenceObject = StringProperty(name="Location Object",
                                      description="An object in the scene from which to get the location")
+
     locationOffset = FloatVectorProperty(name="Location Offset",
                                          description="Also add this to the location",
                                          default=[0, 0, 0], subtype="XYZ")
+
     rotationOffset = FloatVectorProperty(name="Rotation Offset",
                                          description="Also add this to the rotation",
                                          default=[0, 0, 0], subtype="XYZ")
@@ -296,6 +299,7 @@ class RandomNode(CrowdMasterAGenTreeNode):
                                description="The minimum random rotation in the Z axis for each agent.",
                                default=-10, min=-360.0, max=360,
                                update=updateRandomNode)
+
     maxRandRot = FloatProperty(name="Max Rand Rotation",
                                description="The maximum random rotation in the Z axis for each agent.",
                                default=10, min=-360, max=360.0,
@@ -305,10 +309,18 @@ class RandomNode(CrowdMasterAGenTreeNode):
                               description="The minimum random scale for each agent.",
                               default=1.0, min=0, precision=3,
                               update=updateRandomNode)
+
     maxRandSz = FloatProperty(name="Max Rand Scale",
                               description="The maximum random scale for each agent.",
                               default=1.0, min=0, precision=3,
                               update=updateRandomNode)
+    
+    randMat = BoolProperty(name="Random Material",
+                             description="Sould each agents have a random material?",
+                             default=False)
+    
+    randMatPrefix = StringProperty(name="Name Prefix",
+                                     description="The prefix which all materials must have to be chosen from randomly")
 
     def init(self, context):
         self.inputs.new("TemplateSocketType", "Template")
@@ -326,12 +338,22 @@ class RandomNode(CrowdMasterAGenTreeNode):
         row.alignment = 'EXPAND'
         row.prop(self, "minRandSz")
         row.prop(self, "maxRandSz")
+        
+        row = layout.row()
+        row.prop(self, "randMat")
+
+        row = layout.row()
+        if not self.randMat:
+            row.enabled = False
+        row.prop(self, "randMatPrefix")
 
     def getSettings(self):
         return {"maxRandRot": self.maxRandRot,
                 "minRandRot": self.minRandRot,
                 "maxRandSz": self.maxRandSz,
-                "minRandSz": self.minRandSz}
+                "minRandSz": self.minRandSz,
+                "randMat": self.randMat,
+                "randMatPrefix": self.randMatPrefix}
 
 
 class PointTowardsNode(CrowdMasterAGenTreeNode):
