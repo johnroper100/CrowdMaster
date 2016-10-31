@@ -189,6 +189,7 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
 # =============== SIMULATION START ===============#
 
+customSyncMode = 'NONE' # This saves the sync_mode value
 
 class SCENE_OT_cm_start(Operator):
     """Start the CrowdMaster agent simulation."""
@@ -197,14 +198,15 @@ class SCENE_OT_cm_start(Operator):
 
     def execute(self, context):
         scene = context.scene
+        global customSyncMode
 
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
-        
-        if (bpy.context.scene.sync_mode == 'AUDIO_SYNC') or (bpy.context.scene.sync_mode == 'FRAME_DROP'):
-            bpy.context.scene.sync_mode = 'NONE'
+
+        customSyncMode = bpy.context.scene.sync_mode
+        bpy.context.scene.sync_mode = 'NONE'
         
         if preferences.show_node_hud:
             newhudText = "Simulation Running!"
@@ -238,12 +240,15 @@ class SCENE_OT_cm_stop(Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
+        global customSyncMode
         if preferences.play_animation:
             bpy.ops.screen.animation_cancel()
 
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
+        
+        bpy.context.scene.sync_mode = customSyncMode
 
         if preferences.show_node_hud:
             newhudText = "Simulation Stopped!"
