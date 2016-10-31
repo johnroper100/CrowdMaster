@@ -203,7 +203,7 @@ class SCENE_OT_cm_start(Operator):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
         
-        if bpy.context.scene.sync_mode == 'AUDIO_SYNC':
+        if (bpy.context.scene.sync_mode == 'AUDIO_SYNC') or (bpy.context.scene.sync_mode == 'FRAME_DROP'):
             bpy.context.scene.sync_mode = 'NONE'
         
         if preferences.show_node_hud:
