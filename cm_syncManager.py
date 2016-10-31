@@ -71,7 +71,11 @@ class syncManager:
                 else:
                     seenPairs.add((s0, s1))
                     # Don't evaluate the same pair again
-                if s1 in self.messages and s0 in self.messages[s1]:
+                messagesPresent = s0 in self.messages and s1 in self.messages
+                if messagesPresent:
+                    messagesPresent = s0 in self.messages[s1]
+                    messagesPresent &= s1 in self.messages[s0]
+                if messagesPresent:
                     m0 = self.messages[s0][s1]  # All messages from a -> b
                     m1 = self.messages[s1][s0]  # All messages from b -> a
                     for action, (state, value) in m0.items():
