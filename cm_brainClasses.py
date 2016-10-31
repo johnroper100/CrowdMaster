@@ -185,6 +185,8 @@ class State:
             self.finalValue += random.random()
 
     def evaluateState(self):
+        # TODO Not sure this is actually used... it seems to be overwritten
+        #    in all child classes.
         """Return the state to move to (allowed to return itself)
 
         :returns: moving to new state, name of new state or None
