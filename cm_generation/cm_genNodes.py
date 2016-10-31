@@ -75,9 +75,14 @@ class GenerateNode(CrowdMasterAGenTreeNode):
         self.inputs[0].link_limit = 4095
 
     def draw_buttons(self, context, layout):
+        preferences = context.user_preferences.addons["CrowdMaster"].preferences
         layout.scale_y = 1.5
-        oper = layout.operator("scene.cm_agent_nodes_generate",
-                               icon_value=cicon('add_agents'))
+        if preferences.use_custom_icons:
+            oper = layout.operator("scene.cm_agent_nodes_generate",
+                                   icon_value=cicon('add_agents'))
+        else:
+            oper = layout.operator("scene.cm_agent_nodes_generate",
+                                   icon='MOD_ARRAY')
         oper.nodeName = self.name
         oper.nodeTreeName = self.id_data.name
 
