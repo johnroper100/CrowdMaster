@@ -231,8 +231,7 @@ class LogicGRAPH(Neuron):
         for into in inps:
             for i in into:
                 if i in output:
-                    print("""LogicGRAPH data lost due to multiple inputs
-                             with the same key""")
+                    print("""LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
                         output[i] = (RBF(into[i])*settings["Multiply"])
