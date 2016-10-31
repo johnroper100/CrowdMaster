@@ -694,8 +694,9 @@ class StateAction(State):
                     possible = True
                     break
 
-            if len(self.valueInputs) == 0:
+            if not possible or len(self.valueInputs) == 0:
                 self.finalValue = 0
+                self.finalValueCalcd = True
                 return
 
             sm = self.brain.sim.syncManager
@@ -703,8 +704,14 @@ class StateAction(State):
 
             for inp in self.valueInputs:
                 vals = self.neurons[inp].evaluate()
-                for k, v in vals.items():
-                    sm.tell(userid, k, self.actionName, v, self.name)
+                for key, v in vals.items():
+                    if self.settings["RandomInput"]:
+                        val = v + (self.settings["ValueDefault"] *
+                                   v * random.random())
+                    else:
+                        val = v + (v * self.settings["ValueDefault"])
+                    if val > 0:
+                        sm.tell(userid, key, self.actionName, val, self.name)
 
             state, pairedAgent = sm.getResult(userid)
 

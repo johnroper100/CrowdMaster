@@ -55,16 +55,28 @@ class DefaultSocket(NodeSocket):
         preferences = context.user_preferences.addons[__package__].preferences
         if not self.is_output and isinstance(node, StateNode):
             row = layout.row(align=True)
-            if self.is_linked:
-                row.prop(self, "filterProperty", text=text)
+            if node.syncState:
+                if self.is_linked:
+                    row.prop(self, "defaultValueProperty", text="")
+                    if preferences.use_custom_icons:
+                        row.prop(self, "randomInputValue",
+                                 icon_value=cicon('dice'), icon_only=True)
+                    else:
+                        row.prop(self, "randomInputValue", icon="FILE_REFRESH",
+                                 icon_only=True)
+                else:
+                    row.label(text)
             else:
-                row.prop(self, "defaultValueProperty", text="")
-            if preferences.use_custom_icons:
-                row.prop(self, "randomInputValue", icon_value=cicon('dice'),
-                         icon_only=True)
-            else:
-                row.prop(self, "randomInputValue", icon="FILE_REFRESH",
-                         icon_only=True)
+                if self.is_linked:
+                    row.prop(self, "filterProperty", text=text)
+                else:
+                    row.prop(self, "defaultValueProperty", text="")
+                if preferences.use_custom_icons:
+                    row.prop(self, "randomInputValue",
+                             icon_value=cicon('dice'), icon_only=True)
+                else:
+                    row.prop(self, "randomInputValue", icon="FILE_REFRESH",
+                             icon_only=True)
         else:
             layout.label(text)
 
