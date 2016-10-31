@@ -190,6 +190,8 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 # =============== SIMULATION START ===============#
 
 customSyncMode = 'NONE' # This saves the sync_mode value
+customOutline = True # This saves the outline value
+customRLines = True # This saves the relationship lines value
 
 class SCENE_OT_cm_start(Operator):
     """Start the CrowdMaster agent simulation."""
@@ -199,6 +201,8 @@ class SCENE_OT_cm_start(Operator):
     def execute(self, context):
         scene = context.scene
         global customSyncMode
+        global customOutline
+        global customRLines
 
         preferences = context.user_preferences.addons[__package__].preferences
         if (bpy.data.is_dirty) and (preferences.ask_to_save):
@@ -207,6 +211,13 @@ class SCENE_OT_cm_start(Operator):
 
         customSyncMode = bpy.context.scene.sync_mode
         bpy.context.scene.sync_mode = 'NONE'
+
+        for area in bpy.context.screen.areas:
+            if area.type == 'VIEW_3D':
+                customOutline = area.spaces[0].show_outline_selected
+                customRLines = area.spaces[0].show_relationship_lines
+                area.spaces[0].show_outline_selected = False
+                area.spaces[0].show_relationship_lines = False
         
         if preferences.show_node_hud:
             newhudText = "Simulation Running!"
@@ -241,6 +252,9 @@ class SCENE_OT_cm_stop(Operator):
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
         global customSyncMode
+        global customOutline
+        global customRLines
+
         if preferences.play_animation:
             bpy.ops.screen.animation_cancel()
 
@@ -249,6 +263,10 @@ class SCENE_OT_cm_stop(Operator):
             sim.stopFrameHandler()
         
         bpy.context.scene.sync_mode = customSyncMode
+        for area in bpy.context.screen.areas:
+            if area.type == 'VIEW_3D':
+                area.spaces[0].show_outline_selected = customOutline
+                area.spaces[0].show_relationship_lines = customRLines
 
         if preferences.show_node_hud:
             newhudText = "Simulation Stopped!"
