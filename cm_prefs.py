@@ -193,8 +193,14 @@ class CMPreferences(AddonPreferences):
 
 
 def draw_cmweb_item(self, context):
-    self.layout.operator("wm.url_open", text="CrowdMaster Website", icon_value=cicon('house'),).url = "http://jmroper.com/crowdmaster/"
-    self.layout.operator("wm.url_open", text="CrowdMaster Email", icon_value=cicon('email'),).url = "mailto:crowdmaster@jmroper.com"
+    preferences = context.user_preferences.addons[__package__].preferences
+    self.layout.separator()
+    if preferences.use_custom_icons:
+        self.layout.operator("wm.url_open", text="CrowdMaster Website", icon_value=cicon('house'),).url = "http://jmroper.com/crowdmaster/"
+        self.layout.operator("wm.url_open", text="CrowdMaster Email", icon_value=cicon('email'),).url = "mailto:crowdmaster@jmroper.com"
+    else:
+        self.layout.operator("wm.url_open", text="Our Website", icon='URL').url = "http://jmroper.com/crowdmaster/"
+        self.layout.operator("wm.url_open", text="Email Us", icon='URL').url = "mailto:crowdmaster@jmroper.com"
 
 
 def register():
