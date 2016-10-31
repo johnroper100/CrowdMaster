@@ -181,14 +181,21 @@ class CMPreferences(AddonPreferences):
         row = layout.row(align=True)
         row.scale_y = 1.25
         row.operator("scene.cm_save_prefs", icon='SAVE_PREFS')
-        row.operator("wm.url_open", text="Email Us", icon='URL').url = "mailto:crowdmaster@jmroper.com"
+        row.operator("wm.url_open", text="Email Us", icon_value=cicon('email')).url = "mailto:crowdmaster@jmroper.com"
+
+
+def draw_cmweb_item(self, context):
+    self.layout.operator("wm.url_open", text="CrowdMaster Website", icon_value=cicon('house'),).url = "http://jmroper.com/crowdmaster/"
+    self.layout.operator("wm.url_open", text="CrowdMaster Email", icon_value=cicon('email'),).url = "mailto:crowdmaster@jmroper.com"
 
 
 def register():
     bpy.utils.register_class(CMSavePrefs)
     bpy.utils.register_class(CMPreferences)
+    bpy.types.INFO_MT_help.append(draw_cmweb_item)
 
 
 def unregister():
     bpy.utils.unregister_class(CMSavePrefs)
     bpy.utils.unregister_class(CMPreferences)
+    bpy.types.INFO_MT_help.remove(draw_cmweb_item)
