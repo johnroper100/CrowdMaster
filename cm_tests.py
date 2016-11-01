@@ -32,8 +32,8 @@ class AddonRegisterTestCase(unittest.TestCase):
 
     def testStartStopSim(self):
         pa = bpy.context.user_preferences.addons[__package__].preferences.play_animation
-        bpy.ops.crowdmaster.start()
-        bpy.ops.crowdmaster.stop()
+        bpy.ops.scene.cm_start()
+        bpy.ops.scene.cm_stop()
 
     def testRegistered(self):
         sceneProps = ["cm_actions", "cm_events", "cm_groups",

@@ -204,7 +204,7 @@ class TemplateADDTOGROUP(Template):
             group = scene.cm_groups[self.settings["groupName"]]
             isFrozen = group.freezePlacement
             if group.groupType == "auto":
-                bpy.ops.crowdmaster.groups_reset(groupName=self.settings["groupName"])
+                bpy.ops.scene.cm_groups_reset(groupName=self.settings["groupName"])
             else:
                 return
         if isFrozen:
@@ -238,10 +238,10 @@ class TemplateAGENT(Template):
         topObj.scale = Vector((scale, scale, scale))
         
         if material != "none":
-            topObj.material_slots[matSlotIndex].link = 'OBJECT'
-            topObj.material_slots[matSlotIndex].material = bpy.data.materials[material]
+            topObj.material_slots[0].link = 'OBJECT'
+            topObj.material_slots[0].material = bpy.data.materials[material]
 
-        bpy.ops.crowdmaster.agent_add(agentName=topObj.name,
+        bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
                                    groupName=cm_group.name,
                                    geoGroupName=new_group.name)
