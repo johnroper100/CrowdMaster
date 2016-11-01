@@ -238,8 +238,8 @@ class TemplateAGENT(Template):
         topObj.scale = Vector((scale, scale, scale))
         
         if material != "none":
-            topObj.material_slots[0].link = 'OBJECT'
-            topObj.material_slots[0].material = bpy.data.materials[material]
+            topObj.material_slots[matSlotIndex].link = 'OBJECT'
+            topObj.material_slots[matSlotIndex].material = bpy.data.materials[material]
 
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
