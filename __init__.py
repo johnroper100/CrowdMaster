@@ -450,30 +450,30 @@ prefix = "http://jmroper.com/crowdmaster/docs/"
 documentation_mapping = (
     # OPERATORS
     # toolbar
-    ("bpy.ops.scene.cm_start", "simulation/toolbar/main.html#main"),
-    ("bpy.ops.scene.cm_stop", "simulation/toolbar/main.html#main"),
-    ("bpy.ops.scene.cm_place_deferred_geo", "getting_started/utilities/place_defered_geo.html#place-defered-geometry"),
-    ("bpy.ops.scene.cm_setup_sample_nodes", "getting_started/utilities/sample_node_setups.html#sample-node-setups"),
-    ("bpy.ops.scene.cm_convert_to_bound_box", "getting_started/utilities/conv_to_bound_box.html#convert-selected-to-bounding-box"),
-    ("bpy.ops.scene.cm_groups_reset", "simulation/toolbar/agents.html?highlight=groups%20reset#status"),
-    ("bpy.ops.scene.cm_agent_add_selected", "simulation/toolbar/manual_agents.html#manual-agents"),
-    ("bpy.ops.scene.cm_actions_populate", "simulation/toolbar/actions.html#actions"),
-    ("bpy.ops.scene.cm_actions_remove", "simulation/toolbar/actions.html#actions"),
-    ("bpy.ops.scene.cm_agents_move", "simulation/toolbar/actions.html#actions"),
-    ("bpy.ops.scene.cm_events_populate", "simulation/toolbar/events.html#events"),
-    ("bpy.ops.scene.cm_events_remove", "simulation/toolbar/events.html#events"),
-    ("bpy.ops.scene.cm_events_move", "simulation/toolbar/events.html#events"),
-    ("bpy.ops.scene.cm_paths_populate", "simulation/toolbar/paths.html#paths"),
-    ("bpy.ops.scene.cm_paths_remove", "simulation/toolbar/paths.html#paths"),
+    ("bpy.ops.scene.cm_start", "simulation/toolbar/main.html"),
+    ("bpy.ops.scene.cm_stop", "simulation/toolbar/main.html"),
+    ("bpy.ops.scene.cm_place_deferred_geo", "getting_started/utilities/place_defered_geo.html"),
+    ("bpy.ops.scene.cm_setup_sample_nodes", "getting_started/utilities/sample_node_setups.html"),
+    ("bpy.ops.scene.cm_convert_to_bound_box", "getting_started/utilities/conv_to_bound_box.html"),
+    ("bpy.ops.scene.cm_groups_reset", "simulation/toolbar/agents.html#status"),
+    ("bpy.ops.scene.cm_agent_add_selected", "simulation/toolbar/manual_agents.html"),
+    ("bpy.ops.scene.cm_actions_populate", "simulation/toolbar/actions.html"),
+    ("bpy.ops.scene.cm_actions_remove", "simulation/toolbar/actions.html"),
+    ("bpy.ops.scene.cm_agents_move", "simulation/toolbar/actions.html"),
+    ("bpy.ops.scene.cm_events_populate", "simulation/toolbar/events.html"),
+    ("bpy.ops.scene.cm_events_remove", "simulation/toolbar/events.html"),
+    ("bpy.ops.scene.cm_events_move", "simulation/toolbar/events.html"),
+    ("bpy.ops.scene.cm_paths_populate", "simulation/toolbar/paths.html"),
+    ("bpy.ops.scene.cm_paths_remove", "simulation/toolbar/paths.html"),
     # TODO - nodes
 
     # PROPS
     # toolbar
     ("bpy.types.Scene.nodeTreeType", "getting_started/utilities/sample_node_setups.html#node-tree-type"),
-    ("bpy.types.Scene.append_to_tree", "getting_started/utilities/sample_node_setups.html#sample-node-setups"),
-    ("bpy.types.Scene.node_tree_name", "getting_started/utilities/sample_node_setups.html#sample-node-setups"),
-    ("bpy.types.Scene.cm_manual.groupName", "simulation/toolbar/manual_agents.html#manual-agents"),
-    ("bpy.types.Scene.cm_manual.brainType", "simulation/toolbar/manual_agents.html#manual-agents"),
+    ("bpy.types.Scene.append_to_tree", "getting_started/utilities/sample_node_setups.html"),
+    ("bpy.types.Scene.node_tree_name", "getting_started/utilities/sample_node_setups.html"),
+    ("bpy.types.Scene.cm_manual.groupName", "simulation/toolbar/manual_agents.html"),
+    ("bpy.types.Scene.cm_manual.brainType", "simulation/toolbar/manual_agents.html"),
     # TODO - nodes
 )
 
