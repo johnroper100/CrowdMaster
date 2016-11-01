@@ -228,7 +228,7 @@ class TemplateADDTOGROUP(Template):
 
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none"):
+    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
         groupName = cm_group.name + "/" + self.settings["brainType"]
         new_group = bpy.data.groups.new(groupName)
         defG = self.settings["deferGeo"]
@@ -327,13 +327,21 @@ class TemplateRANDOM(Template):
                 for mat in bpy.data.materials:
                     if self.settings["randMatPrefix"] in mat.name:
                         allMats.append(mat.name)
-                newMat = random.choice(allMats)
+                        newMat = random.choice(allMats)
+                        newSlotIndex = self.settings["slotIndex"]
+                    else:
+                        print("Prefix not found!")
+                        newMat = "none"
+                        newSlotIndex = 0
             else:
                 print("You must enter a prefix!")
                 newMat = "none"
+                newSlotIndex = 0
         else:
             newMat = "none"
-        self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group, material=newMat)
+            newSlotIndex = 0
+
+        self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group, material=newMat, matSlotIndex=newSlotIndex)
 
     def check(self):
         if "Template" not in self.inputs:

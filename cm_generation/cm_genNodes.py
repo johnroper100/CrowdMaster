@@ -324,8 +324,12 @@ class RandomNode(CrowdMasterAGenTreeNode):
                              description="Sould each agents have a random material?",
                              default=False)
     
-    randMatPrefix = StringProperty(name="Name Prefix",
+    randMatPrefix = StringProperty(name="Prefix",
                                      description="The prefix which all materials must have to be chosen from randomly")
+    
+    slotIndex = IntProperty(name="Slot Index",
+                              description="The material slot on the object(s) that you want to set randomly.",
+                              default=0, min=0)
 
     def init(self, context):
         self.inputs.new("TemplateSocketType", "Template")
@@ -351,6 +355,7 @@ class RandomNode(CrowdMasterAGenTreeNode):
         if not self.randMat:
             row.enabled = False
         row.prop(self, "randMatPrefix")
+        row.prop(self, "slotIndex")
 
     def getSettings(self):
         return {"maxRandRot": self.maxRandRot,
@@ -358,7 +363,8 @@ class RandomNode(CrowdMasterAGenTreeNode):
                 "maxRandSz": self.maxRandSz,
                 "minRandSz": self.minRandSz,
                 "randMat": self.randMat,
-                "randMatPrefix": self.randMatPrefix}
+                "randMatPrefix": self.randMatPrefix,
+                "slotIndex": self.slotIndex}
 
 
 class PointTowardsNode(CrowdMasterAGenTreeNode):
