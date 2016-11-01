@@ -445,8 +445,48 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
         op.groupName = "cm_" + scene.cm_manual.groupName
         op.brainType = scene.cm_manual.brainType
 
+# Documentation Links
+prefix = "http://jmroper.com/crowdmaster/docs/"
+documentation_mapping = (
+    # OPERATORS
+    # toolbar
+    ("bpy.ops.scene.cm_start", "simulation/toolbar/main.html"),
+    ("bpy.ops.scene.cm_stop", "simulation/toolbar/main.html"),
+    ("bpy.ops.scene.cm_place_deferred_geo", "getting_started/utilities/place_defered_geo.html"),
+    ("bpy.ops.scene.cm_setup_sample_nodes", "getting_started/utilities/sample_node_setups.html"),
+    ("bpy.ops.scene.cm_convert_to_bound_box", "getting_started/utilities/conv_to_bound_box.html"),
+    ("bpy.ops.scene.cm_groups_reset", "simulation/toolbar/agents.html#status"),
+    ("bpy.ops.scene.cm_agent_add_selected", "simulation/toolbar/manual_agents.html"),
+    ("bpy.ops.scene.cm_actions_populate", "simulation/toolbar/actions.html"),
+    ("bpy.ops.scene.cm_actions_remove", "simulation/toolbar/actions.html"),
+    ("bpy.ops.scene.cm_agents_move", "simulation/toolbar/actions.html"),
+    ("bpy.ops.scene.cm_events_populate", "simulation/toolbar/events.html"),
+    ("bpy.ops.scene.cm_events_remove", "simulation/toolbar/events.html"),
+    ("bpy.ops.scene.cm_events_move", "simulation/toolbar/events.html"),
+    ("bpy.ops.scene.cm_paths_populate", "simulation/toolbar/paths.html"),
+    ("bpy.ops.scene.cm_paths_remove", "simulation/toolbar/paths.html"),
+    # TODO - nodes
+
+    # PROPS
+    # toolbar
+    ("bpy.types.Scene.nodeTreeType", "getting_started/utilities/sample_node_setups.html#node-tree-type"),
+    ("bpy.types.Scene.append_to_tree", "getting_started/utilities/sample_node_setups.html"),
+    ("bpy.types.Scene.node_tree_name", "getting_started/utilities/sample_node_setups.html"),
+    ("bpy.types.Scene.cm_manual.groupName", "simulation/toolbar/manual_agents.html"),
+    ("bpy.types.Scene.cm_manual.brainType", "simulation/toolbar/manual_agents.html"),
+    # TODO - nodes
+)
+
+
+def doc_map():
+    dm = (prefix, documentation_mapping)
+    return dm
+
 
 def register():
+    # Register custom documentation mapping
+    bpy.utils.register_manual_map(doc_map)
+
     register_icons()
     cm_nodeHUD.register()
 
@@ -538,6 +578,9 @@ def unregister():
     if "sim" in globals():
         if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
+    
+    # Unregister custom documentation mapping
+    bpy.utils.unregister_manual_map(doc_map)
 
 if __name__ == "__main__":
     register()
