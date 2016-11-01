@@ -95,7 +95,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
         if allSuccess:
             if "cm_allAgents" in context.scene.cm_groups:
-                bpy.ops.scene.cm_groups_reset(groupName="cm_allAgents")
+                bpy.ops.crowdmaster.groups_reset(groupName="cm_allAgents")
             newGroup = context.scene.cm_groups.add()
             newGroup.groupName = "cm_allAgents"
             newGroup.name = "cm_allAgents"
