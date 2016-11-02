@@ -47,13 +47,36 @@ class Template():
         self.buildCount = 0
         self.checkCache = None
 
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         """Called when this template is being used to modify the scene"""
         self.buildCount += 1
 
     def check(self):
         """Return true if the inputs and gettings are correct"""
         return True
+
+
+class TemplateRequest():
+    """Passed between the children of Template"""
+    def __init__(self):
+        self.pos = Vector((0, 0, 0))
+        self.rot = Vector((0, 0, 0))
+        self.scale = 1
+        self.tags = {}
+        self.cm_group = "cm_allAgents"
+        self.material = None
+        self.matSlotIndex = 0
+
+    def copy(self):
+        new = TemplateRequest()
+        new.pos = self.pos
+        new.rot = self.rot
+        new.scale = self.scale
+        new.tags = self.tags.copy()
+        new.cm_group = self.cm_group
+        new.material = self.material
+        new.matSlotIndex = self.matSlotIndex
+        return new
 
 
 class GeoTemplate(Template):
@@ -197,7 +220,7 @@ class GeoTemplatePARENT(GeoTemplate):
 
 class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         scene = bpy.context.scene
         isFrozen = False
         if scene.cm_groups.find(self.settings["groupName"]) != -1:
@@ -211,8 +234,8 @@ class TemplateADDTOGROUP(Template):
             return
         newGroup = scene.cm_groups.add()
         newGroup.name = self.settings["groupName"]
-        group = scene.cm_groups[self.settings["groupName"]]
-        self.inputs["Template"].build(pos, rot, scale, tags, group, material, matSlotIndex)
+        buildRequest.cm_groups = self.settings["groupName"]
+        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -228,22 +251,28 @@ class TemplateADDTOGROUP(Template):
 
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
-        groupName = cm_group.name + "/" + self.settings["brainType"]
+    def build(self, buildRequest):
+        groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
         new_group = bpy.data.groups.new(groupName)
         defG = self.settings["deferGeo"]
+        pos = buildRequest.pos
+        rot = buildRequest.rot
+        scale = buildRequest.scale
         topObj = self.inputs["Objects"].build(pos, rot, scale, new_group, defG)
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
-        
-        if material != "none":
+
+        if buildRequest.material is not None:
+            matSlotIndex = buildRequest.matSlotIndex
+            mat = buildRequest.material
+            print("Top obj", topObj, buildRequest.material)
             topObj.material_slots[matSlotIndex].link = 'OBJECT'
-            topObj.material_slots[matSlotIndex].material = bpy.data.materials[material]
+            topObj.material_slots[matSlotIndex].material = bpy.data.materials[mat]
 
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
-                                   groupName=cm_group.name,
+                                   groupName=buildRequest.cm_group,
                                    geoGroupName=new_group.name)
         # TODO set tags
 
@@ -257,11 +286,11 @@ class TemplateAGENT(Template):
 
 class TemplateSWITCH(Template):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         if random.random() < self.settings["switchAmout"]:
-            self.inputs["Template 1"].build(pos, rot, scale, tags, cm_group, material, matSlotIndex)
+            self.inputs["Template 1"].build(buildRequest)
         else:
-            self.inputs["Template 2"].build(pos, rot, scale, tags, cm_group, material, matSlotIndex)
+            self.inputs["Template 2"].build(buildRequest)
 
     def check(self):
         if "Template 1" not in self.inputs:
@@ -281,12 +310,12 @@ class TemplateSWITCH(Template):
 
 class TemplateOFFSET(Template):
     """Modify the postion and/or the rotation of the request made"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         nPos = Vector()
         nRot = Vector()
         if not self.settings["overwrite"]:
-            nPos = Vector(pos)
-            nRot = Vector(rot)
+            nPos = Vector(buildRequest.pos)
+            nRot = Vector(buildRequest.rot)
         if self.settings["referenceObject"] != "":
             refObj = bpy.data.objects[self.settings["referenceObject"]]
             nPos += refObj.location
@@ -294,7 +323,9 @@ class TemplateOFFSET(Template):
         nPos += self.settings["locationOffset"]
         tmpRot = self.settings["rotationOffset"]
         nRot += Vector((radians(tmpRot.x), radians(tmpRot.y), radians(tmpRot.z)))
-        self.inputs["Template"].build(nPos, nRot, scale, tags, cm_group, material, matSlotIndex)
+        buildRequest.pos = nPos
+        buildRequest.rot = nRot
+        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -311,16 +342,16 @@ class TemplateOFFSET(Template):
 
 class TemplateRANDOM(Template):
     """Randomly modify rotation and scale of the request made"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         rotDiff = random.uniform(self.settings["minRandRot"],
                                  self.settings["maxRandRot"])
-        eul = mathutils.Euler(rot, 'XYZ')
+        eul = mathutils.Euler(buildRequest.rot, 'XYZ')
         eul.rotate_axis('Z', math.radians(rotDiff))
 
         scaleDiff = random.uniform(self.settings["minRandSz"],
                                    self.settings["maxRandSz"])
-        newScale = scale * scaleDiff
-        
+        newScale = buildRequest.scale * scaleDiff
+
         allMats = []
         if self.settings["randMat"]:
             if self.settings["randMatPrefix"]:
@@ -331,17 +362,20 @@ class TemplateRANDOM(Template):
                         newSlotIndex = self.settings["slotIndex"]
                     else:
                         print("Prefix not found!")
-                        newMat = "none"
+                        newMat = None
                         newSlotIndex = 0
             else:
                 print("You must enter a prefix!")
-                newMat = "none"
+                newMat = None
                 newSlotIndex = 0
         else:
-            newMat = "none"
+            newMat = None
             newSlotIndex = 0
-
-        self.inputs["Template"].build(pos, Vector(eul), newScale, tags, cm_group, material=newMat, matSlotIndex=newSlotIndex)
+        buildRequest.rot = Vector(eul)
+        buildRequest.scale = newScale
+        buildRequest.material = newMat
+        buildRequest.matSlotIndex = newSlotIndex
+        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -359,8 +393,9 @@ class TemplatePOINTTOWARDS(Template):
         Template.__init__(self, inputs, settings, bpyName)
         self.kdtree = None
 
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         ob = bpy.context.scene.objects[self.settings["PointObject"]]
+        pos = buildRequest.pos
         if self.settings["PointType"] == "OBJECT":
             point = ob.location
         else:  # self.settings["PointObject"] == "MESH":
@@ -374,7 +409,8 @@ class TemplatePOINTTOWARDS(Template):
             point = ob.matrix_world * co
         direc = point - pos
         rotQuat = direc.to_track_quat('Y', 'Z')
-        self.inputs["Template"].build(pos, rotQuat.to_euler(), scale, tags, cm_group, material, matSlotIndex)
+        buildRequest.rot = rotQuat.to_euler()
+        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if self.settings["PointObject"] not in bpy.context.scene.objects:
@@ -391,15 +427,15 @@ class TemplatePOINTTOWARDS(Template):
 
 class TemplateCOMBINE(Template):
     """Duplicate request to all inputs"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         for name, inp in self.inputs.items():
-            print("name", name, inp.__class__.__name__)
-            inp.build(pos, rot, scale, tags, cm_group, material, matSlotIndex)
+            newBuildRequest = buildRequest.copy()
+            inp.build(newBuildRequest)
 
 
 class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         positions = []
         for a in range(self.settings["noToPlace"]):
             if self.settings["locationType"] == "radius":
@@ -413,15 +449,15 @@ class TemplateRANDOMPOSITIONING(Template):
                 x *= length
                 y *= length
                 diff = Vector((x, y, 0))
-                diff.rotate(mathutils.Euler(rot))
-                newPos = Vector(pos) + diff
+                diff.rotate(mathutils.Euler(buildRequest.rot))
+                newPos = Vector(buildRequest.pos) + diff
                 positions.append(newPos)
             elif self.settings["locationType"] == "sector":
                 x = random.uniform(0, self.settings["MaxX"])
                 y = random.uniform(0, self.settings["MaxY"])
                 diff = Vector((x, y, 0))
-                diff.rotate(mathutils.Euler(rot))
-                newPos = Vector(pos) + diff
+                diff.rotate(mathutils.Euler(buildRequest.rot))
+                newPos = Vector(buildRequest.pos) + diff
                 positions.append(newPos)
         if self.settings["relax"]:
             radius = self.settings["relaxRadius"]
@@ -440,7 +476,9 @@ class TemplateRANDOMPOSITIONING(Template):
                     if len(localPoints) > 0:
                         positions[n] += adjust/len(localPoints)
         for newPos in positions:
-            self.inputs["Template"].build(newPos, rot, scale, tags, cm_group, material, matSlotIndex)
+            newBuildRequest = buildRequest.copy()
+            newBuildRequest.pos = newPos
+            self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -454,22 +492,25 @@ class TemplateRANDOMPOSITIONING(Template):
 
 class TemplateFORMATION(Template):
     """Place in a row"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
-        placePos = Vector(pos)
+    def build(self, buildRequest):
+        placePos = Vector(buildRequest.pos)
         diffRow = Vector((self.settings["ArrayRowMargin"], 0, 0))
         diffCol = Vector((0, self.settings["ArrayColumnMargin"], 0))
-        diffRow.rotate(mathutils.Euler(rot))
-        diffCol.rotate(mathutils.Euler(rot))
-        diffRow *= scale
-        diffCol *= scale
+        diffRow.rotate(mathutils.Euler(buildRequest.rot))
+        diffCol.rotate(mathutils.Euler(buildRequest.rot))
+        diffRow *= buildRequest.scale
+        diffCol *= buildRequest.scale
         number = self.settings["noToPlace"]
         rows = self.settings["ArrayRows"]
         for fullcols in range(number // rows):
             for row in range(rows):
-                self.inputs["Template"].build(placePos + fullcols*diffCol +
-                                              row*diffRow, rot, scale, tags, cm_group, material, matSlotIndex)
+                newBuildRequest = buildRequest.copy()
+                newBuildRequest.pos = placePos + fullcols*diffCol + row*diffRow
+                self.inputs["Template"].build(newBuildRequest)
         for leftOver in range(number % rows):
-            self.inputs["Template"].build(placePos + (number//rows)*diffCol + leftOver*diffRow, rot, scale, tags, cm_group, material, matSlotIndex)
+            newBuild = buildRequest.copy()
+            newBuild.pos = placePos + (number//rows)*diffCol + leftOver*diffRow
+            self.inputs["Template"].build(newBuild)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -483,22 +524,25 @@ class TemplateFORMATION(Template):
 
 class TemplateTARGET(Template):
     """Place based on the positions of vertices"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         if self.settings["targetType"] == "object":
             objs = bpy.data.groups[self.settings["targetGroups"]].objects
             if self.settings["overwritePosition"]:
                 for obj in objs:
-                    self.inputs["Template"].build(obj.location,
-                                                  Vector(obj.rotation_euler),
-                                                  scale, tags, cm_group, material, matSlotIndex)
+                    newBuildRequest = buildRequest.copy()
+                    newBuildRequest.pos = obj.location
+                    newBuildRequest.rot = Vector(obj.rotation_euler)
+                    self.inputs["Template"].build(newBuildRequest)
             else:
                 for obj in objs:
                     loc = obj.location
                     oRot = Vector(obj.rotation_euler)
                     loc.rotate(mathutils.Euler(rot))
                     loc *= scale
-                    self.inputs["Template"].build(loc + pos, rot + oRot,
-                                                  scale, tags, cm_group, material, matSlotIndex)
+                    newBuildRequest = buildRequest.copy()
+                    newBuildRequest.pos = loc + buildRequest.pos
+                    newBuildRequest.rot = buildRequest.rot + oRot
+                    self.inputs["Template"].build(newBuildRequest)
         else:  # targetType == "vertex"
             obj = bpy.data.objects[self.settings["targetObject"]]
             if self.settings["overwritePosition"]:
@@ -506,15 +550,18 @@ class TemplateTARGET(Template):
                 targets = [wrld*v.co for v in obj.data.vertices]
                 newRot = Vector(obj.rotation_euler)
                 for vert in targets:
-                    self.inputs["Template"].build(vert, newRot, scale, tags,
-                                                  cm_group, material, matSlotIndex)
+                    newBuildRequest = buildRequest.copy()
+                    newBuildRequest.pos = vert
+                    newBuildRequest.rot = newRot
+                    self.inputs["Template"].build(newBuildRequest)
             else:
                 targets = [Vector(v.co) for v in obj.data.vertices]
                 for loc in targets:
-                    loc.rotate(mathutils.Euler(rot))
-                    loc *= scale
-                    self.inputs["Template"].build(loc + pos, rot, scale, tags,
-                                                  cm_group, material, matSlotIndex)
+                    loc.rotate(mathutils.Euler(buildRequest.rot))
+                    loc *= buildRequest.scale
+                    newBuildRequest = buildRequest.copy()
+                    newBuildRequest.pos = loc + buildRequest.pos
+                    self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -538,7 +585,7 @@ class TemplateOBSTACLE(Template):
         Template.__init__(self, inputs, settings, bpyName)
         self.octree = None
 
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         if self.octree is None:
             objs = bpy.data.groups[self.settings["obstacleGroup"]].objects
             margin = self.settings["margin"]
@@ -548,7 +595,7 @@ class TemplateOBSTACLE(Template):
                                                   radii=radii)
         intersections = self.octree.checkPoint(pos)
         if len(intersections) == 0:
-            self.inputs["Template"].build(pos, rot, scale, tags, cm_group, material, matSlotIndex)
+            self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
@@ -568,27 +615,31 @@ class TemplateGROUND(Template):
         Template.__init__(self, inputs, settings, bpyName)
         self.bvhtree = None
 
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
+    def build(self, buildRequest):
         sce = bpy.context.scene
         gnd = sce.objects[self.settings["groundMesh"]]
         if self.bvhtree is None:
             self.bvhtree = BVHTree.FromObject(gnd, sce)
-        point = pos - gnd.location
+        point = buildRequest.pos - gnd.location
         hitA, normA, indA, distA = self.bvhtree.ray_cast(point, (0, 0, -1))
         hitB, normB, indB, distB = self.bvhtree.ray_cast(point, (0, 0, 1))
         if hitA and hitB:
             if distA <= distB:
                 hitA += gnd.location
-                self.inputs["Template"].build(hitA, rot, scale, tags, cm_group, material, matSlotIndex)
+                buildRequest.pos = hitA
+                self.inputs["Template"].build(buildRequest)
             else:
                 hitB += gnd.location
-                self.inputs["Template"].build(hitB, rot, scale, tags, cm_group, material, matSlotIndex)
+                buildRequest.pos = hitB
+                self.inputs["Template"].build(buildRequest)
         elif hitA:
             hitA += gnd.location
-            self.inputs["Template"].build(hitA, rot, scale, tags, cm_group, material, matSlotIndex)
+            buildRequest.pos = hitA
+            self.inputs["Template"].build(buildRequest)
         elif hitB:
             hitB += gnd.location
-            self.inputs["Template"].build(hitB, rot, scale, tags, cm_group, material, matSlotIndex)
+            buildRequest.pos = hitB
+            self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if self.settings["groundMesh"] not in bpy.context.scene.objects:
@@ -602,9 +653,9 @@ class TemplateGROUND(Template):
 
 class TemplateSETTAG(Template):
     """Set a tag for an agent to start with"""
-    def build(self, pos, rot, scale, tags, cm_group, material="none", matSlotIndex=0):
-        tags[self.settings["tagName"]] = self.settings["tagValue"]
-        self.inputs["Template"].build(pos, rot, scale, tags, cm_group, material, matSlotIndex)
+    def build(self, buildRequest):
+        buildRequest.tags[self.settings["tagName"]] = self.settings["tagValue"]
+        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
