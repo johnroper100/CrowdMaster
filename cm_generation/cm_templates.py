@@ -266,7 +266,6 @@ class TemplateAGENT(Template):
         if buildRequest.material is not None:
             matSlotIndex = buildRequest.matSlotIndex
             mat = buildRequest.material
-            print("Top obj", topObj, buildRequest.material)
             topObj.material_slots[matSlotIndex].link = 'OBJECT'
             topObj.material_slots[matSlotIndex].material = bpy.data.materials[mat]
 
