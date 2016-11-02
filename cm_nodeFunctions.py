@@ -203,6 +203,8 @@ class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
     def core(self, inps, settings):
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+
         def linear(value):
             lz = settings["LowerZero"]
             lo = settings["LowerOne"]
@@ -231,7 +233,8 @@ class LogicGRAPH(Neuron):
         for into in inps:
             for i in into:
                 if i in output:
-                    print("""LogicGRAPH data lost due to multiple inputs with the same key""")
+                    if preferences.show_debug_options:
+                        print("""LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
                         output[i] = (RBF(into[i])*settings["Multiply"])
@@ -489,6 +492,7 @@ class LogicOUTPUT(Neuron):
     """Sets an agents output. (Has to be picked up in cm_agents.Agents)"""
 
     def core(self, inps, settings):
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
         val = 0
         if settings["MultiInputType"] == "AVERAGE":
             count = 0
@@ -510,7 +514,8 @@ class LogicOUTPUT(Neuron):
             SmSquared = 0
             for into in inps:
                 for i in into:
-                    print("Val:", into[i])
+                    if preferences.show_debug_options:
+                        print("Val:", into[i])
                     Sm += into[i]
                     SmSquared += into[i] * abs(into[i])  # To retain sign
             # print(Sm, SmSquared)

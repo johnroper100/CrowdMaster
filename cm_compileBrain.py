@@ -58,6 +58,7 @@ def getOutputs(out):
 def compileBrain(nodeGroup, sim, userid):
     """Compile the brain that defines how and agent moves and is animated"""
     result = Brain(sim, userid)
+    preferences = bpy.context.user_preferences.addons[__package__].preferences
     """create the connections from the node"""
     for node in nodeGroup.nodes:
         if node.bl_idname in logictypes:
@@ -77,7 +78,8 @@ def compileBrain(nodeGroup, sim, userid):
             item = statetypes[node.bl_idname](result, node, node.name)
             node.getSettings(item)
             item.outputs = getOutputs(node.outputs["To"])
-            print(node.name, "outputs", item.outputs)
+            if preferences.show_debug_options:
+                print(node.name, "outputs", item.outputs)
             if node.bl_idname == "StartState":
                 result.setStartState(node.name)
             else:

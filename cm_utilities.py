@@ -56,10 +56,12 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
     bl_label = "Sample Node Setups"
 
     def execute(self, context):
+        preferences = context.user_preferences.addons[__package__].preferences
 
-        newhudText = "Sample Node Setups Created!"
-        update_hud_text(newhudText)
-        cm_redrawAll()
+        if preferences.show_node_hud:
+            newhudText = "Sample Node Setups Created!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -290,7 +292,10 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
     bl_label = "Convert Selected To Bounding Box"
 
     def execute(self, context):
-        startT = time.time()
+        preferences = context.user_preferences.addons[__package__].preferences
+        
+        if preferences.show_node_hud:
+            startT = time.time()
 
         selected = bpy.context.selected_objects
         for obj in selected:
@@ -302,15 +307,16 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
             bound_box.rotation_euler = obj.rotation_euler
             bound_box.select = True
 
-        endT = time.time() - startT
+        if preferences.show_node_hud:
+            endT = time.time() - startT
 
-        newhudText = "Done Converting to Bounding Boxes!"
-        update_hud_text(newhudText)
+            newhudText = "Done Converting to Bounding Boxes!"
+            update_hud_text(newhudText)
 
-        newhudText2 = "Time taken: {} seconds".format(str(endT))
-        update_hud_text2(newhudText2)
+            newhudText2 = "Time taken: {} seconds".format(str(endT))
+            update_hud_text2(newhudText2)
 
-        cm_redrawAll()
+            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -333,11 +339,13 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_label = "Place Deferred Geometry"
 
     def execute(self, context):
-        newhudText = "Placing Deferred Geometry!"
-        update_hud_text(newhudText)
-        cm_redrawAll()
-
         preferences = context.user_preferences.addons[__package__].preferences
+        
+        if preferences.show_node_hud:
+            newhudText = "Placing Deferred Geometry!"
+            update_hud_text(newhudText)
+            cm_redrawAll()
+
         groups = bpy.data.groups
         objects = context.scene.objects
         for group in context.scene.cm_groups:
