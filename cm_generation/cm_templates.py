@@ -361,7 +361,7 @@ class TemplateRANDOM(Template):
                         newMat = random.choice(allMats)
                         newSlotIndex = self.settings["slotIndex"]
                     else:
-                        print("Prefix not found!")
+                        print("Prefix: "+self.settings["randMatPrefix"]+" not found!")
                         newMat = None
                         newSlotIndex = 0
             else:
