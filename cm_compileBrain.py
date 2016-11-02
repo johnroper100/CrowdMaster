@@ -17,6 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import bpy
 from .cm_nodeFunctions import logictypes, statetypes
 from .cm_brainClasses import Brain
 
