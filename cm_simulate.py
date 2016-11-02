@@ -64,11 +64,13 @@ class Simulation:
     def newagent(self, name, brain):
         """Set up an agent"""
         nGps = bpy.data.node_groups
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
             ag = Agent(name, nGps[brain], self)
             self.agents[name] = ag
         else:
-            print("No such brain type:" + brain)
+            if preferences.show_debug_options:
+                print("No such brain type:" + brain)
 
     def createAgents(self, group):
         """Set up all the agents at the beginning of the simulation"""

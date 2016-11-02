@@ -72,6 +72,7 @@ class SCENE_OT_cm_groups_reset(Operator):
 
     def execute(self, context):
         scene = context.scene
+        preferences = context.user_preferences.addons[__package__].preferences
 
         group = scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
@@ -96,9 +97,10 @@ class SCENE_OT_cm_groups_reset(Operator):
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
 
-        newhudText = "Group {} reset!".format(self.groupName)
-        update_hud_text(newhudText)
-        cm_redrawAll()
+        if preferences.show_node_hud:
+            newhudText = "Group {} reset!".format(self.groupName)
+            update_hud_text(newhudText)
+            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -149,37 +151,44 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
     def execute(self, context):
         scene = context.scene
+        preferences = context.user_preferences.addons[__package__].preferences
 
-        print("Calling")
+        if preferences.show_debug_options:
+            print("Calling")
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}
         if scene.cm_groups.find(self.groupName) == -1:
             newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "manual"
-        print("Calling1")
+        if preferences.show_debug_options:
+            print("Calling1")
         group = scene.cm_groups.get(self.groupName)
         if group.groupType == "auto":
             return {'CANCELLED'}
-        print("Calling2")
+        if preferences.show_debug_options:
+            print("Calling2")
         ty = group.agentTypes.find(self.brainType)
         if ty == -1:
             at = group.agentTypes.add()
             at.name = self.brainType
             ty = group.agentTypes.find(at.name)
-        print("Calling3")
+        if preferences.show_debug_options:
+            print("Calling3")
         agentType = group.agentTypes[ty]
         for obj in context.selected_objects:
             inGroup = agentType.agents.find(obj.name)
-            print("inGroup", inGroup)
+            if prefrences.show_debug_options:
+                print("inGroup", inGroup)
             if inGroup == -1:
                 newAgent = agentType.agents.add()
                 newAgent.name = obj.name
                 group.totalAgents += 1
 
-        newhudText = "Manual Agents {} Created!".format(self.groupName)
-        update_hud_text(newhudText)
-        cm_redrawAll()
+        if preferences.show_node_hud:
+            newhudText = "Manual Agents {} Created!".format(self.groupName)
+            update_hud_text(newhudText)
+            cm_redrawAll()
 
         return {'FINISHED'}
 
