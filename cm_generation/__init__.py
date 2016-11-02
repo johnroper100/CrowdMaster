@@ -24,7 +24,7 @@ from bpy.props import StringProperty
 
 from .. libs.ins_vector import Vector
 
-from . cm_templates import templates
+from . cm_templates import templates, TemplateRequest
 from .. cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
 from .. cm_graphics . utils import cm_redrawAll
 
@@ -104,10 +104,11 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 tipNode = space.from_node
                 if tipNode.bl_idname == "NodeReroute":
                     tipNode = self.getInput(tipNode.inputs[0])
-                genSpaces[tipNode].build(Vector((0, 0, 0)), Vector((0, 0, 0)), 1, {}, context.scene.cm_groups["cm_allAgents"])
+                buildRequest = TemplateRequest()
+                genSpaces[tipNode].build(buildRequest)
         else:
             return {'CANCELLED'}
-        
+
         if allSuccess:
             newhudText = "Agents Generated!"
             update_hud_text(newhudText)
@@ -115,9 +116,9 @@ class SCENE_OT_agent_nodes_generate(Operator):
         else:
             newhudText = "Agents Generated With Errors!"
             update_hud_text(newhudText)
-        
+
         endT = time.time() - startT
-        
+
         newhudText2 = "Time taken: {} seconds".format(str(endT))
         update_hud_text2(newhudText2)
 
