@@ -178,7 +178,8 @@ class CMPreferences(AddonPreferences):
                 else:
                     row.prop(preferences, 'show_debug_options', icon='RECOVER_AUTO')
 
-        row = layout.row(align=True)
+        box = layout.box()
+        row = box.row(align=True)
         row.scale_y = 1.2
         if preferences.use_custom_icons:
             row.operator("wm.url_open", text="Our Website", icon_value=cicon('house')).url = "http://jmroper.com/crowdmaster/"
@@ -187,7 +188,7 @@ class CMPreferences(AddonPreferences):
             row.operator("wm.url_open", text="Our Website", icon='URL').url = "http://jmroper.com/crowdmaster/"
             row.operator("wm.url_open", text="Email Us", icon='URL').url = "mailto:crowdmaster@jmroper.com"
 
-        row = layout.row()
+        row = box.row()
         row.scale_y = 1.25
         row.operator("scene.cm_save_prefs", icon='SAVE_PREFS')
 
