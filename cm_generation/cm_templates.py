@@ -358,12 +358,13 @@ class TemplateRANDOM(Template):
                 for mat in bpy.data.materials:
                     if self.settings["randMatPrefix"] in mat.name:
                         allMats.append(mat.name)
-                        newMat = random.choice(allMats)
-                        newSlotIndex = self.settings["slotIndex"]
-                    else:
-                        print("Prefix: "+self.settings["randMatPrefix"]+" not found!")
-                        newMat = None
-                        newSlotIndex = 0
+                if len(allMats):
+                    newMat = random.choice(allMats)
+                    newSlotIndex = self.settings["slotIndex"]
+                else:
+                    print("Prefix: "+self.settings["randMatPrefix"]+" not found!")
+                    newMat = None
+                    newSlotIndex = 0
             else:
                 print("You must enter a prefix!")
                 newMat = None
