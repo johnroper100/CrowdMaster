@@ -21,7 +21,7 @@ import os
 import bpy
 
 ICONS = 'node_tree_logo start_sim stop_sim ' \
-        'agents reset instant_setup add_agents plug code shuffle array target setup motion dice house email'.split(' ')
+        'agents reset instant_setup add_agents plug code shuffle array target setup motion dice house email download'.split(' ')
 icon_collection = {}
 
 
