@@ -178,7 +178,7 @@ class SCENE_OT_cm_agent_add_selected(Operator):
         agentType = group.agentTypes[ty]
         for obj in context.selected_objects:
             inGroup = agentType.agents.find(obj.name)
-            if prefrences.show_debug_options:
+            if preferences.show_debug_options:
                 print("inGroup", inGroup)
             if inGroup == -1:
                 newAgent = agentType.agents.add()
