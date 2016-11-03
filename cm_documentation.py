@@ -19,8 +19,11 @@
 
 import bpy
 import os
+import urllib.request
+from sys import platform
 
 from bpy.props import *
+from bpy.types import Operator
 from . icon_load import cicon
 
 # Documentation Links
@@ -60,15 +63,34 @@ def doc_map():
     dm = (prefix, documentation_mapping)
     return dm
 
+class SCENE_OT_cm_download_docs(Operator):
+    bl_idname = "scene.cm_download_docs"
+    bl_label = "Download CrowdMaster Documentation"
+
+    def execute(self, context):
+        scene = context.scene
+        
+        if platform == "win32":
+            downloadLocation = os.path.expanduser("~")+"\Downloads\CrowdMasterDocumentation.zip"
+        else:
+            downloadLocation = os.path.expanduser("~")+"/Downloads/CrowdMasterDocumentation.zip"
+        zipPath = "http://jmroper.com/crowdmaster/docs/CrowdMasterDocumentation.zip"
+
+        urllib.request.urlretrieve(zipPath, downloadLocation)
+        
+        self.report({"INFO"}, "Documentation Downloaded!")
+
+        return {'FINISHED'}
+
 def register():
     # Register custom documentation mapping
     bpy.utils.register_manual_map(doc_map)
 
-    #bpy.utils.register_class(CrowdMasterTree)
+    bpy.utils.register_class(SCENE_OT_cm_download_docs)
 
 
 def unregister():
-    #bpy.utils.unregister_class(CrowdMasterTree)
+    bpy.utils.unregister_class(SCENE_OT_cm_download_docs)
     
     # Unregister custom documentation mapping
     bpy.utils.unregister_manual_map(doc_map)

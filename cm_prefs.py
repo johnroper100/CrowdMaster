@@ -199,9 +199,11 @@ def draw_cmweb_item(self, context):
     if preferences.use_custom_icons:
         self.layout.operator("wm.url_open", text="CrowdMaster Website", icon_value=cicon('house'),).url = "http://jmroper.com/crowdmaster/"
         self.layout.operator("wm.url_open", text="CrowdMaster Email", icon_value=cicon('email'),).url = "mailto:crowdmaster@jmroper.com"
+        self.layout.operator("scene.cm_download_docs", icon_value=cicon('download'))
     else:
         self.layout.operator("wm.url_open", text="Our Website", icon='URL').url = "http://jmroper.com/crowdmaster/"
         self.layout.operator("wm.url_open", text="Email Us", icon='URL').url = "mailto:crowdmaster@jmroper.com"
+        self.layout.operator("scene.cm_download_docs", icon='URL')
 
 
 def register():
