@@ -153,33 +153,23 @@ class SCENE_OT_cm_agent_add_selected(Operator):
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
-        if preferences.show_debug_options:
-            print("Calling")
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}
         if scene.cm_groups.find(self.groupName) == -1:
             newGroup = scene.cm_groups.add()
             newGroup.name = self.groupName
             newGroup.groupType = "manual"
-        if preferences.show_debug_options:
-            print("Calling1")
         group = scene.cm_groups.get(self.groupName)
         if group.groupType == "auto":
             return {'CANCELLED'}
-        if preferences.show_debug_options:
-            print("Calling2")
         ty = group.agentTypes.find(self.brainType)
         if ty == -1:
             at = group.agentTypes.add()
             at.name = self.brainType
             ty = group.agentTypes.find(at.name)
-        if preferences.show_debug_options:
-            print("Calling3")
         agentType = group.agentTypes[ty]
         for obj in context.selected_objects:
             inGroup = agentType.agents.find(obj.name)
-            if preferences.show_debug_options:
-                print("inGroup", inGroup)
             if inGroup == -1:
                 newAgent = agentType.agents.add()
                 newAgent.name = obj.name
@@ -227,7 +217,7 @@ class SCENE_OT_cm_start(Operator):
                 customRLines = area.spaces[0].show_relationship_lines
                 area.spaces[0].show_outline_selected = False
                 area.spaces[0].show_relationship_lines = False
-        
+
         if preferences.show_node_hud:
             newhudText = "Simulation Running!"
             update_hud_text(newhudText)
@@ -270,7 +260,7 @@ class SCENE_OT_cm_stop(Operator):
         global sim
         if "sim" in globals():
             sim.stopFrameHandler()
-        
+
         bpy.context.scene.sync_mode = customSyncMode
         for area in bpy.context.screen.areas:
             if area.type == 'VIEW_3D':
@@ -551,7 +541,7 @@ def unregister():
     if "sim" in globals():
         if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
-    
+
     cm_documentation.unregister()
 
 if __name__ == "__main__":
