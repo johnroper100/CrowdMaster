@@ -348,14 +348,14 @@ class RandomNode(CrowdMasterAGenTreeNode):
         row.prop(self, "minRandSz")
         row.prop(self, "maxRandSz")
         
-        row = layout.row()
+        """row = layout.row()
         row.prop(self, "randMat")
 
         row = layout.row()
         if not self.randMat:
             row.enabled = False
         row.prop(self, "randMatPrefix")
-        row.prop(self, "slotIndex")
+        row.prop(self, "slotIndex")"""
 
     def getSettings(self):
         return {"maxRandRot": self.maxRandRot,
