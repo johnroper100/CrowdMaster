@@ -593,7 +593,7 @@ class TemplateOBSTACLE(Template):
             radii = [(o.dimensions/2) + mVec for o in objs]
             self.octree = createOctreeFromBPYObjs(objs, allSpheres=False,
                                                   radii=radii)
-        intersections = self.octree.checkPoint(pos)
+        intersections = self.octree.checkPoint(buildRequest.pos)
         if len(intersections) == 0:
             self.inputs["Template"].build(buildRequest)
 
