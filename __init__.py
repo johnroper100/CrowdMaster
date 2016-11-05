@@ -211,12 +211,13 @@ class SCENE_OT_cm_start(Operator):
         customSyncMode = bpy.context.scene.sync_mode
         bpy.context.scene.sync_mode = 'NONE'
 
-        for area in bpy.context.screen.areas:
-            if area.type == 'VIEW_3D':
-                customOutline = area.spaces[0].show_outline_selected
-                customRLines = area.spaces[0].show_relationship_lines
-                area.spaces[0].show_outline_selected = False
-                area.spaces[0].show_relationship_lines = False
+        if bpy.context.screen is not None:
+            for area in bpy.context.screen.areas:
+                if area.type == 'VIEW_3D':
+                    customOutline = area.spaces[0].show_outline_selected
+                    customRLines = area.spaces[0].show_relationship_lines
+                    area.spaces[0].show_outline_selected = False
+                    area.spaces[0].show_relationship_lines = False
 
         if preferences.show_node_hud:
             newhudText = "Simulation Running!"
@@ -262,10 +263,11 @@ class SCENE_OT_cm_stop(Operator):
             sim.stopFrameHandler()
 
         bpy.context.scene.sync_mode = customSyncMode
-        for area in bpy.context.screen.areas:
-            if area.type == 'VIEW_3D':
-                area.spaces[0].show_outline_selected = customOutline
-                area.spaces[0].show_relationship_lines = customRLines
+        if bpy.context.screen is not None:
+            for area in bpy.context.screen.areas:
+                if area.type == 'VIEW_3D':
+                    area.spaces[0].show_outline_selected = customOutline
+                    area.spaces[0].show_relationship_lines = customRLines
 
         if preferences.show_node_hud:
             newhudText = "Simulation Stopped!"
