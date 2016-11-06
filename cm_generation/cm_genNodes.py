@@ -319,14 +319,14 @@ class RandomNode(CrowdMasterAGenTreeNode):
                               description="The maximum random scale for each agent.",
                               default=1.0, min=0, precision=3,
                               update=updateRandomNode)
-    
+
     randMat = BoolProperty(name="Random Material",
                              description="Sould each agents have a random material?",
                              default=False)
-    
+
     randMatPrefix = StringProperty(name="Prefix",
                                      description="The prefix which all materials must have to be chosen from randomly")
-    
+
     slotIndex = IntProperty(name="Slot Index",
                               description="The material slot on the object(s) that you want to set randomly.",
                               default=0, min=0)
@@ -347,7 +347,7 @@ class RandomNode(CrowdMasterAGenTreeNode):
         row.alignment = 'EXPAND'
         row.prop(self, "minRandSz")
         row.prop(self, "maxRandSz")
-        
+
         """row = layout.row()
         row.prop(self, "randMat")
 
@@ -433,7 +433,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 
     locationType = EnumProperty(
         items=[("radius", "Radius", "Within radius of requested"),
-               ("sector", "Sector", "Within a minimum and maximum rande in the x and y directions")],
+               ("area", "Area", "Within a minimum and maximum range in the x and y directions")],
         name="Location Type",
         description="Which location type to use",
         default="radius"
@@ -474,10 +474,10 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
         if self.locationType == "radius":
             row.prop(self, "radius")
 
-        elif self.locationType == "sector":
+        elif self.locationType == "area":
             row.prop(self, "MaxX")
             row.prop(self, "MaxY")
-        
+
         layout.prop(self, "relax")
         if self.relax:
             layout.prop(self, "relaxIterations")

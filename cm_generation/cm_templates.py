@@ -452,11 +452,12 @@ class TemplateRANDOMPOSITIONING(Template):
                 diff.rotate(mathutils.Euler(buildRequest.rot))
                 newPos = Vector(buildRequest.pos) + diff
                 positions.append(newPos)
-            elif self.settings["locationType"] == "sector":
-                x = random.uniform(0, self.settings["MaxX"])
-                y = random.uniform(0, self.settings["MaxY"])
+            elif self.settings["locationType"] == "area":
+                MaxX = self.settings["MaxX"]/2
+                MaxY = self.settings["MaxY"]/2
+                x = random.uniform(-MaxX, MaxX)
+                y = random.uniform(-MaxY, MaxY)
                 diff = Vector((x, y, 0))
-                diff.rotate(mathutils.Euler(buildRequest.rot))
                 newPos = Vector(buildRequest.pos) + diff
                 positions.append(newPos)
         if self.settings["relax"]:
