@@ -433,7 +433,8 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 
     locationType = EnumProperty(
         items=[("radius", "Radius", "Within radius of requested"),
-               ("area", "Area", "Within a minimum and maximum range in the x and y directions")],
+               ("area", "Area", "Within a minimum and maximum range in the x and y directions"),
+               ("sector", "Sector", "Within a sector of a circle")],
         name="Location Type",
         description="Which location type to use",
         default="radius"
@@ -460,6 +461,13 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                          description="The maximum distance in the Y direction around the center point where the agents will be randomly spawned.",
                          default=50.0)
 
+    direc = FloatProperty(name="Direction",
+                          description="The direction that the sector faces",
+                          default=0, min=-180, max=180)
+    angle = FloatProperty(name="Angle",
+                          description="Angle that is covered by sector",
+                          default=45, min=0, max=360)
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs[0].link_limit = 1
@@ -473,10 +481,13 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
         row.alignment = 'EXPAND'
         if self.locationType == "radius":
             row.prop(self, "radius")
-
         elif self.locationType == "area":
             row.prop(self, "MaxX")
             row.prop(self, "MaxY")
+        elif self.locationType == "sector":
+            row.prop(self, "radius")
+            row.prop(self, "direc")
+            row.prop(self, "angle")
 
         layout.prop(self, "relax")
         if self.relax:
@@ -491,7 +502,9 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                 "radius": self.radius,
                 "relax": self.relax,
                 "relaxIterations": self.relaxIterations,
-                "relaxRadius": self.relaxRadius}
+                "relaxRadius": self.relaxRadius,
+                "direc": self.direc,
+                "angle": self.angle}
 
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
