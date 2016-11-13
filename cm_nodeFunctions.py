@@ -678,9 +678,9 @@ class StateAction(State):
             action = actionobj.action  # bpy action
             if action:
                 currentFrame = bpy.context.scene.frame_current
-                strip = tr.strips.new("", currentFrame, action)
-                strip.extrapolation = 'NOTHING'
-                strip.use_auto_blend = True
+                self.strip = tr.strips.new("", currentFrame, action)
+                self.strip.extrapolation = 'NOTHING'
+                self.strip.use_auto_blend = True
             self.length = actionobj.length
 
             """tr = obj.animation_data.nla_tracks.new()  # NLA track
@@ -770,6 +770,7 @@ class StateAction(State):
                     syncOptions.append((con, val))
 
                     if len(syncOptions) > 0:
+                        self.strip.action_frame_end = self.currentFrame + 1
                         if len(syncOptions) == 1:
                             return True, syncOptions[0][0]
                         else:
@@ -823,9 +824,9 @@ class StateActionGroup(State):
             action = actionobj.action  # bpy action
             if action:
                 currentFrame = bpy.context.scene.frame_current
-                strip = tr.strips.new("", currentFrame, action)
-                strip.extrapolation = 'NOTHING'
-                strip.use_auto_blend = True
+                self.strip = tr.strips.new("", currentFrame, action)
+                self.strip.extrapolation = 'NOTHING'
+                self.strip.use_auto_blend = True
             self.length = actionobj.length
 
     def evaluateState(self):
