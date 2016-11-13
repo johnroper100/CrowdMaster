@@ -85,6 +85,7 @@ def compileBrain(nodeGroup, sim, userid):
                 result.setStartState(node.name)
             else:
                 item.valueInputs = getInputs(node.inputs["Value"])
+                item.inputs = getInputs(node.inputs["From"])
                 if len(item.valueInputs) != 0:
                     result.outputs.append(node.name)
             result.neurons[node.name] = item
