@@ -97,7 +97,7 @@ class syncManager:
         #    already been assigned to either agent.
         seenAgents = set()
         agentActions = {}
-        for pair in sorted(pairs, key=lambda x: x[2]):
+        for pair in sorted(pairs, key=lambda x: x[2], reverse=True):
             if pair[0][0] not in seenPairs and pair[1][0] not in seenPairs:
                 agentActions[pair[0][0]] = (pair[0][1], pair[1][0])
                 agentActions[pair[1][0]] = (pair[1][1], pair[0][0])
