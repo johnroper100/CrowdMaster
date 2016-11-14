@@ -135,5 +135,5 @@ class SyncManagerTestCase(unittest.TestCase):
         sm.tell("y", "z", "attack", 0.1, "attackState")
         sm.tell("y", "z", "defence", 0.9, "defenceState")
 
-        self.assertEqual(sm.resolveSync(), {'z': ('defenceState', 'y'),
-                                            'y': ('attackState', 'z')})
+        self.assertEqual(sm.resolveSync(), {'z': ('attackState', 'y'),
+                                            'y': ('defenceState', 'z')})
