@@ -33,7 +33,8 @@ class syncManager:
     def actionPair(self, action0, action1):
         if action0 not in self.actionPairs:
             self.actionPairs[action0] = []
-        self.actionPairs[action0].append(action1)
+        if action1 not in self.actionPairs[action0]:
+            self.actionPairs[action0].append(action1)
 
     def tell(self, source, target, action, value, state):
         """
