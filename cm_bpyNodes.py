@@ -717,10 +717,11 @@ def updateWait(self, context):
 class StartState(StateNode):
     """CrowdMaster Start State"""
     bl_label = "Start"
+    bl_width_default = 225.0
 
-    minRandWait = IntProperty(name="Minimum random wait", default=0, min=0,
+    minRandWait = IntProperty(name="Minimum", default=0, min=0,
                               update=updateWait)
-    maxRandWait = IntProperty(name="Maximum random wait", default=0, min=0,
+    maxRandWait = IntProperty(name="Maximum", default=0, min=0,
                               update=updateWait)
 
     def init(self, context):
@@ -737,8 +738,9 @@ class StartState(StateNode):
                                      self.maxRandWait)
 
     def draw_buttons(self, context, layout):
+        row = layout.row()
+        row.label("Random wait time:")
         row = layout.row(align=True)
-        row.label("Random wait:")
         row.prop(self, "minRandWait")
         row.prop(self, "maxRandWait")
 
