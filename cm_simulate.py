@@ -65,6 +65,7 @@ class Simulation:
         self.actions, self.actionGroups = getmotions()
         for m in bpy.context.scene.cm_action_pairs.coll:
             self.syncManager.actionPair(m.source, m.target)
+            self.syncManager.actionPair(m.target, m.source)
 
     def newagent(self, name, brain):
         """Set up an agent"""
