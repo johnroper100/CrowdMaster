@@ -24,6 +24,7 @@ from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 import textwrap
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
+import random
 
 from . icon_load import cicon
 
@@ -707,10 +708,20 @@ class StateNode(CrowdMasterNode):
 
 # ====== End of Super class ======
 
+def updateWait(self, context):
+    """Keeps the random wait values in the right order"""
+    if self.minRandWait > self.maxRandWait:
+        self.minRandWait = self.maxRandWait
+
 
 class StartState(StateNode):
     """CrowdMaster Start State"""
     bl_label = "Start"
+
+    minRandWait = IntProperty(name="Minimum random wait", default=0, min=0,
+                              update=updateWait)
+    maxRandWait = IntProperty(name="Maximum random wait", default=0, min=0,
+                              update=updateWait)
 
     def init(self, context):
         self.inputs.new("DependanceSocketType", "Dependant")
@@ -720,7 +731,16 @@ class StartState(StateNode):
         self.outputs["To"].link_limit = 4095
 
     def getSettings(self, item):
-        return
+        item.settings["minRandWait"] = self.minRandWait
+        item.settings["maxRandWait"] = self.maxRandWait
+        item.length = random.randint(self.minRandWait,
+                                     self.maxRandWait)
+
+    def draw_buttons(self, context, layout):
+        row = layout.row(align=True)
+        row.label("Random wait:")
+        row.prop(self, "minRandWait")
+        row.prop(self, "maxRandWait")
 
 
 class ActionState(StateNode):

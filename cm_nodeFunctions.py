@@ -662,7 +662,10 @@ logictypes = OrderedDict([
 
 class StateSTART(State):
     """Points to the first state for the agent to be in"""
-
+    def moveTo(self):
+        self.length = random.randint(self.settings["minRandWait"],
+                                         self.settings["maxRandWait"])
+        State.moveTo(self)
 
 class StateAction(State):
     """The normal state in a state machine"""
