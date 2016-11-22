@@ -721,7 +721,7 @@ class StateAction(State):
                     if val > 0:
                         sm.tell(userid, key, self.actionName, val, self.name)
 
-            state, pairedAgent = sm.getResult(userid)
+            (state, action), pairedAgent = sm.getResult(userid)
 
             if state == self.name:
                 self.finalValue = 1

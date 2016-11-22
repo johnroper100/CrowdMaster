@@ -82,6 +82,7 @@ class syncManager:
                     for action, (state, value) in m0.items():
                         if action in self.actionPairs:
                             bestState = None
+                            bestAction = None
                             bestScore = 0
                             for possiblePair in self.actionPairs[action]:
                                 if possiblePair in m1:
@@ -89,10 +90,12 @@ class syncManager:
                                     score = v * value
                                     if score > bestScore:
                                         bestState = s
+                                        bestAction = possiblePair
                                         bestScore = score
                             if bestScore > 0:
                                 # All possible pairings get to this point
-                                pairs.append(((s0, state), (s1, bestState),
+                                pairs.append(((s0, (state, action)),
+                                              (s1, (bestState, possiblePair)),
                                               bestScore))
         # Starting at maximum valued pair assign actions if no action has
         #    already been assigned to either agent.
@@ -104,6 +107,7 @@ class syncManager:
                 agentActions[pair[1][0]] = (pair[1][1], pair[0][0])
                 seenPairs.add(pair[0][0])
                 seenPairs.add(pair[1][0])
+        # agentActions in the form {fromActions: ((state, action), otherAgent)}
         return agentActions
 
     def getResult(self, agentName):
@@ -136,5 +140,5 @@ class SyncManagerTestCase(unittest.TestCase):
         sm.tell("y", "z", "attack", 0.1, "attackState")
         sm.tell("y", "z", "defence", 0.9, "defenceState")
 
-        self.assertEqual(sm.resolveSync(), {'z': ('attackState', 'y'),
-                                            'y': ('defenceState', 'z')})
+        self.assertEqual(sm.resolveSync(), {'z': (('attackState', 'attack'), 'y'),
+                                            'y': (('defenceState', 'defence'), 'z')})
