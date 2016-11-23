@@ -114,7 +114,7 @@ class syncManager:
         if agentName in self.lastFrame:
             return self.lastFrame[agentName]
         else:
-            return None, None
+            return (None, None), None
 
 
 class SyncManagerTestCase(unittest.TestCase):
