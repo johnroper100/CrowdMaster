@@ -325,7 +325,7 @@ class SCENE_PT_CrowdMaster(Panel):
             box = layout.box()
             row = box.row()
             row.scale_y = 1.5
-            row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_VEC_HLT")
+            row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_HLT")
 
             box = layout.box()
             row = box.row()
