@@ -192,8 +192,10 @@ class SCENE_UL_action_pair(UIList):
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
-            layout.prop(item, "source", text="")
-            layout.prop(item, "target", text="")
+            layout.prop_search(item, "source", context.scene.cm_action_groups,
+                               "groups", text="")
+            layout.prop_search(item, "target", context.scene.cm_action_groups,
+                               "groups", text="")
 
 
 class SCENE_PT_action(Panel):

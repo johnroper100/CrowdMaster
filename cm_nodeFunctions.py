@@ -664,17 +664,26 @@ class StateSTART(State):
     """Points to the first state for the agent to be in"""
     def moveTo(self):
         self.length = random.randint(self.settings["minRandWait"],
-                                         self.settings["maxRandWait"])
+                                     self.settings["maxRandWait"])
         State.moveTo(self)
 
 class StateAction(State):
     """The normal state in a state machine"""
+    def __init__(self, *args, **kwargs):
+        self.action = None
+        State.__init__(self, *args, **kwargs)
+
+    def isGroup(self):
+        if len(self.actionName) > 0:
+            return self.actionName[0] == "[" and self.actionName[-1] == "]"
+        return False
+
     def moveTo(self):
         State.moveTo(self)
 
-        act = self.actionName
-        if act in self.brain.sim.actions:
-            actionobj = self.brain.sim.actions[act]  # from .cm_motion.py
+        if self.action in self.brain.sim.actions:
+            actionobj = self.brain.sim.actions[self.action]
+            # from .cm_motion.py
             obj = bpy.context.scene.objects[self.brain.userid]  # bpy object
 
             tr = obj.animation_data.nla_tracks.new()  # NLA track
@@ -686,15 +695,10 @@ class StateAction(State):
                 self.strip.use_auto_blend = True
             self.length = actionobj.length
 
-            """tr = obj.animation_data.nla_tracks.new()  # NLA track
-            action = actionobj.motion
-            if action:
-                strip = tr.strips.new("", sce.frame_current, action)
-                strip.extrapolation = 'HOLD_FORWARD'
-                strip.use_auto_blend = False
-                strip.blend_type = 'ADD'"""
+        self.currentAction = self.action
 
     def evaluate(self):
+        act = self.actionName
         if self.syncState:
             possible = False
             for sInp in self.inputs:
@@ -719,17 +723,25 @@ class StateAction(State):
                     else:
                         val = v + (v * self.settings["ValueDefault"])
                     if val > 0:
-                        sm.tell(userid, key, self.actionName, val, self.name)
+                        if self.isGroup():
+                            for act in self.brain.sim.actionGroups[act[1:-1]]:
+                                print(act, self.name)
+                                sm.tell(userid, key, act, val, self.name)
+                        else:
+                            print(self.actionName, self.name)
+                            sm.tell(userid, key, self.actionName, val, self.name)
 
             (state, action), pairedAgent = sm.getResult(userid)
 
             if state == self.name:
                 self.finalValue = 1
+                self.action = action
             else:
                 self.finalValue = 0
             self.finalValueCalcd = True
         else:
             State.evaluate(self)
+            self.action = self.actionName
 
     def evaluateState(self):
         self.currentFrame += 1
@@ -748,7 +760,7 @@ class StateAction(State):
         self.resultLog[currentFrame] = ((0.15, 0.4, complete))
 
         if self.actionName in self.brain.sim.actions:
-            actionobj = self.brain.sim.actions[self.actionName]
+            actionobj = self.brain.sim.actions[self.currentAction]
 
             for data_path, data in actionobj.motiondata.items():
                 x = data[0][self.currentFrame] - data[0][self.currentFrame - 1]

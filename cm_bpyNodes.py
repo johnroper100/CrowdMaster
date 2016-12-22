@@ -774,9 +774,9 @@ class ActionState(StateNode):
             layout.prop(self, "stateLength")
         layout.prop(self, "cycleState")
         row = layout.row()
-        row.prop(self, "actionName", text="")
+        row.prop_search(self, "actionName", context.scene.cm_action_groups,
+                        "groups")
         layout.prop(self, "syncState")
-        # row.prop(self, "useValueOfSpeed", text="")
 
 
 class ActionGroupState(StateNode):
