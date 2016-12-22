@@ -95,7 +95,7 @@ class syncManager:
                             if bestScore > 0:
                                 # All possible pairings get to this point
                                 pairs.append(((s0, (state, action)),
-                                              (s1, (bestState, possiblePair)),
+                                              (s1, (bestState, bestAction)),
                                               bestScore))
         # Starting at maximum valued pair assign actions if no action has
         #    already been assigned to either agent.
@@ -142,3 +142,38 @@ class SyncManagerTestCase(unittest.TestCase):
 
         self.assertEqual(sm.resolveSync(), {'z': (('attackState', 'attack'), 'y'),
                                             'y': (('defenceState', 'defence'), 'z')})
+
+    def testCase2(self):
+        sm = syncManager()
+        sm.actionPair("attack", "impact")
+        sm.actionPair("attack", "death1")
+        sm.actionPair("attack", "death2")
+
+        sm.actionPair("death1", "attack")
+        sm.actionPair("death1", "slash")
+
+        sm.actionPair("slash", "impact")
+        sm.actionPair("slash", "death1")
+        sm.actionPair("slash", "death2")
+
+        sm.actionPair("death2", "attack")
+        sm.actionPair("death2", "slash")
+
+        sm.actionPair("impact", "attack")
+        sm.actionPair("impact", "slash")
+
+        sm.tell("x", "y", "death1", 1.5322003178298897, "Action.005")
+        sm.tell("x", "y", "attack", 1.0213593144361799, "Action.001")
+        sm.tell("x", "y", "slash", 1.0213593144361799, "Action.001")
+        sm.tell("x", "y", "death2", 0.5322003178298897, "Action.005")
+        sm.tell("x", "y", "impact", 1.012717818329232, "Action.002")
+
+        sm.tell("y", "x", "death1", 0.5275212760897328, "Action.005")
+        sm.tell("y", "x", "attack", 1.0282780862831944, "Action.001")
+        sm.tell("y", "x", "slash", 1.0282780862831944, "Action.001")
+        sm.tell("y", "x", "death2", 0.5275212760897328, "Action.005")
+        sm.tell("y", "x", "impact", 1.0214241096853804, "Action.002")
+
+        result = sm.resolveSync()
+        self.assertEqual(result, {'y': (('Action.001', 'attack'), 'x'),
+                                  'x': (('Action.005', 'death1'), 'y')})
