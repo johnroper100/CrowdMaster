@@ -779,32 +779,6 @@ class ActionState(StateNode):
         layout.prop(self, "syncState")
 
 
-class ActionGroupState(StateNode):
-    """CrowdMaster Action Group State"""
-    bl_label = "Action Group"
-
-    cycleState = BoolProperty(name="Cycle State", default=False)
-    groupName = StringProperty(name="Action Group Name", default="")
-    useValueOfSpeed = BoolProperty(name=" Use Value of Speed", default=True)
-
-    def init(self, context):
-        StateNode.init(self, context)
-
-    def getSettings(self, item):
-        val = self.inputs['Value']
-        item.settings["ValueFilter"] = val.filterProperty
-        item.settings["ValueDefault"] = val.defaultValueProperty
-        item.settings["RandomInput"] = val.randomInputValue
-        item.settings["GroupName"] = self.groupName
-        item.cycleState = self.cycleState
-        item.useValueOfSpeed = self.useValueOfSpeed
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "cycleState")
-        row = layout.row()
-        row.prop(self, "groupName", text="")
-        # row.prop(self, "useValueOfSpeed", text="")
-
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
@@ -941,8 +915,7 @@ node_categories = [
         ]),
     MyNodeCategory("STATE", "State", items=[
         NodeItem("StartState"),
-        NodeItem("ActionState"),
-        NodeItem("ActionGroupState")
+        NodeItem("ActionState")
         ]),
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("QueryTagNode"),
@@ -967,7 +940,6 @@ def register():
     bpy.utils.register_class(DependanceSocket)
     bpy.utils.register_class(LogicNode)
     bpy.utils.register_class(StateNode)
-    bpy.utils.register_class(ActionGroupState)
 
     bpy.utils.register_class(InputNode)
     bpy.utils.register_class(NewInputNode)
@@ -1007,7 +979,6 @@ def unregister():
     bpy.utils.unregister_class(DependanceSocket)
     bpy.utils.unregister_class(LogicNode)
     bpy.utils.unregister_class(StateNode)
-    bpy.utils.unregister_class(ActionGroupState)
 
     bpy.utils.unregister_class(InputNode)
     bpy.utils.unregister_class(NewInputNode)
