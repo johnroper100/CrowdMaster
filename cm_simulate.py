@@ -67,8 +67,20 @@ class Simulation:
         """Set up the actions"""
         self.actions, self.actionGroups = getmotions()
         for m in bpy.context.scene.cm_action_pairs.coll:
-            self.syncManager.actionPair(m.source, m.target)
-            self.syncManager.actionPair(m.target, m.source)
+            sources = []
+            targets = []
+            if m.source[0] == "[" and m.source[-1] == "]":
+                sources += self.actionGroups[m.source[1:-1]]
+            else:
+                sources = [m.source]
+            if m.target[0] == "[" and m.target[-1] == "]":
+                targets += self.actionGroups[m.target[1:-1]]
+            else:
+                targets = [m.target]
+            for s in sources:
+                for t in targets:
+                    self.syncManager.actionPair(s, t)
+                    self.syncManager.actionPair(t, s)
 
     def newagent(self, name, brain):
         """Set up an agent"""
