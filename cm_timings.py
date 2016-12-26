@@ -17,6 +17,11 @@ simulation = {
     "betweenFrames": 0,
     "totalFrames": 0
 }
+neuron = {
+    "deps": 0,
+    "core": 0,
+    "colour": 0
+}
 
 def printTimings():
     print("Placement")
@@ -30,4 +35,7 @@ def printTimings():
         print("     ", k, v)
     print("Simulation")
     for k, v in simulation.items():
+        print("     ", k, v)
+    print("Neuron")
+    for k, v in neuron.items():
         print("     ", k, v)

@@ -43,6 +43,8 @@ class Neuron():
     def evaluate(self):
         """Called by any neurons that take this neuron as an input"""
         preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.show_debug_options:
+            t = time.time()
         if self.result:
             # Return a cached version of the answer if possible
             return self.result
@@ -50,6 +52,10 @@ class Neuron():
         dep = True in [self.neurons[x].isCurrent for x in self.dependantOn]
         # Only output something if the node isn't dependant on a state
         #  or if one of it's dependancies is the current state
+        if preferences.show_debug_options:
+            cm_timings.neuron["deps"] += time.time() - t
+            t = time.time()
+
         if noDeps or dep:
             inps = []
             for i in self.inputs:
@@ -64,6 +70,10 @@ class Neuron():
         else:
             output = None
         self.result = output
+
+        if preferences.show_debug_options:
+            cm_timings.neuron["core"] += time.time() - t
+            t = time.time()
 
         # Calculate the colour that would be displayed in the agent is selected
         total = 0
@@ -95,6 +105,9 @@ class Neuron():
             sat = 0
             val = 0.5
         self.resultLog[-1] = (hue, sat, val)
+
+        if preferences.show_debug_options:
+            cm_timings.neuron["colour"] += time.time() - t
 
         return output
 
