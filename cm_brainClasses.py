@@ -23,6 +23,9 @@ import bpy
 
 import mathutils
 
+from . import cm_timings
+import time
+
 
 class Neuron():
     """The representation of the nodes. Not to be used on own"""
@@ -280,17 +283,38 @@ class Brain():
 
     def execute(self):
         """Called for each time the agents needs to evaluate"""
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+
         actv = bpy.context.active_object
         self.isActiveSelection = actv is not None and actv.name == self.userid
         self.reset()
         randstate = hash(self.userid) + self.sim.framelast
         random.seed(randstate)
+
+        if preferences.show_debug_options:
+            t = time.time()
+
         for name, var in self.lvars.items():
             var.setuser(self.userid)
+
+        if preferences.show_debug_options:
+            cm_timings.brain["setUser"] += time.time() - t
+            t = time.time()
+
         for neur in self.neurons.values():
             neur.newFrame()
+
+        if preferences.show_debug_options:
+            cm_timings.brain["newFrame"] += time.time() - t
+            t = time.time()
+
         for out in self.outputs:
             self.neurons[out].evaluate()
+
+        if preferences.show_debug_options:
+            cm_timings.brain["evaluate"] += time.time() - t
+            t = time.time()
+
         if self.currentState:
             new, nextState = self.neurons[self.currentState].evaluateState()
             self.neurons[self.currentState].isCurrent = False
@@ -300,6 +324,9 @@ class Brain():
             self.neurons[self.currentState].isCurrent = True
             if new:
                 self.neurons[nextState].moveTo()
+
+        if preferences.show_debug_options:
+            cm_timings.brain["evalState"] += time.time() - t
 
     def hightLight(self, frame):
         """This will be called for the agent that is the active selection"""

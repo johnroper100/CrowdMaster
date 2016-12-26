@@ -23,6 +23,8 @@ import copy
 
 from .cm_compileBrain import compileBrain
 
+import time
+from . import cm_timings
 
 class Agent:
     """Represents each of the agents in the scene"""
@@ -30,6 +32,7 @@ class Agent:
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             print("Blender id", blenderid)
+            t = time.time()
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
@@ -89,18 +92,29 @@ class Agent:
         objs[blenderid].keyframe_insert(data_path="location", frame=1)
         objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
 
+        if preferences.show_debug_options:
+            cm_timings.agent["init"] += time.time() - t
+
     def step(self):
         objs = bpy.data.objects
         preferences = bpy.context.user_preferences.addons[__package__].preferences
 
+        if preferences.show_debug_options:
+            t = time.time()
         self.brain.execute()
-        if objs[self.id].select:
-            if preferences.show_debug_options:
+        if preferences.show_debug_options:
+            cm_timings.agent["brainExecute"] += time.time() - t
+            if objs[self.id].select:
                 print("ID: ", self.id, "Tags: ", self.brain.tags,
                       "outvars: ", self.brain.outvars)
             # TODO show this in the UI
+        if preferences.show_debug_options:
+            t = time.time()
         if objs[self.id] == bpy.context.active_object:
             self.brain.hightLight(bpy.context.scene.frame_current)
+        if preferences.show_debug_options:
+            cm_timings.agent["highLight"] += time.time() - t
+            t = time.time()
 
         self.rx = self.brain.outvars["rx"] if self.brain.outvars["rx"] else 0
         self.ry = self.brain.outvars["ry"] if self.brain.outvars["ry"] else 0
@@ -141,9 +155,16 @@ class Agent:
 
         self.apz += result[2]
 
+        if preferences.show_debug_options:
+            cm_timings.agent["setOutput"] += time.time() - t
+
     def apply(self):
         """Called in single thread after all agent.step() calls are done"""
         obj = bpy.data.objects[self.id]
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+
+        if preferences.show_debug_options:
+            t = time.time()
 
         if obj.animation_data:
             obj.animation_data.action_extrapolation = 'HOLD_FORWARD'
@@ -232,6 +253,9 @@ class Agent:
             self.apzKey = False
 
         self.access = copy.deepcopy(self.external)
+
+        if preferences.show_debug_options:
+            cm_timings.agent["applyOutput"] += time.time() - t
 
     def highLight(self):
         for n in self.brain.neurons.values():

@@ -27,6 +27,8 @@ from .cm_agent import Agent
 from .cm_actions import getmotions
 from .cm_syncManager import syncManager
 
+from . import cm_timings
+
 
 class Simulation:
     """The object that contains everything once the simulation starts"""
@@ -54,6 +56,7 @@ class Simulation:
         if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0
+            self.lastFrameTime = None
 
         self.actions = {}
         self.actionGroups = {}
@@ -90,6 +93,9 @@ class Simulation:
         if preferences.show_debug_options:
             t = time.time()
             print("NEWFRAME", bpy.context.scene.frame_current)
+            if self.lastFrameTime is not None:
+                between = time.time() - self.lastFrameTime
+                cm_timings.simulation["betweenFrames"] += between
         for agent in self.agents.values():
             for tag in agent.access["tags"]:
                 for channel in self.lvars:
@@ -108,11 +114,16 @@ class Simulation:
         for chan in self.lvars.values():
             chan.newframe()
         if preferences.show_debug_options:
+            cm_timings.printTimings()
             newT = time.time()
-            print("time", newT - t)
-            self.totalTime += newT - t
-            self.totalFrames += 1
-            print("spf", self.totalTime/self.totalFrames)  # seconds per frame
+            print("Frame time", newT - t)
+            cm_timings.simulation["total"] += newT - t
+            print("Total time", cm_timings.simulation["total"])
+            cm_timings.simulation["totalFrames"] += 1
+            tf = cm_timings.simulation["totalFrames"]
+            tt = cm_timings.simulation["total"]
+            print("spf", tt/tf)  # seconds per frame
+            self.lastFrameTime = time.time()
 
     def frameChangeHandler(self, scene):
         """Given to Blender to call whenever the scene moves to a new frame"""
