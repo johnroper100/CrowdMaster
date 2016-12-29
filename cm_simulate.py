@@ -93,9 +93,10 @@ class Simulation:
         if preferences.show_debug_options:
             t = time.time()
             print("NEWFRAME", bpy.context.scene.frame_current)
-            if self.lastFrameTime is not None:
-                between = time.time() - self.lastFrameTime
-                cm_timings.simulation["betweenFrames"] += between
+            if preferences.show_debug_options and preferences.show_debug_timings:
+                if self.lastFrameTime is not None:
+                    between = time.time() - self.lastFrameTime
+                    cm_timings.simulation["betweenFrames"] += between
         for agent in self.agents.values():
             for tag in agent.access["tags"]:
                 for channel in self.lvars:
@@ -113,7 +114,7 @@ class Simulation:
             a.apply()
         for chan in self.lvars.values():
             chan.newframe()
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.printTimings()
             newT = time.time()
             print("Frame time", newT - t)

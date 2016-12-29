@@ -48,23 +48,24 @@ channelTimes = {}
 
 def timeChannel(classOverwrite=None):
     def createDecorator(func):
-        prefs = bpy.context.user_preferences.addons["CrowdMaster"].preferences
-        if not prefs.show_debug_options:
-            return func
         def wrapped(self, *args, **kwargs):
-            t = time.time()
-            result = func(self, *args, **kwargs)
-            t = time.time() - t
-            if classOverwrite is None:
-                cl = self.__class__.__name__
+            prefs = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+            if prefs.show_debug_options and prefs.show_debug_timings:
+                t = time.time()
+                result = func(self, *args, **kwargs)
+                t = time.time() - t
+                if classOverwrite is None:
+                    cl = self.__class__.__name__
+                else:
+                    cl = classOverwrite
+                nm = func.__name__
+                if cl not in channelTimes:
+                    channelTimes[cl] = {}
+                if nm not in channelTimes[cl]:
+                    channelTimes[cl][nm] = 0
+                channelTimes[cl][nm] += t
+                return result
             else:
-                cl = classOverwrite
-            nm = func.__name__
-            if cl not in channelTimes:
-                channelTimes[cl] = {}
-            if nm not in channelTimes[cl]:
-                channelTimes[cl][nm] = 0
-            channelTimes[cl][nm] += t
-            return result
+                return func(self, *args, **kwargs)
         return wrapped
     return createDecorator

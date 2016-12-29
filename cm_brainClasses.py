@@ -52,7 +52,7 @@ class Neuron():
         dep = True in [self.neurons[x].isCurrent for x in self.dependantOn]
         # Only output something if the node isn't dependant on a state
         #  or if one of it's dependancies is the current state
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.neuron["deps"] += time.time() - t
 
         if noDeps or dep:
@@ -66,7 +66,7 @@ class Neuron():
             if preferences.show_debug_options:
                 coreT = time.time()
             output = self.core(inps, self.settings)
-            if preferences.show_debug_options:
+            if preferences.show_debug_options and preferences.show_debug_timings:
                 cm_timings.coreTimes[self.__class__.__name__] += time.time() - coreT
                 cm_timings.coreNumber[self.__class__.__name__] += 1
             if not (isinstance(output, dict) or output is None):
@@ -108,7 +108,7 @@ class Neuron():
             val = 0.5
         self.resultLog[-1] = (hue, sat, val)
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.neuron["colour"] += time.time() - t
 
         return output
@@ -312,21 +312,21 @@ class Brain():
         for name, var in self.lvars.items():
             var.setuser(self.userid)
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.brain["setUser"] += time.time() - t
             t = time.time()
 
         for neur in self.neurons.values():
             neur.newFrame()
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.brain["newFrame"] += time.time() - t
             t = time.time()
 
         for out in self.outputs:
             self.neurons[out].evaluate()
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.brain["evaluate"] += time.time() - t
             t = time.time()
 
@@ -340,7 +340,7 @@ class Brain():
             if new:
                 self.neurons[nextState].moveTo()
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.brain["evalState"] += time.time() - t
 
     def hightLight(self, frame):

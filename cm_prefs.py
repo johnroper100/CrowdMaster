@@ -85,13 +85,19 @@ class CMPreferences(AddonPreferences):
         description="Chose whether to show the debug options in the interface. This also enables debug mode.",
         default=False,
         )
-    
+
+    show_debug_timings = BoolProperty(
+        name="Show debug timings",
+        description="Time and print to console the times taken by elements of the system.",
+        default=False,
+    )
+
     show_node_hud = BoolProperty(
         name="Show Node Editor HUD",
         description="Chose whether to show the CrowdMaster text HUD in the node editor.",
         default=False,
         )
-    
+
     show_sim_data = BoolProperty(
         name="Show Detailed Simulation Data",
         description="Chose whether to show detailed data while running a simulation or operator in the node tree hud. Warning, this makes each operator take longer.",
@@ -145,11 +151,11 @@ class CMPreferences(AddonPreferences):
 
             row = layout.row()
             row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
-            
+
             if preferences.show_node_hud:
                 row.prop(preferences, 'show_sim_data', icon='OUTLINER_DATA_FONT')
                 row = layout.row()
-    
+
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))
             else:
@@ -158,20 +164,22 @@ class CMPreferences(AddonPreferences):
         if preferences.prefs_tab == "UPDATE":
             layout.row()
             addon_updater_ops.update_settings_ui(self, context)
-        
+
         if preferences.prefs_tab == "DEBUG":
             if preferences.show_debug_options:
                 row = layout.row()
                 row.scale_y = 1.25
                 row.operator("scene.cm_run_short_tests", icon='CONSOLE')
-                
+
                 row = layout.row()
                 row.scale_y = 1.25
                 row.operator("scene.cm_run_long_tests", icon='QUIT')
+
+                layout.prop(preferences, 'show_debug_timings', icon='TIME')
             else:
                 row = layout.row()
                 row.label("Enable Show Debug Options to access these settings (only for developers).")
-                
+
                 row = layout.row()
                 if preferences.use_custom_icons:
                     row.prop(preferences, 'show_debug_options', icon_value=cicon('code'))

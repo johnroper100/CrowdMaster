@@ -92,7 +92,7 @@ class Agent:
         objs[blenderid].keyframe_insert(data_path="location", frame=1)
         objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
 
     def step(self):
@@ -103,7 +103,8 @@ class Agent:
             t = time.time()
         self.brain.execute()
         if preferences.show_debug_options:
-            cm_timings.agent["brainExecute"] += time.time() - t
+            if preferences.show_debug_timings:
+                cm_timings.agent["brainExecute"] += time.time() - t
             if objs[self.id].select:
                 print("ID: ", self.id, "Tags: ", self.brain.tags,
                       "outvars: ", self.brain.outvars)
@@ -112,7 +113,7 @@ class Agent:
             t = time.time()
         if objs[self.id] == bpy.context.active_object:
             self.brain.hightLight(bpy.context.scene.frame_current)
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["highLight"] += time.time() - t
             t = time.time()
 
@@ -155,7 +156,7 @@ class Agent:
 
         self.apz += result[2]
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["setOutput"] += time.time() - t
 
     def apply(self):
@@ -254,7 +255,7 @@ class Agent:
 
         self.access = copy.deepcopy(self.external)
 
-        if preferences.show_debug_options:
+        if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["applyOutput"] += time.time() - t
 
     def highLight(self):
