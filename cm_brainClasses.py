@@ -54,7 +54,6 @@ class Neuron():
         #  or if one of it's dependancies is the current state
         if preferences.show_debug_options:
             cm_timings.neuron["deps"] += time.time() - t
-            t = time.time()
 
         if noDeps or dep:
             inps = []
@@ -64,7 +63,12 @@ class Neuron():
                 input in not a dictionary then it is made into one"""
                 if got is not None:
                     inps.append(got)
+            if preferences.show_debug_options:
+                coreT = time.time()
             output = self.core(inps, self.settings)
+            if preferences.show_debug_options:
+                cm_timings.coreTimes[self.__class__.__name__] += time.time() - coreT
+                cm_timings.coreNumber[self.__class__.__name__] += 1
             if not (isinstance(output, dict) or output is None):
                 output = {"None": output}
         else:
@@ -72,9 +76,7 @@ class Neuron():
         self.result = output
 
         if preferences.show_debug_options:
-            cm_timings.neuron["core"] += time.time() - t
             t = time.time()
-
         # Calculate the colour that would be displayed in the agent is selected
         total = 0
         if output:

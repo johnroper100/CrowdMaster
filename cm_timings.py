@@ -29,6 +29,49 @@ neuron = OrderedDict([
     ("colour", 0)
 ])
 
+coreTimes = OrderedDict([
+    ("LogicINPUT", 0),
+    ("LogicNEWINPUT", 0),
+    ("LogicGRAPH", 0),
+    ("LogicMATH", 0),
+    ("LogicAND", 0),
+    ("LogicOR", 0),
+    ("LogicSTRONG", 0),
+    ("LogicWEAK", 0),
+    ("LogicQUERYTAG", 0),
+    ("LogicSETTAG", 0),
+    ("LogicVARIABLE", 0),
+    ("LogicFILTER", 0),
+    ("LogicMAP", 0),
+    ("LogicOUTPUT", 0),
+    ("LogicPRIORITY", 0),
+    ("LogicEVENT", 0),
+    ("LogicPYTHON", 0),
+    ("LogicPRINT", 0)
+])
+
+coreNumber = OrderedDict([
+    ("LogicINPUT", 0),
+    ("LogicNEWINPUT", 0),
+    ("LogicGRAPH", 0),
+    ("LogicMATH", 0),
+    ("LogicAND", 0),
+    ("LogicOR", 0),
+    ("LogicSTRONG", 0),
+    ("LogicWEAK", 0),
+    ("LogicQUERYTAG", 0),
+    ("LogicSETTAG", 0),
+    ("LogicVARIABLE", 0),
+    ("LogicFILTER", 0),
+    ("LogicMAP", 0),
+    ("LogicOUTPUT", 0),
+    ("LogicPRIORITY", 0),
+    ("LogicEVENT", 0),
+    ("LogicPYTHON", 0),
+    ("LogicPRINT", 0)
+])
+
+
 def printTimings():
     print("Placement")
     for k, v in placement.items():
@@ -45,3 +88,14 @@ def printTimings():
     print("Neuron")
     for k, v in neuron.items():
         print("     ", k, v)
+    print("Cores")
+    for k, v in coreTimes.items():
+        n = coreNumber[k]
+        print("     ", k, v, n, v/max(n, 1))
+    print("Channel times")
+    for k in sorted(channelTimes):
+        v = channelTimes[k]
+        print("     ", k, sum(v.values()))
+        for k1 in sorted(v):
+            v1 = v[k1]
+            print("          ", k1, v1)
