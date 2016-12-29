@@ -1,27 +1,33 @@
-placement = {}
-agent = {
-    "init": 0,
-    "brainExecute": 0,
-    "highLight": 0,
-    "setOutput": 0,
-    "applyOutput": 0
-}
-brain = {
-    "setUser": 0,
-    "newFrame": 0,
-    "evaluate": 0,
-    "evalState": 0
-}
-simulation = {
-    "total": 0,
-    "betweenFrames": 0,
-    "totalFrames": 0
-}
-neuron = {
-    "deps": 0,
-    "core": 0,
-    "colour": 0
-}
+from collections import OrderedDict
+from .cm_channels import channelTimes
+
+placement = OrderedDict([])
+
+agent = OrderedDict([
+    ("init", 0),
+    ("brainExecute", 0),
+    ("highLight", 0),
+    ("setOutput", 0),
+    ("applyOutput", 0)
+])
+
+brain = OrderedDict([
+    ("setUser", 0),
+    ("newFrame", 0),
+    ("evaluate", 0),
+    ("evalState", 0)
+])
+
+simulation = OrderedDict([
+    ("total", 0),
+    ("betweenFrames", 0),
+    ("totalFrames", 0)
+])
+
+neuron = OrderedDict([
+    ("deps", 0),
+    ("colour", 0)
+])
 
 def printTimings():
     print("Placement")
