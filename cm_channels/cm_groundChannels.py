@@ -23,6 +23,7 @@ from mathutils import *
 BVHTree = bvhtree.BVHTree
 
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 
 class Ground(Mc):
@@ -100,6 +101,7 @@ class Channel:
             self.store["distance"] = 0
         self.calcd = True
 
+    @timeChannel("Ground")
     def dh(self):
         if not self.calcd:
             self.calcground()

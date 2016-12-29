@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 import math
 import mathutils
 Vector = mathutils.Vector
@@ -414,6 +415,7 @@ class Channel:
         return {k: v[prop] if prop in v else default for k, v in dictionary}
 
     @property
+    @timeChannel("Sound")
     def rz(self):
         """Return the horizontal angle of sound emitting agents"""
         items = self.calcAndGetItems()
@@ -421,6 +423,7 @@ class Channel:
             return self._buildDictFromProperty(items, "rz")
 
     @property
+    @timeChannel("Sound")
     def rx(self):
         """Return the vertical angle of sound emitting agents"""
         items = self.calcAndGetItems()
@@ -428,6 +431,7 @@ class Channel:
             return self._buildDictFromProperty(items, "rx")
 
     @property
+    @timeChannel("Sound")
     def dist(self):
         """Return the distance to the sound emitting agents 0-1"""
         items = self.calcAndGetItems()
@@ -435,6 +439,7 @@ class Channel:
             return self._buildDictFromProperty(items, "distProp")
 
     @property
+    @timeChannel("Sound")
     def close(self):
         """Return how close the sound emitting is 0-1"""
         items = self.calcAndGetItems()
@@ -443,6 +448,7 @@ class Channel:
             return {k: 1-v for k, v in result.items()}
 
     @property
+    @timeChannel("Sound")
     def db(self):
         """Return the volume (dist^2) of sound emitting agents"""
         items = self.calcAndGetItems()
@@ -451,6 +457,7 @@ class Channel:
             return {k: (1-v)**2 for k, v in tmp.items()}
 
     @property
+    @timeChannel("Sound")
     def cert(self):
         """Return the certainty of a prediction 0-1"""
         items = self.calcAndGetItems()
@@ -458,6 +465,7 @@ class Channel:
             return self._buildDictFromProperty(items, "cert", default=1)
 
     @property
+    @timeChannel("Sound")
     def acc(self):
         """Return the recommended acceleration to avoid a collision"""
         items = self.calcAndGetItems()
@@ -465,6 +473,7 @@ class Channel:
             return self._buildDictFromProperty(items, "acc")
 
     @property
+    @timeChannel("Sound")
     def over(self):
         """Return the predicted worst case overlap"""
         items = self.calcAndGetItems()

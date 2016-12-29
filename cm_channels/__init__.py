@@ -28,6 +28,7 @@ from .cm_pathChannels import Path
 from . import cm_pathChannels
 Path = cm_pathChannels.Path
 
+from .cm_masterChannels import channelTimes, timeChannel
 
 def register():
     cm_pathChannels.register()

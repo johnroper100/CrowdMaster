@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 import random
 
 
@@ -26,10 +27,12 @@ class Noise(Mc):
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
+    @timeChannel("Noise")
     def random(self):
         """Returns a random number in range 0-1"""
         return random.random()
 
+    @timeChannel("Noise")
     def agentRandom(self, offset=0):
         """Return a random number that is consistent between frame but can
         be offset by an integer"""

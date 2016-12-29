@@ -19,6 +19,7 @@
 
 import bpy
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 import math
 import mathutils
@@ -91,18 +92,21 @@ class Channel:
         self.calcd = True
 
     @property
+    @timeChannel("World")
     def rz(self):
         if not self.calcd:
             self.calculate()
         return self.store["rz"]
 
     @property
+    @timeChannel("World")
     def rx(self):
         if not self.calcd:
             self.calculate()
         return self.store["rx"]
 
     @property
+    @timeChannel("World")
     def arrived(self):
         if not self.calcd:
             self.calculate()

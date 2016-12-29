@@ -30,6 +30,7 @@ from bpy.props import FloatProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 
 class Path(Mc):
@@ -173,6 +174,7 @@ class Path(Mc):
 
         return offset
 
+    @timeChannel("Path")
     def rz(self, pathName):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
@@ -185,6 +187,7 @@ class Path(Mc):
             self.resultsCache[pathObject] = target
         return math.atan2(target[0], target[1])/math.pi
 
+    @timeChannel("Path")
     def rx(self, pathName):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]

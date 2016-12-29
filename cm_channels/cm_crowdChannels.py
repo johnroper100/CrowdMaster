@@ -21,6 +21,7 @@ import bpy
 import mathutils
 import math
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 from mathutils import Vector
 
 
@@ -122,6 +123,7 @@ class Crowd(Mc):
         relative = cohVec * rotation
         return relative
 
+    @timeChannel()
     def separateTx(self, inputs):
         inSet = set()
         for into in inputs:
@@ -132,6 +134,7 @@ class Crowd(Mc):
         sepVec = self.calcSeparate(inSet)
         return sepVec[0]
 
+    @timeChannel()
     def separateTy(self, inputs):
         inSet = set()
         for into in inputs:
@@ -142,6 +145,7 @@ class Crowd(Mc):
         sepVec = self.calcSeparate(inSet)
         return sepVec[1]
 
+    @timeChannel()
     def separateTz(self, inputs):
         inSet = set()
         for into in inputs:
@@ -152,6 +156,7 @@ class Crowd(Mc):
         sepVec = self.calcSeparate(inSet)
         return sepVec[2]
 
+    @timeChannel()
     def alignRz(self, inputs):
         inSet = set()
         for into in inputs:
@@ -162,6 +167,7 @@ class Crowd(Mc):
         alnVec = self.calcAlign(inSet)
         return alnVec.z
 
+    @timeChannel()
     def alignRx(self, inputs):
         inSet = set()
         for into in inputs:
@@ -172,6 +178,7 @@ class Crowd(Mc):
         alnVec = self.calcAlign(inSet)
         return alnVec.x
 
+    @timeChannel()
     def cohereTx(self, inputs):
         inSet = set()
         for into in inputs:
@@ -182,6 +189,7 @@ class Crowd(Mc):
         cohVec = self.calcCohere(inSet)
         return cohVec[0]
 
+    @timeChannel()
     def cohereTy(self, inputs):
         inSet = set()
         for into in inputs:
@@ -192,6 +200,7 @@ class Crowd(Mc):
         cohVec = self.calcCohere(inSet)
         return cohVec[1]
 
+    @timeChannel()
     def cohereTz(self, inputs):
         inSet = set()
         for into in inputs:

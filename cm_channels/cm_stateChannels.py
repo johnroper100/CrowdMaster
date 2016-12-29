@@ -19,6 +19,7 @@
 
 import bpy
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 
 class State(Mc):
@@ -27,26 +28,31 @@ class State(Mc):
         Mc.__init__(self, sim)
 
     @property
+    @timeChannel("State")
     def radius(self):
         return bpy.context.scene.objects[self.userid].dimensions.length/2
 
     @property
+    @timeChannel("State")
     def userObject(self):
         """Shoudn't really ever be used but here for when a feature is missing"""
         return bpy.context.scene.objects[self.userid]
 
     @property
+    @timeChannel("State")
     def vars(self):
         """Get last frames agent variables. (Has to be last frames because this
         frames variables can be changed during the evaluation of the brain)"""
         return self.sim.agents[self.userid].access
 
     @property
+    @timeChannel("State")
     def speed(self):
         """Get the distance travelled in the last frame"""
         return self.sim.agents[self.userid].globalVelocity.length
 
     @property
+    @timeChannel("State")
     def velocity(self):
         """The vector of the change in position for the last frame"""
         return self.sim.agents[self.userid].globalVelocity

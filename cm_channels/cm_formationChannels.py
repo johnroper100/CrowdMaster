@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 import mathutils
 import math
 
@@ -149,6 +150,7 @@ class Channel:
         else:
             return False
 
+    @timeChannel("Formation")
     def fixedDist(self, fixedPoint):
         """Distance from this agent to the position in formation.
         :type fixedPoint: int
@@ -164,6 +166,7 @@ class Channel:
             return None
 
     @property
+    @timeChannel("Formation")
     def dist(self):
         """Distance from this agent to the position in formation"""
         objs = bpy.data.objects
@@ -175,6 +178,7 @@ class Channel:
         else:
             return None
 
+    @timeChannel("Formation")
     def fixedRz(self, fixedPoint):
         """Horizontal rotation to be pointing at position in formation.
         :type fixedPoint: int
@@ -199,6 +203,7 @@ class Channel:
             return math.atan2(relative[0], relative[1])/math.pi
 
     @property
+    @timeChannel("Formation")
     def rz(self):
         """Horizontal rotation to be pointing at position in formation"""
         objs = bpy.data.objects
@@ -220,6 +225,7 @@ class Channel:
         else:
             return None
 
+    @timeChannel("Formation")
     def fixedRx(self, fixedPoint):
         """Vertical rotation to be pointing at position in formation.
         :type fixedPoint: int
@@ -244,6 +250,7 @@ class Channel:
             return math.atan2(relative[2], relative[1])/math.pi
 
     @property
+    @timeChannel("Formation")
     def rx(self):
         """Vertical rotation to be pointing at position in formation"""
         objs = bpy.data.objects
