@@ -44,6 +44,7 @@ class Simulation:
         Flock = chan.Flock(self)
         Ground = chan.Ground(self)
         Formation = chan.Formation(self)
+        AgentInfo = chan.AgentInfo(self)
         Path = chan.Path(self)
         self.lvars = {"Noise": Noise,
                       "Sound": Sound,
@@ -52,7 +53,8 @@ class Simulation:
                       "Flock": Flock,
                       "Ground": Ground,
                       "Formation": Formation,
-                      "Path": Path}
+                      "Path": Path,
+                      "AgentInfo": AgentInfo}
         if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0

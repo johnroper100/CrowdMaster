@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2016 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,21 +17,21 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from .cm_noiseChannels import Noise
-from .cm_soundChannels import Sound
-from .cm_stateChannels import State
-from .cm_worldChannels import World
-from .cm_flockChannels import Flock
-from .cm_groundChannels import Ground
-from .cm_formationChannels import Formation
-from .cm_pathChannels import Path
-from .cm_agentInfoChannels import AgentInfo
-
-from .cm_masterChannels import channelTimes, timeChannel
-
-def register():
-    cm_pathChannels.register()
+from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 
-def unregister():
-    cm_pathChannels.unregister()
+class AgentInfo(Mc):
+    """Used to get information about other agent in a scene"""
+
+    @timeChannel("AgentInfo")
+    def getTag(self, inputs, tag):
+        """For each agent in the input look up their tag"""
+        result = {}
+        for into in inputs:
+            for i in into:
+                if i in self.sim.agents:
+                    agentTags = self.sim.agents[i].access["tags"]
+                    if tag in agentTags:
+                        result[i] = agentTags[tag]
+        return result

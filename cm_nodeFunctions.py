@@ -198,6 +198,11 @@ class LogicNEWINPUT(Neuron):
             elif settings["WorldOptions"] == "TIME":
                 return {"None": channels["World"].time}
 
+        elif settings["InputSource"] == "AGENTINFO":
+            agent = channels["AgentInfo"]
+            if settings["GetTagName"].strip() != "":
+                return agent.getTag(inps, settings["GetTagName"].strip())
+
 
 class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""

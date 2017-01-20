@@ -166,7 +166,8 @@ class NewInputNode(LogicNode):
                                       ("PATH", "Path", "", 6),
                                       ("SOUND", "Sound", "", 7),
                                       ("STATE", "State", "", 8),
-                                      ("WORLD", "World", "", 9)])
+                                      ("WORLD", "World", "", 9),
+                                      ("AGENTINFO", "AgentInfo", "", 10)])
 
     Constant = FloatProperty(name="Constant")
 
@@ -230,6 +231,8 @@ class NewInputNode(LogicNode):
                                         ("RX", "rx", "", 2),
                                         ("ARRIVED", "Arrived", "", 3)])
 
+    GetTagName = StringProperty(name="Get Tag Name")
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "InputSource", text="Input")
         if self.InputSource == "CONSTANT":
@@ -265,6 +268,8 @@ class NewInputNode(LogicNode):
                 layout.prop_search(self, "TargetObject", context.scene, "objects")
                 if self.TargetObject != "":
                     layout.prop(self, "TargetOptions")
+        elif self.InputSource == "AGENTINFO":
+            layout.prop(self, "GetTagName")
 
     def getSettings(self, node):
         node.settings["InputSource"] = self.InputSource
@@ -300,6 +305,8 @@ class NewInputNode(LogicNode):
                 node.settings["TargetObject"] = self.TargetObject
                 if self.TargetObject != "":
                     node.settings["TargetOptions"] = self.TargetOptions
+        elif self.InputSource == "AGENTINFO":
+            node.settings["GetTagName"] = self.GetTagName
 
 
 def update_properties(self, context):
