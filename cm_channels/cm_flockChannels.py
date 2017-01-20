@@ -25,7 +25,7 @@ from .cm_masterChannels import timeChannel
 from mathutils import Vector
 
 
-class Crowd(Mc):
+class Flock(Mc):
     """Used to access the data of other agents"""
     def __init__(self, sim):
         Mc.__init__(self, sim)

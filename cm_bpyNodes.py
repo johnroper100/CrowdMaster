@@ -159,7 +159,7 @@ class NewInputNode(LogicNode):
 
     InputSource = EnumProperty(name="Input Channel",
                                items=[("CONSTANT", "Constant", "", 1),
-                                      ("CROWD", "Crowd", "", 2),
+                                      ("FLOCK", "Flock", "", 2),
                                       ("FORMATION", "Formation", "", 3),
                                       ("GROUND", "Ground", "", 4),
                                       ("NOISE", "Noise", "", 5),
@@ -234,7 +234,7 @@ class NewInputNode(LogicNode):
         layout.prop(self, "InputSource", text="Input")
         if self.InputSource == "CONSTANT":
             layout.prop(self, "Constant")
-        elif self.InputSource == "CROWD":
+        elif self.InputSource == "FLOCK":
             layout.prop(self, "Flocking")
             if self.Flocking == "SEPARATE" or self.Flocking == "COHERE":
                 layout.prop(self, "TranslationAxis")
@@ -270,7 +270,7 @@ class NewInputNode(LogicNode):
         node.settings["InputSource"] = self.InputSource
         if self.InputSource == "CONSTANT":
             node.settings["Constant"] = self.Constant
-        elif self.InputSource == "CROWD":
+        elif self.InputSource == "FLOCK":
             node.settings["Flocking"] = self.Flocking
             if self.Flocking == "SEPARATE" or self.Flocking == "COHERE":
                 node.settings["TranslationAxis"] = self.TranslationAxis

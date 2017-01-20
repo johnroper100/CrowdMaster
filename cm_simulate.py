@@ -41,7 +41,7 @@ class Simulation:
         Sound = chan.Sound(self)
         State = chan.State(self)
         World = chan.World(self)
-        Crowd = chan.Crowd(self)
+        Flock = chan.Flock(self)
         Ground = chan.Ground(self)
         Formation = chan.Formation(self)
         Path = chan.Path(self)
@@ -49,7 +49,7 @@ class Simulation:
                       "Sound": Sound,
                       "State": State,
                       "World": World,
-                      "Crowd": Crowd,
+                      "Flock": Flock,
                       "Ground": Ground,
                       "Formation": Formation,
                       "Path": Path}
