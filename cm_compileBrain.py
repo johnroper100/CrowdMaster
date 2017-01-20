@@ -18,7 +18,11 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from .cm_nodeFunctions import logictypes, statetypes
+#from .cm_nodeFunctions import logictypes, statetypes
+from .C_cm_nodeFunctions import logictypes, statetypes
+preferences = bpy.context.user_preferences.addons[__package__].preferences
+if preferences.show_debug_options:
+    print("IMPORTED C_cm_nodeFunctions")
 from .cm_brainClasses import Brain
 
 
