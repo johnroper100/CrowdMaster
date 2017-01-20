@@ -26,7 +26,7 @@ from mathutils import Vector
 
 
 class Flock(Mc):
-    """Used to access the data of other agents"""
+    """Used for flocking behaviour"""
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
@@ -39,12 +39,11 @@ class Flock(Mc):
         self.alignCache = {}
         self.cohereCache = {}
 
-    def allagents(self):
-        return bpy.context.scene.cm_agents
-
     # ==== FLOCKING ====
 
     def _hashSet(self, s):
+        """An experiment for how to cache the results of calculations when the
+        input is a set"""
         s = 1
         for item in s:
             s *= hash(item) % (10**25) + 1
@@ -125,6 +124,8 @@ class Flock(Mc):
 
     @timeChannel()
     def separateTx(self, inputs):
+        """The amount to move on the x axis (ie. left-right) away from the
+        average position of close neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -136,6 +137,8 @@ class Flock(Mc):
 
     @timeChannel()
     def separateTy(self, inputs):
+        """The amount to move on the y axis (ie. forward-backward) away from the
+        average position of close neighbours (ie. slow down - speed up)"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -147,6 +150,8 @@ class Flock(Mc):
 
     @timeChannel()
     def separateTz(self, inputs):
+        """The amount to move on the z axis (ie. up-down) away from the
+        average position of close neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -158,6 +163,8 @@ class Flock(Mc):
 
     @timeChannel()
     def alignRz(self, inputs):
+        """The amount to rotate about the z axis (ie. turn left-right) to
+        align with the direction of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -169,6 +176,8 @@ class Flock(Mc):
 
     @timeChannel()
     def alignRx(self, inputs):
+        """The amount to rotate about the x axis (ie. turn up-down) to
+        align with the direction of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -180,6 +189,8 @@ class Flock(Mc):
 
     @timeChannel()
     def cohereTx(self, inputs):
+        """The amount to move on the x axis (ie. left-right) towards the average
+        position of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -191,6 +202,8 @@ class Flock(Mc):
 
     @timeChannel()
     def cohereTy(self, inputs):
+        """The amount to move on the y axis (ie. forward-backward) towards the
+        average position of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -202,6 +215,8 @@ class Flock(Mc):
 
     @timeChannel()
     def cohereTz(self, inputs):
+        """The amount to move on the z axis (ie. up-down) towards the average
+        position of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
