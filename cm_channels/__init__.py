@@ -25,8 +25,6 @@ from .cm_flockChannels import Flock
 from .cm_groundChannels import Ground
 from .cm_formationChannels import Formation
 from .cm_pathChannels import Path
-from . import cm_pathChannels
-Path = cm_pathChannels.Path
 
 from .cm_masterChannels import channelTimes, timeChannel
 
