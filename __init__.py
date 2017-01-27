@@ -32,6 +32,7 @@ bl_info = {
 
 import bpy
 from bpy.props import PointerProperty, BoolProperty, StringProperty
+from bpy.props import CollectionProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from . import cm_prefs
@@ -40,6 +41,7 @@ from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
 from . cm_graphics . cm_nodeHUD import update_hud_text
 from . cm_graphics . utils import cm_redrawAll
+from . cm_blenderData import initialTagProperty
 
 # =============== GROUPS LIST START ===============#
 
@@ -118,6 +120,7 @@ class SCENE_OT_cm_agent_add(Operator):
     brainType = StringProperty()
     groupName = StringProperty()
     geoGroupName = StringProperty()
+    initialTags = CollectionProperty(type=initialTagProperty)
 
     def execute(self, context):
         scene = context.scene
@@ -138,6 +141,10 @@ class SCENE_OT_cm_agent_add(Operator):
         newAgent = agentType.agents.add()
         newAgent.name = self.agentName
         newAgent.geoGroup = self.geoGroupName
+        for x in self.initialTags:
+            tag = newAgent.initialTags.add()
+            tag.name = x.name
+            tag.value = x.value
         group.totalAgents += 1
         return {'FINISHED'}
 
@@ -458,6 +465,9 @@ def register():
     addon_updater_ops.register(bl_info)
     cm_prefs.register()
 
+    from . import cm_blenderData
+    cm_blenderData.registerTypes()
+
     bpy.utils.register_class(SCENE_UL_group)
     bpy.utils.register_class(SCENE_UL_agent_type)
     bpy.utils.register_class(SCENE_OT_cm_groups_reset)
@@ -481,9 +491,6 @@ def register():
     from .cm_events import event_register
     global event_unregister
     from .cm_events import event_unregister
-
-    from . import cm_blenderData
-    cm_blenderData.registerTypes()
 
     global cm_bpyNodes
     from . import cm_bpyNodes

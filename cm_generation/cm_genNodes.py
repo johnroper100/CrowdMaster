@@ -637,6 +637,31 @@ class GroundNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"groundMesh": self.groundMesh}
 
+
+class SettagNode(CrowdMasterAGenTreeNode):
+    """The settag node"""
+    bl_idname = 'SettagNodeType'
+    bl_label = 'Settag'
+    bl_icon = 'SOUND'
+    bl_width_default = 150
+
+    tagName = StringProperty(name="Name")
+    tagValue = FloatProperty(name="Value")
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "tagName")
+        layout.prop(self, "tagValue")
+
+    def getSettings(self):
+        return {"tagName": self.tagName, "tagValue": self.tagValue}
+
+
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
@@ -773,7 +798,8 @@ agen_node_categories = [
         ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
-        NodeItem("AddToGroupNodeType")
+        NodeItem("AddToGroupNodeType"),
+        NodeItem("SettagNodeType")
         ]),
     CrowdMasterAGenCategories("layout", "Layout", items=[
         NodeItem("NodeFrame"),
@@ -806,6 +832,7 @@ def register():
     bpy.utils.register_class(TargetPositionNode)
     bpy.utils.register_class(ObstacleNode)
     bpy.utils.register_class(GroundNode)
+    bpy.utils.register_class(SettagNode)
 
     bpy.utils.register_class(NoteNode)
     bpy.utils.register_class(GenNoteTextFromClipboard)
@@ -839,6 +866,7 @@ def unregister():
     bpy.utils.unregister_class(TargetPositionNode)
     bpy.utils.unregister_class(ObstacleNode)
     bpy.utils.unregister_class(GroundNode)
+    bpy.utils.unregister_class(SettagNode)
 
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(GenNoteTextFromClipboard)

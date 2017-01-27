@@ -84,12 +84,12 @@ class Simulation:
                     self.syncManager.actionPair(s, t)
                     self.syncManager.actionPair(t, s)
 
-    def newagent(self, name, brain):
+    def newagent(self, name, brain, initialTags):
         """Set up an agent"""
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
-            ag = Agent(name, nGps[brain], self)
+            ag = Agent(name, nGps[brain], self, tags=initialTags)
             self.agents[name] = ag
         else:
             if preferences.show_debug_options:
@@ -99,7 +99,7 @@ class Simulation:
         """Set up all the agents at the beginning of the simulation"""
         for ty in group.agentTypes:
             for ag in ty.agents:
-                self.newagent(ag.name, ty.name)
+                self.newagent(ag.name, ty.name, ag.initialTags)
 
     def step(self, scene):
         """Called when the next frame is moved to"""

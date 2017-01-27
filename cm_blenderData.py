@@ -20,13 +20,21 @@
 import bpy
 from bpy.props import IntProperty, EnumProperty, CollectionProperty
 from bpy.props import PointerProperty, BoolProperty, StringProperty
+from bpy.props import FloatProperty, CollectionProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
+
+
+class initialTagProperty(bpy.types.PropertyGroup):
+    """For storing a dictionary like structure of initial tags"""
+    # name - Name of the tag
+    value = FloatProperty()
 
 
 class agent_entry(PropertyGroup):
     """The data structure for the agent entries"""
     # name - The name of the blender object
     geoGroup = StringProperty()
+    initialTags = CollectionProperty(type=initialTagProperty)
 
 
 class agent_type_entry(PropertyGroup):
@@ -54,6 +62,7 @@ class manual_props(PropertyGroup):
 
 
 def registerTypes():
+    bpy.utils.register_class(initialTagProperty)
     bpy.utils.register_class(agent_entry)
     bpy.utils.register_class(agent_type_entry)
     bpy.utils.register_class(group_entry)
@@ -70,6 +79,7 @@ def registerTypes():
 
 
 def unregisterAllTypes():
+    bpy.utils.unregister_class(initialTagProperty)
     bpy.utils.unregister_class(agent_entry)
     bpy.utils.unregister_class(agent_type_entry)
     bpy.utils.unregister_class(group_entry)

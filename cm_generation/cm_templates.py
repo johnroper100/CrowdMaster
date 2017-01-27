@@ -269,11 +269,13 @@ class TemplateAGENT(Template):
             topObj.material_slots[matSlotIndex].link = 'OBJECT'
             topObj.material_slots[matSlotIndex].material = bpy.data.materials[mat]
 
+        tags = buildRequest.tags
+        packTags = [{"name": x, "value": tags[x]} for x in tags]
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
                                    groupName=buildRequest.cm_group,
-                                   geoGroupName=new_group.name)
-        # TODO set tags
+                                   geoGroupName=new_group.name,
+                                   initialTags=packTags)
 
     def check(self):
         if "Objects" not in self.inputs:
@@ -681,6 +683,7 @@ class TemplateSETTAG(Template):
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
             return False
+        return True
 
 templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
@@ -698,5 +701,6 @@ templates = OrderedDict([
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),
     ("ObstacleNodeType", TemplateOBSTACLE),
-    ("GroundNodeType", TemplateGROUND)
+    ("GroundNodeType", TemplateGROUND),
+    ("SettagNodeType", TemplateSETTAG)
 ])

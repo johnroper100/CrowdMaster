@@ -28,7 +28,7 @@ from . import cm_timings
 
 class Agent:
     """Represents each of the agents in the scene"""
-    def __init__(self, blenderid, nodeGroup, sim):
+    def __init__(self, blenderid, nodeGroup, sim, tags=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             print("Blender id", blenderid)
@@ -36,7 +36,7 @@ class Agent:
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
-        self.external = {"id": self.id, "tags": {}}
+        self.external = {"id": self.id, "tags": {t.name: t.value for t in tags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
