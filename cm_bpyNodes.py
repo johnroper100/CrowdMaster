@@ -535,15 +535,23 @@ class FilterNode(LogicNode):
                                     ("LEAST", "Least only", "", 5),
                                     ("Most", "Most only", "", 6),
                                     ("AVERAGE", "Average", "", 7)])
+    Tag = BoolProperty(name="Tag", default=False)
+    TagName = StringProperty("Tag name", default="")
     Value = FloatProperty(name="Value", default=0.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Operation")
         if self.Operation in {"EQUAL", "NOT EQUAL", "LESS", "GREATER"}:
-            layout.prop(self, "Value")
+            layout.prop(self, "Tag")
+            if self.Tag:
+                layout.prop(self, "TagName")
+            else:
+                layout.prop(self, "Value")
 
     def getSettings(self, node):
         node.settings["Operation"] = self.Operation
+        node.settings["Tag"] = self.Tag
+        node.settings["TagName"] = self.TagName
         node.settings["Value"] = self.Value
 
 

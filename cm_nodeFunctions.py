@@ -424,27 +424,51 @@ class LogicFILTER(Neuron):
     def core(self, inps, settings):
         result = {}
 
+        useTag = settings["Tag"]
+        if useTag:
+            tagName = settings["TagName"]
+            if tagName in self.brain.tags:
+                tagValue = self.brain.tags[tagName]
+            else:
+                tagValue = None
+
         # TODO what if multiple inputs have the same keys?
         if self.settings["Operation"] == "EQUAL":
             for into in inps:
                 for i in into:
-                    if into[i] == self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] == tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] == self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "NOT EQUAL":
             for into in inps:
                 for i in into:
-                    if into[i] != self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] != tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] != self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "LESS":
             for into in inps:
                 for i in into:
-                    if into[i] <= self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] <= tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] <= self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "GREATER":
             for into in inps:
                 for i in into:
-                    if into[i] > self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] > tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] > self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "LEAST":
             leastVal = -float("inf")
             leastName = "None"
