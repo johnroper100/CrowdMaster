@@ -754,10 +754,8 @@ class StateAction(State):
                     if val > 0:
                         if self.isGroup():
                             for act in self.brain.sim.actionGroups[act[1:-1]]:
-                                print(act, self.name)
                                 sm.tell(userid, key, act, val, self.name)
                         else:
-                            print(self.actionName, self.name)
                             sm.tell(userid, key, self.actionName, val, self.name)
 
             (state, action), pairedAgent = sm.getResult(userid)
@@ -813,12 +811,12 @@ class StateAction(State):
                 if val is not None and val > 0:
                     syncOptions.append((con, val))
 
-                    if len(syncOptions) > 0:
-                        self.strip.action_frame_end = self.currentFrame + 1
-                        if len(syncOptions) == 1:
-                            return True, syncOptions[0][0]
-                        else:
-                            return True, max(syncOptions, key=lambda v: v[1])[0]
+        if len(syncOptions) > 0:
+            self.strip.action_frame_end = self.currentFrame + 1
+            if len(syncOptions) == 1:
+                return True, syncOptions[0][0]
+            else:
+                return True, max(syncOptions, key=lambda v: v[1])[0]
 
         # ==== Will stop here if there is a valid sync state ====
 
@@ -831,14 +829,15 @@ class StateAction(State):
         for con in self.outputs:
             val = self.neurons[con].query()
             # print(con, val)
-            if val is not None:
+            if val is not None and val > 0:
                 options.append((con, val))
 
         # If the cycleState button is checked then add a contection back to
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
             val = self.neurons[self.name].query()
-            if val is not None:
+            syncState = self.neurons[self.name].syncState
+            if val is not None and val > 0:
                 options.append((self.name, val))
 
         if len(options) > 0:
