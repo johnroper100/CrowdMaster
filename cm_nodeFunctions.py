@@ -470,7 +470,7 @@ class LogicFILTER(Neuron):
                         if into[i] > self.settings["Value"]:
                             result[i] = into[i]
         elif self.settings["Operation"] == "LEAST":
-            leastVal = -float("inf")
+            leastVal = float("inf")
             leastName = "None"
             for into in inps:
                 for i in into:
