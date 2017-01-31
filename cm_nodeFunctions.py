@@ -424,6 +424,13 @@ class LogicFILTER(Neuron):
     def core(self, inps, settings):
         result = {}
 
+        allEmpty = True
+        for into in inps:
+            if len(into) > 0:
+                allEmpty = False
+        if allEmpty:
+            return result
+
         useTag = settings["Tag"]
         if useTag:
             tagName = settings["TagName"]
