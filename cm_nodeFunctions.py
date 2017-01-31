@@ -753,7 +753,8 @@ class StateAction(State):
                         val = v + (v * self.settings["ValueDefault"])
                     if val > 0:
                         if self.isGroup():
-                            for act in self.brain.sim.actionGroups[act[1:-1]]:
+                            acNm = self.actionName
+                            for act in self.brain.sim.actionGroups[acNm[1:-1]]:
                                 sm.tell(userid, key, act, val, self.name)
                         else:
                             sm.tell(userid, key, self.actionName, val, self.name)
