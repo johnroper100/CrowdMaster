@@ -71,8 +71,10 @@ class Neuron():
                 cm_timings.coreNumber[self.__class__.__name__] += 1
             if not (isinstance(output, dict) or output is None):
                 output = {"None": output}
+            if output is None:
+                output = {}
         else:
-            output = None
+            output = {}
         self.result = output
 
         if preferences.show_debug_options:

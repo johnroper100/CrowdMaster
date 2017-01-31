@@ -61,65 +61,65 @@ class LogicNEWINPUT(Neuron):
                 if settings["TranslationAxis"] == "TX":
                     separateTx = channels["Flock"].separateTx(inps)
                     if separateTx is None:
-                        return None
+                        return {}
                     return {"None": separateTx}
                 elif settings["TranslationAxis"] == "TY":
                     separateTy = channels["Flock"].separateTy(inps)
                     if separateTy is None:
-                        return None
+                        return {}
                     return {"None": separateTy}
                 elif settings["TranslationAxis"] == "TZ":
                     separateTz = channels["Flock"].separateTz(inps)
                     if separateTz is None:
-                        return None
+                        return {}
                     return {"None": separateTz}
             elif settings["Flocking"] == "COHERE":
                 if settings["TranslationAxis"] == "TX":
                     cohereTx = channels["Flock"].cohereTx(inps)
                     if cohereTx is None:
-                        return None
+                        return {}
                     return {"None": cohereTx}
                 elif settings["TranslationAxis"] == "TY":
                     cohereTy = channels["Flock"].cohereTy(inps)
                     if cohereTy is None:
-                        return None
+                        return {}
                     return {"None": cohereTy}
                 elif settings["TranslationAxis"] == "TZ":
                     cohereTz = channels["Flock"].cohereTz(inps)
                     if cohereTz is None:
-                        return None
+                        return {}
                     return {"None": cohereTz}
             else:  # ie. settings["Flocking"] == "ALIGN"
                 if settings["RotationAxis"] == "RZ":
                     alignRz = channels["Flock"].alignRz(inps)
                     if alignRz is None:
-                        return None
+                        return {}
                     return {"None": alignRz}
                 elif settings["RotationAxis"] == "RX":
                     alignRx = channels["Flock"].alignRx(inps)
                     if alignRx is None:
-                        return None
+                        return {}
                     return {"None": alignRx}
 
         elif settings["InputSource"] == "FORMATION":
             fChan = channels["Formation"].retrieve(settings["FormationGroup"])
             if fChan is None:
-                return None
+                return {}
             # TODO  Add fixed formations
             if settings["FormationOptions"] == "RZ":
                 rz = fChan.rz
                 if rz is None:
-                    return None
+                    return {}
                 return {"None": rz}
             elif settings["FormationOptions"] == "RX":
                 rx = fChan.rx
                 if rx is None:
-                    return None
+                    return {}
                 return {"None": rx}
             elif settings["FormationOptions"] == "DIST":
                 dist = fChan.dist
                 if dist is None:
-                    return None
+                    return {}
                 return {"None": dist}
 
         elif settings["InputSource"] == "GROUND":
@@ -143,7 +143,7 @@ class LogicNEWINPUT(Neuron):
             sound = channels["Sound"]
             ch = sound.retrieve(settings["SoundFrequency"])
             if ch is None:
-                return None
+                return {}
             if settings["SoundMode"] == "BASIC":
                 ch.predictNext = False
                 ch.steeringNext = False
