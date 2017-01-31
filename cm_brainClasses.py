@@ -149,7 +149,8 @@ class State:
         self.cycleState = False
         self.currentFrame = 0
 
-        self.syncState = False  # Set during compileBrain
+        self.interuptState = False
+        self.syncState = False
 
         self.bpyNode = bpyNode
         self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}

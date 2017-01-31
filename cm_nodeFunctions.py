@@ -826,7 +826,35 @@ class StateAction(State):
             else:
                 return True, max(syncOptions, key=lambda v: v[1])[0]
 
-        # ==== Will stop here if there is a valid sync state ====
+        # Check to see if there is a valid interupt state to move to
+
+        interuptOptions = []
+        for con in self.outputs:
+            conNeu = self.neurons[con]
+            if conNeu.interuptState and not conNeu.syncState:
+                val = conNeu.query()
+                if val is not None and val > 0:
+                    interuptOptions.append((con, val))
+
+        if len(interuptOptions) > 0:
+            if len(interuptOptions) == 1:
+                nextState, nextVal = interuptOptions[0]
+                # return True, interuptOptions[0][0]
+            else:
+                nextState, nextVal = max(interuptOptions, key=lambda v: v[1])
+                # return True, max(interuptOptions, key=lambda v: v[1])[0]
+
+            moveToInterupt = True
+
+            val = self.neurons[self.name].query()
+            if val is not None and val >= nextVal:
+                moveToInterupt = False
+
+            if moveToInterupt:
+                self.strip.action_frame_end = self.currentFrame + 1
+                return True, nextState
+
+        # ==== Will stop here if there is a valid sync or interupt state ====
 
         if self.currentFrame < self.length - 1:
             return False, self.name
@@ -840,11 +868,10 @@ class StateAction(State):
             if val is not None and val > 0:
                 options.append((con, val))
 
-        # If the cycleState button is checked then add a contection back to
+        # If the cycleState button is checked then add a connection back to
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
             val = self.neurons[self.name].query()
-            syncState = self.neurons[self.name].syncState
             if val is not None and val > 0:
                 options.append((self.name, val))
 

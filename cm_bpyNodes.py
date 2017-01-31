@@ -767,7 +767,8 @@ class ActionState(StateNode):
     stateLength = IntProperty(name="State Length", default=1)
     cycleState = BoolProperty(name="Cycle State", default=False)
     actionName = StringProperty(name="Action Name", default="")
-    useValueOfSpeed = BoolProperty(name=" Use Value of Speed", default=True)
+    useValueOfSpeed = BoolProperty(name="Use Value of Speed", default=True)
+    interuptState = BoolProperty(name="Interupt State", default=False)
     syncState = BoolProperty(name="Sync State", default=False)
 
     def init(self, context):
@@ -782,6 +783,7 @@ class ActionState(StateNode):
         item.cycleState = self.cycleState
         item.actionName = self.actionName
         item.useValueOfSpeed = self.useValueOfSpeed
+        item.interuptState = self.interuptState
         item.syncState = self.syncState
 
     def draw_buttons(self, context, layout):
@@ -791,7 +793,9 @@ class ActionState(StateNode):
         row = layout.row()
         row.prop_search(self, "actionName", context.scene.cm_action_groups,
                         "groups")
-        layout.prop(self, "syncState")
+        layout.prop(self, "interuptState")
+        if self.interuptState:
+            layout.prop(self, "syncState")
 
 
 TEXT_WIDTH = 6
