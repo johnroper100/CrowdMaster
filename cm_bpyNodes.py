@@ -403,7 +403,9 @@ class MathNode(LogicNode):
                              ("add", "Add", "Add the two numbers together"),
                              ("sub", "Subtract", "Subtract the two numbers from each other"),
                              ("mul", "Multiply", "Multiply the two numbers"),
-                             ("div", "Divide", "Divide the two numbers")], default="add")
+                             ("div", "Divide", "Divide the two numbers"),
+                             ("set", "Set to", "Set all inputs to this number")],
+                             default="add")
 
     num1 = FloatProperty(name="Number 1", default=1.0)
 
