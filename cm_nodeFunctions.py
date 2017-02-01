@@ -814,7 +814,7 @@ class StateAction(State):
 
         syncOptions = []
         for con in self.outputs:
-            if self.neurons[con].syncState:
+            if self.neurons[con].interuptState and self.neurons[con].syncState:
                 val = self.neurons[con].query()
                 if val is not None and val > 0:
                     syncOptions.append((con, val))
