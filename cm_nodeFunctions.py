@@ -401,25 +401,6 @@ class LogicSETTAG(Neuron):
         return settings["Threshold"]
 
 
-class LogicVARIABLE(Neuron):
-    """Set or retrieve (or both) an agent variable (0 if it doesn't exist)"""
-
-    def core(self, inps, settings):
-        count = 0
-        for into in inps:
-            for i in into:
-                self.brain.agvars[settings["Variable"]] += into[i]
-                count += 1
-        if count:
-            self.brain.agvars[settings["Variable"]] /= count
-        if settings["Variable"] in self.brain.agvars:
-            out = self.brain.agvars[settings["Variable"]]  # out is not actually used!
-        else:
-            out = 0  # out is not actually used!
-        # TODO Doesn't work
-        return self.brain.agvars[settings["Variable"]]
-
-
 class LogicFILTER(Neuron):
     """Only allow some values through"""
 
@@ -687,7 +668,6 @@ logictypes = OrderedDict([
     ("WeakNode", LogicWEAK),
     ("QueryTagNode", LogicQUERYTAG),
     ("SetTagNode", LogicSETTAG),
-    ("VariableNode", LogicVARIABLE),
     ("FilterNode", LogicFILTER),
     ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),

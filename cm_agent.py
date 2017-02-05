@@ -41,8 +41,6 @@ class Agent:
         at the end of the frame so that the updated values can be accessed by
         other agents"""
         self.access = copy.deepcopy(self.external)
-        self.agvars = {"None": None}
-        "agent variables. Don't access from other agents"
 
         objs = bpy.data.objects
 
@@ -135,7 +133,6 @@ class Agent:
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
 
         self.external["tags"] = self.brain.tags
-        self.agvars = self.brain.agvars
 
         move = mathutils.Vector((self.px + self.sx,
                                  self.py + self.sy,

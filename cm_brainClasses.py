@@ -274,7 +274,6 @@ class Brain():
     def __init__(self, sim, userid):
         self.userid = userid
         self.sim = sim
-        self.agvars = {}
         self.lvars = self.sim.lvars
         self.outvars = {}
         self.tags = {}
@@ -297,7 +296,6 @@ class Brain():
         self.outvars = {"rx": 0, "ry": 0, "rz": 0,
                         "px": 0, "py": 0, "pz": 0}
         self.tags = self.sim.agents[self.userid].access["tags"]
-        self.agvars = self.sim.agents[self.userid].agvars
 
     def execute(self):
         """Called for each time the agents needs to evaluate"""
