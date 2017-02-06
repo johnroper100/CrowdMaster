@@ -475,19 +475,6 @@ class WeakNode(LogicNode):
     bl_label = "Weak"
 
 
-class QueryTagNode(LogicNode):
-    """CrowdMaster Query Tag node"""
-    bl_label = "Query Tag"
-
-    Tag = StringProperty(name="Tag", default="default")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "Tag")
-
-    def getSettings(self, node):
-        node.settings["Tag"] = self.Tag
-
-
 class SetTagNode(LogicNode):
     """CrowdMaster Set Tag node"""
     bl_label = "Set Tag"
@@ -944,7 +931,6 @@ node_categories = [
         NodeItem("ActionState")
         ]),
     MyNodeCategory("OTHER", "Other", items=[
-        NodeItem("QueryTagNode"),
         NodeItem("SetTagNode"),
         NodeItem("MathNode"),
         NodeItem("VariableNode"),
@@ -975,7 +961,6 @@ def register():
     bpy.utils.register_class(OrNode)
     bpy.utils.register_class(StrongNode)
     bpy.utils.register_class(WeakNode)
-    bpy.utils.register_class(QueryTagNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(VariableNode)
     bpy.utils.register_class(FilterNode)
@@ -1014,7 +999,6 @@ def unregister():
     bpy.utils.unregister_class(OrNode)
     bpy.utils.unregister_class(StrongNode)
     bpy.utils.unregister_class(WeakNode)
-    bpy.utils.unregister_class(QueryTagNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(VariableNode)
     bpy.utils.unregister_class(FilterNode)

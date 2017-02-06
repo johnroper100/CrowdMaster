@@ -362,17 +362,6 @@ class LogicWEAK(Neuron):
         return results
 
 
-class LogicQUERYTAG(Neuron):
-    """Return the value of Tag (normally 1) or else 0"""
-
-    def core(self, inps, settings):
-        results = {}
-        if settings["Tag"] in self.brain.tags:
-            return self.brain.tags[settings["Tag"]]
-        else:
-            return 0
-
-
 class LogicSETTAG(Neuron):
     """If any of the inputs are above the Threshold level add or remove the
     Tag from the agents tags"""
@@ -668,7 +657,6 @@ logictypes = OrderedDict([
     ("OrNode", LogicOR),
     ("StrongNode", LogicSTRONG),
     ("WeakNode", LogicWEAK),
-    ("QueryTagNode", LogicQUERYTAG),
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
     ("MapNode", LogicMAP),
