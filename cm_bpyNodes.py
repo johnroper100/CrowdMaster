@@ -220,7 +220,9 @@ class NewInputNode(LogicNode):
                                        ("SPEED", "Speed", "", 2),
                                        ("GLOBALVELX", "Global Vel X", "", 3),
                                        ("GLOBALVELY", "Global Vel Y", "", 4),
-                                       ("GLOBALVELZ", "Global Vel Z", "", 5)])
+                                       ("GLOBALVELZ", "Global Vel Z", "", 5),
+                                       ("QUERYTAG", "Query tag", "", 6)])
+    StateTagName = StringProperty(name="Tag name")
 
     WorldOptions = EnumProperty(name="World Options",
                                 items=[("TIME", "Time", "", 1),
@@ -262,6 +264,8 @@ class NewInputNode(LogicNode):
             layout.prop(self, "SoundOptions", text="Options")
         elif self.InputSource == "STATE":
             layout.prop(self, "StateOptions")
+            if self.StateOptions == "QUERYTAG":
+                layout.prop(self, "StateTagName")
         elif self.InputSource == "WORLD":
             layout.prop(self, "WorldOptions"),
             if self.WorldOptions == "TARGET":
@@ -299,6 +303,7 @@ class NewInputNode(LogicNode):
             node.settings["SoundOptions"] = self.SoundOptions
         elif self.InputSource == "STATE":
             node.settings["StateOptions"] = self.StateOptions
+            node.settings["StateTagName"] = self.StateTagName
         elif self.InputSource == "WORLD":
             node.settings["WorldOptions"] = self.WorldOptions
             if self.WorldOptions == "TARGET":

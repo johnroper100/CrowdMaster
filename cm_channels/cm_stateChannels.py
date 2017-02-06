@@ -56,3 +56,11 @@ class State(Mc):
     def velocity(self):
         """The vector of the change in position for the last frame"""
         return self.sim.agents[self.userid].globalVelocity
+
+    @timeChannel("State")
+    def getTag(self, tag):
+        name = self.userid
+        if name in self.sim.agents:
+            if tag in self.sim.agents[name].access["tags"]:
+                return {"None": self.sim.agents[name].access["tags"][tag]}
+        return {}

@@ -182,6 +182,8 @@ class LogicNEWINPUT(Neuron):
                 return {"None": state.velocity.y}
             elif settings["StateOptions"] == "GLOBALVELZ":
                 return {"None": state.velocity.z}
+            elif settings["StateOptions"] == "QUERYTAG":
+                return state.getTag(settings["StateTagName"])
 
         elif settings["InputSource"] == "WORLD":
             world = channels["World"]
