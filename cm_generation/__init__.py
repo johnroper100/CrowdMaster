@@ -78,6 +78,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
         startT = time.time()
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
+        preferences = context.user_preferences.addons[__package__].preferences
 
         cache = {}
         genSpaces = {}
@@ -100,6 +101,10 @@ class SCENE_OT_agent_nodes_generate(Operator):
             newGroup.groupName = "cm_allAgents"
             newGroup.name = "cm_allAgents"
 
+            if preferences.show_node_hud:
+                newhudText = "Agents Generated!"
+                update_hud_text(newhudText)
+
             for space in generateNode.inputs[0].links:
                 tipNode = space.from_node
                 if tipNode.bl_idname == "NodeReroute":
@@ -107,22 +112,19 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 buildRequest = TemplateRequest()
                 genSpaces[tipNode].build(buildRequest)
         else:
+            if preferences.show_node_hud:
+                newhudText = "Agents Generated With Errors!"
+                update_hud_text(newhudText)
+
             return {'CANCELLED'}
-
-        if allSuccess:
-            newhudText = "Agents Generated!"
-            update_hud_text(newhudText)
-
-        else:
-            newhudText = "Agents Generated With Errors!"
-            update_hud_text(newhudText)
 
         endT = time.time() - startT
 
-        newhudText2 = "Time taken: {} seconds".format(str(endT))
-        update_hud_text2(newhudText2)
+        if preferences.show_node_hud:
+            newhudText2 = "Time taken: {} seconds".format(str(endT))
+            update_hud_text2(newhudText2)
 
-        cm_redrawAll()
+            cm_redrawAll()
 
         return {'FINISHED'}
 
