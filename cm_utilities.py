@@ -22,7 +22,7 @@ import time
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 
-from . icon_load import cicon
+from . cm_iconLoad import cicon
 
 from . cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
 from . cm_graphics . utils import cm_redrawAll

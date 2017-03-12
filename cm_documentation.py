@@ -24,7 +24,7 @@ from sys import platform
 
 from bpy.props import *
 from bpy.types import Operator
-from . icon_load import cicon
+from . cm_iconLoad import cicon
 
 # Documentation Links
 prefix = "http://jmroper.com/crowdmaster/docs/"

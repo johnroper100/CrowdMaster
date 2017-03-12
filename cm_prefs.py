@@ -22,7 +22,7 @@ import os
 from bpy.types import AddonPreferences
 from bpy.props import *
 from . import addon_updater_ops
-from . icon_load import cicon
+from . cm_iconLoad import cicon
 
 
 class CMSavePrefs(bpy.types.Operator):

@@ -36,7 +36,7 @@ from bpy.props import CollectionProperty
 from bpy.types import PropertyGroup, UIList, Panel, Operator
 
 from . import cm_prefs
-from . icon_load import register_icons, unregister_icons, cicon
+from . cm_iconLoad import register_icons, unregister_icons, cicon
 from . import addon_updater_ops
 from . cm_graphics import cm_nodeHUD
 from . cm_graphics . cm_nodeHUD import update_hud_text

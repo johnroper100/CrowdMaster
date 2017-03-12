@@ -21,7 +21,7 @@ import bpy
 from bpy.types import NodeTree, Node, NodeSocket
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
-from .. icon_load import cicon
+from .. cm_iconLoad import cicon
 import textwrap
 import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem

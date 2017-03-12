@@ -26,7 +26,7 @@ import nodeitems_utils
 from nodeitems_utils import NodeCategory, NodeItem
 import random
 
-from . icon_load import cicon
+from . cm_iconLoad import cicon
 
 
 class CrowdMasterTree(NodeTree):
