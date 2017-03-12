@@ -155,7 +155,7 @@ class InputNode(LogicNode):
 class NewInputNode(LogicNode):
     """CrowdMaster input node"""
     bl_label = "Input"
-    bl_width_default = 200.0
+    bl_width_default = 250.0
 
     InputSource = EnumProperty(name="Input Channel",
                                items=[("CONSTANT", "Constant", "", 1),
@@ -169,7 +169,7 @@ class NewInputNode(LogicNode):
                                       ("WORLD", "World", "", 9),
                                       ("AGENTINFO", "AgentInfo", "", 10)])
 
-    Constant = FloatProperty(name="Constant")
+    Constant = FloatProperty(name="Constant", precision=3)
 
     Flocking = EnumProperty(name="Flocking Input",
                             items=[("SEPARATE", "Separate", "", 1),
