@@ -226,12 +226,14 @@ class NewInputNode(LogicNode):
 
     WorldOptions = EnumProperty(name="World Options",
                                 items=[("TIME", "Time", "", 1),
-                                       ("TARGET", "Target", "", 2)])
+                                       ("TARGET", "Target", "", 2),
+                                       ("EVENT", "Event", "", 3)])
     TargetObject = StringProperty(name="Target Object")
     TargetOptions = EnumProperty(name="Target Options",
                                  items=[("RZ", "rz", "", 1),
                                         ("RX", "rx", "", 2),
                                         ("ARRIVED", "Arrived", "", 3)])
+    EventName = StringProperty(name="Event name")
 
     GetTagName = StringProperty(name="Get Tag Name")
 
@@ -272,6 +274,8 @@ class NewInputNode(LogicNode):
                 layout.prop_search(self, "TargetObject", context.scene, "objects")
                 if self.TargetObject != "":
                     layout.prop(self, "TargetOptions")
+            if self.WorldOptions == "EVENT":
+                layout.prop(self, "EventName")
         elif self.InputSource == "AGENTINFO":
             layout.prop(self, "GetTagName")
 
@@ -310,6 +314,8 @@ class NewInputNode(LogicNode):
                 node.settings["TargetObject"] = self.TargetObject
                 if self.TargetObject != "":
                     node.settings["TargetOptions"] = self.TargetOptions
+            if self.WorldOptions == "EVENT":
+                node.settings["EventName"] = self.EventName
         elif self.InputSource == "AGENTINFO":
             node.settings["GetTagName"] = self.GetTagName
 
@@ -599,20 +605,6 @@ class OutputNode(LogicNode):
     def getSettings(self, node):
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
-
-
-class EventNode(LogicNode):
-    """CrowdMaster Event node"""
-    bl_label = "Event"
-    bl_width_default = 250.0
-
-    EventName = StringProperty(name="Event Name", default="default")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "EventName")
-
-    def getSettings(self, node):
-        node.settings["EventName"] = self.EventName
 
 
 class PythonNode(LogicNode):
@@ -934,8 +926,7 @@ node_categories = [
         NodeItem("SetTagNode"),
         NodeItem("MathNode"),
         NodeItem("VariableNode"),
-        NodeItem("FilterNode"),
-        NodeItem("EventNode")
+        NodeItem("FilterNode")
         ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
@@ -967,7 +958,6 @@ def register():
     bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
-    bpy.utils.register_class(EventNode)
     bpy.utils.register_class(PythonNode)
     bpy.utils.register_class(PrintNode)
 
@@ -1005,7 +995,6 @@ def unregister():
     bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
-    bpy.utils.unregister_class(EventNode)
     bpy.utils.unregister_class(PythonNode)
     bpy.utils.unregister_class(PrintNode)
 

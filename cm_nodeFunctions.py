@@ -199,6 +199,8 @@ class LogicNEWINPUT(Neuron):
                     return {"None": tgt.arrived}
             elif settings["WorldOptions"] == "TIME":
                 return {"None": channels["World"].time}
+            elif settings["WorldOptions"] == "EVENT":
+                return world.event(settings["EventName"])
 
         elif settings["InputSource"] == "AGENTINFO":
             agent = channels["AgentInfo"]
@@ -583,33 +585,6 @@ class LogicPRIORITY(Neuron):
         return result
 
 
-class LogicEVENT(Neuron):
-    """Check if an event is happening that frame"""
-
-    def core(self, inps, settings):
-        events = bpy.context.scene.cm_events.coll
-        en = settings["EventName"]
-        for e in events:
-            if e.eventname == en:
-                result = 1
-                if e.category == "Time" or e.category == "Time+Volume":
-                    if e.time != bpy.context.scene.frame_current:
-                        result = 0
-                if e.category == "Volume" or e.category == "Time+Volume":
-                    if result:
-                        pt = bpy.data.objects[self.brain.userid].location
-                        l = bpy.data.objects[e.volume].location
-                        d = bpy.data.objects[e.volume].dimensions
-
-                        if not (l.x-(d.x/2) <= pt.x <= l.x+(d.x/2) and
-                                l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
-                                l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
-                            result = 0
-                if result:
-                    return result
-        return 0
-
-
 class LogicPYTHON(Neuron):
     """execute a python expression"""
 
@@ -662,7 +637,6 @@ logictypes = OrderedDict([
     ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
-    ("EventNode", LogicEVENT),
     ("PythonNode", LogicPYTHON),
     ("PrintNode", LogicPRINT)
 ])

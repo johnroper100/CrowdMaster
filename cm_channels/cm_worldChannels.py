@@ -48,6 +48,30 @@ class World(Mc):
     def time(self):
         return bpy.context.scene.frame_current
 
+    @timeChannel("World")
+    def event(self, eventName):
+        events = bpy.context.scene.cm_events.coll
+        en = eventName
+        for e in events:
+            if e.eventname == en:
+                result = 1
+                if e.category == "Time" or e.category == "Time+Volume":
+                    if e.time != bpy.context.scene.frame_current:
+                        result = 0
+                if e.category == "Volume" or e.category == "Time+Volume":
+                    if result:
+                        pt = bpy.data.objects[self.userid].location
+                        l = bpy.data.objects[e.volume].location
+                        d = bpy.data.objects[e.volume].dimensions
+
+                        if not (l.x-(d.x/2) <= pt.x <= l.x+(d.x/2) and
+                                l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
+                                l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
+                            result = 0
+                if result:
+                    return {"None": result}
+        return {}
+
 
 class Channel:
     def __init__(self, target, user, sim):
