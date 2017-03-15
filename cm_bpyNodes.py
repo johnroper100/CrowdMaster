@@ -837,7 +837,7 @@ class NoteNode(CrowdMasterNode):
         return out
 
     def init(self, context):
-        self.width = 400
+        self.width = 300
         self.color = (0.5, 0.5, 0.5)
         self.use_custom_color = True
 
