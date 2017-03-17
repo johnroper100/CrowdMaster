@@ -293,7 +293,7 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         if preferences.show_node_hud:
             startT = time.time()
 
@@ -340,7 +340,7 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
-        
+
         if preferences.show_node_hud:
             newhudText = "Placing Deferred Geometry!"
             update_hud_text(newhudText)
