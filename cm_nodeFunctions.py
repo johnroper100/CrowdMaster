@@ -252,6 +252,7 @@ class LogicGRAPH(Neuron):
                     # cubic bezier could also be an option here (1/2 sided)
         return output
 
+
 class LogicMATH(Neuron):
     """returns the values added/subtracted/multiplied/divided together"""
 
@@ -610,7 +611,7 @@ class LogicPRINT(Neuron):
         if self.brain.userid in selected:
             for into in inps:
                 for i in into:
-                    if settings["save_to_file"] == True:
+                    if settings["save_to_file"]:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
                             message = settings["Label"] + " >> " + str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
@@ -648,6 +649,7 @@ class StateSTART(State):
         self.length = random.randint(self.settings["minRandWait"],
                                      self.settings["maxRandWait"])
         State.moveTo(self)
+
 
 class StateAction(State):
     """The normal state in a state machine"""
