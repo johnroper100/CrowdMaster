@@ -22,6 +22,7 @@ import bpy
 
 from . cm_syncManager import SyncManagerTestCase
 
+
 class AddonRegisterTestCase(unittest.TestCase):
     def setUp(self):
         self.play_animation = bpy.context.user_preferences.addons[__package__].preferences.play_animation
@@ -58,12 +59,14 @@ class AddonRegisterTestCase(unittest.TestCase):
         for op in opsProps:
             self.assertIn(op, dir(bpy.ops.scene))
 
+
 def createShortTestSuite():
     """Gather all the short tests from this module in a test suite"""
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(AddonRegisterTestCase))
     test_suite.addTest(unittest.makeSuite(SyncManagerTestCase))
     return test_suite
+
 
 def createLongTestSuite():
     """Gather all the long tests from this module in a test suite"""
@@ -85,6 +88,7 @@ class CrowdMaster_run_short_tests(bpy.types.Operator):
             return {'CANCELLED'}
         return {'FINISHED'}
 
+
 class CrowdMaster_run_long_tests(bpy.types.Operator):
     """For tests cases that will take a long time.
     ie. that involve simulation"""
@@ -103,6 +107,7 @@ class CrowdMaster_run_long_tests(bpy.types.Operator):
 def register():
     bpy.utils.register_class(CrowdMaster_run_short_tests)
     bpy.utils.register_class(CrowdMaster_run_long_tests)
+
 
 def unregister():
     bpy.utils.unregister_class(CrowdMaster_run_short_tests)
