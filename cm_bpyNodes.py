@@ -891,6 +891,7 @@ class SimNoteClear(bpy.types.Operator):
         node.clear()
         return {'FINISHED'}
 
+
 class MyNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
