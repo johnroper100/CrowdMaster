@@ -195,9 +195,10 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
 # =============== SIMULATION START ===============#
 
-customSyncMode = 'NONE' # This saves the sync_mode value
-customOutline = True # This saves the outline value
-customRLines = True # This saves the relationship lines value
+customSyncMode = 'NONE'  # This saves the sync_mode value
+customOutline = True  # This saves the outline value
+customRLines = True  # This saves the relationship lines value
+
 
 class SCENE_OT_cm_start(Operator):
     """Start the CrowdMaster agent simulation."""
