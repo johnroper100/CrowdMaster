@@ -19,6 +19,7 @@
 
 import unittest
 
+
 class syncManager:
     def __init__(self):
         self.messages = {}
@@ -53,7 +54,7 @@ class syncManager:
         if action not in tgt:
             tgt[action] = (state, value)
         else:
-            tgt[action] = max(tgt[action], (state, value), key=lambda x:x[1])
+            tgt[action] = max(tgt[action], (state, value), key=lambda x: x[1])
 
     def resolveSync(self):
         seenPairs = set()
