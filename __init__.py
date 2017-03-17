@@ -20,7 +20,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 2, 2),
+    "version": (1, 2, 3),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster",
     "description": "Blender crowd simulation",
