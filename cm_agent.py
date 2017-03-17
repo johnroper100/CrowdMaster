@@ -26,6 +26,7 @@ from .cm_compileBrain import compileBrain
 import time
 from . import cm_timings
 
+
 class Agent:
     """Represents each of the agents in the scene"""
     def __init__(self, blenderid, nodeGroup, sim, tags=None):
