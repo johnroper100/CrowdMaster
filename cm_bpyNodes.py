@@ -536,7 +536,7 @@ class FilterNode(LogicNode):
                                     ("MOST", "Most only", "", 6),
                                     ("AVERAGE", "Average", "", 7)])
     Tag = BoolProperty(name="Tag", default=False)
-    TagName = StringProperty("Tag name", default="")
+    TagName = StringProperty(name="Tag Name", default="")
     Value = FloatProperty(name="Value", default=0.0)
 
     def draw_buttons(self, context, layout):
