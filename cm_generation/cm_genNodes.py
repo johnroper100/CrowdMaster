@@ -223,7 +223,7 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     bl_idname = 'TemplateNodeType'
     bl_label = 'Template'
     bl_icon = 'SOUND'
-    bl_width_default = 325.0
+    bl_width_default = 300.0
 
     brainType = StringProperty(name="Brain Type")
     deferGeo = BoolProperty(name="Defer Geometry",

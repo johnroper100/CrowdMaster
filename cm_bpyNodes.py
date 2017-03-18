@@ -525,7 +525,7 @@ class VariableNode(LogicNode):
 class FilterNode(LogicNode):
     """CrowdMaster Filter node"""
     bl_label = "Filter"
-    bl_width_default = 200.0
+    bl_width_default = 215.0
 
     Operation = EnumProperty(name="Operation",
                              items=[("EQUAL", "Equal", "", 1),
