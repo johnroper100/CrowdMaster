@@ -155,7 +155,7 @@ class InputNode(LogicNode):
 class NewInputNode(LogicNode):
     """CrowdMaster input node"""
     bl_label = "Input"
-    bl_width_default = 250.0
+    bl_width_default = 275.0
 
     InputSource = EnumProperty(name="Input Channel",
                                items=[("CONSTANT", "Constant", "", 1),
@@ -408,14 +408,14 @@ class GraphNode(LogicNode):
 class MathNode(LogicNode):
     """CrowdMaster math node"""
     bl_label = "Math"
-    bl_width_default = 150.0
+    bl_width_default = 200.0
 
     operation = EnumProperty(name="Operation", items=[
                              ("add", "Add", "Add the two numbers together"),
                              ("sub", "Subtract", "Subtract the two numbers from each other"),
                              ("mul", "Multiply", "Multiply the two numbers"),
                              ("div", "Divide", "Divide the two numbers"),
-                             ("set", "Set to", "Set all inputs to this number")],
+                             ("set", "Set To", "Set all inputs to this number")],
                              default="add")
 
     num1 = FloatProperty(name="Number 1", default=1.0)
@@ -525,7 +525,7 @@ class VariableNode(LogicNode):
 class FilterNode(LogicNode):
     """CrowdMaster Filter node"""
     bl_label = "Filter"
-    bl_width_default = 250.0
+    bl_width_default = 240.0
 
     Operation = EnumProperty(name="Operation",
                              items=[("EQUAL", "Equal", "", 1),
@@ -581,7 +581,7 @@ class MapNode(LogicNode):
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
-    bl_width_default = 300.0
+    bl_width_default = 310.0
 
     Output = EnumProperty(name="Output",
                           items=[("rz", "rz", "", 3),
@@ -625,7 +625,7 @@ class PythonNode(LogicNode):
 class PrintNode(LogicNode):
     """CrowdMaster Print Node"""
     bl_label = "Print"
-    bl_width_default = 300.0
+    bl_width_default = 310.0
 
     Label = StringProperty(name="Label", description="The label to append to each printed statement.", default="")
     save_to_file = BoolProperty(
@@ -662,8 +662,8 @@ class PriorityNode(LogicNode):
     defaultValue = FloatProperty(name="Default Value", default=0)
 
     def init(self, context):
-        self.inputs.new("DefaultSocketType", "Values0")
-        self.inputs.new("DefaultSocketType", "Priority0")
+        self.inputs.new("DefaultSocketType", "Values 0")
+        self.inputs.new("DefaultSocketType", "Priority 0")
 
         self.outputs.new('DefaultSocketType', "Output")
         self.outputs.new("DependanceSocketType", "Dependant")
@@ -671,8 +671,8 @@ class PriorityNode(LogicNode):
     def update(self):
         if self.inputs[-1].is_linked and self.inputs[-2].is_linked:
             n = len(self.inputs)//2
-            self.inputs.new("DefaultSocketType", "Values{}".format(n))
-            self.inputs.new("DefaultSocketType", "Priority{}".format(n))
+            self.inputs.new("DefaultSocketType", "Values {}".format(n))
+            self.inputs.new("DefaultSocketType", "Priority {}".format(n))
 
             self.inputs[-1].link_limit = 1
             self.inputs[-2].link_limit = 1
@@ -749,6 +749,7 @@ class StartState(StateNode):
 class ActionState(StateNode):
     """CrowdMaster Action State"""
     bl_label = "Action"
+    bl_width_default = 250.0
 
     stateLength = IntProperty(name="State Length", default=1)
     cycleState = BoolProperty(name="Cycle State", default=False)
