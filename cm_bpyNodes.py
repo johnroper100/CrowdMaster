@@ -607,21 +607,6 @@ class OutputNode(LogicNode):
         node.settings["MultiInputType"] = self.MultiInputType
 
 
-class PythonNode(LogicNode):
-    """CrowdMaster Python node"""
-    bl_label = "Python"
-    bl_width_default = 300.0
-
-    Expression = StringProperty(name="Expression", default="output = Noise.random")
-    # This really needs to link to a text block
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "Expression")
-
-    def getSettings(self, node):
-        node.settings["Expression"] = self.Expression
-
-
 class PrintNode(LogicNode):
     """CrowdMaster Print Node"""
     bl_label = "Print"
@@ -900,8 +885,7 @@ class MyNodeCategory(NodeCategory):
 
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
-        NodeItem("NewInputNode"),
-        NodeItem("PythonNode")
+        NodeItem("NewInputNode")
         ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
@@ -960,7 +944,6 @@ def register():
     bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
-    bpy.utils.register_class(PythonNode)
     bpy.utils.register_class(PrintNode)
 
     bpy.utils.register_class(StartState)
@@ -997,7 +980,6 @@ def unregister():
     bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
-    bpy.utils.unregister_class(PythonNode)
     bpy.utils.unregister_class(PrintNode)
 
     bpy.utils.unregister_class(StartState)

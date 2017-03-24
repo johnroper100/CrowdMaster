@@ -20,7 +20,6 @@
 from collections import OrderedDict
 import math
 from .cm_brainClasses import Neuron, State
-from .cm_pythonEmbededInterpreter import Interpreter
 import copy
 import bpy
 import os
@@ -586,23 +585,6 @@ class LogicPRIORITY(Neuron):
         return result
 
 
-class LogicPYTHON(Neuron):
-    """execute a python expression"""
-
-    def core(self, inps, settings):
-        global Inter
-        setup = copy.copy(self.brain.lvars)
-        setup["inps"] = inps
-        setup["settings"] = settings
-        Inter.setup(setup)
-        Inter.enter(settings["Expression"]["value"])
-        result = Inter.getoutput()
-        return result
-
-
-Inter = Interpreter()
-
-
 class LogicPRINT(Neuron):
     """print everything that is given to it"""
 
@@ -638,7 +620,6 @@ logictypes = OrderedDict([
     ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
-    ("PythonNode", LogicPYTHON),
     ("PrintNode", LogicPRINT)
 ])
 

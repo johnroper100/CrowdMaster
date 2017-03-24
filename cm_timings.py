@@ -44,7 +44,6 @@ coreTimes = OrderedDict([
     ("LogicOUTPUT", 0),
     ("LogicPRIORITY", 0),
     ("LogicEVENT", 0),
-    ("LogicPYTHON", 0),
     ("LogicPRINT", 0)
 ])
 
@@ -63,7 +62,6 @@ coreNumber = OrderedDict([
     ("LogicOUTPUT", 0),
     ("LogicPRIORITY", 0),
     ("LogicEVENT", 0),
-    ("LogicPYTHON", 0),
     ("LogicPRINT", 0)
 ])
 
