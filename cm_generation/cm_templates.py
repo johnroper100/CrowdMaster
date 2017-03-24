@@ -113,6 +113,10 @@ class GeoTemplateGROUP(GeoTemplate):
     def build(self, pos, rot, scale, group, deferGeo):
         dat = bpy.data
 
+        gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
+        group_objects = [o.copy() for o in gp]
+        zaxis = lambda x: x.location[2]
+
         if deferGeo:
             for obj in dat.groups[self.settings["inputGroup"]].objects:
                 if obj.type == 'ARMATURE':
@@ -125,9 +129,12 @@ class GeoTemplateGROUP(GeoTemplate):
                     newObj["cm_deferGroup"] = {"group": self.settings["inputGroup"],
                                                "aName": obj.name}
                     return newObj
-
-        gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
-        group_objects = [o.copy() for o in gp]
+            bpy.ops.object.add(type='EMPTY',
+                               location=min(group_objects, key=zaxis).location)
+            e = bpy.context.object
+            group.objects.link(e)
+            e["cm_deferGroup"] = {"group": self.settings["inputGroup"]}
+            return e
 
         topObj = None
 
@@ -155,7 +162,6 @@ class GeoTemplateGROUP(GeoTemplate):
                 topObj = obj
 
         if topObj is None:  # For if there is no armature object in the group
-            zaxis = lambda x: x.location[2]
             bpy.ops.object.add(type='EMPTY',
                                location=min(group_objects, key=zaxis).location)
             e = bpy.context.object

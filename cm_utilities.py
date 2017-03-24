@@ -377,28 +377,43 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                         elif "cm_deferGroup" in obj:
                             df = obj["cm_deferGroup"]
                             originalGroup = df["group"]
-                            aName = df["aName"]
+                            if "aName" in df:
+                                aName = df["aName"]
 
-                            newObjs = []
-                            gp = list(groups[originalGroup].objects)
-                            for groupObj in gp:
-                                if groupObj.name != aName:
+                                newObjs = []
+                                gp = list(groups[originalGroup].objects)
+                                for groupObj in gp:
+                                    if groupObj.name != aName:
+                                        newObjs.append(groupObj.copy())
+                                    else:
+                                        newObjs.append(context.scene.objects[agent.name])
+
+                                for nObj in newObjs:
+                                    if nObj.name == agent.name:
+                                        continue
+                                    if nObj.parent in gp:
+                                        nObj.parent = newObjs[gp.index(nObj.parent)]
+
+                                    groups[agent.geoGroup].objects.link(nObj)
+                                    bpy.context.scene.objects.link(nObj)
+                                    if nObj.type == 'MESH' and len(nObj.modifiers) > 0:
+                                        for mod in nObj.modifiers:
+                                            if mod.type == "ARMATURE":
+                                                mod.object = objects[agent.name]
+                            else:
+                                newObjs = []
+                                gp = list(groups[originalGroup].objects)
+                                for groupObj in gp:
                                     newObjs.append(groupObj.copy())
-                                else:
-                                    newObjs.append(context.scene.objects[agent.name])
 
-                            for nObj in newObjs:
-                                if nObj.name == agent.name:
-                                    continue
-                                if nObj.parent in gp:
-                                    nObj.parent = newObjs[gp.index(nObj.parent)]
+                                for nObj in newObjs:
+                                    if nObj.parent in gp:
+                                        nObj.parent = newObjs[gp.index(nObj.parent)]
+                                    elif nObj.parent is None:
+                                        nObj.parent = obj
 
-                                groups[agent.geoGroup].objects.link(nObj)
-                                bpy.context.scene.objects.link(nObj)
-                                if nObj.type == 'MESH' and len(nObj.modifiers) > 0:
-                                    for mod in nObj.modifiers:
-                                        if mod.type == "ARMATURE":
-                                            mod.object = objects[agent.name]
+                                    groups[agent.geoGroup].objects.link(nObj)
+                                    bpy.context.scene.objects.link(nObj)
 
         if preferences.show_node_hud:
             newhudText = "Done Placing Deferred Geometry!"
