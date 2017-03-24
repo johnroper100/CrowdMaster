@@ -360,14 +360,17 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                 bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
-                            newObj.matrix_world = obj.matrix_world
+                            child = False
                             for con in obj.constraints:
                                 if con.type == "CHILD_OF":
+                                    child = True
                                     nCon = newObj.constraints.new("CHILD_OF")
                                     nCon.target = con.target
                                     nCon.subtarget = con.subtarget
                                     nCon.inverse_matrix = con.inverse_matrix
                                     newObj.data.update()
+                            if not child:
+                                newObj.matrix_world = obj.matrix_world
                             bpy.context.scene.objects.link(newObj)
                             for user_group in obj.users_group:
                                 user_group.objects.link(newObj)
