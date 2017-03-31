@@ -18,9 +18,11 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.types import NodeTree, Node, NodeSocket
+from bpy.types import NodeTree, Node, NodeSocket, PropertyGroup, UIList
+from bpy.types import Operator
 from bpy.props import FloatProperty, StringProperty, BoolProperty
 from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
+from bpy.props import CollectionProperty
 from .. cm_iconLoad import cicon
 import textwrap
 import nodeitems_utils
@@ -216,6 +218,86 @@ class ParentNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"parentTo": self.parentTo}
+
+
+class material_entry(PropertyGroup):
+    # name - StringProperty
+    weight = FloatProperty(name="Weight", default=1.0, min=0.0, description="Weight for weighted probability when randomly selecting material")
+
+
+class material_UIList(UIList):
+    """for drawing each row"""
+    def draw_item(self, context, layout, data, item, icon, active_data,
+                  active_propname):
+        layout.prop_search(item, "name", bpy.data, "materials", text="")
+        layout.prop(item, "weight")
+
+
+class SCENE_OT_cm_materialsNode_add(Operator):
+    bl_idname = "scene.cm_materialsnode_add"
+    bl_label = "Add"
+
+    nodeName = StringProperty(name="node name")
+    nodeTreeName = StringProperty(name="node tree")
+
+    def execute(self, context):
+        n = bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName]
+        n.materialList.add()
+        return {'FINISHED'}
+
+
+class SCENE_OT_cm_materialsNode_remove(Operator):
+    bl_idname = "scene.cm_materialsnode_remove"
+    bl_label = "Remove"
+
+    nodeName = StringProperty(name="node name")
+    nodeTreeName = StringProperty(name="node tree")
+
+    def execute(self, context):
+        n = bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName]
+        if n.materialIndex >= 0:
+            n.materialList.remove(n.materialIndex)
+            n.materialIndex -= 1
+        return {'FINISHED'}
+
+
+class RandomMaterialNode(CrowdMasterAGenTreeNode):
+    """The random material node"""
+    bl_idname = 'RandomMaterialNodeType'
+    bl_label = 'Random Material'
+    bl_icon = 'SOUND'
+    bl_width_default = 300
+
+    targetMaterial = StringProperty(name="Target material", description="The name of the material to be randomised")
+    materialList = CollectionProperty(type=material_entry)
+    materialIndex = IntProperty()
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "targetMaterial", bpy.data, "materials")
+        row = layout.row()
+        row.template_list("material_UIList", "", self, "materialList", self,
+                             "materialIndex")
+        sub = row.column().column(True)
+        oper = sub.operator("scene.cm_materialsnode_add", text="",
+                               icon="ZOOMIN")
+        oper.nodeName = self.name
+        oper.nodeTreeName = self.id_data.name
+        oper = sub.operator("scene.cm_materialsnode_remove", text="",
+                               icon="ZOOMOUT")
+        oper.nodeName = self.name
+        oper.nodeTreeName = self.id_data.name
+
+    def getSettings(self):
+        matList = [(m.name, m.weight) for m in self.materialList]
+        return {"targetMaterial": self.targetMaterial,
+                "materialList": matList,
+                "totalWeight": sum([x[1] for x in matList])}
 
 
 class TemplateNode(CrowdMasterAGenTreeNode):
@@ -799,7 +881,8 @@ agen_node_categories = [
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
         NodeItem("AddToGroupNodeType"),
-        NodeItem("SettagNodeType")
+        NodeItem("SettagNodeType"),
+        NodeItem("RandomMaterialNodeType")
         ]),
     CrowdMasterAGenCategories("layout", "Layout", items=[
         NodeItem("NodeFrame"),
@@ -822,6 +905,11 @@ def register():
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
+    bpy.utils.register_class(material_entry)
+    bpy.utils.register_class(material_UIList)
+    bpy.utils.register_class(SCENE_OT_cm_materialsNode_add)
+    bpy.utils.register_class(SCENE_OT_cm_materialsNode_remove)
+    bpy.utils.register_class(RandomMaterialNode)
     bpy.utils.register_class(TemplateNode)
     bpy.utils.register_class(OffsetNode)
     bpy.utils.register_class(RandomNode)
@@ -856,6 +944,11 @@ def unregister():
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)
+    bpy.utils.unregister_class(material_entry)
+    bpy.utils.unregister_class(material_UIList)
+    bpy.utils.unregister_class(SCENE_OT_cm_materialsNode_add)
+    bpy.utils.unregister_class(SCENE_OT_cm_materialsNode_remove)
+    bpy.utils.unregister_class(RandomMaterialNode)
     bpy.utils.unregister_class(TemplateNode)
     bpy.utils.unregister_class(OffsetNode)
     bpy.utils.unregister_class(RandomNode)

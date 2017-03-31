@@ -64,8 +64,9 @@ class TemplateRequest():
         self.scale = 1
         self.tags = {}
         self.cm_group = "cm_allAgents"
-        self.material = None
-        self.matSlotIndex = 0
+
+        self.materials = {}
+        # Key: material to replace. Value: material to replace with
 
     def copy(self):
         new = TemplateRequest()
@@ -74,8 +75,19 @@ class TemplateRequest():
         new.scale = self.scale
         new.tags = self.tags.copy()
         new.cm_group = self.cm_group
-        new.material = self.material
-        new.matSlotIndex = self.matSlotIndex
+        new.materials = self.materials.copy()
+        return new
+
+    def toGeoTemplate(self, deferGeo, group):
+        new = GeoRequest()
+        new.pos = self.pos
+        new.rot = self.rot
+        new.scale = self.scale
+        new.tags = self.tags.copy()
+        new.cm_group = self.cm_group
+        new.group = group
+        new.materials = self.materials.copy()
+        new.deferGeo = deferGeo
         return new
 
 
@@ -87,20 +99,46 @@ class GeoTemplate(Template):
         """Called when this GeoTemplate is being used to modify the scene"""
         self.buildCount += 1
 
+
+class GeoRequest(TemplateRequest):
+    """Passed between the children of GeoTemplate"""
+    def __init__(self):
+        TemplateRequest.__init__(self)
+        self.deferGeo = False
+        self.group = None
+
+    def copy(self):
+        new = GeoRequest()
+        new.pos = self.pos
+        new.rot = self.rot
+        new.scale = self.scale
+        new.tags = self.tags.copy()
+        new.cm_group = self.cm_group
+        new.group = self.group
+        new.materials = self.materials.copy()
+        new.deferGeo = self.deferGeo
+        return new
+
+
 # ==================== End of base classes ====================
 
 
 class GeoTemplateOBJECT(GeoTemplate):
     """For placing objects into the scene"""
-    def build(self, pos, rot, scale, group, deferGeo):
+    def build(self, buildRequest):
         obj = bpy.context.scene.objects[self.settings["inputObject"]]
-        if deferGeo:
+        if buildRequest.deferGeo:
             cp = bpy.data.objects.new("Empty", None)
             cp.matrix_world = obj.matrix_world
             cp["cm_deferObj"] = obj.name
+            cp["cm_materials"] = buildRequest.materials
         else:
             cp = obj.copy()
-        group.objects.link(cp)
+            for m in cp.material_slots:
+                if m.name in buildRequest.materials:
+                    replacement = buildRequest.materials[m.name]
+                    m.material = bpy.data.materials[replacement]
+        buildRequest.group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
         return cp
 
@@ -110,8 +148,14 @@ class GeoTemplateOBJECT(GeoTemplate):
 
 class GeoTemplateGROUP(GeoTemplate):
     """For placing groups into the scene"""
-    def build(self, pos, rot, scale, group, deferGeo):
+    def build(self, buildRequest):
         dat = bpy.data
+
+        pos = buildRequest.pos
+        rot = buildRequest.rot
+        scale = buildRequest.scale
+        group = buildRequest.group
+        deferGeo = buildRequest.deferGeo
 
         gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
         group_objects = [o.copy() for o in gp]
@@ -128,17 +172,24 @@ class GeoTemplateGROUP(GeoTemplate):
                     bpy.context.scene.objects.link(newObj)
                     newObj["cm_deferGroup"] = {"group": self.settings["inputGroup"],
                                                "aName": obj.name}
+                    newObj["cm_materials"] = buildRequest.materials
                     return newObj
             bpy.ops.object.add(type='EMPTY',
                                location=min(group_objects, key=zaxis).location)
             e = bpy.context.object
             group.objects.link(e)
             e["cm_deferGroup"] = {"group": self.settings["inputGroup"]}
+            e["cm_materials"] = buildRequest.materials
             return e
 
         topObj = None
 
         for obj in group_objects:
+            for m in obj.material_slots:
+                if m.name in buildRequest.materials:
+                    replacement = buildRequest.materials[m.name]
+                    m.material = bpy.data.materials[replacement]
+
             if obj.parent in gp:
                 obj.parent = group_objects[gp.index(obj.parent)]
             else:
@@ -178,11 +229,11 @@ class GeoTemplateGROUP(GeoTemplate):
 
 class GeoTemplateSWITCH(GeoTemplate):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
-    def build(self, pos, rot, scale, group, deferGeo):
+    def build(self, buildRequest):
         if random.random() < self.settings["switchAmout"]:
-            return self.inputs["Object 1"].build(pos, rot, scale, group, deferGeo)
+            return self.inputs["Object 1"].build(buildRequest)
         else:
-            return self.inputs["Object 2"].build(pos, rot, scale, group, deferGeo)
+            return self.inputs["Object 2"].build(buildRequest)
 
     def check(self):
         if "Object 1" not in self.inputs:
@@ -198,9 +249,9 @@ class GeoTemplateSWITCH(GeoTemplate):
 
 class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
-    def build(self, pos, rot, scale, group, deferGeo):
-        parent = self.inputs["Parent Group"].build(pos, rot, scale, group, deferGeo)
-        child = self.inputs["Child Object"].build(pos, rot, scale, group, deferGeo)
+    def build(self, buildRequest):
+        parent = self.inputs["Parent Group"].build(buildRequest.copy())
+        child = self.inputs["Child Object"].build(buildRequest.copy())
         con = child.constraints.new("CHILD_OF")
         con.target = parent
         con.subtarget = self.settings["parentTo"]
@@ -255,32 +306,53 @@ class TemplateADDTOGROUP(Template):
         return True
 
 
+class TemplateRANDOMMATERIAL(Template):
+    """Assign random materials"""
+    def build(self, buildRequest):
+        s = random.random() * self.settings["totalWeight"]
+        index = 0
+        mat = None
+        while mat is None:
+            s -= self.settings["materialList"][index][1]
+            if s <= 0:
+                mat = self.settings["materialList"][index][0]
+            index += 1
+        buildRequest.materials[self.settings["targetMaterial"]] = mat
+        self.inputs["Template"].build(buildRequest)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
+
+
 class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
     def build(self, buildRequest):
         groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
-        new_group = bpy.data.groups.new(groupName)
+        newGp = bpy.data.groups.new(groupName)
         defG = self.settings["deferGeo"]
         pos = buildRequest.pos
         rot = buildRequest.rot
         scale = buildRequest.scale
-        topObj = self.inputs["Objects"].build(pos, rot, scale, new_group, defG)
+        geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
+        topObj = self.inputs["Objects"].build(geoBuildRequest)
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
 
-        if buildRequest.material is not None:
-            matSlotIndex = buildRequest.matSlotIndex
-            mat = buildRequest.material
-            topObj.material_slots[matSlotIndex].link = 'OBJECT'
-            topObj.material_slots[matSlotIndex].material = bpy.data.materials[mat]
+        topObj["cm_randomMaterial"] = buildRequest.materials
 
         tags = buildRequest.tags
         packTags = [{"name": x, "value": tags[x]} for x in tags]
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
                                    groupName=buildRequest.cm_group,
-                                   geoGroupName=new_group.name,
+                                   geoGroupName=newGp.name,
                                    initialTags=packTags)
 
     def check(self):
@@ -359,30 +431,8 @@ class TemplateRANDOM(Template):
                                    self.settings["maxRandSz"])
         newScale = buildRequest.scale * scaleDiff
 
-        allMats = []
-        if self.settings["randMat"]:
-            if self.settings["randMatPrefix"]:
-                for mat in bpy.data.materials:
-                    if self.settings["randMatPrefix"] in mat.name:
-                        allMats.append(mat.name)
-                if len(allMats):
-                    newMat = random.choice(allMats)
-                    newSlotIndex = self.settings["slotIndex"]
-                else:
-                    print("Prefix: "+self.settings["randMatPrefix"]+" not found!")
-                    newMat = None
-                    newSlotIndex = 0
-            else:
-                print("You must enter a prefix!")
-                newMat = None
-                newSlotIndex = 0
-        else:
-            newMat = None
-            newSlotIndex = 0
         buildRequest.rot = Vector(eul)
         buildRequest.scale = newScale
-        buildRequest.material = newMat
-        buildRequest.matSlotIndex = newSlotIndex
         self.inputs["Template"].build(buildRequest)
 
     def check(self):
@@ -698,6 +748,7 @@ templates = OrderedDict([
     ("AddToGroupNodeType", TemplateADDTOGROUP),
     ("TemplateSwitchNodeType", TemplateSWITCH),
     ("ParentNodeType", GeoTemplatePARENT),
+    ("RandomMaterialNodeType", TemplateRANDOMMATERIAL),
     ("TemplateNodeType", TemplateAGENT),
     ("OffsetNodeType", TemplateOFFSET),
     ("RandomNodeType", TemplateRANDOM),

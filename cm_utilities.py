@@ -357,9 +357,18 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                 newhudText = "Placing Object {}".format(obj.name)
                                 update_hud_text(newhudText)
                                 cm_redrawAll()
-                                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP', iterations=1)
+                                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP',
+                                                        iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
+
+                            materials = obj["cm_materials"]
+                            D = bpy.data
+                            for m in newObj.material_slots:
+                                if m.name in materials:
+                                    replacement = materials[m.name]
+                                    m.material = D.materials[replacement]
+
                             child = False
                             for con in obj.constraints:
                                 if con.type == "CHILD_OF":
@@ -377,10 +386,10 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                         elif "cm_deferGroup" in obj:
                             df = obj["cm_deferGroup"]
                             originalGroup = df["group"]
+                            newObjs = []
                             if "aName" in df:
                                 aName = df["aName"]
 
-                                newObjs = []
                                 gp = list(groups[originalGroup].objects)
                                 for groupObj in gp:
                                     if groupObj.name != aName:
@@ -401,7 +410,6 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                             if mod.type == "ARMATURE":
                                                 mod.object = objects[agent.name]
                             else:
-                                newObjs = []
                                 gp = list(groups[originalGroup].objects)
                                 for groupObj in gp:
                                     newObjs.append(groupObj.copy())
@@ -414,6 +422,14 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
 
                                     groups[agent.geoGroup].objects.link(nObj)
                                     bpy.context.scene.objects.link(nObj)
+                            if "cm_materials" in obj:
+                                materials = obj["cm_materials"]
+                                for nObj in newObjs:
+                                    D = bpy.data
+                                    for m in nObj.material_slots:
+                                        if m.name in materials:
+                                            replacement = materials[m.name]
+                                            m.material = D.materials[replacement]
 
         if preferences.show_node_hud:
             newhudText = "Done Placing Deferred Geometry!"
