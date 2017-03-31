@@ -580,8 +580,8 @@ class TemplateMESHPOSITIONING(Template):
         wrld = guide.matrix_world
         if self.totalArea is None:
             self.totalArea = sum(p.area for p in data.polygons)
+        positions = []
         for n in range(self.settings["noToPlace"]):
-            newBuildRequest = buildRequest.copy()
             remaining = random.random() * self.totalArea
             index = 0
             while remaining > 0:
@@ -594,13 +594,40 @@ class TemplateMESHPOSITIONING(Template):
                     r2 = random.random()
                     pos = (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c
                     if self.settings["overwritePosition"]:
-                        newBuildRequest.pos = wrld * pos
+                        pos = wrld * pos
                     else:
                         pos.rotate(mathutils.Euler(buildRequest.rot))
                         pos *= buildRequest.scale
-                        newBuildRequest.pos = buildRequest.pos + pos
-                    self.inputs["Template"].build(newBuildRequest)
+                        pos = buildRequest.pos + pos
+                    positions.append(pos)
                 index += 1
+
+        if self.settings["relax"]:
+            sce = bpy.context.scene
+            gnd = sce.objects[self.settings["guideMesh"]]
+            if self.bvhtree is None:
+                self.bvhtree = BVHTree.FromObject(gnd, sce)
+            radius = self.settings["relaxRadius"]
+            for i in range(self.settings["relaxIterations"]):
+                kd = KDTree(len(positions))
+                for n, p in enumerate(positions):
+                    kd.insert(p, n)
+                kd.balance()
+                for n, p in enumerate(positions):
+                    adjust = Vector()
+                    localPoints = kd.find_range(p, radius*2)
+                    for (co, ind, dist) in localPoints:
+                        if ind != n:
+                            v = p - co
+                            adjust += v * ((2*radius - v.length)/v.length)
+                    if len(localPoints) > 0:
+                        adjPos = positions[n] + adjust/len(localPoints)
+                        positions[n] = self.bvhtree.find_nearest(adjPos)[0]
+
+        for newPos in positions:
+            newBuildRequest = buildRequest.copy()
+            newBuildRequest.pos = newPos
+            self.inputs["Template"].build(newBuildRequest)
 
 
     def check(self):

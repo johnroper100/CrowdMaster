@@ -606,6 +606,18 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
                                      description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
                                      default=False)
 
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs[0].link_limit = 1
@@ -616,11 +628,19 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
         layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
         layout.prop(self, "noToPlace")
         layout.prop(self, "overwritePosition")
+        
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
 
     def getSettings(self):
         return {"guideMesh": self.guideMesh,
                 "noToPlace": self.noToPlace,
-                "overwritePosition": self.overwritePosition}
+                "overwritePosition": self.overwritePosition,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
 
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
