@@ -566,6 +566,55 @@ class TemplateRANDOMPOSITIONING(Template):
         return True
 
 
+class TemplateMESHPOSITIONING(Template):
+    """Place randomly over the surface of a mesh"""
+    def __init__(self, inputs, settings, bpyName):
+        Template.__init__(self, inputs, settings, bpyName)
+        self.bvhtree = None  # TODO use to relax points
+        self.totalArea = None
+
+    def build(self, buildRequest):
+        guide = bpy.data.objects[self.settings["guideMesh"]]
+        data = guide.data
+
+        wrld = guide.matrix_world
+        if self.totalArea is None:
+            self.totalArea = sum(p.area for p in data.polygons)
+        for n in range(self.settings["noToPlace"]):
+            newBuildRequest = buildRequest.copy()
+            remaining = random.random() * self.totalArea
+            index = 0
+            while remaining > 0:
+                remaining -= data.polygons[index].area
+                if remaining <= 0:
+                    a = data.vertices[data.polygons[index].vertices[0]].co
+                    b = data.vertices[data.polygons[index].vertices[1]].co
+                    c = data.vertices[data.polygons[index].vertices[2]].co
+                    r1 = math.sqrt(random.random())
+                    r2 = random.random()
+                    pos = (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c
+                    if self.settings["overwritePosition"]:
+                        newBuildRequest.pos = wrld * pos
+                    else:
+                        pos.rotate(mathutils.Euler(buildRequest.rot))
+                        pos *= buildRequest.scale
+                        newBuildRequest.pos = buildRequest.pos + pos
+                    self.inputs["Template"].build(newBuildRequest)
+                index += 1
+
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if self.settings["guideMesh"] not in bpy.context.scene.objects:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
+
+
 class TemplateFORMATION(Template):
     """Place in a row"""
     def build(self, buildRequest):
@@ -756,6 +805,7 @@ templates = OrderedDict([
     ("PointTowardsNodeType", TemplatePOINTTOWARDS),
     ("CombineNodeType", TemplateCOMBINE),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
+    ("MeshPositionNodeType", TemplateMESHPOSITIONING),
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),
     ("ObstacleNodeType", TemplateOBSTACLE),
