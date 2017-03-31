@@ -216,6 +216,7 @@ class GeoTemplateGROUP(GeoTemplate):
             bpy.ops.object.add(type='EMPTY',
                                location=min(group_objects, key=zaxis).location)
             e = bpy.context.object
+            group.objects.link(e)
             for obj in group_objects:
                 if obj.parent not in group_objects:
                     obj.location -= pos
