@@ -190,6 +190,13 @@ class NewInputNode(LogicNode):
                                            ("DIST", "dist", "", 3)])
 
     GroundGroup = StringProperty(name="Ground Group")
+    GroundOptions = EnumProperty(name="Ground Options",
+                                 items=[("DH", "dh", "", 1),
+                                        ("ARZ", "ahead rz", "", 2),
+                                        ("ARX", "ahead rx", "", 3)])
+    GroundAheadOffset = FloatVectorProperty(name="Ground Ahead Offset",
+                                            description="Position relative to the agent to check the ground mesh",
+                                            default=(0, 1, 0))
 
     NoiseOptions = EnumProperty(name="Noise Options",
                                 items=[("RANDOM", "Random", "", 1),
@@ -254,6 +261,9 @@ class NewInputNode(LogicNode):
                 layout.prop(self, "FormationOptions")
         elif self.InputSource == "GROUND":
             layout.prop_search(self, "GroundGroup", bpy.data, "groups")
+            layout.prop(self, "GroundOptions")
+            if self.GroundOptions == "ARX" or self.GroundOptions == "ARZ":
+                layout.prop(self, "GroundAheadOffset")
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
         elif self.InputSource == "PATH":
@@ -296,6 +306,8 @@ class NewInputNode(LogicNode):
                 node.settings["FormationOptions"] = self.FormationOptions
         elif self.InputSource == "GROUND":
             node.settings["GroundGroup"] = self.GroundGroup
+            node.settings["GroundOptions"] = self.GroundOptions
+            node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
         elif self.InputSource == "PATH":
