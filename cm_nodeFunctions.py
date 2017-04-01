@@ -294,13 +294,11 @@ class LogicAND(Neuron):
 
         if settings["SingleOutput"]:
             total = 1
-            for k, v in results.items():
-                total *= v
             if settings["Method"] == "MUL":
                 for k, v in results.items():
                     total *= v
             else:  # Method == "MIN"
-                total = min(results)
+                total = min(results.values())
             return {"None": total}
         else:
             return results
