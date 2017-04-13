@@ -743,14 +743,15 @@ class StateAction(State):
                 x = data[0][self.currentFrame] - data[0][self.currentFrame - 1]
                 y = data[1][self.currentFrame] - data[1][self.currentFrame - 1]
                 z = data[2][self.currentFrame] - data[2][self.currentFrame - 1]
+                scale = bpy.context.scene.objects[self.brain.userid].scale
                 if data_path == "location":
-                    self.brain.outvars["px"] += x
-                    self.brain.outvars["py"] += y
-                    self.brain.outvars["pz"] += z
+                    self.brain.outvars["px"] += x * scale.x
+                    self.brain.outvars["py"] += y * scale.y
+                    self.brain.outvars["pz"] += z * scale.z
                 elif data_path == "rotation_euler":
-                    self.brain.outvars["rx"] += x
-                    self.brain.outvars["ry"] += y
-                    self.brain.outvars["rz"] += z
+                    self.brain.outvars["rx"] += x * scale.x
+                    self.brain.outvars["ry"] += y * scale.y
+                    self.brain.outvars["rz"] += z * scale.z
 
         # Check to see if there is a valid sync state to move to
 
