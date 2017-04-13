@@ -754,6 +754,7 @@ class ActionState(StateNode):
     useValueOfSpeed = BoolProperty(name="Use Value of Speed", default=True)
     interuptState = BoolProperty(name="Interupt State", default=False)
     syncState = BoolProperty(name="Sync State", default=False)
+    randomActionFromGroup = BoolProperty(name="Rand Group Action", default=True)
 
     def init(self, context):
         StateNode.init(self, context)
@@ -769,14 +770,24 @@ class ActionState(StateNode):
         item.useValueOfSpeed = self.useValueOfSpeed
         item.interuptState = self.interuptState
         item.syncState = self.syncState
+        item.randomActionFromGroup = self.randomActionFromGroup
 
     def draw_buttons(self, context, layout):
+        preferences = context.user_preferences.addons[__package__].preferences
         if self.actionName == "":
             layout.prop(self, "stateLength")
         layout.prop(self, "cycleState")
-        row = layout.row()
+        row = layout.row(align=True)
         row.prop_search(self, "actionName", context.scene.cm_action_groups,
                         "groups")
+        isGroup = self.actionName[0] == "[" and self.actionName[-1] == "]"
+        if isGroup and (not self.interuptState or not self.syncState):
+            if preferences.use_custom_icons:
+                row.prop(self, "randomActionFromGroup",
+                         icon_value=cicon('dice'), icon_only=True)
+            else:
+                row.prop(self, "randomActionFromGroup", icon="FILE_REFRESH",
+                         icon_only=True)
         layout.prop(self, "interuptState")
         if self.interuptState:
             layout.prop(self, "syncState")

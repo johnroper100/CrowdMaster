@@ -708,6 +708,14 @@ class StateAction(State):
             else:
                 self.finalValue = 0
             self.finalValueCalcd = True
+        elif self.isGroup():
+            State.evaluate(self)
+            acNm = self.actionName
+            state = random.getstate()
+            if not self.randomActionFromGroup:
+                random.seed(hash(self.brain.userid))
+            self.action = random.choice(self.brain.sim.actionGroups[acNm[1:-1]])
+            random.setstate(state)
         else:
             State.evaluate(self)
             self.action = self.actionName
@@ -728,7 +736,7 @@ class StateAction(State):
         currentFrame = bpy.context.scene.frame_current
         self.resultLog[currentFrame] = ((0.15, 0.4, complete))
 
-        if self.actionName in self.brain.sim.actions:
+        if self.currentAction in self.brain.sim.actions:
             actionobj = self.brain.sim.actions[self.currentAction]
 
             for data_path, data in actionobj.motiondata.items():
