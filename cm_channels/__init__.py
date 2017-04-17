@@ -30,6 +30,9 @@ Path = cm_pathChannels.Path
 
 from .cm_masterChannels import channelTimes, timeChannel
 
+from . cm_testSoundAccel import SoundAccelTestCase
+from . cm_testSoundAccel import SoundAccelTimingCase
+
 def register():
     cm_pathChannels.register()
 

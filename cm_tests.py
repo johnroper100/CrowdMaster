@@ -21,6 +21,8 @@ import unittest
 import bpy
 
 from . cm_syncManager import SyncManagerTestCase
+from . cm_channels import SoundAccelTestCase
+from . cm_channels import SoundAccelTimingCase
 
 class AddonRegisterTestCase(unittest.TestCase):
     def setUp(self):
@@ -63,6 +65,8 @@ def createShortTestSuite():
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(AddonRegisterTestCase))
     test_suite.addTest(unittest.makeSuite(SyncManagerTestCase))
+    test_suite.addTest(unittest.makeSuite(SoundAccelTestCase))
+    test_suite.addTest(unittest.makeSuite(SoundAccelTimingCase))
     return test_suite
 
 def createLongTestSuite():
