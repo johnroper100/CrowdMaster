@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.c
 *.so
 
 # Distribution / packaging
@@ -89,3 +90,7 @@ ENV/
 .ropeproject
 CrowdMaster_updater/updater_status.json
 crowdmaster_updater/updater_status.json
+
+crowdmaster_updater/
+
+sources/cm_nodeFunctions\.html
