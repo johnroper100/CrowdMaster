@@ -38,3 +38,16 @@ class AccelerateTestCase(unittest.TestCase):
                                             m)
         self.assertAlmostEqual(py[0], cy[0])
         self.assertAlmostEqual(py[1], cy[1])
+
+    def testRelativeRotation2(self):
+        to = mathutils.Vector((1, 2, 3))
+        ag = mathutils.Vector((3, 2, 1))
+        rotation = mathutils.Vector((1, 0, 1))
+
+        py = pythonRelativeRotation(to, ag, rotation)
+        m = cm_accelerate.makeRotationMatrix(rotation.x, rotation.y, rotation.z)
+        cy = cm_accelerate.relativeRotation(to.x, to.y, to.z,
+                                            ag.x, ag.y, ag.z,
+                                            m)
+        self.assertAlmostEqual(py[0], cy[0], 6)
+        self.assertAlmostEqual(py[1], cy[1], 6)

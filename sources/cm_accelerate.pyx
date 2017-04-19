@@ -1,5 +1,7 @@
 import math
 
+cdef float invPi = 1 / math.pi
+
 cdef struct s_matrix:
     float R11
     float R21
@@ -30,11 +32,11 @@ def makeRotationMatrix(float rotX, float rotY, float rotZ):
     m.R11 = cb * cc
     m.R21 = -cb * sc
     m.R31 = sb
-    m.R12 = casc + sasb * cc
-    m.R22 = cacc - sasb * sc
+    m.R12 = casc + (sasb * cc)
+    m.R22 = cacc - (sasb * sc)
     m.R32 = -sa * cb
-    m.R13 = sa * sc - cacc * sb
-    m.R23 = sa * cc + casc * sb
+    m.R13 = (sa * sc) - (cacc * sb)
+    m.R23 = (sa * cc) + (casc * sb)
     m.R33 = ca * cb
 
     return m
@@ -46,11 +48,11 @@ def relativeRotation(float toLocX, float toLocY, float toLocZ,
         cdef float targetY = toLocY - fromLocY
         cdef float targetZ = toLocZ - fromLocZ
 
-        cdef float relativeX = targetX * rot.R11 + targetY * rot.R21 + targetZ * rot.R31
-        cdef float relativeY = targetX * rot.R12 + targetY * rot.R22 + targetZ * rot.R32
-        cdef float relativeZ = targetX * rot.R13 + targetY * rot.R23 + targetZ * rot.R33
+        cdef float relativeX = targetX * rot.R11 + targetY * rot.R12 + targetZ * rot.R13
+        cdef float relativeY = targetX * rot.R21 + targetY * rot.R22 + targetZ * rot.R23
+        cdef float relativeZ = targetX * rot.R31 + targetY * rot.R32 + targetZ * rot.R33
 
-        changez = math.atan2(relativeX, relativeY)/math.pi
-        changex = math.atan2(relativeZ, relativeY)/math.pi
+        changez = math.atan2(relativeX, relativeY) * invPi
+        changex = math.atan2(relativeZ, relativeY) * invPi
 
         return changez, changex

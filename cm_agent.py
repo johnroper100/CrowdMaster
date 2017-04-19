@@ -25,6 +25,7 @@ from .cm_compileBrain import compileBrain
 
 import time
 from . import cm_timings
+from . libs import cm_accelerate
 
 
 class Agent:
@@ -97,6 +98,12 @@ class Agent:
     def step(self):
         objs = bpy.data.objects
         preferences = bpy.context.user_preferences.addons[__package__].preferences
+
+        rot = objs[self.id].rotation_euler
+
+        self.rotationMatrix = cm_accelerate.makeRotationMatrix(rot[0],
+                                                               rot[1],
+                                                               rot[2])
 
         if preferences.show_debug_options:
             t = time.time()

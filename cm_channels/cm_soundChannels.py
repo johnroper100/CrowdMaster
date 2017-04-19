@@ -24,6 +24,7 @@ import mathutils
 Vector = mathutils.Vector
 
 from ..libs import ins_octree as ot
+from ..libs import cm_accelerate
 
 import bpy
 
@@ -120,7 +121,7 @@ class Channel:
             if dist <= val:
                 to = O[emitterid]
 
-                target = to.location - ag.location
+                """target = to.location - ag.location
 
                 z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
                 y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
@@ -130,7 +131,18 @@ class Channel:
                 relative = target * rotation
 
                 changez = math.atan2(relative[0], relative[1])/math.pi
-                changex = math.atan2(relative[2], relative[1])/math.pi
+                changex = math.atan2(relative[2], relative[1])/math.pi"""
+                """m = cm_accelerate.makeRotationMatrix(ag.rotation_euler[0],
+                                                     ag.rotation_euler[1],
+                                                     ag.rotation_euler[2])"""
+                rotMat = self.sim.agents[self.userid].rotationMatrix
+                changez, changex = cm_accelerate.relativeRotation(to.location.x,
+                                                                  to.location.y,
+                                                                  to.location.z,
+                                                                  ag.location.x,
+                                                                  ag.location.y,
+                                                                  ag.location.z,
+                                                                  rotMat)
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
                                          "distProp": dist/val}
