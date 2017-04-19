@@ -780,7 +780,8 @@ class ActionState(StateNode):
         row = layout.row(align=True)
         row.prop_search(self, "actionName", context.scene.cm_action_groups,
                         "groups")
-        isGroup = self.actionName[0] == "[" and self.actionName[-1] == "]"
+        actName = self.actionName
+        isGroup = actName != "" and actName[0] == "[" and actName[-1] == "]"
         if isGroup and (not self.interuptState or not self.syncState):
             if preferences.use_custom_icons:
                 row.prop(self, "randomActionFromGroup",
