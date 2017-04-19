@@ -94,3 +94,5 @@ crowdmaster_updater/updater_status.json
 crowdmaster_updater/
 
 sources/cm_nodeFunctions\.html
+
+sources/cm_accelerate\.html
