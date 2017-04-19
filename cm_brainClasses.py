@@ -49,7 +49,11 @@ class Neuron():
             # Return a cached version of the answer if possible
             return self.result
         noDeps = len(self.dependantOn) == 0
-        dep = True in [self.neurons[x].isCurrent for x in self.dependantOn]
+        dep = False
+        for x in self.dependantOn:
+            if self.neurons[x].isCurrent:
+                dep = True
+                break
         # Only output something if the node isn't dependant on a state
         #  or if one of it's dependancies is the current state
         if preferences.show_debug_options and preferences.show_debug_timings:
