@@ -26,7 +26,7 @@ simulation = OrderedDict([
 
 neuron = OrderedDict([
     ("deps", 0),
-    ("colour", 0)
+    ("sumColour", 0)
 ])
 
 coreTimes = OrderedDict([

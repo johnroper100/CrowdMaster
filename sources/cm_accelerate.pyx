@@ -56,3 +56,49 @@ def relativeRotation(float toLocX, float toLocY, float toLocZ,
         changex = math.atan2(relativeZ, relativeY) * invPi
 
         return changez, changex
+
+def neuronColour(float total, Py_ssize_t length):
+    cdef float hueChange
+    cdef float absav
+
+    cdef float hue
+    cdef float sat
+    cdef float val
+
+    if length > 0:
+        val = 1
+        av = total / length
+
+        if av > 0:
+            startHue = 0.333
+            absav = av
+        else:
+            startHue = 0.5
+            absav = -av
+
+        if av > 1:
+            hueChange = absav
+            hueChange += 1
+            hueChange /= -absav
+            hueChange += 2
+            hueChange /= -3
+            hue = 0.333 + hueChange
+        elif av < -1:
+            hueChange = absav
+            hueChange += 1
+            hueChange /= -absav
+            hueChange += 2
+            hueChange /= 3
+            hue = 0.5 + hueChange
+        else:
+            hue = startHue
+
+        if absav < 1:
+            sat = math.sqrt(absav)
+        else:
+            sat = 1
+    else:
+        hue = 0
+        sat = 0
+        val = 0.5
+    return hue, sat, val

@@ -25,6 +25,7 @@ import mathutils
 
 from . import cm_timings
 import time
+from . libs import cm_accelerate
 
 
 class Neuron():
@@ -34,7 +35,9 @@ class Neuron():
         self.neurons = self.brain.neurons  # type: List[Neuron]
         self.inputs = []  # type: List[str] - strings are names of neurons
         self.result = None  # type: None | ImpulseContainer - Cache for current
-        self.resultLog = [(0, 0, 0), (0, 0, 0)]  # type: List[(int, int, int)]
+        self.resultLog = [(None, 0), (None, 0)]
+        # type resultLog: List[(float : sum, int | None : numVals)]
+        # Second value None if node not evaluated
         self.fillOutput = bpy.props.BoolProperty(default=True)
         self.bpyNode = bpyNode  # type: cm_bpyNodes.LogicNode
         self.settings = {}  # type: Dict[str, bpy.props.*]
@@ -83,51 +86,33 @@ class Neuron():
 
         if preferences.show_debug_options:
             t = time.time()
-        # Calculate the colour that would be displayed in the agent is selected
-        total = 0
-        if output:
-            val = 1
-            av = sum(output.values()) / len(output)
-            if av > 0:
-                startHue = 0.333
-            else:
-                startHue = 0.5
 
-            if av > 1:
-                hueChange = -(-(abs(av)+1)/abs(av) + 2) * (1/3)
-                hue = 0.333 + hueChange
-                sat = 1
-            elif av < -1:
-                hueChange = (-(abs(av)+1)/abs(av) + 2) * (1/3)
-                hue = 0.5 + hueChange
-                sat = 1
-            else:
-                hue = startHue
-
-            if abs(av) < 1:
-                sat = abs(av)**(1/2)
-            else:
-                sat = 1
+        if (len(output) > 0):
+            self.resultLog[-1] = (sum(output.values()), len(output))
         else:
-            hue = 0
-            sat = 0
-            val = 0.5
-        self.resultLog[-1] = (hue, sat, val)
+            self.resultLog[-1] = (0, None)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
-            cm_timings.neuron["colour"] += time.time() - t
+            cm_timings.neuron["sumColour"] += time.time() - t
+
 
         return output
 
     def newFrame(self):
         self.result = None
-        self.resultLog.append((0, 0, 0.5))
+        self.resultLog.append((0, None))
 
     def highLight(self, frame):
         """Colour the nodes in the interface to reflect the output"""
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.use_node_color:
-            hue, sat, val = self.resultLog[frame]
+            sm, nm = self.resultLog[frame]
+            if nm is not None:
+                hue, sat, val = cm_accelerate.neuronColour(sm, nm)
+            else:
+                hue = 0
+                sat = 0
+                val = 0.5
             self.bpyNode.use_custom_color = True
             c = mathutils.Color()
             c.hsv = hue, sat, val
@@ -157,7 +142,7 @@ class State:
         self.syncState = False
 
         self.bpyNode = bpyNode
-        self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}
+        self.resultLog = {0: 0, 1: 0}
 
     def query(self):
         """If this state is a valid next move return float > 0"""
@@ -224,7 +209,7 @@ class State:
             complete = self.currentFrame/self.length
             complete = 0.5 + complete/2
         sceneFrame = bpy.context.scene.frame_current
-        self.resultLog[sceneFrame] = ((0.15, 0.4, complete))
+        self.resultLog[sceneFrame] = complete
 
         if self.currentFrame < self.length - 1:
             return False, self.name
@@ -261,7 +246,9 @@ class State:
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.use_node_color:
             if frame in self.resultLog:
-                hue, sat, val = self.resultLog[frame]
+                hue = 0.15
+                sat = 0.4
+                val = self.resultLog[frame]
             else:
                 hue = 0.0
                 sat = 0.0
