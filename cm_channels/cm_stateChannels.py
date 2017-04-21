@@ -18,19 +18,21 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
 
 class State(Mc):
     """Used for accessing the data of the current agent"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
     @property
     @timeChannel("State")
     def radius(self):
-        return bpy.context.scene.objects[self.userid].dimensions.length/2
+        return bpy.context.scene.objects[self.userid].dimensions.length / 2
 
     @property
     @timeChannel("State")

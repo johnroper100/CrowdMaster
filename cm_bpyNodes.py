@@ -17,16 +17,17 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from bpy.props import FloatProperty, StringProperty, BoolProperty
-from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
-import textwrap
-import nodeitems_utils
-from nodeitems_utils import NodeCategory, NodeItem
 import random
+import textwrap
 
-from . cm_iconLoad import cicon
+import bpy
+import nodeitems_utils
+from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
+                       FloatVectorProperty, IntProperty, StringProperty)
+from bpy.types import Node, NodeSocket, NodeTree
+from nodeitems_utils import NodeCategory, NodeItem
+
+from .cm_iconLoad import cicon
 
 
 class CrowdMasterTree(NodeTree):
@@ -267,7 +268,8 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
         elif self.InputSource == "PATH":
-            layout.prop_search(self, "PathName", context.scene.cm_paths, "coll")
+            layout.prop_search(
+                self, "PathName", context.scene.cm_paths, "coll")
             if self.PathName != "":
                 layout.prop(self, "PathOptions")
         elif self.InputSource == "SOUND":
@@ -281,7 +283,8 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "WORLD":
             layout.prop(self, "WorldOptions"),
             if self.WorldOptions == "TARGET":
-                layout.prop_search(self, "TargetObject", context.scene, "objects")
+                layout.prop_search(self, "TargetObject",
+                                   context.scene, "objects")
                 if self.TargetObject != "":
                     layout.prop(self, "TargetOptions")
             if self.WorldOptions == "EVENT":
@@ -347,16 +350,21 @@ class GraphNode(LogicNode):
     bl_label = "Graph"
     bl_width_default = 200.0
 
-    Multiply = FloatProperty(name="Multiply", description="Multiply the outputted value by this number", default=1.0)
+    Multiply = FloatProperty(
+        name="Multiply", description="Multiply the outputted value by this number", default=1.0)
 
     CurveType = EnumProperty(name="Curve Type",
                              items=[("RBF", "RBF", "", 1),
                                     ("RANGE", "Range", "", 2)])
 
-    LowerZero = FloatProperty(name="Lower Zero", default=-1.0, update=update_properties)
-    LowerOne = FloatProperty(name="Lower One", default=-0.5, update=update_properties)
-    UpperOne = FloatProperty(name="Upper One", default=0.5, update=update_properties)
-    UpperZero = FloatProperty(name="Upper Zero", default=1.0, update=update_properties)
+    LowerZero = FloatProperty(
+        name="Lower Zero", default=-1.0, update=update_properties)
+    LowerOne = FloatProperty(
+        name="Lower One", default=-0.5, update=update_properties)
+    UpperOne = FloatProperty(
+        name="Upper One", default=0.5, update=update_properties)
+    UpperZero = FloatProperty(
+        name="Upper Zero", default=1.0, update=update_properties)
 
     RBFMiddle = FloatProperty(default=0.0)
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
@@ -424,7 +432,8 @@ class MathNode(LogicNode):
 
     operation = EnumProperty(name="Operation", items=[
                              ("add", "Add", "Add the two numbers together"),
-                             ("sub", "Subtract", "Subtract the two numbers from each other"),
+                             ("sub", "Subtract",
+                              "Subtract the two numbers from each other"),
                              ("mul", "Multiply", "Multiply the two numbers"),
                              ("div", "Divide", "Divide the two numbers"),
                              ("set", "Set To", "Set all inputs to this number")],
@@ -624,20 +633,22 @@ class PrintNode(LogicNode):
     bl_label = "Print"
     bl_width_default = 310.0
 
-    Label = StringProperty(name="Label", description="The label to append to each printed statement.", default="")
+    Label = StringProperty(
+        name="Label", description="The label to append to each printed statement.", default="")
     save_to_file = BoolProperty(
         name="Save To File",
         description="Save the printed statements to a file for later viewing.",
         default=False,
-        )
+    )
 
     output_filepath = StringProperty(
-      name="Output Filepath",
-      default="",
-      description="Define the output file path.",
-      subtype='DIR_PATH'
-      )
-    # PrintSelected = BoolProperty(name="Print Selected", default=True)  # Not implemented
+        name="Output Filepath",
+        default="",
+        description="Define the output file path.",
+        subtype='DIR_PATH'
+    )
+    # PrintSelected = BoolProperty(name="Print Selected", default=True)  # Not
+    # implemented
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Label")
@@ -667,7 +678,7 @@ class PriorityNode(LogicNode):
 
     def update(self):
         if self.inputs[-1].is_linked and self.inputs[-2].is_linked:
-            n = len(self.inputs)//2
+            n = len(self.inputs) // 2
             self.inputs.new("DefaultSocketType", "Values {}".format(n))
             self.inputs.new("DefaultSocketType", "Priority {}".format(n))
 
@@ -754,7 +765,8 @@ class ActionState(StateNode):
     useValueOfSpeed = BoolProperty(name="Use Value of Speed", default=True)
     interuptState = BoolProperty(name="Interupt State", default=False)
     syncState = BoolProperty(name="Sync State", default=False)
-    randomActionFromGroup = BoolProperty(name="Rand Group Action", default=True)
+    randomActionFromGroup = BoolProperty(
+        name="Rand Group Action", default=True)
 
     def init(self, context):
         StateNode.init(self, context)
@@ -808,7 +820,8 @@ class NoteNode(CrowdMasterNode):
     bl_idname = 'LogicNoteNode'
     bl_label = 'Note'
 
-    text = StringProperty(name='Note Text', description="Text to show, if set will overide file")
+    text = StringProperty(
+        name='Note Text', description="Text to show, if set will overide file")
 
     text_file = StringProperty(description="Textfile to show")
 
@@ -907,43 +920,44 @@ class MyNodeCategory(NodeCategory):
     def poll(cls, context):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
+
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("NewInputNode")
-        ]),
+    ]),
     MyNodeCategory("OUTPUT", "Output", items=[
         NodeItem("OutputNode"),
         NodeItem("PrintNode")
-        ]),
+    ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
         NodeItem("MapNode"),
         NodeItem("PriorityNode")
-        ]),
+    ]),
     MyNodeCategory("LOGIC", "Logic", items=[
         NodeItem("AndNode"),
         NodeItem("OrNode")
-        ]),
+    ]),
     MyNodeCategory("STRENGTH", "Strength", items=[
         NodeItem("StrongNode"),
         NodeItem("WeakNode")
-        ]),
+    ]),
     MyNodeCategory("STATE", "State", items=[
         NodeItem("StartState"),
         NodeItem("ActionState")
-        ]),
+    ]),
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("SetTagNode"),
         NodeItem("MathNode"),
         NodeItem("VariableNode"),
         NodeItem("FilterNode")
-        ]),
+    ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
         NodeItem("NodeReroute"),
         NodeItem("LogicNoteNode")
-        ])
-    ]
+    ])
+]
 
 
 def register():
@@ -977,7 +991,8 @@ def register():
     bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
-    nodeitems_utils.register_node_categories("CrowdMaster_NODES", node_categories)
+    nodeitems_utils.register_node_categories(
+        "CrowdMaster_NODES", node_categories)
 
 
 def unregister():
@@ -1012,6 +1027,7 @@ def unregister():
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
+
 
 if __name__ == "__main__":
     register()

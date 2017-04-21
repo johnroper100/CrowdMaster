@@ -31,23 +31,24 @@ bl_info = {
 }
 
 import bpy
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.props import CollectionProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
+from bpy.props import (BoolProperty, CollectionProperty, PointerProperty,
+                       StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
 
-from . import cm_prefs
-from . cm_iconLoad import register_icons, unregister_icons, cicon
-from . import addon_updater_ops
-from . cm_graphics import cm_nodeHUD
-from . cm_graphics . cm_nodeHUD import update_hud_text
-from . cm_graphics . utils import cm_redrawAll
-from . cm_blenderData import initialTagProperty
+from . import addon_updater_ops, cm_prefs
+from .cm_blenderData import initialTagProperty
+from .cm_graphics import cm_nodeHUD
+from .cm_graphics.cm_nodeHUD import update_hud_text
+from .cm_graphics.utils import cm_redrawAll
+from .cm_iconLoad import cicon, register_icons, unregister_icons
+
 
 # =============== GROUPS LIST START ===============#
 
 
 class SCENE_UL_group(UIList):
     """for drawing each row"""
+
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         layout.label(item.name)
@@ -310,14 +311,16 @@ class SCENE_PT_CrowdMaster(Panel):
         row = layout.row()
         row.scale_y = 1.5
         if preferences.use_custom_icons:
-            row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))
+            row.operator(SCENE_OT_cm_start.bl_idname,
+                         icon_value=cicon('start_sim'))
         else:
             row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
 
         row = layout.row()
         row.scale_y = 1.25
         if preferences.use_custom_icons:
-            row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
+            row.operator(SCENE_OT_cm_stop.bl_idname,
+                         icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
@@ -326,9 +329,11 @@ class SCENE_PT_CrowdMaster(Panel):
 
         row = layout.row()
         if not scene.show_utilities:
-            row.prop(scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
+            row.prop(scene, "show_utilities",
+                     icon="RIGHTARROW", text="Utilities")
         else:
-            row.prop(scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
+            row.prop(scene, "show_utilities",
+                     icon="TRIA_DOWN", text="Utilities")
 
             box = layout.box()
             row = box.row()
@@ -344,12 +349,14 @@ class SCENE_PT_CrowdMaster(Panel):
 
             if scene.append_to_tree:
                 row = box.row()
-                row.prop_search(scene, "node_tree_name", bpy.data, "node_groups")
+                row.prop_search(scene, "node_tree_name",
+                                bpy.data, "node_groups")
 
             row = box.row()
             row.scale_y = 1.5
             if preferences.use_custom_icons:
-                row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
+                row.operator("scene.cm_setup_sample_nodes",
+                             icon_value=cicon('instant_setup'))
             else:
                 row.operator("scene.cm_setup_sample_nodes", icon="NODETREE")
 
@@ -360,7 +367,8 @@ class SCENE_PT_CrowdMaster(Panel):
 
             box = layout.box()
             row = box.row()
-            row.label("You must have the Simplify Curves addon enabled and an agent selected.")
+            row.label(
+                "You must have the Simplify Curves addon enabled and an agent selected.")
             row = box.row()
             row.scale_y = 1.5
             row.operator("graph.simplify", icon="IPO")
@@ -416,7 +424,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                     box.prop(group, "freezePlacement")
 
                 if preferences.use_custom_icons:
-                    op = box.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
+                    op = box.operator(
+                        SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
                 else:
                     op = box.operator(SCENE_OT_cm_groups_reset.bl_idname)
                 op.groupName = group.name
@@ -448,7 +457,8 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
         layout.prop(scene.cm_manual, "groupName", text="Group Name")
         layout.prop(scene.cm_manual, "brainType", text="Brain Type")
         if preferences.use_custom_icons:
-            op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
+            op = layout.operator(
+                SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         else:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
         op.groupName = "cm_" + scene.cm_manual.groupName
@@ -553,6 +563,7 @@ def unregister():
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
+
 
 if __name__ == "__main__":
     register()

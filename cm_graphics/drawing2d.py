@@ -17,8 +17,8 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import blf
 import bgl
+import blf
 from bgl import *
 
 dpi = 72
@@ -98,8 +98,8 @@ def unload_custom_font(font_file_path):
 def draw_box(x0, y0, width, height, color):
 
     x1 = x0 + width
-    y1 = y0 - height/2
-    y0 += height/2
+    y1 = y0 - height / 2
+    y0 += height / 2
 
     position = [[x0, y0], [x0, y1], [x1, y1], [x1, y0]]
 

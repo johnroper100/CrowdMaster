@@ -17,16 +17,17 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import time
-from bpy.types import Operator
+
+import bpy
 from bpy.props import StringProperty
+from bpy.types import Operator
 
-from .. libs.ins_vector import Vector
-
-from . cm_templates import templates, TemplateRequest
-from .. cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
-from .. cm_graphics . utils import cm_redrawAll
+from . import cm_genNodes
+from ..cm_graphics.cm_nodeHUD import update_hud_text, update_hud_text2
+from ..cm_graphics.utils import cm_redrawAll
+from ..libs.ins_vector import Vector
+from .cm_templates import TemplateRequest, templates
 
 
 class SCENE_OT_agent_nodes_generate(Operator):
@@ -129,7 +130,6 @@ class SCENE_OT_agent_nodes_generate(Operator):
         return {'FINISHED'}
 
 
-from . import cm_genNodes
 
 
 def register():

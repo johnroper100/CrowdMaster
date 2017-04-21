@@ -17,13 +17,15 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import random
+
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
-import random
 
 
 class Noise(Mc):
     """Used to generate randomness in a scene"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
 

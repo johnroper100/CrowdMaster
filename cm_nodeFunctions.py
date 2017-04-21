@@ -17,13 +17,15 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from collections import OrderedDict
-import math
-from .cm_brainClasses import Neuron, State
 import copy
-import bpy
+import math
 import os
 import random
+from collections import OrderedDict
+
+import bpy
+
+from .cm_brainClasses import Neuron, State
 
 
 """
@@ -242,19 +244,20 @@ class LogicGRAPH(Neuron):
             TPP = settings["RBFTenPP"]
 
             a = math.log(0.1) / (TPP**2)
-            return math.e**(a*(value-u)**2)
+            return math.e**(a * (value - u)**2)
 
         output = {}
         for into in inps:
             for i in into:
                 if i in output:
                     if preferences.show_debug_options:
-                        print("""LogicGRAPH data lost due to multiple inputs with the same key""")
+                        print(
+                            """LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
-                        output[i] = (RBF(into[i])*settings["Multiply"])
+                        output[i] = (RBF(into[i]) * settings["Multiply"])
                     elif settings["CurveType"] == "RANGE":
-                        output[i] = (linear(into[i])*settings["Multiply"])
+                        output[i] = (linear(into[i]) * settings["Multiply"])
                     # cubic bezier could also be an option here (1/2 sided)
         return output
 
@@ -324,7 +327,7 @@ class LogicOR(Neuron):
             for into in inps:
                 if settings["Method"] == "MUL":
                     for i in [into[i] for i in into]:
-                        total *= (1-i)
+                        total *= (1 - i)
                 else:  # Method == "MAX"
                     total = max(list(into.values()) + [total])
             if settings["Method"] == "MUL":
@@ -336,12 +339,12 @@ class LogicOR(Neuron):
                 for i in into:
                     if i in results:
                         if settings["Method"] == "MUL":
-                            results[i] *= (1-into[i])
+                            results[i] *= (1 - into[i])
                         else:  # Method == "MAX"
-                            results[i] = min(1-results[i], 1-into[i])
+                            results[i] = min(1 - results[i], 1 - into[i])
                     else:
-                        results[i] = (1-into[i])
-            results.update((k, 1-v) for k, v in results.items())
+                        results[i] = (1 - into[i])
+            results.update((k, 1 - v) for k, v in results.items())
             return results
 
 
@@ -353,7 +356,7 @@ class LogicSTRONG(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                results[i] = into[i]**2 * (-2*into[i] + 3)
+                results[i] = into[i]**2 * (-2 * into[i] + 3)
         return results
 
 
@@ -365,7 +368,7 @@ class LogicWEAK(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                results[i] = 2*into[i] - (into[i]**2 * (-2*into[i] + 3))
+                results[i] = 2 * into[i] - (into[i]**2 * (-2 * into[i] + 3))
         return results
 
 
@@ -483,7 +486,7 @@ class LogicFILTER(Neuron):
                     total += into[i]
                     count += 1
             if count != 0:
-                result = {"None": total/count}
+                result = {"None": total / count}
         return result
 
 
@@ -517,7 +520,7 @@ class LogicOUTPUT(Neuron):
                 for i in into:
                     val += into[i]
                     count += 1
-            out = val/(max(1, count))
+            out = val / (max(1, count))
         elif settings["MultiInputType"] == "MAX":
             out = 0
             for into in inps:
@@ -555,11 +558,11 @@ class LogicPRIORITY(Neuron):
     def core(self, inps, settings):
         result = {}
         remaining = {}
-        for v in range((len(inps)+1)//2):
-            into = inps[2*v]
+        for v in range((len(inps) + 1) // 2):
+            into = inps[2 * v]
             # print("into", into)
-            if 2*v+1 < len(inps):
-                priority = inps[2*v+1]
+            if 2 * v + 1 < len(inps):
+                priority = inps[2 * v + 1]
                 usesPriority = True
             else:
                 priority = []
@@ -600,7 +603,8 @@ class LogicPRINT(Neuron):
                 for i in into:
                     if settings["save_to_file"]:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            message = settings["Label"] + " >> " + str(i) + " " + str(into[i]) + "\n"
+                            message = settings["Label"] + " >> " + \
+                                str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
                         print(settings["Label"], ">>", i, into[i])
@@ -631,6 +635,7 @@ logictypes = OrderedDict([
 
 class StateSTART(State):
     """Points to the first state for the agent to be in"""
+
     def moveTo(self):
         self.length = random.randint(self.settings["minRandWait"],
                                      self.settings["maxRandWait"])
@@ -639,6 +644,7 @@ class StateSTART(State):
 
 class StateAction(State):
     """The normal state in a state machine"""
+
     def __init__(self, *args, **kwargs):
         self.action = None
         State.__init__(self, *args, **kwargs)
@@ -698,7 +704,8 @@ class StateAction(State):
                             for act in self.brain.sim.actionGroups[acNm[1:-1]]:
                                 sm.tell(userid, key, act, val, self.name)
                         else:
-                            sm.tell(userid, key, self.actionName, val, self.name)
+                            sm.tell(userid, key, self.actionName,
+                                    val, self.name)
 
             (state, action), pairedAgent = sm.getResult(userid)
 
@@ -714,7 +721,8 @@ class StateAction(State):
             state = random.getstate()
             if not self.randomActionFromGroup:
                 random.seed(hash(self.brain.userid))
-            self.action = random.choice(self.brain.sim.actionGroups[acNm[1:-1]])
+            self.action = random.choice(
+                self.brain.sim.actionGroups[acNm[1:-1]])
             random.setstate(state)
         else:
             State.evaluate(self)
@@ -731,8 +739,8 @@ class StateAction(State):
         if self.length == 0:
             complete = 1
         else:
-            complete = self.currentFrame/self.length
-            complete = 0.5 + complete/2
+            complete = self.currentFrame / self.length
+            complete = 0.5 + complete / 2
         currentFrame = bpy.context.scene.frame_current
         self.resultLog[currentFrame] = complete
 

@@ -17,20 +17,24 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from .cm_masterChannels import MasterChannel as Mc
-from .cm_masterChannels import timeChannel
 import math
+
+import bpy
 import mathutils
-Vector = mathutils.Vector
 
 from ..libs import ins_octree as ot
 from ..libs import cm_accelerate
+from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
-import bpy
+Vector = mathutils.Vector
+
+
 
 
 class Sound(Mc):
     """The object containing all of the sound channels"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
         # All the different sound frequencies that were emitted last frame
@@ -62,6 +66,7 @@ class Sound(Mc):
 class Channel:
     """Holds a record of all objects that are emitting on a
     certain frequency"""
+
     def __init__(self, frequency, sim):
         """
         :param frequency: The identifier for this channel
@@ -131,7 +136,7 @@ class Channel:
                                                                   rotMat)
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
-                                         "distProp": dist/val}
+                                         "distProp": dist / val}
         self.storeCalced = True
 
     def calculatePrediction(self):
@@ -152,19 +157,19 @@ class Channel:
                 b = d1.dot(d2)
                 e = d2.dot(d2)
 
-                d = a*e - b*b
+                d = a * e - b * b
 
                 if d != 0:  # If the two lines are not parallel.
                     r = p1 - p2
                     c = d1.dot(r)
                     f = d2.dot(r)
 
-                    s = (b*f - c*e) / d
-                    t = (a*f - b*c) / d
+                    s = (b * f - c * e) / d
+                    t = (a * f - b * c) / d
                     # t*d2 == closest point
                     # s*d2 == point 2 is at when 1 is at closest approach
-                    pd1 = p1 + (s*d1)
-                    pd2 = p2 + (s*d2)
+                    pd1 = p1 + (s * d1)
+                    pd2 = p2 + (s * d2)
                     dist = (pd1 - pd2).length
                 else:
                     dist = float("inf")
@@ -181,8 +186,8 @@ class Channel:
                     rotation = x * y * z
                     relative = target * rotation
 
-                    changez = math.atan2(relative[0], relative[1])/math.pi
-                    changex = math.atan2(relative[2], relative[1])/math.pi
+                    changez = math.atan2(relative[0], relative[1]) / math.pi
+                    changex = math.atan2(relative[2], relative[1]) / math.pi
                     if (s < 1) or (t < 1):
                         cert = 0
                     else:
@@ -190,11 +195,11 @@ class Channel:
                             c = 1
                         else:
                             c = s / 32
-                        cert = (1 - ((-(c**3)/3 + (c**2)/2) * 6))**2
+                        cert = (1 - ((-(c**3) / 3 + (c**2) / 2) * 6))**2
                         # https://www.desmos.com/calculator/godi4zejgd
                     self.storePrediction[emitterid] = {"rz": changez,
                                                        "changex": changex,
-                                                       "distProp": dist/val,
+                                                       "distProp": dist / val,
                                                        "cert": cert}
                     # (z rot, x rot, dist proportion, time until prediction)
         self.storePredictionCalced = False
@@ -225,9 +230,9 @@ class Channel:
 
             a = (vx - vy).length**2
 
-            b = 2*(px[0] - py[0])*(vx[0] - vy[0]) +\
-                2*(px[1] - py[1])*(vx[1] - vy[1]) +\
-                2*(px[2] - py[2])*(vx[2] - vy[2])
+            b = 2 * (px[0] - py[0]) * (vx[0] - vy[0]) +\
+                2 * (px[1] - py[1]) * (vx[1] - vy[1]) +\
+                2 * (px[2] - py[2]) * (vx[2] - vy[2])
 
             c = (px - py).length**2 - (rx + ry)**2
 
@@ -236,7 +241,7 @@ class Channel:
             if a == 0:
                 tc = 0
             else:
-                tc = -b/(2*a)  # Time that they are closest
+                tc = -b / (2 * a)  # Time that they are closest
 
             xc = px + tc * vx
             yc = py + tc * vy
@@ -246,10 +251,10 @@ class Channel:
             dist = max(dist, 0)  # The distance can't be negative
 
             """Check if they actually collide"""
-            det = b**2 - 4*a*c
+            det = b**2 - 4 * a * c
             if det > 0:
-                t0 = (-b - det**0.5)/(2*a)
-                t1 = (-b + det**0.5)/(2*a)
+                t0 = (-b - det**0.5) / (2 * a)
+                t1 = (-b + det**0.5) / (2 * a)
                 if t0 >= 0 or t1 >= 0:
                     x0 = px + t0 * vx
                     x1 = px + t1 * vx
@@ -287,7 +292,7 @@ class Channel:
                             c = 1
                         else:
                             c = t0 / MAXLOOKAHEAD
-                        cert = (1 - ((-(c**3)/3 + (c**2)/2) * 6))**2
+                        cert = (1 - ((-(c**3) / 3 + (c**2) / 2) * 6))**2
                         # https://www.desmos.com/calculator/godi4zejgd
 
                     self.storeSteering[emitterid] = {"rz": changez,
@@ -313,7 +318,7 @@ class Channel:
                 changez = relative[0] / (abs(relative[0]) + 1)
                 changex = relative[2] / (abs(relative[2]) + 1)
 
-                dstp = dist/val  # distance proportion 1-0
+                dstp = dist / val  # distance proportion 1-0
 
                 if tc < 0:
                     # collision in the past
@@ -324,7 +329,8 @@ class Channel:
                         c = 1
                     else:
                         c = tc / MAXLOOKAHEAD
-                    cert = (1 - ((-(c**3)/3 + (c**2)/2) * 6))**2  # this is never used
+                    # this is never used
+                    cert = (1 - ((-(c**3) / 3 + (c**2) / 2) * 6))**2
                     # https://www.desmos.com/calculator/godi4zejgd
 
                 self.storeSteering[emitterid] = {"rz": changez,
@@ -392,7 +398,7 @@ class Channel:
         items = self.calcAndGetItems()
         if items:
             result = self._buildDictFromProperty(items, "distProp")
-            return {k: 1-v for k, v in result.items()}
+            return {k: 1 - v for k, v in result.items()}
 
     @property
     @timeChannel("Sound")
@@ -401,7 +407,7 @@ class Channel:
         items = self.calcAndGetItems()
         if items:
             tmp = self._buildDictFromProperty(items, "distProp")
-            return {k: (1-v)**2 for k, v in tmp.items()}
+            return {k: (1 - v)**2 for k, v in tmp.items()}
 
     @property
     @timeChannel("Sound")

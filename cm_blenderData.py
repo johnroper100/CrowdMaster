@@ -18,10 +18,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.props import FloatProperty, CollectionProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       FloatProperty, IntProperty, PointerProperty,
+                       StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
 class initialTagProperty(bpy.types.PropertyGroup):

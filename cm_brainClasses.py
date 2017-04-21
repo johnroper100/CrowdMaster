@@ -18,18 +18,18 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import random
+import time
 
 import bpy
-
 import mathutils
 
 from . import cm_timings
-import time
-from . libs import cm_accelerate
+from .libs import cm_accelerate
 
 
 class Neuron():
     """The representation of the nodes. Not to be used on own"""
+
     def __init__(self, brain, bpyNode):
         self.brain = brain  # type: Brain
         self.neurons = self.brain.neurons  # type: List[Neuron]
@@ -74,7 +74,8 @@ class Neuron():
                 coreT = time.time()
             output = self.core(inps, self.settings)
             if preferences.show_debug_options and preferences.show_debug_timings:
-                cm_timings.coreTimes[self.__class__.__name__] += time.time() - coreT
+                cm_timings.coreTimes[self.__class__.__name__] += time.time() - \
+                    coreT
                 cm_timings.coreNumber[self.__class__.__name__] += 1
             if not (isinstance(output, dict) or output is None):
                 output = {"None": output}
@@ -94,7 +95,6 @@ class Neuron():
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.neuron["sumColour"] += time.time() - t
-
 
         return output
 
@@ -122,6 +122,7 @@ class Neuron():
 
 class State:
     """The basic element of the state machine. Abstract class"""
+
     def __init__(self, brain, bpyNode, name):
         """A lot of the fields are modified by the compileBrain function"""
         self.name = name
@@ -206,8 +207,8 @@ class State:
         if self.length == 0:
             complete = 1
         else:
-            complete = self.currentFrame/self.length
-            complete = 0.5 + complete/2
+            complete = self.currentFrame / self.length
+            complete = 0.5 + complete / 2
         sceneFrame = bpy.context.scene.frame_current
         self.resultLog[sceneFrame] = complete
 
@@ -262,6 +263,7 @@ class State:
 
 class Brain():
     """An executable brain object. One created per agent"""
+
     def __init__(self, sim, userid):
         self.userid = userid
         self.sim = sim

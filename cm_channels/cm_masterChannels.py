@@ -18,10 +18,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import time
+
 import bpy
+
 
 class MasterChannel:
     """The parent class for all the channels"""
+
     def __init__(self, sim):
         self.sim = sim
         self.userid = ""
@@ -45,6 +48,7 @@ class MasterChannel:
 
 
 channelTimes = {}
+
 
 def timeChannel(classOverwrite=None):
     def createDecorator(func):

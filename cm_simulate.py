@@ -17,21 +17,20 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-
 import time
 
+import bpy
+
 from . import cm_channels as chan
-
-from .cm_agent import Agent
-from .cm_actions import getmotions
-from .cm_syncManager import syncManager
-
 from . import cm_timings
+from .cm_actions import getmotions
+from .cm_agent import Agent
+from .cm_syncManager import syncManager
 
 
 class Simulation:
     """The object that contains everything once the simulation starts"""
+
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         self.agents = {}
@@ -137,12 +136,12 @@ class Simulation:
             cm_timings.simulation["totalFrames"] += 1
             tf = cm_timings.simulation["totalFrames"]
             tt = cm_timings.simulation["total"]
-            print("spf", tt/tf)  # seconds per frame
+            print("spf", tt / tf)  # seconds per frame
             self.lastFrameTime = time.time()
 
     def frameChangeHandler(self, scene):
         """Given to Blender to call whenever the scene moves to a new frame"""
-        if self.framelast+1 == bpy.context.scene.frame_current:
+        if self.framelast + 1 == bpy.context.scene.frame_current:
             self.framelast = bpy.context.scene.frame_current
             self.step(scene)
 
@@ -164,7 +163,8 @@ class Simulation:
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
         if self.frameChangeHighlight not in bpy.app.handlers.frame_change_post:
-            bpy.app.handlers.frame_change_post.append(self.frameChangeHighlight)
+            bpy.app.handlers.frame_change_post.append(
+                self.frameChangeHighlight)
 
     def stopFrameHandler(self):
         """Remove self.frameChangeHandler from Blenders event handlers"""

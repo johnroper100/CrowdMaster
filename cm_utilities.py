@@ -17,38 +17,38 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import time
-from bpy.props import FloatProperty, StringProperty, BoolProperty
-from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
 
-from . cm_iconLoad import cicon
+import bpy
+from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
+                       FloatVectorProperty, IntProperty, StringProperty)
 
-from . cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
-from . cm_graphics . utils import cm_redrawAll
+from .cm_graphics.cm_nodeHUD import update_hud_text, update_hud_text2
+from .cm_graphics.utils import cm_redrawAll
+from .cm_iconLoad import cicon
 
 bpy.types.Scene.show_utilities = BoolProperty(
-        name="Show or hide the utilities",
-        description="Show/hide the utilities",
-        default=False,
-        options={'HIDDEN'}
-    )
+    name="Show or hide the utilities",
+    description="Show/hide the utilities",
+    default=False,
+    options={'HIDDEN'}
+)
 
 bpy.types.Scene.append_to_tree = BoolProperty(
-        name="Append To Tree",
-        description="Append the sample nodes to an existing node tree",
-        default=False
-    )
+    name="Append To Tree",
+    description="Append the sample nodes to an existing node tree",
+    default=False
+)
 
 bpy.types.Scene.node_tree_name = StringProperty(name="Node Tree")
 
 bpy.types.Scene.nodeTreeType = EnumProperty(
-        items=[("sim", "Simulation", "Simulation node setups"),
-               ("gen", "Generation", "Generation node setups")],
-        name="Node Tree Type",
-        description="Which node tree setups to show",
-        default="gen"
-    )
+    items=[("sim", "Simulation", "Simulation node setups"),
+           ("gen", "Generation", "Generation node setups")],
+    name="Node Tree Type",
+    description="Which node tree setups to show",
+    default="gen"
+)
 
 
 class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
@@ -78,38 +78,47 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
             row = layout.row()
             row.scale_y = 1.15
             if preferences.use_custom_icons:
-                row.operator("scene.cm_gennodes_pos_random_simple", icon_value=cicon('shuffle'))
+                row.operator("scene.cm_gennodes_pos_random_simple",
+                             icon_value=cicon('shuffle'))
             else:
-                row.operator("scene.cm_gennodes_pos_random_simple", icon="FILE_REFRESH")
+                row.operator("scene.cm_gennodes_pos_random_simple",
+                             icon="FILE_REFRESH")
 
             row = layout.row()
             row.scale_y = 1.15
             if preferences.use_custom_icons:
-                row.operator("scene.cm_gennodes_pos_formation_simple", icon_value=cicon('array'))
+                row.operator("scene.cm_gennodes_pos_formation_simple",
+                             icon_value=cicon('array'))
             else:
-                row.operator("scene.cm_gennodes_pos_formation_simple", icon="MOD_ARRAY")
+                row.operator(
+                    "scene.cm_gennodes_pos_formation_simple", icon="MOD_ARRAY")
 
             row = layout.row()
             row.scale_y = 1.15
             if preferences.use_custom_icons:
-                row.operator("scene.cm_gennodes_pos_target_simple", icon_value=cicon('target'))
+                row.operator("scene.cm_gennodes_pos_target_simple",
+                             icon_value=cicon('target'))
             else:
-                row.operator("scene.cm_gennodes_pos_target_simple", icon="CURSOR")
+                row.operator(
+                    "scene.cm_gennodes_pos_target_simple", icon="CURSOR")
 
         elif scene.nodeTreeType == "sim":
             row = layout.row()
             row.scale_y = 1.15
             if preferences.use_custom_icons:
-                row.operator("scene.cm_simnodes_mov_simple", icon_value=cicon('motion'))
+                row.operator("scene.cm_simnodes_mov_simple",
+                             icon_value=cicon('motion'))
             else:
                 row.operator("scene.cm_simnodes_mov_simple", icon="MOD_OCEAN")
 
             row = layout.row()
             row.scale_y = 1.15
             if preferences.use_custom_icons:
-                row.operator("scene.cm_simnodes_action_random", icon_value=cicon('dice'))
+                row.operator("scene.cm_simnodes_action_random",
+                             icon_value=cicon('dice'))
             else:
-                row.operator("scene.cm_simnodes_action_random", icon="FILE_REFRESH")
+                row.operator("scene.cm_simnodes_action_random",
+                             icon="FILE_REFRESH")
 
 
 class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
@@ -122,7 +131,8 @@ class CrowdMaster_genNodes_pos_random_simple(bpy.types.Operator):
         if scene.append_to_tree:
             ng = bpy.data.node_groups[scene.node_tree_name]
         else:
-            ng = bpy.data.node_groups.new("SimpleRandomPositioning", "CrowdMasterAGenTreeType")
+            ng = bpy.data.node_groups.new(
+                "SimpleRandomPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-1200, 0)
@@ -158,7 +168,8 @@ class CrowdMaster_genNodes_pos_formation_simple(bpy.types.Operator):
         if scene.append_to_tree:
             ng = bpy.data.node_groups[scene.node_tree_name]
         else:
-            ng = bpy.data.node_groups.new("SimpleFormationPositioning", "CrowdMasterAGenTreeType")
+            ng = bpy.data.node_groups.new(
+                "SimpleFormationPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-1200, 0)
@@ -196,7 +207,8 @@ class CrowdMaster_genNodes_pos_target_simple(bpy.types.Operator):
         if scene.append_to_tree:
             ng = bpy.data.node_groups[scene.node_tree_name]
         else:
-            ng = bpy.data.node_groups.new("SimpleTargetPositioning", "CrowdMasterAGenTreeType")
+            ng = bpy.data.node_groups.new(
+                "SimpleTargetPositioning", "CrowdMasterAGenTreeType")
 
         object_node = ng.nodes.new("ObjectInputNodeType")
         object_node.location = (-1050, 0)
@@ -232,7 +244,8 @@ class CrowdMaster_simNodes_mov_simple(bpy.types.Operator):
         if scene.append_to_tree:
             ng = bpy.data.node_groups[scene.node_tree_name]
         else:
-            ng = bpy.data.node_groups.new("SimpleMovement", "CrowdMasterTreeType")
+            ng = bpy.data.node_groups.new(
+                "SimpleMovement", "CrowdMasterTreeType")
 
         input_node = ng.nodes.new("NewInputNode")
         input_node.location = (-300, 0)
@@ -259,7 +272,8 @@ class CrowdMaster_simNodes_action_random(bpy.types.Operator):
         if scene.append_to_tree:
             ng = bpy.data.node_groups[scene.node_tree_name]
         else:
-            ng = bpy.data.node_groups.new("RandomActions", "CrowdMasterTreeType")
+            ng = bpy.data.node_groups.new(
+                "RandomActions", "CrowdMasterTreeType")
 
         start_node = ng.nodes.new("StartState")
         start_node.location = (-125, -75)
@@ -329,7 +343,8 @@ class CrowdMaster_setup_agent(bpy.types.Operator):
 
         selected = bpy.context.selected_objects
         for _ in selected:
-            bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+            bpy.ops.object.transform_apply(
+                location=True, rotation=True, scale=True)
 
         return {'FINISHED'}
 
@@ -354,7 +369,8 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                     for obj in groups[agent.geoGroup].objects:
                         if preferences.show_node_hud:
                             if preferences.show_sim_data:
-                                newhudText = "Placing Object {}".format(obj.name)
+                                newhudText = "Placing Object {}".format(
+                                    obj.name)
                                 update_hud_text(newhudText)
                                 cm_redrawAll()
                                 bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP',
@@ -395,13 +411,15 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                     if groupObj.name != aName:
                                         newObjs.append(groupObj.copy())
                                     else:
-                                        newObjs.append(context.scene.objects[agent.name])
+                                        newObjs.append(
+                                            context.scene.objects[agent.name])
 
                                 for nObj in newObjs:
                                     if nObj.name == agent.name:
                                         continue
                                     if nObj.parent in gp:
-                                        nObj.parent = newObjs[gp.index(nObj.parent)]
+                                        nObj.parent = newObjs[gp.index(
+                                            nObj.parent)]
 
                                     groups[agent.geoGroup].objects.link(nObj)
                                     bpy.context.scene.objects.link(nObj)
@@ -416,7 +434,8 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
 
                                 for nObj in newObjs:
                                     if nObj.parent in gp:
-                                        nObj.parent = newObjs[gp.index(nObj.parent)]
+                                        nObj.parent = newObjs[gp.index(
+                                            nObj.parent)]
                                     elif nObj.parent is None:
                                         nObj.parent = obj
 
@@ -461,6 +480,7 @@ def unregister():
     bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.unregister_class(CrowdMaster_setup_agent)
     bpy.utils.unregister_class(Crowdmaster_place_deferred_geo)
+
 
 if __name__ == "__main__":
     register()

@@ -18,11 +18,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
+
+from .cm_brainClasses import Brain
 from .cm_nodeFunctions import logictypes, statetypes
+
 preferences = bpy.context.user_preferences.addons[__package__].preferences
 if preferences.show_debug_options:
     print("IMPORTED cm_nodeFunctions")
-from .cm_brainClasses import Brain
 
 
 def getInputs(inp):
