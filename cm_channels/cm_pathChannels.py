@@ -21,6 +21,7 @@ import bpy
 import mathutils
 Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
+Vector = mathutils.Vector
 import math
 import bmesh
 
@@ -79,7 +80,7 @@ class Path(Mc):
 
         return kd, bm, pathMatrixInverse, rotation
 
-    def followPath(self, bm, co, index, vel, co_find, radius):
+    def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation):
         nVel = vel.normalized()
         lVel = vel.length
         next = index
@@ -113,11 +114,21 @@ class Path(Mc):
             currentVert = bm.verts[index].co
             nextVert = bm.verts[nextIndex].co
 
-            length = (nextVert - currentVert).length
+            direc = nextVert - currentVert
+
+            if laneSeparation is not None:
+                zaxis = Vector((0, 0, 1))
+                sepVec = direc.cross(zaxis).normalized() * laneSeparation
+
+            length = direc.length
             if lVel < length:
                 fac = lVel/length
                 target = currentVert * (1 - fac) + nextVert * fac
                 rCorrect = start - co_find
+
+                if laneSeparation is not None:
+                    rCorrect += sepVec
+
                 offTargetDist = rCorrect.length - radius
                 if offTargetDist > 0:
                     rCorrect *= (offTargetDist / rCorrect.length)
@@ -153,7 +164,7 @@ class Path(Mc):
             index = nextIndex
             nextIndex = nextVert.index
 
-    def calcRelativeTarget(self, pathObject, radius, lookahead):
+    def calcRelativeTarget(self, pathObject, radius, lookahead, laneSep):
         context = bpy.context
 
         if pathObject in self.pathObjectCache:
@@ -165,7 +176,7 @@ class Path(Mc):
         vel = vel * rotation
         co_find = pathMatrixInverse * context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
-        offset = self.followPath(bm, co, index, vel, co_find, radius)
+        offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep)
 
         offset = offset * pathMatrixInverse
 
@@ -179,11 +190,13 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 25  # Hard coded for simplicity
+            lookahead = 20  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
             pathObject = pathEntry.objectName
             radius = pathEntry.radius
-            target = self.calcRelativeTarget(pathObject, radius, lookahead)
+            laneSeparation = pathEntry.laneSeparation
+            target = self.calcRelativeTarget(pathObject, radius, lookahead,
+                                             laneSeparation)
             self.resultsCache[pathObject] = target
         return math.atan2(target[0], target[1])/math.pi
 
@@ -192,11 +205,13 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 25  # Hard coded for simplicity
+            lookahead = 20  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
             pathObject = pathEntry.objectName
             radius = pathEntry.radius
-            target = self.calcRelativeTarget(pathObject, radius, lookahead)
+            laneSeparation = pathEntry.laneSeparation
+            target = self.calcRelativeTarget(pathObject, radius, lookahead,
+                                             laneSeparation)
             self.resultsCache[pathObject] = target
         return math.atan2(target[2], target[1])/math.pi
 
@@ -206,6 +221,10 @@ class path_entry(PropertyGroup):
     # name - aliase given to the path
     objectName = StringProperty(name="Object Name")
     radius = FloatProperty(name="Radius", min=0)
+    mode = EnumProperty(name="Mode",
+                        items=[("bidirectional", "Bidirectional", "", 1),
+                              ("road", "Road", "", 2)])
+    laneSeparation = FloatProperty(name="Lane Separation")
 
 
 class paths_collection(PropertyGroup):
@@ -246,6 +265,9 @@ class SCENE_UL_cm_path(UIList):
         layout.prop(item, "name", text="")
         layout.prop_search(item, "objectName", bpy.data, "objects", text="")
         layout.prop(item, "radius")
+        layout.prop(item, "mode")
+        if item.mode == "road":
+            layout.prop(item, "laneSeparation")
 
 
 class SCENE_PT_path(Panel):
