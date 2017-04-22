@@ -193,7 +193,7 @@ class Channel:
                         cert = (1 - ((-(c**3)/3 + (c**2)/2) * 6))**2
                         # https://www.desmos.com/calculator/godi4zejgd
                     self.storePrediction[emitterid] = {"rz": changez,
-                                                       "changex": changex,
+                                                       "rx": changex,
                                                        "distProp": dist/val,
                                                        "cert": cert}
                     # (z rot, x rot, dist proportion, time until prediction)
@@ -358,8 +358,8 @@ class Channel:
         return items
 
     @staticmethod
-    def _buildDictFromProperty(dictionary, prop, default=0):
-        return {k: v[prop] if prop in v else default for k, v in dictionary}
+    def _buildDictFromProperty(dictionary, prop):
+        return {k: v[prop] for k, v in dictionary}
 
     @property
     @timeChannel("Sound")

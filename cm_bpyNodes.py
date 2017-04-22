@@ -217,10 +217,24 @@ class NewInputNode(LogicNode):
                                        ("RX", "rx", "", 2),
                                        ("DIST", "dist", "", 3),
                                        ("CLOSE", "close", "", 4),
-                                       ("DB", "db", "", 5),
-                                       ("CERT", "cert", "", 6),
-                                       ("ACC", "acc", "", 7),
-                                       ("OVER", "over", "", 8)])
+                                       ("DB", "db", "", 5)])
+    PredictionOptions = EnumProperty(name="Sound Prediction Options",
+                                     items=[("RZ", "rz", "", 1),
+                                            ("RX", "rx", "", 2),
+                                            ("DIST", "dist", "", 3),
+                                            ("CLOSE", "close", "", 4),
+                                            ("DB", "db", "", 5),
+                                            ("CERT", "cert", "", 6)])
+    SteeringOptions = EnumProperty(name="Sound steering Options",
+                                   items=[("RZ", "rz", "", 1),
+                                          ("RX", "rx", "", 2),
+                                          ("DIST", "dist", "", 3),
+                                          ("CLOSE", "close", "", 4),
+                                          ("DB", "db", "", 5),
+                                          ("CERT", "cert", "", 6),
+                                          ("ACC", "acc", "", 7),
+                                          ("OVER", "over", "", 8)])
+
 
     StateOptions = EnumProperty(name="State Options",
                                 items=[("RADIUS", "Radius", "", 1),
@@ -273,7 +287,12 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "SOUND":
             layout.prop(self, "SoundFrequency", text="Frequency")
             layout.prop(self, "SoundMode", expand=True)
-            layout.prop(self, "SoundOptions", text="Options")
+            if self.SoundMode == "BASIC":
+                layout.prop(self, "SoundOptions", text="Options")
+            elif self.SoundMode == "PREDICTION":
+                layout.prop(self, "PredictionOptions", text="Options")
+            elif self.SoundMode == "STEERING":
+                layout.prop(self, "SteeringOptions", text="Options")
         elif self.InputSource == "STATE":
             layout.prop(self, "StateOptions")
             if self.StateOptions == "QUERYTAG":
@@ -316,9 +335,12 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "SOUND":
             node.settings["SoundFrequency"] = self.SoundFrequency
             node.settings["SoundMode"] = self.SoundMode
-            node.settings["SoundOptions"] = self.SoundOptions
-        elif self.InputSource == "STATE":
-            node.settings["StateOptions"] = self.StateOptions
+            if self.SoundMode == "BASIC":
+                node.settings["SoundOptions"] = self.SoundOptions
+            elif self.SoundMode == "PREDICTION":
+                node.settings["SoundOptions"] = self.PredictionOptions
+            elif self.SoundMode == "STEERING":
+                node.settings["SoundOptions"] = self.SteeringOptions
             node.settings["StateTagName"] = self.StateTagName
         elif self.InputSource == "WORLD":
             node.settings["WorldOptions"] = self.WorldOptions
