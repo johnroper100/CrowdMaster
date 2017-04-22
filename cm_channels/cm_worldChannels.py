@@ -54,8 +54,10 @@ class World(Mc):
     def event(self, eventName):
         events = bpy.context.scene.cm_events.coll
         en = eventName
+        match = False
         for e in events:
             if e.eventname == en:
+                match = True
                 result = 1
                 if e.category == "Time" or e.category == "Time+Volume":
                     if e.time != bpy.context.scene.frame_current:
@@ -70,7 +72,10 @@ class World(Mc):
                                 l.y - (d.y / 2) <= pt.y <= l.y + (d.y / 2) and
                                 l.z - (d.z / 2) <= pt.z <= l.z + (d.z / 2)):
                             result = 0
-                return {"None": result}
+                if result:
+                    return {"None": 1}
+        if match:
+            return {"None": 0}
         return {}
 
 
