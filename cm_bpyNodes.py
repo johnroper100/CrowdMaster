@@ -217,7 +217,9 @@ class NewInputNode(LogicNode):
                                        ("RX", "rx", "", 2),
                                        ("DIST", "dist", "", 3),
                                        ("CLOSE", "close", "", 4),
-                                       ("DB", "db", "", 5)])
+                                       ("DB", "db", "", 5),
+                                       ("HEADRZ", "Heading rz", "", 6),
+                                       ("HEADRX", "Heading rx", "", )])
     PredictionOptions = EnumProperty(name="Sound Prediction Options",
                                      items=[("RZ", "rz", "", 1),
                                             ("RX", "rx", "", 2),

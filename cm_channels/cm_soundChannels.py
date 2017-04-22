@@ -121,7 +121,9 @@ class Channel:
             if dist <= val:
                 to = O[emitterid]
 
-                rotMat = self.sim.agents[self.userid].rotationMatrix
+                agent = self.sim.agents[self.userid]
+
+                rotMat = agent.rotationMatrix
                 changez, changex = cm_accelerate.relativeRotation(to.location.x,
                                                                   to.location.y,
                                                                   to.location.z,
@@ -129,13 +131,27 @@ class Channel:
                                                                   ag.location.y,
                                                                   ag.location.z,
                                                                   rotMat)
+
+                emitterAgent = self.sim.agents[emitterid]
+                eVel = emitterAgent.globalVelocity
+                headRz, headRx = cm_accelerate.relativeRotation(eVel.x,
+                                                                eVel.y,
+                                                                eVel.z,
+                                                                ag.location.x,
+                                                                ag.location.y,
+                                                                ag.location.z,
+                                                                rotMat)
+
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
-                                         "distProp": dist/val}
+                                         "distProp": dist/val,
+                                         "headRz": headRz,
+                                         "headRx": headRx}
         self.storeCalced = True
 
     def calculatePrediction(self):
         """Called the first time an agent uses this frequency"""
+        O = bpy.context.scene.objects
         ag = O[self.userid]
         agSim = self.sim.agents[self.userid]
         for emitterid, val in self.emitters:
@@ -426,3 +442,19 @@ class Channel:
         items = self.calcAndGetItems()
         if items:
             return self._buildDictFromProperty(items, "overlap")
+
+    @property
+    @timeChannel("Sound")
+    def headrz(self):
+        """Return direction the emitter is heading in"""
+        items = self.calcAndGetItems()
+        if items:
+            return self._buildDictFromProperty(items, "headRz")
+
+    @property
+    @timeChannel("Sound")
+    def headrx(self):
+        """Return direction the emitter is heading in"""
+        items = self.calcAndGetItems()
+        if items:
+            return self._buildDictFromProperty(items, "headRx")

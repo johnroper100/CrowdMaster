@@ -175,6 +175,10 @@ class LogicNEWINPUT(Neuron):
                 return ch.acc
             elif settings["SoundOptions"] == "OVER":
                 return ch.over
+            elif settings["SoundOptions"] == "HEADRZ":
+                return ch.headrz
+            elif settings["SoundOptions"] == "HEADRX":
+                return ch.headrx
 
         elif settings["InputSource"] == "STATE":
             state = channels["State"]
