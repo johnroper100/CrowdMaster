@@ -1,12 +1,13 @@
-import bpy
-import mathutils
 import math
 import random
 import time
+import unittest
+
+import bpy
+import mathutils
 
 from . import cm_accelerate
 
-import unittest
 
 def pythonRelativeRotation(to, ag, rotation):
     target = to - ag
@@ -19,8 +20,8 @@ def pythonRelativeRotation(to, ag, rotation):
 
     relative = target * rotation
 
-    changez = math.atan2(relative[0], relative[1])/math.pi
-    changex = math.atan2(relative[2], relative[1])/math.pi
+    changez = math.atan2(relative[0], relative[1]) / math.pi
+    changex = math.atan2(relative[2], relative[1]) / math.pi
 
     return changez, changex
 
@@ -32,7 +33,8 @@ class AccelerateTestCase(unittest.TestCase):
         rotation = mathutils.Vector((math.pi, 0, 0))
 
         py = pythonRelativeRotation(to, ag, rotation)
-        m = cm_accelerate.makeRotationMatrix(rotation.x, rotation.y, rotation.z)
+        m = cm_accelerate.makeRotationMatrix(
+            rotation.x, rotation.y, rotation.z)
         cy = cm_accelerate.relativeRotation(to.x, to.y, to.z,
                                             ag.x, ag.y, ag.z,
                                             m)
@@ -45,7 +47,8 @@ class AccelerateTestCase(unittest.TestCase):
         rotation = mathutils.Vector((1, 0, 1))
 
         py = pythonRelativeRotation(to, ag, rotation)
-        m = cm_accelerate.makeRotationMatrix(rotation.x, rotation.y, rotation.z)
+        m = cm_accelerate.makeRotationMatrix(
+            rotation.x, rotation.y, rotation.z)
         cy = cm_accelerate.relativeRotation(to.x, to.y, to.z,
                                             ag.x, ag.y, ag.z,
                                             m)
@@ -63,18 +66,18 @@ class AccelerateTestCase(unittest.TestCase):
                 startHue = 0.5
 
             if av > 1:
-                hueChange = -(-(abs(av)+1)/abs(av) + 2) * (1/3)
+                hueChange = -(-(abs(av) + 1) / abs(av) + 2) * (1 / 3)
                 hue = 0.333 + hueChange
                 sat = 1
             elif av < -1:
-                hueChange = (-(abs(av)+1)/abs(av) + 2) * (1/3)
+                hueChange = (-(abs(av) + 1) / abs(av) + 2) * (1 / 3)
                 hue = 0.5 + hueChange
                 sat = 1
             else:
                 hue = startHue
 
             if abs(av) < 1:
-                sat = abs(av)**(1/2)
+                sat = abs(av)**(1 / 2)
             else:
                 sat = 1
         else:
@@ -97,18 +100,18 @@ class AccelerateTestCase(unittest.TestCase):
                 startHue = 0.5
 
             if av > 1:
-                hueChange = -(-(abs(av)+1)/abs(av) + 2) * (1/3)
+                hueChange = -(-(abs(av) + 1) / abs(av) + 2) * (1 / 3)
                 hue = 0.333 + hueChange
                 sat = 1
             elif av < -1:
-                hueChange = (-(abs(av)+1)/abs(av) + 2) * (1/3)
+                hueChange = (-(abs(av) + 1) / abs(av) + 2) * (1 / 3)
                 hue = 0.5 + hueChange
                 sat = 1
             else:
                 hue = startHue
 
             if abs(av) < 1:
-                sat = abs(av)**(1/2)
+                sat = abs(av)**(1 / 2)
             else:
                 sat = 1
         else:

@@ -17,16 +17,18 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import math
+
 import bpy
+import mathutils
+
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
-
-import math
-import mathutils
 
 
 class World(Mc):
     """Used to access other data from the scene"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.store = {}
@@ -64,9 +66,9 @@ class World(Mc):
                         l = bpy.data.objects[e.volume].location
                         d = bpy.data.objects[e.volume].dimensions
 
-                        if not (l.x-(d.x/2) <= pt.x <= l.x+(d.x/2) and
-                                l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
-                                l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
+                        if not (l.x - (d.x / 2) <= pt.x <= l.x + (d.x / 2) and
+                                l.y - (d.y / 2) <= pt.y <= l.y + (d.y / 2) and
+                                l.z - (d.z / 2) <= pt.z <= l.z + (d.z / 2)):
                             result = 0
                 return {"None": result}
         return {}
@@ -106,8 +108,8 @@ class Channel:
         rotation = x * y * z
         relative = target * rotation
 
-        changez = math.atan2(relative[0], relative[1])/math.pi
-        changex = math.atan2(relative[2], relative[1])/math.pi
+        changez = math.atan2(relative[0], relative[1]) / math.pi
+        changex = math.atan2(relative[2], relative[1]) / math.pi
         self.store = {"rz": changez,
                       "rx": changex,
                       "arrived": 1 if dist < (tDim + uDim) else 0}

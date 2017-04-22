@@ -17,19 +17,20 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import copy
+import time
+
 import bpy
 import mathutils
-import copy
 
-from .cm_compileBrain import compileBrain
-
-import time
 from . import cm_timings
-from . libs import cm_accelerate
+from .cm_compileBrain import compileBrain
+from .libs import cm_accelerate
 
 
 class Agent:
     """Represents each of the agents in the scene"""
+
     def __init__(self, blenderid, nodeGroup, sim, tags=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
@@ -38,7 +39,8 @@ class Agent:
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
-        self.external = {"id": self.id, "tags": {t.name: t.value for t in tags}}
+        self.external = {"id": self.id, "tags": {
+            t.name: t.value for t in tags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
@@ -184,7 +186,7 @@ class Agent:
             if not self.arxKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=0,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.arxKey = True
             obj.rotation_euler[0] = self.arx
             obj.keyframe_insert(data_path="rotation_euler",
@@ -197,7 +199,7 @@ class Agent:
             if not self.aryKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=1,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.aryKey = True
             obj.rotation_euler[1] = self.ary
             obj.keyframe_insert(data_path="rotation_euler",
@@ -210,7 +212,7 @@ class Agent:
             if not self.arzKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=2,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.arzKey = True
             obj.rotation_euler[2] = self.arz
             obj.keyframe_insert(data_path="rotation_euler",
@@ -223,7 +225,7 @@ class Agent:
             if not self.apxKey:
                 obj.keyframe_insert(data_path="location",
                                     index=0,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.apxKey = True
             obj.location[0] = self.apx
             obj.keyframe_insert(data_path="location",
@@ -236,7 +238,7 @@ class Agent:
             if not self.apyKey:
                 obj.keyframe_insert(data_path="location",
                                     index=1,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.apyKey = True
             obj.location[1] = self.apy
             obj.keyframe_insert(data_path="location",
@@ -249,7 +251,7 @@ class Agent:
             if not self.apzKey:
                 obj.keyframe_insert(data_path="location",
                                     index=2,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.apzKey = True
             obj.location[2] = self.apz
             obj.keyframe_insert(data_path="location",

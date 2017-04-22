@@ -95,7 +95,8 @@ class Rectangle:
 
     def draw_border(self):
         thickness = self.border_thickness
-        thickness = min(abs(self.x1 - self.x2) / 2, abs(self.y1 - self.y2) / 2, thickness)
+        thickness = min(abs(self.x1 - self.x2) / 2,
+                        abs(self.y1 - self.y2) / 2, thickness)
         left, right = sorted([self.x1, self.x2])
         bottom, top = sorted([self.y1, self.y2])
 
@@ -103,8 +104,10 @@ class Rectangle:
             top_border = Rectangle(left, top, right, top - thickness)
             bottom_border = Rectangle(left, bottom + thickness, right, bottom)
         else:
-            top_border = Rectangle(left + thickness, top, right - thickness, top - thickness)
-            bottom_border = Rectangle(left + thickness, bottom + thickness, right - thickness, bottom)
+            top_border = Rectangle(left + thickness, top,
+                                   right - thickness, top - thickness)
+            bottom_border = Rectangle(
+                left + thickness, bottom + thickness, right - thickness, bottom)
         left_border = Rectangle(left, top, left + thickness, bottom)
         right_border = Rectangle(right - thickness, top, right, bottom)
 

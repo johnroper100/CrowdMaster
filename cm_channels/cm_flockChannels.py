@@ -17,16 +17,19 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import math
+
 import bpy
 import mathutils
-import math
+from mathutils import Vector
+
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
-from mathutils import Vector
 
 
 class Flock(Mc):
     """Used for flocking behaviour"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
@@ -82,22 +85,22 @@ class Flock(Mc):
         alnVec.y -= agents[self.userid].ary
         alnVec.z -= agents[self.userid].arz
 
-        alnVec.x %= 2*math.pi
-        alnVec.y %= 2*math.pi
-        alnVec.z %= 2*math.pi
+        alnVec.x %= 2 * math.pi
+        alnVec.y %= 2 * math.pi
+        alnVec.z %= 2 * math.pi
 
         if alnVec.x < math.pi:
-            alnVec.x = alnVec.x/math.pi
+            alnVec.x = alnVec.x / math.pi
         else:
-            alnVec.x = -2 + alnVec.x/math.pi
+            alnVec.x = -2 + alnVec.x / math.pi
         if alnVec.y < math.pi:
-            alnVec.y = alnVec.y/math.pi
+            alnVec.y = alnVec.y / math.pi
         else:
-            alnVec.y = -2 + alnVec.y/math.pi
+            alnVec.y = -2 + alnVec.y / math.pi
         if alnVec.z < math.pi:
-            alnVec.z = alnVec.z/math.pi
+            alnVec.z = alnVec.z / math.pi
         else:
-            alnVec.z = -2 + alnVec.z/math.pi
+            alnVec.z = -2 + alnVec.z / math.pi
         return alnVec
 
     def calcCohere(self, localArea):

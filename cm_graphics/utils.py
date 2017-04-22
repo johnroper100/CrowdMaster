@@ -17,8 +17,9 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import textwrap
+
+import bpy
 from mathutils import Vector
 
 
@@ -58,7 +59,7 @@ def iterActiveScreens():
 
 def cm_redrawAll():
     for area in iterAreas():
-        area.tag_redraw()        
+        area.tag_redraw()
 
 
 def get_dpi_factor():
@@ -74,7 +75,8 @@ def get_dpi():
 def open_error_message(message="", title="Error", icon="ERROR"):
     def draw_error_message(self, context):
         self.layout.label(message)
-    bpy.context.window_manager.popup_menu(draw_error_message, title=title, icon=icon)
+    bpy.context.window_manager.popup_menu(
+        draw_error_message, title=title, icon=icon)
 
 
 def get_location_in_current_3d_view(horizontal="CENTER", vertical="CENTER", offset=(0, 0), adapt_offset_to_dpi=True):
@@ -94,7 +96,8 @@ def get_location_in_region(region, horizontal="CENTER", vertical="CENTER", offse
     elif horizontal == "RIGHT":
         x = region.width
     else:
-        raise Exception("'{}' is not in ('LEFT', 'CENTER', 'RIGHT')".format(horizontal))
+        raise Exception(
+            "'{}' is not in ('LEFT', 'CENTER', 'RIGHT')".format(horizontal))
 
     if vertical == "TOP":
         y = region.height
@@ -103,7 +106,8 @@ def get_location_in_region(region, horizontal="CENTER", vertical="CENTER", offse
     elif vertical == "BOTTOM":
         y = 0
     else:
-        raise Exception("'{}' is not in ('TOP', 'CENTER', 'BOTTOM')".format(vertical))
+        raise Exception(
+            "'{}' is not in ('TOP', 'CENTER', 'BOTTOM')".format(vertical))
 
     offset = Vector(offset)
     if adapt_offset_to_dpi:
@@ -118,7 +122,7 @@ def get_3d_view_tools_panel_overlay_width(area):
     if use_region_overlap:
         for region in area.regions:
             if region.type == "UI":
-                if region.x < bpy.context.region.width/3:
+                if region.x < bpy.context.region.width / 3:
                     n = region.width
 
     if use_region_overlap:
@@ -138,6 +142,7 @@ def write_text(layout, text, width=30, icon="NONE"):
             if icon != "NONE":
                 prefix = "     "
             icon = "NONE"
+
 
 mouse_position = Vector((0, 0))
 

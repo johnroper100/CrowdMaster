@@ -17,17 +17,17 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+from .cm_agentInfoChannels import AgentInfo
+from .cm_flockChannels import Flock
+from .cm_formationChannels import Formation
+from .cm_groundChannels import Ground
+from .cm_masterChannels import channelTimes, timeChannel
 from .cm_noiseChannels import Noise
+from .cm_pathChannels import Path
 from .cm_soundChannels import Sound
 from .cm_stateChannels import State
 from .cm_worldChannels import World
-from .cm_flockChannels import Flock
-from .cm_groundChannels import Ground
-from .cm_formationChannels import Formation
-from .cm_pathChannels import Path
-from .cm_agentInfoChannels import AgentInfo
 
-from .cm_masterChannels import channelTimes, timeChannel
 
 def register():
     cm_pathChannels.register()

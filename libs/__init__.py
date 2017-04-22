@@ -32,5 +32,4 @@ try:
 except Exception:
     print("ERROR importing ins_octree")
 
-from . import cm_accelerate
-from . import cm_testAccelerate
+from . import cm_accelerate, cm_testAccelerate

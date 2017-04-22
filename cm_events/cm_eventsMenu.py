@@ -18,9 +18,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       IntProperty, PointerProperty, StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
 class event_entry(PropertyGroup):
@@ -92,6 +92,7 @@ class SCENE_OT_event_move(Operator):
 
 class SCENE_UL_event(UIList):
     """for drawing each row"""
+
     def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             layout.prop(item, "eventname", text="")

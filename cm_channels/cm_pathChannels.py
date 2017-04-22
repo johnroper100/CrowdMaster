@@ -17,25 +17,31 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import math
+
+import bmesh
 import bpy
 import mathutils
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       FloatProperty, IntProperty, PointerProperty,
+                       StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
+
+from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
+
 Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
 Vector = mathutils.Vector
 import math
 import bmesh
 
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.props import FloatProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
 
-from .cm_masterChannels import MasterChannel as Mc
-from .cm_masterChannels import timeChannel
 
 
 class Path(Mc):
     """Used to access data about paths in the scene"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
@@ -76,7 +82,8 @@ class Path(Mc):
 
         rotation = x * y * z
 
-        self.pathObjectCache[pathObject] = (kd, bm, pathMatrixInverse, rotation)
+        self.pathObjectCache[pathObject] = (
+            kd, bm, pathMatrixInverse, rotation)
 
         return kd, bm, pathMatrixInverse, rotation
 
@@ -122,7 +129,7 @@ class Path(Mc):
 
             length = direc.length
             if lVel < length:
-                fac = lVel/length
+                fac = lVel / length
                 target = currentVert * (1 - fac) + nextVert * fac
                 rCorrect = start - co_find
 
@@ -147,7 +154,8 @@ class Path(Mc):
                 if e.verts[0].index != index and e.verts[1].index != index:
                     endOfPath = False
                     otherVert = e.verts[0] if e.verts[0].index != nextIndex else e.verts[1]
-                    score = (otherVert.co - bm.verts[nextIndex].co).normalized().dot(nVel)
+                    score = (otherVert.co -
+                             bm.verts[nextIndex].co).normalized().dot(nVel)
                     if score > bestScore:
                         bestScore = score
                         nextVert = otherVert
@@ -174,13 +182,15 @@ class Path(Mc):
 
         vel = self.sim.agents[self.userid].globalVelocity * lookahead
         vel = vel * rotation
-        co_find = pathMatrixInverse * context.scene.objects[self.userid].location
+        co_find = pathMatrixInverse * \
+            context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
         offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep)
 
         offset = offset * pathMatrixInverse
 
-        eul = Euler([-x for x in context.scene.objects[self.userid].rotation_euler], 'ZYX')
+        eul = Euler(
+            [-x for x in context.scene.objects[self.userid].rotation_euler], 'ZYX')
         offset.rotate(eul)
 
         return offset
@@ -198,7 +208,7 @@ class Path(Mc):
             target = self.calcRelativeTarget(pathObject, radius, lookahead,
                                              laneSeparation)
             self.resultsCache[pathObject] = target
-        return math.atan2(target[0], target[1])/math.pi
+        return math.atan2(target[0], target[1]) / math.pi
 
     @timeChannel("Path")
     def rx(self, pathName):
@@ -213,7 +223,7 @@ class Path(Mc):
             target = self.calcRelativeTarget(pathObject, radius, lookahead,
                                              laneSeparation)
             self.resultsCache[pathObject] = target
-        return math.atan2(target[2], target[1])/math.pi
+        return math.atan2(target[2], target[1]) / math.pi
 
 
 class path_entry(PropertyGroup):
@@ -260,6 +270,7 @@ class SCENE_OT_cm_path_remove(Operator):
 
 class SCENE_UL_cm_path(UIList):
     """for drawing each row"""
+
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         layout.prop(item, "name", text="")

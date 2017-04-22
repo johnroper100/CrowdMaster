@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import os
+
 import bpy
 
 ICONS = 'node_tree_logo start_sim stop_sim ' \
@@ -32,7 +33,8 @@ def register_icons():
     pcoll = bpy.utils.previews.new()
     icons_dir = os.path.join(os.path.dirname(__file__), "icons")
     for icon_name in ICONS:
-        pcoll.load(icon_name, os.path.join(icons_dir, icon_name + '.png'), 'IMAGE')
+        pcoll.load(icon_name, os.path.join(
+            icons_dir, icon_name + '.png'), 'IMAGE')
 
     icon_collection["main"] = pcoll
 

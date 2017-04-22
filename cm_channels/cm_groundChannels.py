@@ -17,18 +17,21 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-
-from mathutils import *
-BVHTree = bvhtree.BVHTree
 import math
+
+import bpy
+from mathutils import *
 
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
+BVHTree = bvhtree.BVHTree
+
+
 
 class Ground(Mc):
     """Get data about the ground near the agent"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.channels = {}
@@ -131,10 +134,10 @@ class Channel:
                                          "rx": None}
             return
         relative = s.matrix_world.inverted() * result
-        changez = math.atan2(relative[0], relative[1])/math.pi
-        changex = math.atan2(relative[2], relative[1])/math.pi
-        offsetRz = math.atan2(offset[0], offset[1])/math.pi
-        offsetRx = math.atan2(offset[2], offset[1])/math.pi
+        changez = math.atan2(relative[0], relative[1]) / math.pi
+        changex = math.atan2(relative[2], relative[1]) / math.pi
+        offsetRz = math.atan2(offset[0], offset[1]) / math.pi
+        offsetRx = math.atan2(offset[2], offset[1]) / math.pi
         self.aheadStore[offset] = {"rz": changez - offsetRz,
                                    "rx": changex - offsetRx}
 

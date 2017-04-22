@@ -1,4 +1,24 @@
+# Copyright 2017 CrowdMaster Developer Team
+#
+# ##### BEGIN GPL LICENSE BLOCK ######
+# This file is part of CrowdMaster.
+#
+# CrowdMaster is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# CrowdMaster is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
+# ##### END GPL LICENSE BLOCK #####
+
 from collections import OrderedDict
+
 from .cm_channels import channelTimes
 
 placement = OrderedDict([])
@@ -85,7 +105,7 @@ def printTimings():
     print("Cores")
     for k, v in coreTimes.items():
         n = coreNumber[k]
-        print("     ", k, v, n, v/max(n, 1))
+        print("     ", k, v, n, v / max(n, 1))
     print("Channel times")
     for k in sorted(channelTimes):
         v = channelTimes[k]

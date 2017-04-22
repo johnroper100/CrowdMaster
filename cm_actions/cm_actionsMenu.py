@@ -18,10 +18,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
-
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       IntProperty, PointerProperty, StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
 def updateGroups(self, context):
@@ -106,6 +105,7 @@ class SCENE_OT_agent_move(Operator):
 
 class SCENE_UL_action(UIList):
     """for drawing each row"""
+
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
@@ -115,6 +115,7 @@ class SCENE_UL_action(UIList):
             layout.prop(item, "groups", text="")
 
 # =========================== Action groups (for search boxes) ================
+
 
 class action_group(PropertyGroup):
     pass
@@ -189,6 +190,7 @@ class SCENE_OT_action_pair_move(Operator):
 
 class SCENE_UL_action_pair(UIList):
     """for drawing each row"""
+
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
@@ -283,11 +285,13 @@ def action_register():
     bpy.utils.register_class(SCENE_OT_action_pair_move)
     bpy.utils.register_class(action_pair_collection)
     bpy.utils.register_class(SCENE_UL_action_pair)
-    bpy.types.Scene.cm_action_pairs = PointerProperty(type=action_pair_collection)
+    bpy.types.Scene.cm_action_pairs = PointerProperty(
+        type=action_pair_collection)
 
     bpy.utils.register_class(action_group)
     bpy.utils.register_class(action_groups_collection)
-    bpy.types.Scene.cm_action_groups = PointerProperty(type=action_groups_collection)
+    bpy.types.Scene.cm_action_groups = PointerProperty(
+        type=action_groups_collection)
 
 
 def action_unregister():

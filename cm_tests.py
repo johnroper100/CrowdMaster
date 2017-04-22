@@ -18,15 +18,17 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import unittest
+
 import bpy
 
-from . cm_syncManager import SyncManagerTestCase
-from . libs import cm_testAccelerate
+from .cm_syncManager import SyncManagerTestCase
+from .libs import cm_testAccelerate
 
 
 class AddonRegisterTestCase(unittest.TestCase):
     def setUp(self):
-        self.play_animation = bpy.context.user_preferences.addons[__package__].preferences.play_animation
+        self.play_animation = bpy.context.user_preferences.addons[
+            __package__].preferences.play_animation
         bpy.ops.wm.read_homefile()
         bpy.context.user_preferences.addons[__package__].preferences.play_animation = False
 
@@ -66,7 +68,8 @@ def createShortTestSuite():
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(AddonRegisterTestCase))
     test_suite.addTest(unittest.makeSuite(SyncManagerTestCase))
-    test_suite.addTest(unittest.makeSuite(cm_testAccelerate.AccelerateTestCase))
+    test_suite.addTest(unittest.makeSuite(
+        cm_testAccelerate.AccelerateTestCase))
     return test_suite
 
 
