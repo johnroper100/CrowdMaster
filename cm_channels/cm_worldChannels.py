@@ -68,8 +68,7 @@ class World(Mc):
                                 l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
                                 l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
                             result = 0
-                if result:
-                    return {"None": result}
+                return {"None": result}
         return {}
 
 
