@@ -11,7 +11,7 @@ if platform.system() == "Linux":
 else:
     extra_compile_args = ['/Ox','/openmp','/GT','/arch:SSE2','/fp:fast']
 
-ext_modules = [Extension("cm_accelerate", ["cm_accelerate.pyx"], extra_compile_args=extra_compile_args)]
+ext_modules = [Extension("cm_accelerate", ["cm_accelerate.pyx"], extra_compile_args=extra_compile_args), Extension("cm_compileBrain", ["cm_compileBrain.pyx"], extra_compile_args=extra_compile_args)]
 
 setup(
   name = 'CrowdMaster',
