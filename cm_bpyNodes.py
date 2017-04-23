@@ -168,7 +168,7 @@ class NewInputNode(LogicNode):
                                       ("SOUND", "Sound", "", 7),
                                       ("STATE", "State", "", 8),
                                       ("WORLD", "World", "", 9),
-                                      ("AGENTINFO", "AgentInfo", "", 10)])
+                                      ("AGENTINFO", "Agent Info", "", 10)])
 
     Constant = FloatProperty(name="Constant", precision=3)
 
