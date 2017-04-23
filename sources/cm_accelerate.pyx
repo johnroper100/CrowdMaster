@@ -121,3 +121,36 @@ def neuronColour(float total, Py_ssize_t length):
         sat = 0
         val = 0.5
     return hue, sat, val
+
+def getInputs(inp):
+    result = []
+    for link in inp.links:
+        fr = link.from_node
+        if fr.bl_idname == "NodeReroute":
+            result += getInputs(fr.inputs[0])
+        else:
+            result += [fr.name]
+    return result
+
+
+def getMultiInputs(inputs):
+    result = []
+    for inp in inputs:
+        for link in inp.links:
+            fr = link.from_node
+            if fr.bl_idname == "NodeReroute":
+                result += getInputs(fr.inputs[0])
+            else:
+                result += [fr.name]
+    return result
+
+
+def getOutputs(out):
+    result = []
+    for link in out.links:
+        fr = link.to_node
+        if fr.bl_idname == "NodeReroute":
+            result += getOutputs(fr.outputs[0])
+        else:
+            result += [fr.name]
+    return result
