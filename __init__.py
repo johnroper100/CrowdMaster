@@ -20,10 +20,10 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 2, 3),
+    "version": (1, 2, 5),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
-    "description": "Crowd simulation for Blender 3D",
+    "description": "Crowd generation and simulation for Blender 3D",
     "warning": "",
     "wiki_url": "http://jmroper.com/crowdmaster/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
