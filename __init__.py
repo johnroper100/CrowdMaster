@@ -67,7 +67,7 @@ class SCENE_UL_agent_type(UIList):
 
 
 class SCENE_OT_cm_groups_reset(Operator):
-    """Delete a group and all the agent in it (including the agents geo)"""
+    """Delete the selected group and all the agents in it (including the agent's geometry)."""
     bl_idname = "scene.cm_groups_reset"
     bl_label = "Reset Group"
 
@@ -114,6 +114,7 @@ class SCENE_OT_cm_groups_reset(Operator):
 
 
 class SCENE_OT_cm_agent_add(Operator):
+    """Add a single agent to the list of agents in the current group."""
     bl_idname = "scene.cm_agent_add"
     bl_label = "Add single agent to cm agents list"
 
@@ -151,6 +152,7 @@ class SCENE_OT_cm_agent_add(Operator):
 
 
 class SCENE_OT_cm_agent_add_selected(Operator):
+    """Generate an agent group manually from the selected objects."""
     bl_idname = "scene.cm_agent_add_selected"
     bl_label = "Create Manual Agents"
 
@@ -202,7 +204,7 @@ customRLines = True  # This saves the relationship lines value
 
 
 class SCENE_OT_cm_start(Operator):
-    """Start the CrowdMaster agent simulation."""
+    """Start to simulate the CrowdMaster agents."""
     bl_idname = "scene.cm_start"
     bl_label = "Start Simulation"
 
@@ -254,7 +256,7 @@ class SCENE_OT_cm_start(Operator):
 
 
 class SCENE_OT_cm_stop(Operator):
-    """Stop the CrowdMaster agent simulation."""
+    """Stop simulating the CrowdMaster agents."""
     bl_idname = "scene.cm_stop"
     bl_label = "Stop Simulation"
 
@@ -289,7 +291,7 @@ class SCENE_OT_cm_stop(Operator):
 
 
 class SCENE_PT_CrowdMaster(Panel):
-    """Creates CrowdMaster Panel in the node editor."""
+    """Creates CrowdMaster main panel in the node editor."""
     bl_label = "Main"
     bl_idname = "SCENE_PT_CrowdMaster"
     bl_space_type = 'NODE_EDITOR'

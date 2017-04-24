@@ -31,18 +31,15 @@ from .cm_iconLoad import cicon
 
 
 class CrowdMasterTree(NodeTree):
-    """The node tree that contains the CrowdMaster nodes"""
+    """The node tree that contains the CrowdMaster nodes."""
     bl_idname = 'CrowdMasterTreeType'
     bl_label = 'CrowdMaster Agent Simulation'
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
 
 class DefaultSocket(NodeSocket):
-    # Description string
-    """Default socket"""
-    # If not explicitly defined, the python class name is used.
+    """Default CrowdMaster socket type"""
     bl_idname = 'DefaultSocketType'
-    # Label for nice name display
     bl_label = 'Default CrowdMaster Node Socket'
 
     filterProperty = EnumProperty(items=[("AVERAGE", "Average", "", 1),
@@ -52,7 +49,6 @@ class DefaultSocket(NodeSocket):
     defaultValueProperty = FloatProperty(default=1.0)
     randomInputValue = BoolProperty(default=False)
 
-    # Optional function for drawing the socket input value
     def draw(self, context, layout, node, text):
         preferences = context.user_preferences.addons[__package__].preferences
         if not self.is_output and isinstance(node, StateNode):
@@ -91,7 +87,7 @@ class DefaultSocket(NodeSocket):
 
 
 class StateSocket(NodeSocket):
-    """Socket used for state tree transitions"""
+    """Socket type used for state tree transitions."""
     bl_idname = 'StateSocketType'
     bl_label = 'CrowdMaster State Node Socket'
 
@@ -103,7 +99,7 @@ class StateSocket(NodeSocket):
 
 
 class DependanceSocket(NodeSocket):
-    """Socket used for state tree transitions"""
+    """Socket type used for dependance tree transitions."""
     bl_idname = 'DependanceSocketType'
     bl_label = 'CrowdMaster Dependance Node Socket'
 
@@ -115,7 +111,7 @@ class DependanceSocket(NodeSocket):
 
 
 class CrowdMasterNode(Node):
-    """CrowdMaster node superclass"""
+    """CrowdMaster node type superclass."""
     bl_label = 'Super class'
 
     @classmethod
@@ -124,6 +120,7 @@ class CrowdMasterNode(Node):
 
 
 class LogicNode(CrowdMasterNode):
+    """CrowdMAster logic type node class."""
     bl_label = 'Logic super class'
 
     def init(self, context):
@@ -140,7 +137,7 @@ class LogicNode(CrowdMasterNode):
 
 
 class InputNode(LogicNode):
-    """CrowdMaster input node"""
+    """CrowdMaster input node."""
     bl_label = "Old Input Node !UNSTABLE!"
     bl_width_default = 200.0
 
@@ -154,7 +151,7 @@ class InputNode(LogicNode):
 
 
 class NewInputNode(LogicNode):
-    """CrowdMaster input node"""
+    """CrowdMaster new input node."""
     bl_label = "Input"
     bl_width_default = 275.0
 
@@ -168,7 +165,8 @@ class NewInputNode(LogicNode):
                                       ("SOUND", "Sound", "", 7),
                                       ("STATE", "State", "", 8),
                                       ("WORLD", "World", "", 9),
-                                      ("AGENTINFO", "Agent Info", "", 10)])
+                                      ("AGENTINFO", "Agent Info", "", 10)],
+                               description="Which channel the input data should be pulled from")
 
     Constant = FloatProperty(name="Constant", precision=3)
 
@@ -237,7 +235,6 @@ class NewInputNode(LogicNode):
                                           ("CERT", "cert", "", 6),
                                           ("ACC", "acc", "", 7),
                                           ("OVER", "over", "", 8)])
-
 
     StateOptions = EnumProperty(name="State Options",
                                 items=[("RADIUS", "Radius", "", 1),
@@ -360,7 +357,7 @@ class NewInputNode(LogicNode):
 
 
 def update_properties(self, context):
-    """Keeps the values in the graph node in the correct order"""
+    """Keeps the values in the graph node in the correct order."""
     if self.UpperZero < self.UpperOne:
         self.UpperOne = self.UpperZero
     if self.UpperOne < self.LowerOne:
@@ -370,7 +367,7 @@ def update_properties(self, context):
 
 
 class GraphNode(LogicNode):
-    """CrowdMaster graph node"""
+    """CrowdMaster graph node."""
     bl_label = "Graph"
     bl_width_default = 200.0
 
@@ -379,7 +376,8 @@ class GraphNode(LogicNode):
 
     CurveType = EnumProperty(name="Curve Type",
                              items=[("RBF", "RBF", "", 1),
-                                    ("RANGE", "Range", "", 2)])
+                                    ("RANGE", "Range", "", 2)],
+                             description="Which curve function to use")
 
     LowerZero = FloatProperty(
         name="Lower Zero", default=-1.0, update=update_properties)
@@ -450,7 +448,7 @@ class GraphNode(LogicNode):
 
 
 class MathNode(LogicNode):
-    """CrowdMaster math node"""
+    """CrowdMaster math node."""
     bl_label = "Math"
     bl_width_default = 200.0
 
@@ -461,9 +459,11 @@ class MathNode(LogicNode):
                              ("mul", "Multiply", "Multiply the two numbers"),
                              ("div", "Divide", "Divide the two numbers"),
                              ("set", "Set To", "Set all inputs to this number")],
-                             default="add")
+                             default="add",
+                             description="which mathematical operation to use.")
 
-    num1 = FloatProperty(name="Number 1", default=1.0)
+    num1 = FloatProperty(name="Number 1", default=1.0,
+                         description="Input is added/subtracted/multiplied/divided to this number")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation")

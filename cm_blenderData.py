@@ -25,13 +25,13 @@ from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
 class initialTagProperty(bpy.types.PropertyGroup):
-    """For storing a dictionary like structure of initial tags"""
+    """For storing a dictionary like structure of initial tags."""
     # name - Name of the tag
     value = FloatProperty()
 
 
 class agent_entry(PropertyGroup):
-    """The data structure for the agent entries"""
+    """The data structure for the agent entries."""
     # name - The name of the blender object
     geoGroup = StringProperty()
     initialTags = CollectionProperty(type=initialTagProperty)
@@ -46,7 +46,7 @@ class agent_type_entry(PropertyGroup):
 
 
 class group_entry(PropertyGroup):
-    """For storing data about the groups created by the generation nodes"""
+    """For storing data about the groups created by the generation nodes."""
     # name - The label given to this group
     agentTypes = CollectionProperty(type=agent_type_entry)
     totalAgents = IntProperty(default=0)
@@ -56,7 +56,7 @@ class group_entry(PropertyGroup):
 
 
 class manual_props(PropertyGroup):
-    """All settings for manually adding agents"""
+    """All settings for manually adding agents."""
     groupName = StringProperty()
     brainType = StringProperty()
 

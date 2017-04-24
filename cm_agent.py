@@ -29,7 +29,7 @@ from .libs import cm_accelerate
 
 
 class Agent:
-    """Represents each of the agents in the scene"""
+    """Represents each of the agents in the scene."""
 
     def __init__(self, blenderid, nodeGroup, sim, tags=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
@@ -98,6 +98,8 @@ class Agent:
             cm_timings.agent["init"] += time.time() - t
 
     def step(self):
+        """Called each frame of the simulation."""
+
         objs = bpy.data.objects
         preferences = bpy.context.user_preferences.addons[__package__].preferences
 
