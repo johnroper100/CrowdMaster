@@ -601,7 +601,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 class MeshPositionNode(CrowdMasterAGenTreeNode):
     """The mesh positioning node"""
     bl_idname = 'MeshPositionNodeType'
-    bl_label = 'Mesh Positioning'
+    bl_label = 'Mesh'
     bl_icon = 'SOUND'
     bl_width_default = 150.0
 
