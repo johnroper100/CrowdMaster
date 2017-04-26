@@ -216,8 +216,13 @@ class LogicNEWINPUT(Neuron):
 
         elif settings["InputSource"] == "AGENTINFO":
             agent = channels["AgentInfo"]
-            if settings["GetTagName"].strip() != "":
-                return agent.getTag(inps, settings["GetTagName"].strip())
+            if settings["AgentInfoOptions"] == "GETTAG":
+                if settings["GetTagName"].strip() != "":
+                    return agent.getTag(inps, settings["GetTagName"].strip())
+            elif settings["AgentInfoOptions"] == "HEADRZ":
+                return agent.headingRz(inps)
+            elif settings["AgentInfoOptions"] == "HEADRX":
+                return agent.headingRx(inps)
 
 
 class LogicGRAPH(Neuron):

@@ -216,9 +216,7 @@ class NewInputNode(LogicNode):
                                        ("RX", "rx", "", 2),
                                        ("DIST", "dist", "", 3),
                                        ("CLOSE", "close", "", 4),
-                                       ("DB", "db", "", 5),
-                                       ("HEADRZ", "Heading rz", "", 6),
-                                       ("HEADRX", "Heading rx", "", )])
+                                       ("DB", "db", "", 5)])
     PredictionOptions = EnumProperty(name="Sound Prediction Options",
                                      items=[("RZ", "rz", "", 1),
                                             ("RX", "rx", "", 2),
@@ -256,7 +254,12 @@ class NewInputNode(LogicNode):
                                         ("ARRIVED", "Arrived", "", 3)])
     EventName = StringProperty(name="Event name")
 
+    AgentInfoOptions = EnumProperty(name="Agent Info Options",
+                                    items=[("GETTAG", "Get tag", "", 1),
+                                           ("HEADRZ", "Heading rz", "", 2),
+                                           ("HEADRX", "Heading rx", "", 3)])
     GetTagName = StringProperty(name="Get Tag Name")
+
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "InputSource", text="Input")
@@ -308,7 +311,9 @@ class NewInputNode(LogicNode):
             if self.WorldOptions == "EVENT":
                 layout.prop(self, "EventName")
         elif self.InputSource == "AGENTINFO":
-            layout.prop(self, "GetTagName")
+            layout.prop(self, "AgentInfoOptions")
+            if self.AgentInfoOptions == "GETTAG":
+                layout.prop(self, "GetTagName")
 
     def getSettings(self, node):
         node.settings["InputSource"] = self.InputSource
@@ -353,6 +358,7 @@ class NewInputNode(LogicNode):
             if self.WorldOptions == "EVENT":
                 node.settings["EventName"] = self.EventName
         elif self.InputSource == "AGENTINFO":
+            node.settings["AgentInfoOptions"] = self.AgentInfoOptions
             node.settings["GetTagName"] = self.GetTagName
 
 

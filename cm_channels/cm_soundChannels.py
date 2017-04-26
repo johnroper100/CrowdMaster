@@ -137,21 +137,9 @@ class Channel:
                                                                   ag.location.z,
                                                                   rotMat)
 
-                emitterAgent = self.sim.agents[emitterid]
-                eVel = emitterAgent.globalVelocity
-                headRz, headRx = cm_accelerate.relativeRotation(eVel.x,
-                                                                eVel.y,
-                                                                eVel.z,
-                                                                ag.location.x,
-                                                                ag.location.y,
-                                                                ag.location.z,
-                                                                rotMat)
-
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
-                                         "distProp": dist/val,
-                                         "headRz": headRz,
-                                         "headRx": headRx}
+                                         "distProp": dist/val}
         self.storeCalced = True
 
     def calculatePrediction(self):
@@ -448,19 +436,3 @@ class Channel:
         items = self.calcAndGetItems()
         if items:
             return self._buildDictFromProperty(items, "overlap")
-
-    @property
-    @timeChannel("Sound")
-    def headrz(self):
-        """Return direction the emitter is heading in"""
-        items = self.calcAndGetItems()
-        if items:
-            return self._buildDictFromProperty(items, "headRz")
-
-    @property
-    @timeChannel("Sound")
-    def headrx(self):
-        """Return direction the emitter is heading in"""
-        items = self.calcAndGetItems()
-        if items:
-            return self._buildDictFromProperty(items, "headRx")
