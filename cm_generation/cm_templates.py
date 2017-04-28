@@ -714,8 +714,8 @@ class TemplateTARGET(Template):
                 for obj in objs:
                     loc = obj.location
                     oRot = Vector(obj.rotation_euler)
-                    loc.rotate(mathutils.Euler(rot))
-                    loc *= scale
+                    loc.rotate(mathutils.Euler(buildRequest.rot))
+                    loc *= buildRequest.scale
                     newBuildRequest = buildRequest.copy()
                     newBuildRequest.pos = loc + buildRequest.pos
                     newBuildRequest.rot = buildRequest.rot + oRot
