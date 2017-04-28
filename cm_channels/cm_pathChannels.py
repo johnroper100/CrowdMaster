@@ -88,6 +88,13 @@ class Path(Mc):
         return kd, bm, pathMatrixInverse, rotation
 
     def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation):
+        """
+        :param bm: bmesh object
+        :param co: coordinates of nearest vertex
+        :param index: index of nearest vertex
+
+        :param co_find: position of agent
+        """
         nVel = vel.normalized()
         lVel = vel.length
         next = index
@@ -95,27 +102,46 @@ class Path(Mc):
         edges = bm.verts[next].link_edges
 
         bestScore = -2  # scores in range -1 -> 1 (worst to best)
+        nextIndex = None
         nextVert = None
+        nextDirec = None
 
-        for e in edges:
-            otherVert = e.verts[0] if e.verts[0].index != next else e.verts[1]
-            score = (otherVert.co - bm.verts[next].co).normalized().dot(nVel)
-            if score > bestScore:
-                bestScore = score
-                nextVert = otherVert
+        normNearestToAgent = (co_find - co).normalized()
 
-        if nextVert is None:
+        if len(edges) <= 2:
+            # Select next nearest edge based on nearest connecting edge.
+            for e in edges:
+                otherVert = e.verts[0] if e.verts[0].index != next else e.verts[1]
+                normNearestToOther = (otherVert.co - bm.verts[next].co).normalized()
+                score = normNearestToOther.dot(normNearestToAgent)
+                if score > bestScore:
+                    bestScore = score
+                    nextIndex = otherVert.index
+                    nextVert = otherVert.co
+                    nextDirec = normNearestToOther
+            if nextDirec.dot(nVel) < 0:
+                nextVert, co = co, nextVert
+                nextIndex, index = index, nextIndex
+        else:
+            # Select next edge with nearest matching direction
+            for e in edges:
+                otherVert = e.verts[0] if e.verts[0].index != next else e.verts[1]
+                score = (otherVert.co - bm.verts[next].co).normalized().dot(nVel)
+                if score > bestScore:
+                    bestScore = score
+                    nextIndex = otherVert.index
+                    nextVert = otherVert.co
+
+        if nextVert is None or co is None:
             raise Exception("Invalid mesh")
 
-        ab = nextVert.co - co
+        ab = nextVert - co
         ap = co_find - co
 
         fac = ap.dot(ab) / ab.dot(ab)
         adjust = fac * ab
         lVel += ab.length * fac
         start = co + adjust
-
-        nextIndex = nextVert.index
 
         while True:
             currentVert = bm.verts[index].co
@@ -200,7 +226,7 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 20  # Hard coded for simplicity
+            lookahead = 1  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
             pathObject = pathEntry.objectName
             radius = pathEntry.radius
@@ -215,7 +241,7 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 20  # Hard coded for simplicity
+            lookahead = 1  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
             pathObject = pathEntry.objectName
             radius = pathEntry.radius
