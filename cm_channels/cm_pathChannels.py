@@ -36,7 +36,7 @@ Vector = mathutils.Vector
 import math
 import bmesh
 
-
+from ..libs import cm_draw
 
 
 class Path(Mc):
@@ -55,7 +55,7 @@ class Path(Mc):
         Mc.setuser(self, userid)
         self.resultsCache = {}
 
-    def calcPathData(self, pathObject):
+    def calcPathData(self, pathObject, revDirec):
         if pathObject in self.pathObjectCache:
             return self.pathObjectCache[pathObject]
         obj = bpy.context.scene.objects[pathObject]
@@ -70,6 +70,17 @@ class Path(Mc):
 
         bm = bmesh.new()
         bm.from_mesh(mesh)
+
+        bm.edges.layers.int.new("revDirec")
+        revDirecLayer = bm.edges.layers.int["revDirec"]
+        bm.edges.ensure_lookup_table()
+
+        if revDirec is not None:
+            for edge in bm.edges:
+                if str(edge.index) in revDirec:
+                    edge[revDirecLayer] = 0
+                else:
+                    edge[revDirecLayer] = 1
 
         bm.verts.ensure_lookup_table()
 
@@ -87,13 +98,16 @@ class Path(Mc):
 
         return kd, bm, pathMatrixInverse, rotation
 
-    def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation):
+    def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation,
+                   isDirectional):
         """
         :param bm: bmesh object
         :param co: coordinates of nearest vertex
         :param index: index of nearest vertex
 
         :param co_find: position of agent
+
+        :param isDirectional: is this path a directional path
         """
         nVel = vel.normalized()
         lVel = vel.length
@@ -105,29 +119,61 @@ class Path(Mc):
         nextIndex = None
         nextVert = None
         nextDirec = None
+        nextRevDirec = None
 
         normNearestToAgent = (co_find - co).normalized()
 
+
+        # TODO look for new path segement when only 1 connecting edge
         if len(edges) <= 2:
             # Select next nearest edge based on nearest connecting edge.
             for e in edges:
-                otherVert = e.verts[0] if e.verts[0].index != next else e.verts[1]
-                normNearestToOther = (otherVert.co - bm.verts[next].co).normalized()
+                if isDirectional:
+                    revDirecLayer = bm.edges.layers.int["revDirec"]
+                    if e.verts[0].index != index:
+                        otherVert = e.verts[0]
+                        direcNearestToOther = e[revDirecLayer] == 1
+                    else:
+                        otherVert = e.verts[1]
+                        direcNearestToOther = e[revDirecLayer] == 0
+                else:
+                    if e.verts[0].index != index:
+                        otherVert = e.verts[0]
+                    else:
+                        otherVert = e.verts[1]
+                normNearestToOther = (otherVert.co - bm.verts[index].co).normalized()
                 score = normNearestToOther.dot(normNearestToAgent)
                 if score > bestScore:
                     bestScore = score
                     nextIndex = otherVert.index
                     nextVert = otherVert.co
                     nextDirec = normNearestToOther
-            if nextDirec.dot(nVel) < 0:
+                    if isDirectional:
+                        nextRevDirec = direcNearestToOther
+            wrongDirectional = isDirectional and nextRevDirec
+            notDirec = not isDirectional
+            if notDirec and nextDirec.dot(nVel) < 0 or wrongDirectional:
                 nextVert, co = co, nextVert
                 nextIndex, index = index, nextIndex
         else:
             # Select next edge with nearest matching direction
             for e in edges:
-                otherVert = e.verts[0] if e.verts[0].index != next else e.verts[1]
-                score = (otherVert.co - bm.verts[next].co).normalized().dot(nVel)
-                if score > bestScore:
+                if isDirectional:
+                    revDirecLayer = bm.edges.layers.int["revDirec"]
+                    if e.verts[0].index != index:
+                        otherVert = e.verts[0]
+                        direcNearestToOther = e[revDirecLayer] == 0
+                    else:
+                        otherVert = e.verts[1]
+                        direcNearestToOther = e[revDirecLayer] == 1
+                else:
+                    if e.verts[0].index != index:
+                        otherVert = e.verts[0]
+                    else:
+                        otherVert = e.verts[1]
+                score = (otherVert.co - bm.verts[index].co).normalized().dot(nVel)
+                notDirec = not isDirectional
+                if notDirec or (direcNearestToOther and score > bestScore):
                     bestScore = score
                     nextIndex = otherVert.index
                     nextVert = otherVert.co
@@ -141,11 +187,15 @@ class Path(Mc):
         fac = ap.dot(ab) / ab.dot(ab)
         adjust = fac * ab
         lVel += ab.length * fac
+        # whole length of current edge is compared to lVel so add length that
+        #   is behind the agent.
         start = co + adjust
 
         while True:
             currentVert = bm.verts[index].co
             nextVert = bm.verts[nextIndex].co
+
+            # ============ Move along current edge ============
 
             direc = nextVert - currentVert
 
@@ -170,19 +220,35 @@ class Path(Mc):
                 return target - start
             lVel -= length
 
-            edges = bm.verts[next].link_edges
+            # ============ Select next edge ============
+
+            edges = bm.verts[nextIndex].link_edges
             bestScore = -2  # scores in range -1 -> 1 (worst to best)
             nextCo = nextVert
             nextVert = None
 
             endOfPath = True
             for e in edges:
+                # don't go back in the direction agent has come from.
                 if e.verts[0].index != index and e.verts[1].index != index:
                     endOfPath = False
-                    otherVert = e.verts[0] if e.verts[0].index != nextIndex else e.verts[1]
+                    if isDirectional:
+                        revDirecLayer = bm.edges.layers.int["revDirec"]
+                        if e.verts[0].index != nextIndex:
+                            otherVert = e.verts[0]
+                            direcNearestToOther = e[revDirecLayer] == 0
+                        else:
+                            otherVert = e.verts[1]
+                            direcNearestToOther = e[revDirecLayer] == 1
+                    else:
+                        if e.verts[0].index != nextIndex:
+                            otherVert = e.verts[0]
+                        else:
+                            otherVert = e.verts[1]
                     score = (otherVert.co -
                              bm.verts[nextIndex].co).normalized().dot(nVel)
-                    if score > bestScore:
+                    notDirec = not isDirectional
+                    if notDirec or direcNearestToOther and score > bestScore:
                         bestScore = score
                         nextVert = otherVert
             if endOfPath:
@@ -198,22 +264,32 @@ class Path(Mc):
             index = nextIndex
             nextIndex = nextVert.index
 
-    def calcRelativeTarget(self, pathObject, radius, lookahead, laneSep):
+    def calcRelativeTarget(self, pathEntry, lookahead):
         context = bpy.context
+
+        pathObject = pathEntry.objectName
+        radius = pathEntry.radius
+        laneSep = pathEntry.laneSeparation
+        isDirectional = pathEntry.mode == "directional"
+        revDirec = pathEntry.revDirec if isDirectional else None
 
         if pathObject in self.pathObjectCache:
             kd, bm, pathMatrixInverse, rotation = self.pathObjectCache[pathObject]
         else:
-            kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject)
+            kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
+                                                                    revDirec)
 
         vel = self.sim.agents[self.userid].globalVelocity * lookahead
         vel = vel * rotation
         co_find = pathMatrixInverse * \
             context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
-        offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep)
+        offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep,
+                                 isDirectional)
 
         offset = offset * pathMatrixInverse
+
+        print(offset)
 
         eul = Euler(
             [-x for x in context.scene.objects[self.userid].rotation_euler], 'ZYX')
@@ -226,14 +302,10 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 1  # Hard coded for simplicity
+            lookahead = 20  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
-            pathObject = pathEntry.objectName
-            radius = pathEntry.radius
-            laneSeparation = pathEntry.laneSeparation
-            target = self.calcRelativeTarget(pathObject, radius, lookahead,
-                                             laneSeparation)
-            self.resultsCache[pathObject] = target
+            target = self.calcRelativeTarget(pathEntry, lookahead)
+            self.resultsCache[pathEntry.objectName] = target
         return math.atan2(target[0], target[1]) / math.pi
 
     @timeChannel("Path")
@@ -241,15 +313,83 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 1  # Hard coded for simplicity
+            lookahead = 20  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
-            pathObject = pathEntry.objectName
-            radius = pathEntry.radius
-            laneSeparation = pathEntry.laneSeparation
-            target = self.calcRelativeTarget(pathObject, radius, lookahead,
-                                             laneSeparation)
-            self.resultsCache[pathObject] = target
+            target = self.calcRelativeTarget(pathEntry, lookahead)
+            self.resultsCache[pathEntry.objectName] = target
         return math.atan2(target[2], target[1]) / math.pi
+
+
+activePath = None
+
+
+class switch_path_direction_operator(Operator):
+    bl_idname = "view3d.switch_path_direction_operator"
+    bl_label = "Switch the direction of the selected edges"
+
+    def invoke(self, context, event):
+        if activePath is None:
+            return {'CANCELLED'}
+        bm = bmesh.from_edit_mesh(bpy.context.object.data)
+        revDirec = bpy.context.scene.cm_paths.coll[activePath].revDirec
+        for edge in bm.edges:
+            if edge.select:
+                indexStr = str(edge.index)
+                if indexStr in revDirec:
+                    revDirec.remove(revDirec.find(indexStr))
+                else:
+                    revEdge = revDirec.add()
+                    revEdge.name = indexStr
+        return {'FINISHED'}
+
+
+class draw_path_directions_operator(Operator):
+    bl_idname = "view3d.draw_path_operator"
+    bl_label = "Draw the directions of a path"
+
+    pathName = StringProperty(name="Name of path")
+
+    def drawCallback(self, context, path):
+        with cm_draw.bglWrapper:
+            obj = bpy.data.objects[path.objectName]
+            M = obj.matrix_world
+            up = Vector((0.0, 0.0, 1.0))
+            for edge in obj.data.edges:
+                a = M * obj.data.vertices[edge.vertices[0]].co
+                b = M * obj.data.vertices[edge.vertices[1]].co
+                if str(edge.index) in path.revDirec:
+                    a, b = b, a
+                close = (2 * a + b) / 3
+                far = (a + 2 * b) / 3
+                mid = (a + b) / 2
+                edgeVec = a - b
+                perp = edgeVec.cross(up).normalized() * (edgeVec.length / 12)
+                cm_draw.drawLine3D((0, 1, 0, 0.7), close + perp, far)
+                cm_draw.drawLine3D((0, 1, 0, 0.7), close - perp, far)
+
+    def modal(self, context, event):
+        context.area.tag_redraw()
+
+        if event.type in {'ESC'}:
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
+            # bpy.types.SpaceView3D.draw_handler_remove(self._handle_2d, 'WINDOW')
+            global activePath
+            activePath = None
+            return {'CANCELLED'}
+
+        return {'PASS_THROUGH'}
+
+    def invoke(self, context, event):
+        global activePath
+        activePath = self.pathName
+        args = (context, bpy.context.scene.cm_paths.coll[self.pathName])
+
+        self._handle_3d = bpy.types.SpaceView3D.draw_handler_add(self.drawCallback, args, 'WINDOW', 'POST_VIEW')
+        # self._handle_2d = bpy.types.SpaceView3D.draw_handler_add(cm_draw.draw_callback_2d, args, 'WINDOW', 'POST_PIXEL')
+
+        context.window_manager.modal_handler_add(self)
+
+        return {'RUNNING_MODAL'}
 
 
 class path_entry(PropertyGroup):
@@ -259,8 +399,10 @@ class path_entry(PropertyGroup):
     radius = FloatProperty(name="Radius", min=0)
     mode = EnumProperty(name="Mode",
                         items=[("bidirectional", "Bidirectional", "", 1),
-                              ("road", "Road", "", 2)])
+                               ("road", "Road", "", 2),
+                               ("directional", "Directional", "", 3)])
     laneSeparation = FloatProperty(name="Lane Separation")
+    revDirec = CollectionProperty(name="Directions", type=PropertyGroup)
 
 
 class paths_collection(PropertyGroup):
@@ -305,6 +447,9 @@ class SCENE_UL_cm_path(UIList):
         layout.prop(item, "mode")
         if item.mode == "road":
             layout.prop(item, "laneSeparation")
+        if item.mode == "directional":
+            oper = layout.operator("view3d.draw_path_operator")
+            oper.pathName = item.name
 
 
 class SCENE_PT_path(Panel):
@@ -341,6 +486,8 @@ class SCENE_PT_path(Panel):
 
 
 def register():
+    bpy.utils.register_class(draw_path_directions_operator)
+    bpy.utils.register_class(switch_path_direction_operator)
     bpy.utils.register_class(path_entry)
     bpy.utils.register_class(paths_collection)
     bpy.utils.register_class(SCENE_OT_cm_path_populate)
@@ -351,6 +498,8 @@ def register():
 
 
 def unregister():
+    bpy.utils.unregister_class(draw_path_directions_operator)
+    bpy.utils.unregister_class(switch_path_direction_operator)
     bpy.utils.unregister_class(path_entry)
     bpy.utils.unregister_class(paths_collection)
     bpy.utils.unregister_class(SCENE_OT_cm_path_populate)
