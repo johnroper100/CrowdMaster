@@ -289,8 +289,6 @@ class Path(Mc):
 
         offset = offset * pathMatrixInverse
 
-        print(offset)
-
         eul = Euler(
             [-x for x in context.scene.objects[self.userid].rotation_euler], 'ZYX')
         offset.rotate(eul)

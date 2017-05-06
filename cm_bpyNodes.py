@@ -360,6 +360,8 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "AGENTINFO":
             node.settings["AgentInfoOptions"] = self.AgentInfoOptions
             node.settings["GetTagName"] = self.GetTagName
+        elif self.InputSource == "STATE":
+            node.settings["StateOptions"] = self.StateOptions
 
 
 def update_properties(self, context):
