@@ -102,7 +102,7 @@ class Channel:
         self.storeSteering = {}
         self.storeSteeringCalced = False
 
-    def calculate(self):
+    def calculate(self, minusRadius):
         """Called the first time an agent uses this frequency"""
         O = bpy.context.scene.objects
 
@@ -119,14 +119,14 @@ class Channel:
 
         collisions = self.kdtree.find_range(ag.location, self.maxVal)
 
+        agent = self.sim.agents[self.userid]
+
         for (co, index, dist) in collisions:
             emitterid, val = self.emitters[index]
             if emitterid == self.userid:
                 continue
             if dist <= val:
                 to = O[emitterid]
-
-                agent = self.sim.agents[self.userid]
 
                 rotMat = agent.rotationMatrix
                 changez, changex = cm_accelerate.relativeRotation(to.location.x,
@@ -136,7 +136,11 @@ class Channel:
                                                                   ag.location.y,
                                                                   ag.location.z,
                                                                   rotMat)
-
+                if minusRadius:
+                    dist -= self.sim.agents[emitterid].radius
+                    dist -= agent.radius
+                    if dist < 0:
+                        dist = 0
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
                                          "distProp": dist/val}
@@ -346,7 +350,7 @@ class Channel:
                 # (z rot, x rot, dist proportion, recommended acceleration)
         self.storeSteeringCalced = False
 
-    def calcAndGetItems(self):
+    def calcAndGetItems(self, minusRadius):
         # TODO this gets called for both the sender and the receiver but I
         #   think it always calculates the same results...
         """If this channel hasn't been used then calculate and then return the
@@ -363,7 +367,7 @@ class Channel:
             items = self.storeSteering.items()
         else:
             if not self.storeCalced:
-                self.calculate()
+                self.calculate(minusRadius)
             items = self.store.items()
         return items
 
@@ -371,68 +375,60 @@ class Channel:
     def _buildDictFromProperty(dictionary, prop):
         return {k: v[prop] for k, v in dictionary}
 
-    @property
     @timeChannel("Sound")
-    def rz(self):
+    def rz(self, minusRadius):
         """Return the horizontal angle of sound emitting agents"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             return self._buildDictFromProperty(items, "rz")
 
-    @property
     @timeChannel("Sound")
-    def rx(self):
+    def rx(self, minusRadius):
         """Return the vertical angle of sound emitting agents"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             return self._buildDictFromProperty(items, "rx")
 
-    @property
     @timeChannel("Sound")
-    def dist(self):
+    def dist(self, minusRadius):
         """Return the distance to the sound emitting agents 0-1"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             return self._buildDictFromProperty(items, "distProp")
 
-    @property
     @timeChannel("Sound")
-    def close(self):
+    def close(self, minusRadius):
         """Return how close the sound emitting is 0-1"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             result = self._buildDictFromProperty(items, "distProp")
             return {k: 1 - v for k, v in result.items()}
 
-    @property
     @timeChannel("Sound")
-    def db(self):
+    def db(self, minusRadius):
         """Return the volume (dist^2) of sound emitting agents"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             tmp = self._buildDictFromProperty(items, "distProp")
             return {k: (1 - v)**2 for k, v in tmp.items()}
 
-    @property
     @timeChannel("Sound")
-    def cert(self):
+    def cert(self, minusRadius):
         """Return the certainty of a prediction 0-1"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             return self._buildDictFromProperty(items, "cert", default=1)
 
-    @property
     @timeChannel("Sound")
-    def acc(self):
+    def acc(self, minusRadius):
         """Return the recommended acceleration to avoid a collision"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             return self._buildDictFromProperty(items, "acc")
 
-    @property
     @timeChannel("Sound")
-    def over(self):
+    def over(self, minusRadius):
         """Return the predicted worst case overlap"""
-        items = self.calcAndGetItems()
+        items = self.calcAndGetItems(minusRadius)
         if items:
             return self._buildDictFromProperty(items, "overlap")

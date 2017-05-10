@@ -170,25 +170,25 @@ class LogicNEWINPUT(Neuron):
                 ch.predictNext = False
                 ch.steeringNext = True
             if settings["SoundOptions"] == "RZ":
-                return ch.rz
+                return ch.rz(settings["MinusRadius"])
             elif settings["SoundOptions"] == "RX":
-                return ch.rx
+                return ch.rx(settings["MinusRadius"])
             elif settings["SoundOptions"] == "DIST":
-                return ch.dist
+                return ch.dist(settings["MinusRadius"])
             elif settings["SoundOptions"] == "CLOSE":
-                return ch.close
+                return ch.close(settings["MinusRadius"])
             elif settings["SoundOptions"] == "DB":
-                return ch.db
+                return ch.db(settings["MinusRadius"])
             elif settings["SoundOptions"] == "CERT":
-                return ch.cert
+                return ch.cert(settings["MinusRadius"])
             elif settings["SoundOptions"] == "ACC":
-                return ch.acc
+                return ch.acc(settings["MinusRadius"])
             elif settings["SoundOptions"] == "OVER":
-                return ch.over
+                return ch.over(settings["MinusRadius"])
             elif settings["SoundOptions"] == "HEADRZ":
-                return ch.headrz
+                return ch.headrz(settings["MinusRadius"])
             elif settings["SoundOptions"] == "HEADRX":
-                return ch.headrx
+                return ch.headrx(settings["MinusRadius"])
 
         elif settings["InputSource"] == "STATE":
             state = channels["State"]

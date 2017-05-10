@@ -235,6 +235,7 @@ class NewInputNode(LogicNode):
                                           ("CERT", "cert", "", 6),
                                           ("ACC", "acc", "", 7),
                                           ("OVER", "over", "", 8)])
+    MinusRadius = BoolProperty(name="Minus radius", default=True)
 
     StateOptions = EnumProperty(name="State Options",
                                 items=[("RADIUS", "Radius", "", 1),
@@ -301,6 +302,7 @@ class NewInputNode(LogicNode):
                 layout.prop(self, "PredictionOptions", text="Options")
             elif self.SoundMode == "STEERING":
                 layout.prop(self, "SteeringOptions", text="Options")
+            layout.prop(self, "MinusRadius")
         elif self.InputSource == "STATE":
             layout.prop(self, "StateOptions")
             if self.StateOptions == "QUERYTAG":
@@ -355,6 +357,7 @@ class NewInputNode(LogicNode):
             elif self.SoundMode == "STEERING":
                 node.settings["SoundOptions"] = self.SteeringOptions
             node.settings["StateTagName"] = self.StateTagName
+            node.settings["MinusRadius"] = self.MinusRadius
         elif self.InputSource == "WORLD":
             node.settings["WorldOptions"] = self.WorldOptions
             if self.WorldOptions == "TARGET":
