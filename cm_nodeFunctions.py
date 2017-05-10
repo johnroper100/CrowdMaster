@@ -146,6 +146,14 @@ class LogicNEWINPUT(Neuron):
                 return {"None": channels["Path"].rz(settings["PathName"])}
             elif settings["PathOptions"] == "RX":
                 return {"None": channels["Path"].rx(settings["PathName"])}
+            elif settings["PathOptions"] == "INLANE":
+                agents = set()
+                for into in inps:
+                    for i in into:
+                        agents.add(i)
+                return channels["Path"].inlane(settings["PathName"],
+                                               settings["PathLaneSearchDistance"],
+                                               agents)
 
         elif settings["InputSource"] == "SOUND":
             sound = channels["Sound"]

@@ -47,13 +47,16 @@ class Path(Mc):
 
         self.pathObjectCache = {}
         self.resultsCache = {}
+        self.laneCache = {}  # {pathName: {vertexID: [(objectID, pathPos)]}}
 
     def newframe(self):
         self.pathObjectCache = {}
+        self.laneCache = {}
 
     def setuser(self, userid):
         Mc.setuser(self, userid)
         self.resultsCache = {}
+        self.laneCache = {}
 
     def calcPathData(self, pathObject, revDirec):
         if pathObject in self.pathObjectCache:
@@ -99,7 +102,7 @@ class Path(Mc):
         return kd, bm, pathMatrixInverse, rotation
 
     def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation,
-                   isDirectional):
+                   isDirectional, pathEntry):
         """
         :param bm: bmesh object
         :param co: coordinates of nearest vertex
@@ -111,9 +114,8 @@ class Path(Mc):
         """
         nVel = vel.normalized()
         lVel = vel.length
-        next = index
 
-        edges = bm.verts[next].link_edges
+        edges = bm.verts[index].link_edges
 
         bestScore = -2  # scores in range -1 -> 1 (worst to best)
         nextIndex = None
@@ -122,7 +124,6 @@ class Path(Mc):
         nextRevDirec = None
 
         normNearestToAgent = (co_find - co).normalized()
-
 
         # TODO look for new path segement when only 1 connecting edge
         if len(edges) <= 2:
@@ -285,7 +286,7 @@ class Path(Mc):
             context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
         offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep,
-                                 isDirectional)
+                                 isDirectional, pathEntry)
 
         offset = offset * pathMatrixInverse
 
@@ -316,6 +317,105 @@ class Path(Mc):
             target = self.calcRelativeTarget(pathEntry, lookahead)
             self.resultsCache[pathEntry.objectName] = target
         return math.atan2(target[2], target[1]) / math.pi
+
+    def laneSearch(self, bm, index, lastIndex, length, edgeCache, result):
+        for e in bm.verts[index].link_edges:
+            if e.verts[0].index == index:
+                nextInd = e.verts[1].index
+            else:
+                nextInd = e.verts[0].index
+            if nextInd != lastIndex:
+                if e.index in edgeCache:
+                    for agent, start in edgeCache[e.index]:
+                        if (bm.verts[index].co - start).length < length:
+                            result[agent] = 1
+
+                rem = length - e.calc_length()
+                if rem > 0:
+                    self.laneSearch(bm, nextInd, index, rem, edgeCache,
+                                    result)
+
+    def startEdgeAndPoint(self, bm, kd, loc):
+        co, index, dist = kd.find(loc)
+
+        normToAgent = (loc - co).normalized()
+
+        bestScore = -2
+        nextVert = None
+        edgeIndex = None
+
+        for e in bm.verts[index].link_edges:
+            if e.verts[0].index == index:
+                potentialNextVert = e.verts[1]
+            else:
+                potentialNextVert = e.verts[0]
+            normToNextVert = (potentialNextVert.co - co).normalized()
+            score = normToNextVert.dot(normToAgent)
+            if score > bestScore:
+                bestScore = score
+                nextVert = potentialNextVert
+                edgeIndex = e.index
+
+        ab = nextVert.co - co
+        ap = loc - co
+
+        fac = ap.dot(ab) / ab.dot(ab)
+        adjust = fac * ab
+        point = co + adjust
+
+        return edgeIndex, point
+
+
+    @timeChannel("Path")
+    def inlane(self, pathName, length, agents):
+        context = bpy.context
+
+        pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
+        pathObject = pathEntry.objectName
+        radius = pathEntry.radius
+        laneSep = pathEntry.laneSeparation
+        isDirectional = pathEntry.mode == "directional"
+        revDirec = pathEntry.revDirec if isDirectional else None
+
+        if pathObject in self.pathObjectCache:
+            kd, bm, pathMatrixInverse, rotation = self.pathObjectCache[pathObject]
+        else:
+            kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
+                                                                    revDirec)
+
+        co_find = pathMatrixInverse * context.scene.objects[self.userid].location
+        myEdgeIndex, myStart = self.startEdgeAndPoint(bm, kd, co_find)
+
+        edgeAgentCache = {}
+
+        for agent in agents:
+            loc = pathMatrixInverse * context.scene.objects[agent].location
+            edgeIndex, start = self.startEdgeAndPoint(bm, kd, loc)
+            if edgeIndex not in edgeAgentCache:
+                edgeAgentCache[edgeIndex] = []
+            edgeAgentCache[edgeIndex].append((agent, start))
+
+        result = {}
+
+        if myEdgeIndex in edgeAgentCache:
+            for agent, start in edgeAgentCache[myEdgeIndex]:
+                if (start - myStart).length < length:
+                    result[agent] = 1
+
+        # Start a recursive search in each direction
+        myEdge = bm.edges[myEdgeIndex]
+
+        nextIndex = myEdge.verts[0].index
+        lastIndex = myEdge.verts[1].index
+        rem = length - (myEdge.verts[0].co - myStart).length
+        self.laneSearch(bm, nextIndex, lastIndex, rem, edgeAgentCache, result)
+
+        nextIndex = myEdge.verts[1].index
+        lastIndex = myEdge.verts[0].index
+        rem = length - (myEdge.verts[1].co - myStart).length
+        self.laneSearch(bm, nextIndex, lastIndex, rem, edgeAgentCache, result)
+
+        return result
 
 
 activePath = None

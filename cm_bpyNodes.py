@@ -204,7 +204,9 @@ class NewInputNode(LogicNode):
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
                                items=[("RZ", "rz", "", 1),
-                                      ("RX", "rx", "", 2)])
+                                      ("RX", "rx", "", 2),
+                                      ("INLANE", "In lane", "", 3)])
+    PathLaneSearchDistance = FloatProperty(name="Search Distance", min=0)
 
     SoundFrequency = StringProperty(name="Sound Frequency")
     SoundMode = EnumProperty(name="Sound mode",
@@ -288,6 +290,8 @@ class NewInputNode(LogicNode):
                 self, "PathName", context.scene.cm_paths, "coll")
             if self.PathName != "":
                 layout.prop(self, "PathOptions")
+                if self.PathOptions == "INLANE":
+                    layout.prop(self, "PathLaneSearchDistance")
         elif self.InputSource == "SOUND":
             layout.prop(self, "SoundFrequency", text="Frequency")
             layout.prop(self, "SoundMode", expand=True)
@@ -339,6 +343,8 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
+            if self.PathOptions == "INLANE":
+                node.settings["PathLaneSearchDistance"] = self.PathLaneSearchDistance
         elif self.InputSource == "SOUND":
             node.settings["SoundFrequency"] = self.SoundFrequency
             node.settings["SoundMode"] = self.SoundMode
