@@ -74,9 +74,7 @@ class World(Mc):
                             result = 0
                 if result:
                     return {"None": 1}
-        if match:
-            return {"None": 0}
-        return {}
+        return {"None": 0}
 
 
 class Channel:
