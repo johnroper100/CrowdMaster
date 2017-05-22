@@ -36,7 +36,7 @@ from bpy.props import (BoolProperty, CollectionProperty, PointerProperty,
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 from . import addon_updater_ops, cm_prefs
-from .cm_blenderData import initialTagProperty
+from .cm_blenderData import initialTagProperty, modifyBoneProperty
 from .cm_graphics import cm_nodeHUD
 from .cm_graphics.cm_nodeHUD import update_hud_text
 from .cm_graphics.utils import cm_redrawAll
@@ -123,6 +123,9 @@ class SCENE_OT_cm_agent_add(Operator):
     groupName = StringProperty()
     geoGroupName = StringProperty()
     initialTags = CollectionProperty(type=initialTagProperty)
+    rigOverwrite = StringProperty()
+    constrainBone = StringProperty()
+    modifyBones = CollectionProperty(type=modifyBoneProperty)
 
     def execute(self, context):
         scene = context.scene
@@ -143,10 +146,17 @@ class SCENE_OT_cm_agent_add(Operator):
         newAgent = agentType.agents.add()
         newAgent.name = self.agentName
         newAgent.geoGroup = self.geoGroupName
+        newAgent.rigOverwrite = self.rigOverwrite
+        newAgent.constrainBone = self.constrainBone
         for x in self.initialTags:
             tag = newAgent.initialTags.add()
             tag.name = x.name
             tag.value = x.value
+        for x in self.modifyBones:
+            modify = newAgent.modifyBones.add()
+            modify.name = x.name
+            modify.tag = x.tag
+            modify.attribute = x.attribute
         group.totalAgents += 1
         return {'FINISHED'}
 

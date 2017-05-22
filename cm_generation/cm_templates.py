@@ -21,6 +21,8 @@ import math
 import random
 from collections import OrderedDict
 from math import radians
+import os
+import shutil
 
 import bpy
 import mathutils
@@ -247,6 +249,115 @@ class GeoTemplateGROUP(GeoTemplate):
         return self.settings["inputGroup"] in bpy.data.groups
 
 
+def duplicateProxyLink(filepath, group, rigName, newName):
+    subfoldername = "cm_duplicates"
+    subdirectory = os.path.join(os.path.split(filepath)[0], subfoldername)
+
+    if not os.path.exists(subdirectory):
+        os.makedirs(subdirectory)
+
+    newfilepath = os.path.join(subdirectory, newName + ".blend")
+
+    shutil.copyfile(filepath, newfilepath)
+
+    # append all groups from the .blend file
+    with bpy.data.libraries.load(newfilepath, link=True) as (data_src, data_dst):
+        data_dst.groups = [group]
+
+    # add the group instance to the scene
+    scene = bpy.context.scene
+    ob = bpy.data.objects.new(newName, None)
+    data_dst.groups[0].name = "cm_" + newName + newName
+    ob.dupli_group = data_dst.groups[0]
+    ob.dupli_type = 'GROUP'
+    scene.objects.link(ob)
+
+    activeStore = bpy.context.scene.objects.active
+    bpy.context.scene.objects.active = ob
+
+    bpy.ops.object.proxy_make(object=rigName)
+    rigObj = bpy.context.scene.objects.active
+
+    bpy.context.scene.objects.active = activeStore
+
+    return ob, rigObj
+
+
+class GeoTemplateLINKGROUPNODE(GeoTemplate):
+    def build(self, buildRequest):
+        gret = self.inputs["Objects"].build(buildRequest)
+        obj = gret.obj
+
+        blendfile = os.path.split(bpy.data.filepath)[0]
+        for d in self.settings["groupFile"][2:].split("/"):
+            if d == "..":
+                blendfile = os.path.split(blendfile)[0]
+            else:
+                blendfile = os.path.join(blendfile, d)
+
+        group = self.settings["groupName"]
+        rigObject = self.settings["rigObject"]
+
+        # so group name can be used as file name
+        name = buildRequest.group.name.replace("/", "-")
+
+        newObj, newRig = duplicateProxyLink(blendfile, group, rigObject, name)
+        buildRequest.group.objects.link(newObj)
+        buildRequest.group.objects.link(newRig)
+
+        constrainBone = newRig.pose.bones[self.settings["constrainBone"]]
+
+        lastActive = bpy.context.scene.objects.active
+        bpy.context.scene.objects.active = newRig
+        bpy.ops.object.posemode_toggle()
+        armature = bpy.data.armatures[rigObject].bones
+        armature.active = armature[self.settings["constrainBone"]]
+        bpy.ops.pose.constraint_add(type="COPY_LOCATION")
+        bpy.ops.pose.constraint_add(type="COPY_ROTATION")
+
+        Cloc = newRig.pose.bones[self.settings["constrainBone"]].constraints[-2]
+        Crot = newRig.pose.bones[self.settings["constrainBone"]].constraints[-1]
+
+        Cloc.target = obj
+        Cloc.use_z = False
+
+        Crot.target = obj
+        # Crot.use_offset = True
+
+        bpy.ops.object.posemode_toggle()
+        bpy.context.scene.objects.active = lastActive
+
+        gret.overwriteRig = newRig
+        gret.constrainBone = newRig.pose.bones[self.settings["constrainBone"]]
+
+        return gret
+
+    def check(self):
+        if "Objects" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Objects"], GeoTemplate):
+            return False
+        return True
+
+
+class GeoTemplateMODIFYBONE(GeoTemplate):
+    def build(self, buildRequest):
+        gret = self.inputs["Objects"].build(buildRequest)
+        bn = self.settings["boneName"]
+        if bn not in gret.modifyBones:
+            gret.modifyBones[bn] = {}
+        attrib = self.settings["attribute"]
+        gret.modifyBones[bn][attrib] = self.settings["tagName"]
+        return gret
+
+    def check(self):
+        if "Objects" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Objects"], GeoTemplate):
+            return False
+        return True
+
+
 class GeoTemplateSWITCH(GeoTemplate):
     """Randomly (biased by "switchAmout") pick which of the inputs to use"""
 
@@ -379,11 +490,26 @@ class TemplateAGENT(Template):
 
         tags = buildRequest.tags
         packTags = [{"name": x, "value": tags[x]} for x in tags]
+
+        rigOverwrite = gret.overwriteRig.name if gret.overwriteRig else ""
+        constrainBone = gret.constrainBone.name if gret.constrainBone else ""
+
+        packModifyBones = []
+        for b in gret.modifyBones:
+            for attribute in gret.modifyBones[b]:
+                tag = gret.modifyBones[b][attribute]
+                packModifyBones.append({"name": b,
+                                        "attribute": attribute,
+                                        "tag": tag})
+
         bpy.ops.scene.cm_agent_add(agentName=topObj.name,
                                    brainType=self.settings["brainType"],
                                    groupName=buildRequest.cm_group,
                                    geoGroupName=newGp.name,
-                                   initialTags=packTags)
+                                   initialTags=packTags,
+                                   rigOverwrite=rigOverwrite,
+                                   constrainBone=constrainBone,
+                                   modifyBones=packModifyBones)
 
     def check(self):
         if "Objects" not in self.inputs:
@@ -863,6 +989,8 @@ class TemplateSETTAG(Template):
 templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
     ("GroupInputNodeType", GeoTemplateGROUP),
+    ("LinkGroupNodeType", GeoTemplateLINKGROUPNODE),
+    ("ModifyBoneNodeType", GeoTemplateMODIFYBONE),
     ("GeoSwitchNodeType", GeoTemplateSWITCH),
     ("AddToGroupNodeType", TemplateADDTOGROUP),
     ("TemplateSwitchNodeType", TemplateSWITCH),

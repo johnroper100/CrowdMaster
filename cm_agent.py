@@ -31,7 +31,8 @@ from .libs import cm_accelerate
 class Agent:
     """Represents each of the agents in the scene."""
 
-    def __init__(self, blenderid, nodeGroup, sim, tags=None):
+    def __init__(self, blenderid, nodeGroup, sim, rigOverwrite, constrainBone,
+                 tags=None, modifyBones=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             print("Blender id", blenderid)
@@ -39,12 +40,20 @@ class Agent:
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
-        self.external = {"id": self.id, "tags": {
-            t.name: t.value for t in tags}}
+        self.external = {"id": self.id, "tags": {t.name: t.value for t in tags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
         self.access = copy.deepcopy(self.external)
+
+        self.rigOverwrite = rigOverwrite
+        self.constrainBone = constrainBone
+        self.modifyBones = {}
+        if modifyBones is not None:
+            for m in modifyBones:
+                if m.name not in self.modifyBones:
+                    self.modifyBones[m.name] = {}
+                self.modifyBones[m.name][m.attribute] = m.tag
 
         objs = bpy.data.objects
 
@@ -261,6 +270,39 @@ class Agent:
                                 frame=bpy.context.scene.frame_current)
         else:
             self.apzKey = False
+
+        objs = bpy.context.scene.objects
+
+        modArm = None
+        if objs[self.id].type == 'Armature':
+            modArm = objs[self.id]
+        if self.rigOverwrite is not None:
+            modArm = objs[self.rigOverwrite]
+
+        if modArm is not None:
+            for bone in self.modifyBones:
+                for attribute in self.modifyBones[bone]:
+                    tag = self.modifyBones[bone][attribute]
+                    tags = self.external["tags"]
+                    if tag in tags:
+                        tagVal = tags[tag]
+                        if bone in modArm.pose.bones:
+                            boneObj = modArm.pose.bones[bone]
+                            if attribute == "RX":
+                                boneObj.rotation_euler[0] = tagVal
+                                boneObj.keyframe_insert(data_path="rotation_euler",
+                                                        index=0,
+                                                        frame=bpy.context.scene.frame_current)
+                            if attribute == "RY":
+                                boneObj.rotation_euler[1] = tagVal
+                                boneObj.keyframe_insert(data_path="rotation_euler",
+                                                        index=1,
+                                                        frame=bpy.context.scene.frame_current)
+                            if attribute == "RZ":
+                                boneObj.rotation_euler[2] = tagVal
+                                boneObj.keyframe_insert(data_path="rotation_euler",
+                                                        index=2,
+                                                        frame=bpy.context.scene.frame_current)
 
         self.access = copy.deepcopy(self.external)
 

@@ -152,6 +152,63 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
         return {"inputGroup": self.inputGroup}
 
 
+class LinkGroupNode(CrowdMasterAGenTreeNode):
+    bl_idname = 'LinkGroupNodeType'
+    bl_label = 'Link Armature'
+    bl_icon = 'SOUND'
+
+    groupFile = StringProperty(name="Group file", subtype='FILE_PATH')
+    groupName = StringProperty(name="Group name")
+    rigObject = StringProperty(name="Rig object")
+    constrainBone = StringProperty(name="Constrain bone")
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Objects")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('GeoSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "groupFile")
+        layout.prop(self, "groupName")
+        layout.prop(self, "rigObject")
+        layout.prop(self, "constrainBone")
+
+    def getSettings(self):
+        return {"groupFile": self.groupFile,
+                "groupName": self.groupName,
+                "rigObject": self.rigObject,
+                "constrainBone": self.constrainBone}
+
+
+class ModifyBoneNode(CrowdMasterAGenTreeNode):
+    bl_idname = 'ModifyBoneNodeType'
+    bl_label = 'Modify Bone'
+    bl_icon = 'SOUND'
+
+    boneName = StringProperty(name="Bone name")
+    attribute = EnumProperty(name="Attribute", items=[("RX", "rx", "", 1),
+                                                      ("RY", "ry", "", 2),
+                                                      ("RZ", "rz", "", 3)])
+    tagName = StringProperty(name="Tag name")
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Objects")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('GeoSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "boneName")
+        layout.prop(self, "attribute")
+        layout.prop(self, "tagName")
+
+    def getSettings(self):
+        return {"boneName": self.boneName,
+                "attribute": self.attribute,
+                "tagName": self.tagName}
+
+
 class GeoSwitchNode(CrowdMasterAGenTreeNode):
     """The geo switch node"""
     bl_idname = 'GeoSwitchNodeType'
@@ -926,6 +983,8 @@ agen_node_categories = [
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
         NodeItem("ObjectInputNodeType"),
         NodeItem("GroupInputNodeType"),
+        NodeItem("LinkGroupNodeType"),
+        NodeItem("ModifyBoneNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
         NodeItem("ParentNodeType")
     ]),
@@ -969,6 +1028,8 @@ def register():
 
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
+    bpy.utils.register_class(LinkGroupNode)
+    bpy.utils.register_class(ModifyBoneNode)
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
@@ -1010,6 +1071,8 @@ def unregister():
 
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
+    bpy.utils.unregister_class(LinkGroupNode)
+    bpy.utils.unregister_class(ModifyBoneNode)
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)

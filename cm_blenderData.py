@@ -24,6 +24,13 @@ from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
+class modifyBoneProperty(bpy.types.PropertyGroup):
+    """For storing bone - tag pairs"""
+    # name - Name of the bone
+    tag = StringProperty()  # Name of tag to attach value to
+    attribute = StringProperty()
+
+
 class initialTagProperty(bpy.types.PropertyGroup):
     """For storing a dictionary like structure of initial tags."""
     # name - Name of the tag
@@ -35,6 +42,9 @@ class agent_entry(PropertyGroup):
     # name - The name of the blender object
     geoGroup = StringProperty()
     initialTags = CollectionProperty(type=initialTagProperty)
+    rigOverwrite = StringProperty()
+    constrainBone = StringProperty()
+    modifyBones = CollectionProperty(type=modifyBoneProperty)
 
 
 class agent_type_entry(PropertyGroup):
@@ -62,6 +72,7 @@ class manual_props(PropertyGroup):
 
 
 def registerTypes():
+    bpy.utils.register_class(modifyBoneProperty)
     bpy.utils.register_class(initialTagProperty)
     bpy.utils.register_class(agent_entry)
     bpy.utils.register_class(agent_type_entry)
@@ -79,6 +90,7 @@ def registerTypes():
 
 
 def unregisterAllTypes():
+    bpy.utils.unregister_class(modifyBoneProperty)
     bpy.utils.unregister_class(initialTagProperty)
     bpy.utils.unregister_class(agent_entry)
     bpy.utils.unregister_class(agent_type_entry)
