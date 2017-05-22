@@ -127,6 +127,15 @@ class GeoRequest(TemplateRequest):
         return new
 
 
+class GeoReturn:
+    """Object that is passed back by geo template nodes"""
+    def __init__(self, obj):
+        self.obj = obj
+        self.overwriteRig = None
+        self.constrainBone = None
+        self.modifyBones = {}
+
+
 # ==================== End of base classes ====================
 
 
@@ -148,7 +157,7 @@ class GeoTemplateOBJECT(GeoTemplate):
                     m.material = bpy.data.materials[replacement]
         buildRequest.group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
-        return cp
+        return GeoReturn(cp)
 
     def check(self):
         return self.settings["inputObject"] in bpy.context.scene.objects
@@ -183,14 +192,14 @@ class GeoTemplateGROUP(GeoTemplate):
                     newObj["cm_deferGroup"] = {"group": self.settings["inputGroup"],
                                                "aName": obj.name}
                     newObj["cm_materials"] = buildRequest.materials
-                    return newObj
+                    return GeoReturn(newObj)
             bpy.ops.object.add(type='EMPTY',
                                location=min(group_objects, key=zaxis).location)
             e = bpy.context.object
             group.objects.link(e)
             e["cm_deferGroup"] = {"group": self.settings["inputGroup"]}
             e["cm_materials"] = buildRequest.materials
-            return e
+            return GeoReturn(e)
 
         topObj = None
 
@@ -232,7 +241,7 @@ class GeoTemplateGROUP(GeoTemplate):
                     obj.location -= pos
                     obj.parent = e
             topObj = e
-        return topObj
+        return GeoReturn(topObj)
 
     def check(self):
         return self.settings["inputGroup"] in bpy.data.groups
@@ -263,8 +272,10 @@ class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
 
     def build(self, buildRequest):
-        parent = self.inputs["Parent Group"].build(buildRequest.copy())
-        child = self.inputs["Child Object"].build(buildRequest.copy())
+        gret = self.inputs["Parent Group"].build(buildRequest.copy())
+        parent = gret.obj
+        gret = self.inputs["Child Object"].build(buildRequest.copy())
+        child = gret.obj
         con = child.constraints.new("CHILD_OF")
         con.target = parent
         con.subtarget = self.settings["parentTo"]
@@ -272,7 +283,7 @@ class GeoTemplatePARENT(GeoTemplate):
         con.inverse_matrix = bone.matrix.inverted()
         if child.data:
             child.data.update()
-        return parent
+        return gret
         # TODO check if the object has an armature modifier
 
     def check(self):
@@ -357,7 +368,9 @@ class TemplateAGENT(Template):
         rot = buildRequest.rot
         scale = buildRequest.scale
         geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
-        topObj = self.inputs["Objects"].build(geoBuildRequest)
+        gret = self.inputs["Objects"].build(geoBuildRequest)
+        topObj = gret.obj
+
         topObj.location = pos
         topObj.rotation_euler = rot
         topObj.scale = Vector((scale, scale, scale))
