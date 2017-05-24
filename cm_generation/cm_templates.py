@@ -58,7 +58,7 @@ class Template():
         self.buildCount += 1
 
     def check(self):
-        """Return true if the inputs and gettings are correct"""
+        """Return true if the inputs and settings are correct"""
         return True
 
 
