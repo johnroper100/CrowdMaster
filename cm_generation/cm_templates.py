@@ -249,33 +249,78 @@ class GeoTemplateGROUP(GeoTemplate):
         return self.settings["inputGroup"] in bpy.data.groups
 
 
-def duplicateProxyLink(filepath, group, rigName, newName):
-    subfoldername = "cm_duplicates"
-    subdirectory = os.path.join(os.path.split(filepath)[0], subfoldername)
+def findUnusedGroup(searchDirectory, namePrefix, sourceGroup):
+    for group in bpy.data.groups:
+        if len(group.users_dupli_group) == 0 and group.name == sourceGroup:
+            if group.library is not None:
+                linkedFileName = os.path.split(group.library.filepath)[0]
+                partialPath = os.path.join(searchDirectory, namePrefix)
+                if linkedFileName[:len(partialPath)] == partialPath:
+                    return group
+    return False
 
-    if not os.path.exists(subdirectory):
-        os.makedirs(subdirectory)
 
-    newfilepath = os.path.join(subdirectory, newName + ".blend")
+def findUnusedFile(searchDirectory, namePrefix, sourceGroup):
+    usedBlends = []
+    for group in bpy.data.groups:
+        if len(group.users_dupli_group) > 0 and group.name == sourceGroup:
+            if group.library is not None:
+                linkedFileName = os.path.split(group.library.filepath)[0]
+                partialPath = os.path.join(searchDirectory, namePrefix)
+                if linkedFileName[:len(partialPath)] == partialPath:
+                    usedBlends.append(group.library.filepath)
 
-    shutil.copyfile(filepath, newfilepath)
+    dupFiles = os.listdir(searchDirectory)
 
-    # append all groups from the .blend file
-    with bpy.data.libraries.load(newfilepath, link=True) as (data_src, data_dst):
-        data_dst.groups = [group]
+    for fileName in dupFiles:
+        if fileName[:len(namePrefix)] == namePrefix:
+            if fileName not in usedBlends:
+                unusedFile = os.path.join(searchDirectory, fileName)
+                with bpy.data.libraries.load(unusedFile, link=True) as (data_src, data_dst):
+                    data_dst.groups = [group]
+                return data_dst.groups[0]
+    return False
+
+
+def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig):
+    if not os.path.exists(dupDir):
+        os.makedirs(dupDir)
+
+    newNamePrefix = "cm_" + os.path.split(sourceBlend)[1][:-6]
+
+    dupliGroup = findUnusedGroup(dupDir, newNamePrefix, sourceGroup)
+
+    if not dupliGroup:
+        dupliGroup = findUnusedFile(dupDir, newNamePrefix, sourceGroup)
+
+    if not dupliGroup:
+        existingFiles = os.listdir(dupDir)
+        count = 0
+        while newNamePrefix + "_" + str(count) + ".blend" in existingFiles:
+            count += 1
+        newName = newNamePrefix + "_" + str(count) + ".blend"
+        newfilepath = os.path.join(dupDir, newName)
+
+        shutil.copyfile(sourceBlend, newfilepath)
+
+        # append all groups from the .blend file
+        with bpy.data.libraries.load(newfilepath, link=True) as (data_src, data_dst):
+            data_dst.groups = [sourceGroup]
+
+        dupliGroup = data_dst.groups[0]
 
     # add the group instance to the scene
     scene = bpy.context.scene
     ob = bpy.data.objects.new(newName, None)
     # data_dst.groups[0].name = "cm_" + newName + newName
-    ob.dupli_group = data_dst.groups[0]
+    ob.dupli_group = dupliGroup
     ob.dupli_type = 'GROUP'
     scene.objects.link(ob)
 
     activeStore = bpy.context.scene.objects.active
     bpy.context.scene.objects.active = ob
 
-    bpy.ops.object.proxy_make(object=rigName)
+    bpy.ops.object.proxy_make(object=sourceRig)
     rigObj = bpy.context.scene.objects.active
 
     bpy.context.scene.objects.active = activeStore
@@ -295,13 +340,17 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             else:
                 blendfile = os.path.join(blendfile, d)
 
+        dupDir = os.path.split(bpy.data.filepath)[0]
+        for d in bpy.context.scene.cm_linked_file_dir[2:].split("/"):
+            if d == "..":
+                dupDir = os.path.split(dupDir)[0]
+            else:
+                dupDir = os.path.join(dupDir, d)
+
         group = self.settings["groupName"]
         rigObject = self.settings["rigObject"]
 
-        # so group name can be used as file name
-        name = buildRequest.group.name.replace("/", "-")
-
-        newObj, newRig = duplicateProxyLink(blendfile, group, rigObject, name)
+        newObj, newRig = duplicateProxyLink(dupDir, blendfile, group, rigObject)
         buildRequest.group.objects.link(newObj)
         buildRequest.group.objects.link(newRig)
 

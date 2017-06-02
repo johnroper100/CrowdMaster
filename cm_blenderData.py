@@ -87,6 +87,8 @@ def registerTypes():
 
     bpy.utils.register_class(manual_props)
     bpy.types.Scene.cm_manual = PointerProperty(type=manual_props)
+    bpy.types.Scene.cm_linked_file_dir = StringProperty(name="Linked file directory",
+                                                        subtype='FILE_PATH')
 
 
 def unregisterAllTypes():
@@ -97,3 +99,6 @@ def unregisterAllTypes():
     bpy.utils.unregister_class(group_entry)
 
     bpy.utils.unregister_class(manual_props)
+
+    del bpy.types.Scene.cm_manual
+    del bpy.types.Scene.cm_linked_file_dir
