@@ -267,7 +267,7 @@ def duplicateProxyLink(filepath, group, rigName, newName):
     # add the group instance to the scene
     scene = bpy.context.scene
     ob = bpy.data.objects.new(newName, None)
-    data_dst.groups[0].name = "cm_" + newName + newName
+    # data_dst.groups[0].name = "cm_" + newName + newName
     ob.dupli_group = data_dst.groups[0]
     ob.dupli_type = 'GROUP'
     scene.objects.link(ob)
