@@ -276,7 +276,7 @@ class Agent:
         modArm = None
         if objs[self.id].type == 'Armature':
             modArm = objs[self.id]
-        if self.rigOverwrite is not None:
+        if self.rigOverwrite is not None and self.rigOverwrite != "":
             modArm = objs[self.rigOverwrite]
 
         if modArm is not None:
