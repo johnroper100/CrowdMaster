@@ -26,6 +26,8 @@ import shutil
 
 import bpy
 import mathutils
+from mathutils import Euler
+import bmesh
 
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
@@ -33,8 +35,8 @@ from ..libs.ins_vector import Vector
 BVHTree = mathutils.bvhtree.BVHTree
 KDTree = mathutils.kdtree.KDTree
 
-
-
+from ..cm_channels import Path
+tmpPathChannel = Path(None)
 
 # ==================== Some base classes ====================
 
@@ -852,6 +854,76 @@ class TemplateMESHPOSITIONING(Template):
         return True
 
 
+class TemplatePATH(Template):
+    """Place along a path"""
+
+    def build(self, buildRequest):
+        pathEntry = bpy.context.scene.cm_paths.coll.get(self.settings["pathName"])
+        obj = bpy.context.scene.objects[pathEntry.objectName]
+        bm = bmesh.new()
+        bm.from_mesh(obj.data)
+        bm.edges.ensure_lookup_table()
+        totalEdge = 0
+        edgeWeights = []
+        for e in bm.edges:
+            length = e.calc_length()
+            totalEdge += length
+            edgeWeights.append(length)
+
+        positions = []
+
+        for n in range(self.settings["noToPlace"]):
+            rem = random.random() * totalEdge
+            ind = -1
+            while rem > 0:
+                ind += 1
+                rem -= edgeWeights[ind]
+            weight = random.random()
+            vs = bm.edges[ind].verts
+            localPos = vs[0].co * weight + vs[1].co * (1 - weight)
+            pos = localPos * obj.matrix_world
+            # TODO look at path object and get rotation to align with path direction
+            globalPos, pointTowards = tmpPathChannel.alignToPath(pathEntry, pos,
+                                                                 Vector((1, 0, 0)))
+            diff = pointTowards - globalPos
+            rot = diff.to_track_quat('Y', 'Z').to_euler()
+
+            positions.append((pos, rot))
+
+        if self.settings["relax"]:
+            sce = bpy.context.scene
+            radius = self.settings["relaxRadius"]
+            for i in range(self.settings["relaxIterations"]):
+                kd = KDTree(len(positions))
+                for n, (p, r) in enumerate(positions):
+                    kd.insert(p, n)
+                kd.balance()
+                for n, (p, r) in enumerate(positions):
+                    adjust = Vector()
+                    localPoints = kd.find_range(p, radius * 2)
+                    for (co, ind, dist) in localPoints:
+                        if ind != n:
+                            v = p - co
+                            adjust += v * ((2 * radius - v.length) / v.length)
+                    if len(localPoints) > 0:
+                        adjPos = p + adjust / len(localPoints)
+                        normal = Vector((0, 1, 0)).rotate(Euler(r))
+                        pos, pointTowards = tmpPathChannel.alignToPath(pathEntry,
+                                                                       adjPos,
+                                                                       normal)
+                        diff = pointTowards - pos
+                        rot = diff.to_track_quat('Y', 'Z').to_euler()
+                        positions[n] = (pos, rot)
+
+        for newPos, newRot in positions:
+            newBuildRequest = buildRequest.copy()
+            newBuildRequest.pos = newPos + buildRequest.pos
+            newBuildRequest.rot = newRot # + buildRequest.rot
+            self.inputs["Template"].build(newBuildRequest)
+
+    # TODO Relax placement and use path channel to snap agents back to path.
+
+
 class TemplateFORMATION(Template):
     """Place in a row"""
 
@@ -1052,6 +1124,7 @@ templates = OrderedDict([
     ("CombineNodeType", TemplateCOMBINE),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("MeshPositionNodeType", TemplateMESHPOSITIONING),
+    ("PathPositionNodeType", TemplatePATH),
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),
     ("ObstacleNodeType", TemplateOBSTACLE),

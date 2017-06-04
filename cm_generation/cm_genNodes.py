@@ -710,6 +710,51 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
                 "relaxRadius": self.relaxRadius}
 
 
+class PathPositionNode(CrowdMasterAGenTreeNode):
+    """The path positioning node"""
+    bl_idname = 'PathPositionNodeType'
+    bl_label = 'Path'
+    bl_icon = 'SOUND'
+
+    pathName = StringProperty(name="Path name")
+    noToPlace = IntProperty(name="Number of Agents",
+                            description="The number of agents to place",
+                            default=1, min=1)
+
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "pathName", bpy.context.scene.cm_paths, "coll")
+        layout.prop(self, "noToPlace")
+
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
+
+    def getSettings(self):
+        return {"pathName": self.pathName,
+                "noToPlace": self.noToPlace,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
+
 class FormationPositionNode(CrowdMasterAGenTreeNode):
     """The formation positioing node"""
     bl_idname = 'FormationPositionNodeType'
@@ -1003,6 +1048,7 @@ agen_node_categories = [
         NodeItem("OffsetNodeType"),
         NodeItem("GroundNodeType"),
         NodeItem("MeshPositionNodeType"),
+        NodeItem("PathPositionNodeType"),
     ]),
     CrowdMasterAGenCategories("other", "Other", items=[
         NodeItem("GenerateNodeType"),
@@ -1045,6 +1091,7 @@ def register():
     bpy.utils.register_class(CombineNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(MeshPositionNode)
+    bpy.utils.register_class(PathPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
     bpy.utils.register_class(ObstacleNode)
@@ -1088,6 +1135,7 @@ def unregister():
     bpy.utils.unregister_class(CombineNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(MeshPositionNode)
+    bpy.utils.unregister_class(PathPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
     bpy.utils.unregister_class(ObstacleNode)

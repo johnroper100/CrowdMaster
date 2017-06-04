@@ -34,7 +34,6 @@ Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
 Vector = mathutils.Vector
 import math
-import bmesh
 
 from ..libs import cm_draw
 
@@ -96,37 +95,30 @@ class Path(Mc):
 
         rotation = x * y * z
 
-        self.pathObjectCache[pathObject] = (
-            kd, bm, pathMatrixInverse, rotation)
+        self.pathObjectCache[pathObject] = (kd, bm, pathMatrixInverse, rotation)
 
         return kd, bm, pathMatrixInverse, rotation
 
-    def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation,
-                   isDirectional, pathEntry):
+    def firstPointOnPath(self, bm, co, index, co_find, nDirec, isDirectional):
         """
         :param bm: bmesh object
-        :param co: coordinates of nearest vertex
-        :param index: index of nearest vertex
-
-        :param co_find: position of agent
-
-        :param isDirectional: is this path a directional path
+        :param co: the location of the nearest vertex on the path object
+        :param index: the index of co
+        :param co_find: the location of the point to search. In local space.
+        :param nDirec: the direction that the agent is facing in
+        :param isDirectional: type of the path
         """
-        nVel = vel.normalized()
-        lVel = vel.length
-
-        edges = bm.verts[index].link_edges
-
         bestScore = -2  # scores in range -1 -> 1 (worst to best)
         nextIndex = None
         nextVert = None
         nextDirec = None
         nextRevDirec = None
 
-        normNearestToAgent = (co_find - co).normalized()
+        edges = bm.verts[index].link_edges
 
         # TODO look for new path segement when only 1 connecting edge
         if len(edges) <= 2:
+            normNearestToAgent = (co_find - co).normalized()
             # Select next nearest edge based on nearest connecting edge.
             for e in edges:
                 if isDirectional:
@@ -153,7 +145,7 @@ class Path(Mc):
                         nextRevDirec = direcNearestToOther
             wrongDirectional = isDirectional and nextRevDirec
             notDirec = not isDirectional
-            if notDirec and nextDirec.dot(nVel) < 0 or wrongDirectional:
+            if notDirec and nextDirec.dot(nDirec) < 0 or wrongDirectional:
                 nextVert, co = co, nextVert
                 nextIndex, index = index, nextIndex
         else:
@@ -172,7 +164,7 @@ class Path(Mc):
                         otherVert = e.verts[0]
                     else:
                         otherVert = e.verts[1]
-                score = (otherVert.co - bm.verts[index].co).normalized().dot(nVel)
+                score = (otherVert.co - bm.verts[index].co).normalized().dot(nDirec)
                 notDirec = not isDirectional
                 if notDirec or (direcNearestToOther and score > bestScore):
                     bestScore = score
@@ -187,10 +179,32 @@ class Path(Mc):
 
         fac = ap.dot(ab) / ab.dot(ab)
         adjust = fac * ab
-        lVel += ab.length * fac
+        # lVel += ab.length * fac
+        adjustLength = ab.length * fac
         # whole length of current edge is compared to lVel so add length that
         #   is behind the agent.
         start = co + adjust
+
+        return nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength
+
+    def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation,
+                   isDirectional, pathEntry):
+        """
+        :param bm: bmesh object
+        :param co: coordinates of nearest vertex
+        :param index: index of nearest vertex
+
+        :param co_find: position of agent
+
+        :param isDirectional: is this path a directional path
+        """
+        nVel = vel.normalized()
+        lVel = vel.length
+
+        res = self.firstPointOnPath(bm, co, index, co_find, nVel, isDirectional)
+        nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength = res
+
+        lVel += adjustLength
 
         while True:
             currentVert = bm.verts[index].co
@@ -265,6 +279,27 @@ class Path(Mc):
             index = nextIndex
             nextIndex = nextVert.index
 
+    def alignToPath(self, pathEntry, point, nDirec):
+        pathObject = pathEntry.objectName
+        isDirectional = pathEntry.mode == "directional"
+        revDirec = pathEntry.revDirec if isDirectional else None
+        kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
+                                                                revDirec)
+        co_find = pathMatrixInverse * point
+        co, index, dist = kd.find(co_find)
+
+        isDirectional = pathEntry.mode == "directional"
+
+        res = self.firstPointOnPath(bm, co, index, co_find, nDirec, isDirectional)
+        nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength = res
+
+        obj = bpy.context.scene.objects[pathObject]
+        globalPos = start * obj.matrix_world
+
+        pointTowards = nextVert * obj.matrix_world
+
+        return globalPos, pointTowards
+
     def calcRelativeTarget(self, pathEntry, lookahead):
         context = bpy.context
 
@@ -274,16 +309,12 @@ class Path(Mc):
         isDirectional = pathEntry.mode == "directional"
         revDirec = pathEntry.revDirec if isDirectional else None
 
-        if pathObject in self.pathObjectCache:
-            kd, bm, pathMatrixInverse, rotation = self.pathObjectCache[pathObject]
-        else:
-            kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
-                                                                    revDirec)
+        kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
+                                                                revDirec)
 
         vel = self.sim.agents[self.userid].globalVelocity * lookahead
         vel = vel * rotation
-        co_find = pathMatrixInverse * \
-            context.scene.objects[self.userid].location
+        co_find = pathMatrixInverse * context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
         offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep,
                                  isDirectional, pathEntry)
@@ -377,11 +408,8 @@ class Path(Mc):
         isDirectional = pathEntry.mode == "directional"
         revDirec = pathEntry.revDirec if isDirectional else None
 
-        if pathObject in self.pathObjectCache:
-            kd, bm, pathMatrixInverse, rotation = self.pathObjectCache[pathObject]
-        else:
-            kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
-                                                                    revDirec)
+        kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
+                                                                revDirec)
 
         co_find = pathMatrixInverse * context.scene.objects[self.userid].location
         myEdgeIndex, myStart = self.startEdgeAndPoint(bm, kd, co_find)
