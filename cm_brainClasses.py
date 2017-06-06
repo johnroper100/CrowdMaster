@@ -89,8 +89,6 @@ class Neuron():
             t = time.time()
 
         if (len(output) > 0):
-            if self.bpyNode.name == "Input.008" and self.brain.userid == "Cone.114":
-                print("Colour", output.values(), len(output))
             self.resultLog[-1] = (sum(output.values()), len(output))
         else:
             self.resultLog[-1] = (0, None)
