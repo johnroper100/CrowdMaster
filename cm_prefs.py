@@ -158,11 +158,13 @@ class CMPreferences(AddonPreferences):
                 row.scale_y = 1.25
                 row.operator("scene.cm_run_short_tests", icon='CONSOLE')
 
+                #row = layout.row()
+                #row.scale_y = 1.25
+                #row.operator("scene.cm_run_long_tests", icon='QUIT')
+
                 row = layout.row()
                 row.scale_y = 1.25
-                row.operator("scene.cm_run_long_tests", icon='QUIT')
-
-                layout.prop(preferences, 'show_debug_timings', icon='TIME')
+                row.prop(preferences, 'show_debug_timings', icon='TIME')
             else:
                 row = layout.row()
                 row.label(
