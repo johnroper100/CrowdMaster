@@ -94,18 +94,6 @@ class CMPreferences(AddonPreferences):
         default=False,
     )
 
-    show_node_hud = BoolProperty(
-        name="Show Node Editor HUD",
-        description="Chose whether to show the CrowdMaster text HUD in the node editor.",
-        default=False,
-    )
-
-    show_sim_data = BoolProperty(
-        name="Show Detailed Simulation Data",
-        description="Chose whether to show detailed data while running a simulation or operator in the node tree hud. Warning, this makes each operator take longer.",
-        default=False,
-    )
-
     play_animation = BoolProperty(
         name="Start Animation Automatically",
         description="Start and stop the animation automatically when the start and stop sim buttons are pressed.",
@@ -153,13 +141,6 @@ class CMPreferences(AddonPreferences):
             row.prop(preferences, 'use_node_color', icon='COLOR')
 
             row = layout.row()
-            row.prop(preferences, 'show_node_hud', icon='SORTALPHA')
-
-            if preferences.show_node_hud:
-                row.prop(preferences, 'show_sim_data',
-                         icon='OUTLINER_DATA_FONT')
-                row = layout.row()
-
             if preferences.use_custom_icons:
                 row.prop(preferences, 'show_debug_options',
                          icon_value=cicon('code'))
@@ -200,12 +181,12 @@ class CMPreferences(AddonPreferences):
         row.scale_y = 1.2
         if preferences.use_custom_icons:
             row.operator("wm.url_open", text="Our Website", icon_value=cicon(
-                'house')).url = "http://jmroper.com/crowdmaster/"
+                'house')).url = "http://crowdmaster.org/"
             row.operator("wm.url_open", text="Email Us", icon_value=cicon(
                 'email')).url = "mailto:crowdmaster@jmroper.com"
         else:
             row.operator("wm.url_open", text="Our Website",
-                         icon='URL').url = "http://jmroper.com/crowdmaster/"
+                         icon='URL').url = "http://crowdmaster.org/"
             row.operator("wm.url_open", text="Email Us",
                          icon='URL').url = "mailto:crowdmaster@jmroper.com"
 
@@ -219,17 +200,14 @@ def draw_cmweb_item(self, context):
     self.layout.separator()
     if preferences.use_custom_icons:
         self.layout.operator("wm.url_open", text="CrowdMaster Website", icon_value=cicon(
-            'house'),).url = "http://jmroper.com/crowdmaster/"
+            'house'),).url = "http://crowdmaster.org/"
         self.layout.operator("wm.url_open", text="CrowdMaster Email", icon_value=cicon(
             'email'),).url = "mailto:crowdmaster@jmroper.com"
-        self.layout.operator("scene.cm_download_docs",
-                             icon_value=cicon('download'))
     else:
         self.layout.operator("wm.url_open", text="Our Website",
-                             icon='URL').url = "http://jmroper.com/crowdmaster/"
+                             icon='URL').url = "http://crowdmaster.org/"
         self.layout.operator("wm.url_open", text="Email Us",
                              icon='URL').url = "mailto:crowdmaster@jmroper.com"
-        self.layout.operator("scene.cm_download_docs", icon='URL')
 
 
 def register():

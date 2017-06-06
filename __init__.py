@@ -25,7 +25,7 @@ bl_info = {
     "location": "Node Editor > CrowdMaster Node Trees",
     "description": "Crowd generation and simulation for Blender 3D",
     "warning": "",
-    "wiki_url": "http://jmroper.com/crowdmaster/docs/",
+    "wiki_url": "http://crowdmaster.org/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
     "category": "Simulation"
 }
@@ -37,9 +37,6 @@ from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 from . import addon_updater_ops, cm_prefs
 from .cm_blenderData import initialTagProperty, modifyBoneProperty
-from .cm_graphics import cm_nodeHUD
-from .cm_graphics.cm_nodeHUD import update_hud_text
-from .cm_graphics.utils import cm_redrawAll
 from .cm_iconLoad import cicon, register_icons, unregister_icons
 
 
@@ -99,11 +96,6 @@ class SCENE_OT_cm_groups_reset(Operator):
             bpy.ops.object.delete(use_global=True)
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
-
-        if preferences.show_node_hud:
-            newhudText = "Group {} reset!".format(self.groupName)
-            update_hud_text(newhudText)
-            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -195,11 +187,6 @@ class SCENE_OT_cm_agent_add_selected(Operator):
                 newAgent.name = obj.name
                 group.totalAgents += 1
 
-        if preferences.show_node_hud:
-            newhudText = "Manual Agents {} Created!".format(self.groupName)
-            update_hud_text(newhudText)
-            cm_redrawAll()
-
         return {'FINISHED'}
 
 
@@ -239,11 +226,6 @@ class SCENE_OT_cm_start(Operator):
                     customRLines = area.spaces[0].show_relationship_lines
                     area.spaces[0].show_outline_selected = False
                     area.spaces[0].show_relationship_lines = False
-
-        if preferences.show_node_hud:
-            newhudText = "Simulation Running!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
 
         scene.frame_current = scene.frame_start
 
@@ -289,11 +271,6 @@ class SCENE_OT_cm_stop(Operator):
                 if area.type == 'VIEW_3D':
                     area.spaces[0].show_outline_selected = customOutline
                     area.spaces[0].show_relationship_lines = customRLines
-
-        if preferences.show_node_hud:
-            newhudText = "Simulation Stopped!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -380,14 +357,6 @@ class SCENE_PT_CrowdMaster(Panel):
             row = box.row()
             row.scale_y = 1.5
             row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
-
-            box = layout.box()
-            row = box.row()
-            row.label(
-                "You must have the Simplify Curves addon enabled and an agent selected.")
-            row = box.row()
-            row.scale_y = 1.5
-            row.operator("graph.simplify", icon="IPO")
 
 
 class SCENE_PT_CrowdMasterAgents(Panel):
@@ -487,7 +456,6 @@ def register():
     cm_documentation.register()
 
     register_icons()
-    cm_nodeHUD.register()
 
     addon_updater_ops.register(bl_info)
     cm_prefs.register()
@@ -567,8 +535,6 @@ def unregister():
     cm_generation.unregister()
     cm_utilities.unregister()
     cm_prefs.unregister()
-
-    cm_nodeHUD.unregister()
 
     cm_channels.unregister()
 

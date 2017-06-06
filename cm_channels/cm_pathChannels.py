@@ -27,15 +27,13 @@ from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
                        StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
+from ..libs import cm_draw
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
 Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
 Vector = mathutils.Vector
-import math
-
-from ..libs import cm_draw
 
 
 class Path(Mc):
@@ -95,7 +93,8 @@ class Path(Mc):
 
         rotation = x * y * z
 
-        self.pathObjectCache[pathObject] = (kd, bm, pathMatrixInverse, rotation)
+        self.pathObjectCache[pathObject] = (
+            kd, bm, pathMatrixInverse, rotation)
 
         return kd, bm, pathMatrixInverse, rotation
 
@@ -134,7 +133,8 @@ class Path(Mc):
                         otherVert = e.verts[0]
                     else:
                         otherVert = e.verts[1]
-                normNearestToOther = (otherVert.co - bm.verts[index].co).normalized()
+                normNearestToOther = (
+                    otherVert.co - bm.verts[index].co).normalized()
                 score = normNearestToOther.dot(normNearestToAgent)
                 if score > bestScore:
                     bestScore = score
@@ -164,7 +164,8 @@ class Path(Mc):
                         otherVert = e.verts[0]
                     else:
                         otherVert = e.verts[1]
-                score = (otherVert.co - bm.verts[index].co).normalized().dot(nDirec)
+                score = (otherVert.co -
+                         bm.verts[index].co).normalized().dot(nDirec)
                 notDirec = not isDirectional
                 if notDirec or (direcNearestToOther and score > bestScore):
                     bestScore = score
@@ -201,7 +202,8 @@ class Path(Mc):
         nVel = vel.normalized()
         lVel = vel.length
 
-        res = self.firstPointOnPath(bm, co, index, co_find, nVel, isDirectional)
+        res = self.firstPointOnPath(
+            bm, co, index, co_find, nVel, isDirectional)
         nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength = res
 
         lVel += adjustLength
@@ -290,7 +292,8 @@ class Path(Mc):
 
         isDirectional = pathEntry.mode == "directional"
 
-        res = self.firstPointOnPath(bm, co, index, co_find, nDirec, isDirectional)
+        res = self.firstPointOnPath(
+            bm, co, index, co_find, nDirec, isDirectional)
         nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength = res
 
         obj = bpy.context.scene.objects[pathObject]
@@ -314,7 +317,8 @@ class Path(Mc):
 
         vel = self.sim.agents[self.userid].globalVelocity * lookahead
         vel = vel * rotation
-        co_find = pathMatrixInverse * context.scene.objects[self.userid].location
+        co_find = pathMatrixInverse * \
+            context.scene.objects[self.userid].location
         co, index, dist = kd.find(co_find)
         offset = self.followPath(bm, co, index, vel, co_find, radius, laneSep,
                                  isDirectional, pathEntry)
@@ -396,7 +400,6 @@ class Path(Mc):
 
         return edgeIndex, point
 
-
     @timeChannel("Path")
     def inlane(self, pathName, length, agents):
         context = bpy.context
@@ -411,7 +414,8 @@ class Path(Mc):
         kd, bm, pathMatrixInverse, rotation = self.calcPathData(pathObject,
                                                                 revDirec)
 
-        co_find = pathMatrixInverse * context.scene.objects[self.userid].location
+        co_find = pathMatrixInverse * \
+            context.scene.objects[self.userid].location
         myEdgeIndex, myStart = self.startEdgeAndPoint(bm, kd, co_find)
 
         edgeAgentCache = {}
@@ -497,7 +501,8 @@ class draw_path_directions_operator(Operator):
         context.area.tag_redraw()
 
         if event.type in {'ESC'}:
-            bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
+            bpy.types.SpaceView3D.draw_handler_remove(
+                self._handle_3d, 'WINDOW')
             # bpy.types.SpaceView3D.draw_handler_remove(self._handle_2d, 'WINDOW')
             global activePath
             activePath = None
@@ -510,7 +515,8 @@ class draw_path_directions_operator(Operator):
         activePath = self.pathName
         args = (context, bpy.context.scene.cm_paths.coll[self.pathName])
 
-        self._handle_3d = bpy.types.SpaceView3D.draw_handler_add(self.drawCallback, args, 'WINDOW', 'POST_VIEW')
+        self._handle_3d = bpy.types.SpaceView3D.draw_handler_add(
+            self.drawCallback, args, 'WINDOW', 'POST_VIEW')
         # self._handle_2d = bpy.types.SpaceView3D.draw_handler_add(cm_draw.draw_callback_2d, args, 'WINDOW', 'POST_PIXEL')
 
         context.window_manager.modal_handler_add(self)

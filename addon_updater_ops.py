@@ -896,7 +896,7 @@ def register(bl_info):
 	#updater.addon = # define at top of module, MUST be done first
 
 	# Website for manual addon download, optional but recommended to set
-	updater.website = "https://jmroper.com/crowdmaster"
+	updater.website = "https://crowdmaster.org"
 
 	# used to check/compare versions
 	updater.current_version = bl_info["version"]

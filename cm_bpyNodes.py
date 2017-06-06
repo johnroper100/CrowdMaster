@@ -263,7 +263,6 @@ class NewInputNode(LogicNode):
                                            ("HEADRX", "Heading rx", "", 3)])
     GetTagName = StringProperty(name="Get Tag Name")
 
-
     def draw_buttons(self, context, layout):
         layout.prop(self, "InputSource", text="Input")
         if self.InputSource == "CONSTANT":

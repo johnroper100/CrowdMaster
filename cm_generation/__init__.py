@@ -24,8 +24,6 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 
 from . import cm_genNodes
-from ..cm_graphics.cm_nodeHUD import update_hud_text, update_hud_text2
-from ..cm_graphics.utils import cm_redrawAll
 from ..libs.ins_vector import Vector
 from .cm_templates import TemplateRequest, templates
 
@@ -102,10 +100,6 @@ class SCENE_OT_agent_nodes_generate(Operator):
             newGroup.groupName = "cm_allAgents"
             newGroup.name = "cm_allAgents"
 
-            if preferences.show_node_hud:
-                newhudText = "Agents Generated!"
-                update_hud_text(newhudText)
-
             for space in generateNode.inputs[0].links:
                 tipNode = space.from_node
                 if tipNode.bl_idname == "NodeReroute":
@@ -113,23 +107,11 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 buildRequest = TemplateRequest()
                 genSpaces[tipNode].build(buildRequest)
         else:
-            if preferences.show_node_hud:
-                newhudText = "Agents Generated With Errors!"
-                update_hud_text(newhudText)
-
             return {'CANCELLED'}
 
         endT = time.time() - startT
 
-        if preferences.show_node_hud:
-            newhudText2 = "Time taken: {} seconds".format(str(endT))
-            update_hud_text2(newhudText2)
-
-            cm_redrawAll()
-
         return {'FINISHED'}
-
-
 
 
 def register():

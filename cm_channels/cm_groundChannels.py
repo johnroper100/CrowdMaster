@@ -28,7 +28,6 @@ from .cm_masterChannels import timeChannel
 BVHTree = bvhtree.BVHTree
 
 
-
 class Ground(Mc):
     """Get data about the ground near the agent"""
 

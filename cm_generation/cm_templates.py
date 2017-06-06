@@ -18,24 +18,24 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import math
+import os
 import random
+import shutil
 from collections import OrderedDict
 from math import radians
-import os
-import shutil
 
+import bmesh
 import bpy
 import mathutils
 from mathutils import Euler
-import bmesh
 
+from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
 
 BVHTree = mathutils.bvhtree.BVHTree
 KDTree = mathutils.kdtree.KDTree
 
-from ..cm_channels import Path
 tmpPathChannel = Path(None)
 
 # ==================== Some base classes ====================
@@ -133,6 +133,7 @@ class GeoRequest(TemplateRequest):
 
 class GeoReturn:
     """Object that is passed back by geo template nodes"""
+
     def __init__(self, obj):
         self.obj = obj
         self.overwriteRig = None
@@ -352,7 +353,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         group = self.settings["groupName"]
         rigObject = self.settings["rigObject"]
 
-        newObj, newRig = duplicateProxyLink(dupDir, blendfile, group, rigObject)
+        newObj, newRig = duplicateProxyLink(
+            dupDir, blendfile, group, rigObject)
         buildRequest.group.objects.link(newObj)
         buildRequest.group.objects.link(newRig)
 
@@ -366,8 +368,10 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         bpy.ops.pose.constraint_add(type="COPY_LOCATION")
         bpy.ops.pose.constraint_add(type="COPY_ROTATION")
 
-        Cloc = newRig.pose.bones[self.settings["constrainBone"]].constraints[-2]
-        Crot = newRig.pose.bones[self.settings["constrainBone"]].constraints[-1]
+        Cloc = newRig.pose.bones[self.settings["constrainBone"]
+                                 ].constraints[-2]
+        Crot = newRig.pose.bones[self.settings["constrainBone"]
+                                 ].constraints[-1]
 
         Cloc.target = obj
         Cloc.use_z = False
@@ -858,7 +862,8 @@ class TemplatePATH(Template):
     """Place along a path"""
 
     def build(self, buildRequest):
-        pathEntry = bpy.context.scene.cm_paths.coll.get(self.settings["pathName"])
+        pathEntry = bpy.context.scene.cm_paths.coll.get(
+            self.settings["pathName"])
         obj = bpy.context.scene.objects[pathEntry.objectName]
         bm = bmesh.new()
         bm.from_mesh(obj.data)
@@ -918,7 +923,7 @@ class TemplatePATH(Template):
         for newPos, newRot in positions:
             newBuildRequest = buildRequest.copy()
             newBuildRequest.pos = newPos + buildRequest.pos
-            newBuildRequest.rot = newRot # + buildRequest.rot
+            newBuildRequest.rot = newRot  # + buildRequest.rot
             self.inputs["Template"].build(newBuildRequest)
 
     # TODO Relax placement and use path channel to snap agents back to path.

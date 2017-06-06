@@ -1,6 +1,7 @@
-import bpy
 import bgl
 import blf
+import bpy
+
 
 def drawLine3D(color, start, end, width=1):
     bgl.glLineWidth(width)
@@ -8,6 +9,7 @@ def drawLine3D(color, start, end, width=1):
     bgl.glBegin(bgl.GL_LINES)
     bgl.glVertex3f(*start)
     bgl.glVertex3f(*end)
+
 
 def drawText2D(color, text):
     font_id = 0  # XXX, need to find out how best to get this.
@@ -32,6 +34,7 @@ class bglWrapperClass:
 
 
 bglWrapper = bglWrapperClass()
+
 
 def draw_callback_2d(self, context):
     with bglWrapper:

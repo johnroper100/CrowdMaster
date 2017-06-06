@@ -23,8 +23,6 @@ import bpy
 from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
                        FloatVectorProperty, IntProperty, StringProperty)
 
-from .cm_graphics.cm_nodeHUD import update_hud_text, update_hud_text2
-from .cm_graphics.utils import cm_redrawAll
 from .cm_iconLoad import cicon
 
 bpy.types.Scene.show_utilities = BoolProperty(
@@ -57,11 +55,6 @@ class CrowdMaster_setup_sample_nodes(bpy.types.Operator):
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
-
-        if preferences.show_node_hud:
-            newhudText = "Sample Node Setups Created!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -308,9 +301,6 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
 
-        if preferences.show_node_hud:
-            startT = time.time()
-
         selected = bpy.context.selected_objects
         for obj in selected:
             bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
@@ -320,17 +310,6 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
             bound_box.location = obj.location
             bound_box.rotation_euler = obj.rotation_euler
             bound_box.select = True
-
-        if preferences.show_node_hud:
-            endT = time.time() - startT
-
-            newhudText = "Done Converting to Bounding Boxes!"
-            update_hud_text(newhudText)
-
-            newhudText2 = "Time taken: {} seconds".format(str(endT))
-            update_hud_text2(newhudText2)
-
-            cm_redrawAll()
 
         return {'FINISHED'}
 
@@ -356,25 +335,12 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
 
-        if preferences.show_node_hud:
-            newhudText = "Placing Deferred Geometry!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
-
         groups = bpy.data.groups
         objects = context.scene.objects
         for group in context.scene.cm_groups:
             for agentType in group.agentTypes:
                 for agent in agentType.agents:
                     for obj in groups[agent.geoGroup].objects:
-                        if preferences.show_node_hud:
-                            if preferences.show_sim_data:
-                                newhudText = "Placing Object {}".format(
-                                    obj.name)
-                                update_hud_text(newhudText)
-                                cm_redrawAll()
-                                bpy.ops.wm.redraw_timer(type='DRAW_WIN_SWAP',
-                                                        iterations=1)
                         if "cm_deferObj" in obj:
                             newObj = objects[obj["cm_deferObj"]].copy()
 
@@ -449,11 +415,6 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
                                         if m.name in materials:
                                             replacement = materials[m.name]
                                             m.material = D.materials[replacement]
-
-        if preferences.show_node_hud:
-            newhudText = "Done Placing Deferred Geometry!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
 
         return {'FINISHED'}
 

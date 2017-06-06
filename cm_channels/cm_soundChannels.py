@@ -30,8 +30,6 @@ from .cm_masterChannels import timeChannel
 Vector = mathutils.Vector
 
 
-
-
 class Sound(Mc):
     """The object containing all of the sound channels"""
 
@@ -143,7 +141,7 @@ class Channel:
                         dist = 0
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
-                                         "distProp": dist/val}
+                                         "distProp": dist / val}
         self.storeCalced = True
 
     def calculatePrediction(self):
@@ -207,7 +205,7 @@ class Channel:
                         # https://www.desmos.com/calculator/godi4zejgd
                     self.storePrediction[emitterid] = {"rz": changez,
                                                        "rx": changex,
-                                                       "distProp": dist/val,
+                                                       "distProp": dist / val,
                                                        "cert": cert}
                     # (z rot, x rot, dist proportion, time until prediction)
         self.storePredictionCalced = False

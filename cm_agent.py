@@ -40,7 +40,8 @@ class Agent:
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
-        self.external = {"id": self.id, "tags": {t.name: t.value for t in tags}}
+        self.external = {"id": self.id, "tags": {
+            t.name: t.value for t in tags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""

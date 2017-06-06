@@ -740,7 +740,8 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "pathName", bpy.context.scene.cm_paths, "coll")
+        layout.prop_search(
+            self, "pathName", bpy.context.scene.cm_paths, "coll")
         layout.prop(self, "noToPlace")
 
         layout.prop(self, "relax")
@@ -754,6 +755,7 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
                 "relax": self.relax,
                 "relaxIterations": self.relaxIterations,
                 "relaxRadius": self.relaxRadius}
+
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
     """The formation positioing node"""

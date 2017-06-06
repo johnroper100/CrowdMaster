@@ -28,7 +28,7 @@ from bpy.types import Operator
 from .cm_iconLoad import cicon
 
 # Documentation Links
-prefix = "http://jmroper.com/crowdmaster/docs/"
+prefix = "http://crowdmaster.org/docs/"
 documentation_mapping = (
     # OPERATORS
     # toolbar
@@ -74,38 +74,12 @@ def doc_map():
     return dm
 
 
-class SCENE_OT_cm_download_docs(Operator):
-    bl_idname = "scene.cm_download_docs"
-    bl_label = "Download CrowdMaster Documentation"
-
-    def execute(self, context):
-        scene = context.scene
-
-        if platform == "win32":
-            downloadLocation = os.path.expanduser(
-                "~") + "\Downloads\CrowdMasterDocumentation.zip"
-        else:
-            downloadLocation = os.path.expanduser(
-                "~") + "/Downloads/CrowdMasterDocumentation.zip"
-        zipPath = "http://jmroper.com/crowdmaster/docs/CrowdMasterDocumentation.zip"
-
-        urllib.request.urlretrieve(zipPath, downloadLocation)
-
-        self.report({"INFO"}, "Documentation Downloaded!")
-
-        return {'FINISHED'}
-
-
 def register():
     # Register custom documentation mapping
     bpy.utils.register_manual_map(doc_map)
 
-    bpy.utils.register_class(SCENE_OT_cm_download_docs)
-
 
 def unregister():
-    bpy.utils.unregister_class(SCENE_OT_cm_download_docs)
-
     # Unregister custom documentation mapping
     bpy.utils.unregister_manual_map(doc_map)
 

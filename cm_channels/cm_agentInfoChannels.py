@@ -19,11 +19,12 @@
 
 import bpy
 import mathutils
-Vector = mathutils.Vector
 
+from ..libs import cm_accelerate
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
-from ..libs import cm_accelerate
+
+Vector = mathutils.Vector
 
 
 class AgentInfo(Mc):
