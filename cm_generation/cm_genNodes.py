@@ -889,11 +889,11 @@ class GroundNode(CrowdMasterAGenTreeNode):
 
 
 class SettagNode(CrowdMasterAGenTreeNode):
-    """The settag node"""
+    """The set tag node"""
     bl_idname = 'SettagNodeType'
-    bl_label = 'Settag'
+    bl_label = 'Set Tag'
     bl_icon = 'SOUND'
-    bl_width_default = 150
+    bl_width_default = 155
 
     tagName = StringProperty(name="Name")
     tagValue = FloatProperty(name="Value")
@@ -1040,7 +1040,10 @@ agen_node_categories = [
         NodeItem("TemplateSwitchNodeType", label="Switch"),
         NodeItem("RandomNodeType"),
         NodeItem("PointTowardsNodeType"),
-        NodeItem("CombineNodeType")
+        NodeItem("CombineNodeType"),
+        NodeItem("AddToGroupNodeType"),
+        NodeItem("SettagNodeType"),
+        NodeItem("RandomMaterialNodeType")
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("RandomPositionNodeType", label="Random"),
@@ -1052,11 +1055,8 @@ agen_node_categories = [
         NodeItem("MeshPositionNodeType"),
         NodeItem("PathPositionNodeType"),
     ]),
-    CrowdMasterAGenCategories("other", "Other", items=[
-        NodeItem("GenerateNodeType"),
-        NodeItem("AddToGroupNodeType"),
-        NodeItem("SettagNodeType"),
-        NodeItem("RandomMaterialNodeType")
+    CrowdMasterAGenCategories("output", "Output", items=[
+        NodeItem("GenerateNodeType")
     ]),
     CrowdMasterAGenCategories("layout", "Layout", items=[
         NodeItem("NodeFrame"),
