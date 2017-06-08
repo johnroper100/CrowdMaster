@@ -316,6 +316,9 @@ class Path(Mc):
                                                                 revDirec)
 
         vel = self.sim.agents[self.userid].globalVelocity * lookahead
+        if vel.x == 0 and vel.y == 0 and vel.z == 0:
+            vel = Vector((0, lookahead, 0))
+            vel.rotate(bpy.context.scene.objects[self.userid].rotation_euler)
         vel = vel * rotation
         co_find = pathMatrixInverse * \
             context.scene.objects[self.userid].location
@@ -498,14 +501,16 @@ class draw_path_directions_operator(Operator):
                 cm_draw.drawLine3D((0, 1, 0, 0.7), close - perp, far)
 
     def modal(self, context, event):
+        global activePath
+
         context.area.tag_redraw()
 
         if event.type in {'ESC'}:
-            bpy.types.SpaceView3D.draw_handler_remove(
-                self._handle_3d, 'WINDOW')
-            # bpy.types.SpaceView3D.draw_handler_remove(self._handle_2d, 'WINDOW')
-            global activePath
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
             activePath = None
+            return {'CANCELLED'}
+        if activePath != self.pathName:
+            bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
             return {'CANCELLED'}
 
         return {'PASS_THROUGH'}
