@@ -279,6 +279,8 @@ class Path(Mc):
                 return target - start
 
             index = nextIndex
+            if nextVert is None:
+                print("no next", index)
             nextIndex = nextVert.index
 
     def alignToPath(self, pathEntry, point, nDirec):
@@ -452,30 +454,6 @@ class Path(Mc):
 
         return result
 
-
-activePath = None
-
-
-class switch_path_direction_operator(Operator):
-    bl_idname = "view3d.switch_path_direction_operator"
-    bl_label = "Switch the direction of the selected edges"
-
-    def invoke(self, context, event):
-        if activePath is None:
-            return {'CANCELLED'}
-        bm = bmesh.from_edit_mesh(bpy.context.object.data)
-        revDirec = bpy.context.scene.cm_paths.coll[activePath].revDirec
-        for edge in bm.edges:
-            if edge.select:
-                indexStr = str(edge.index)
-                if indexStr in revDirec:
-                    revDirec.remove(revDirec.find(indexStr))
-                else:
-                    revEdge = revDirec.add()
-                    revEdge.name = indexStr
-        return {'FINISHED'}
-
-
 class draw_path_directions_operator(Operator):
     bl_idname = "view3d.draw_path_operator"
     bl_label = "Draw the directions of a path"
@@ -508,9 +486,13 @@ class draw_path_directions_operator(Operator):
         if event.type in {'ESC'}:
             bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
             activePath = None
+            # Hack to force redraw
+            bpy.context.scene.objects.active = bpy.context.scene.objects.active
             return {'CANCELLED'}
         if activePath != self.pathName:
             bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
+            # Hack to force redraw
+            bpy.context.scene.objects.active = bpy.context.scene.objects.active
             return {'CANCELLED'}
 
         return {'PASS_THROUGH'}
@@ -526,6 +508,8 @@ class draw_path_directions_operator(Operator):
 
         context.window_manager.modal_handler_add(self)
 
+        # Hack to force redraw
+        bpy.context.scene.objects.active = bpy.context.scene.objects.active
         return {'RUNNING_MODAL'}
 
 
@@ -610,6 +594,14 @@ class SCENE_PT_path(Panel):
         sce = context.scene
 
         row = layout.row()
+        row.operator(cm_path_bfs.bl_idname)
+        row.operator(cm_path_dfs.bl_idname)
+
+        row = layout.row()
+        row.operator(Switch_Selected_Path.bl_idname)
+        row.operator(Switch_Connected_Path.bl_idname)
+
+        row = layout.row()
 
         row.template_list("SCENE_UL_cm_path", "", sce.cm_paths,
                           "coll", sce.cm_paths, "index")
@@ -621,26 +613,211 @@ class SCENE_PT_path(Panel):
         blid_ar = SCENE_OT_cm_path_remove.bl_idname
         sub.operator(blid_ar, text="", icon="ZOOMOUT")
 
+# ==========================================================================
+#                       Path editing operators
+# ==========================================================================
+
+activePath = None
+
+class Switch_Selected_Path(Operator):
+    bl_idname = "view3d.cm_switch_selected_path"
+    bl_label = "Switch the direction of the selected edges"
+
+    @classmethod
+    def poll(cls, context):
+        global activePath
+        C = bpy.context
+        if activePath is None or activePath not in C.scene.cm_paths.coll:
+            return False
+        pathEntry = C.scene.cm_paths.coll[activePath]
+        if pathEntry.mode != "directional":
+            return False
+        if C.active_object.mode != "EDIT":
+            return False
+        return True
+
+    def invoke(self, context, event):
+        bm = bmesh.from_edit_mesh(bpy.context.object.data)
+        revDirec = bpy.context.scene.cm_paths.coll[activePath].revDirec
+        for edge in bm.edges:
+            if edge.select:
+                indexStr = str(edge.index)
+                if indexStr in revDirec:
+                    revDirec.remove(revDirec.find(indexStr))
+                else:
+                    revEdge = revDirec.add()
+                    revEdge.name = indexStr
+
+        # Hack to force redraw
+        bpy.context.scene.objects.active = bpy.context.scene.objects.active
+        return {'FINISHED'}
+
+class Switch_Connected_Path(Operator):
+    bl_idname = "view3d.cm_switch_connected_path"
+    bl_label = "Switch the direction of the connected edges"
+
+    @classmethod
+    def poll(cls, context):
+        global activePath
+        C = bpy.context
+        if activePath is None or activePath not in C.scene.cm_paths.coll:
+            return False
+        pathEntry = C.scene.cm_paths.coll[activePath]
+        if pathEntry.mode != "directional":
+            return False
+        if C.active_object.mode != "EDIT":
+            return False
+        return True
+
+    def invoke(self, context, event):
+        global activePath
+        C = bpy.context
+        pathEntry = C.scene.cm_paths.coll[activePath]
+        bm = bmesh.from_edit_mesh(bpy.context.object.data)
+        fringe = {v for v in bm.verts if v.select}
+        seenEdges = {e for e in bm.edges if e.select}
+        while len(fringe) > 0:
+            nextFrige = set()
+            for v in fringe:
+                for e in v.link_edges:
+                    if e not in seenEdges:
+                        indexStr = str(e.index)
+                        if indexStr in pathEntry.revDirec:
+                            toRm = pathEntry.revDirec.find(indexStr)
+                            pathEntry.revDirec.remove(toRm)
+                        else:
+                            revEdge = pathEntry.revDirec.add()
+                            revEdge.name = indexStr
+                        other = e.other_vert(v)
+                        nextFrige.add(other)
+                        seenEdges.add(e)
+            fringe = nextFrige
+
+        # Hack to force redraw
+        bpy.context.scene.objects.active = bpy.context.scene.objects.active
+        return {'FINISHED'}
+
+class cm_path_bfs(Operator):
+    bl_idname = "view3d.cm_paths_bfs"
+    bl_label = "Breadth first search to direct edges"
+
+    @classmethod
+    def poll(cls, context):
+        global activePath
+        C = bpy.context
+        if activePath is None or activePath not in C.scene.cm_paths.coll:
+            return False
+        pathEntry = C.scene.cm_paths.coll[activePath]
+        if pathEntry.mode != "directional":
+            return False
+        if C.active_object.mode != "EDIT":
+            return False
+        return True
+
+    def execute(self, context):
+        global activePath
+        C = bpy.context
+        pathEntry = C.scene.cm_paths.coll[activePath]
+        bm = bmesh.from_edit_mesh(C.active_object.data)
+
+        fringe = {v for v in bm.verts if v.select}
+        seen = {v for v in bm.verts if v.select}
+        while len(fringe) > 0:
+            nextFrige = set()
+            for v in fringe:
+                for e in v.link_edges:
+                    other = e.other_vert(v)
+                    if other not in seen:
+                        indexStr = str(e.index)
+                        if v.index == e.verts[0].index:
+                            if indexStr in pathEntry.revDirec:
+                                toRm = pathEntry.revDirec.find(indexStr)
+                                pathEntry.revDirec.remove(toRm)
+                        else:
+                            if indexStr not in pathEntry.revDirec:
+                                revEdge = pathEntry.revDirec.add()
+                                revEdge.name = indexStr
+                        nextFrige.add(other)
+                seen.add(v)
+            fringe = nextFrige
+
+        # Hack to force redraw
+        bpy.context.scene.objects.active = bpy.context.scene.objects.active
+        return {'FINISHED'}
+
+class cm_path_dfs(Operator):
+    bl_idname = "view3d.cm_paths_dfs"
+    bl_label = "Depth first search to direct edges"
+
+    @classmethod
+    def poll(cls, context):
+        global activePath
+        C = bpy.context
+        if activePath is None or activePath not in C.scene.cm_paths.coll:
+            return False
+        pathEntry = C.scene.cm_paths.coll[activePath]
+        if pathEntry.mode != "directional":
+            return False
+        if C.active_object.mode != "EDIT":
+            return False
+        return True
+
+    def dfs(self, v):
+        for e in v.link_edges:
+            if e not in self.seen:
+                other = e.other_vert(v)
+                indexStr = str(e.index)
+                if v.index == e.verts[0].index:
+                    if indexStr in self.pathEntry.revDirec:
+                        toRm = self.pathEntry.revDirec.find(indexStr)
+                        self.pathEntry.revDirec.remove(toRm)
+                else:
+                    if indexStr not in self.pathEntry.revDirec:
+                        revEdge = self.pathEntry.revDirec.add()
+                        revEdge.name = indexStr
+                self.seen.add(e)
+                self.dfs(other)
+
+    def execute(self, context):
+        global activePath
+        C = bpy.context
+        self.pathEntry = C.scene.cm_paths.coll[activePath]
+        bm = bmesh.from_edit_mesh(C.active_object.data)
+
+        self.seen = {e for e in bm.edges if e.select}
+        for v in {v for v in bm.verts if v.select}:
+            self.dfs(v)
+
+        # Hack to force redraw
+        bpy.context.scene.objects.active = bpy.context.scene.objects.active
+        return {'FINISHED'}
+
 
 def register():
     bpy.utils.register_class(draw_path_directions_operator)
-    bpy.utils.register_class(switch_path_direction_operator)
     bpy.utils.register_class(path_entry)
     bpy.utils.register_class(paths_collection)
     bpy.utils.register_class(SCENE_OT_cm_path_populate)
     bpy.utils.register_class(SCENE_OT_cm_path_remove)
     bpy.utils.register_class(SCENE_UL_cm_path)
     bpy.utils.register_class(SCENE_PT_path)
+    bpy.utils.register_class(Switch_Selected_Path)
+    bpy.utils.register_class(Switch_Connected_Path)
+    bpy.utils.register_class(cm_path_bfs)
+    bpy.utils.register_class(cm_path_dfs)
     bpy.types.Scene.cm_paths = PointerProperty(type=paths_collection)
 
 
 def unregister():
     bpy.utils.unregister_class(draw_path_directions_operator)
-    bpy.utils.unregister_class(switch_path_direction_operator)
     bpy.utils.unregister_class(path_entry)
     bpy.utils.unregister_class(paths_collection)
     bpy.utils.unregister_class(SCENE_OT_cm_path_populate)
     bpy.utils.unregister_class(SCENE_OT_cm_path_remove)
     bpy.utils.unregister_class(SCENE_UL_cm_path)
     bpy.utils.unregister_class(SCENE_PT_path)
+    bpy.utils.unregister_class(Switch_Selected_Path)
+    bpy.utils.unregister_class(Switch_Connected_Path)
+    bpy.utils.unregister_class(cm_path_bfs)
+    bpy.utils.unregister_class(cm_path_dfs)
     del bpy.types.Scene.cm_paths
