@@ -709,6 +709,64 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
                 "relaxIterations": self.relaxIterations,
                 "relaxRadius": self.relaxRadius}
 
+class PaintPositionNode(CrowdMasterAGenTreeNode):
+    """The paint positioning node"""
+    bl_idname = 'PaintPositionNodeType'
+    bl_label = 'Paint'
+    bl_icon = 'SOUND'
+    bl_width_default = 150.0
+
+    guideMesh = StringProperty(
+        name="Guide mesh", description="The mesh to scatter points over")
+
+    vcols = IntProperty(name="Vcols")
+
+    noToPlace = IntProperty(name="Number of Agents",
+                            description="The number of agents to place",
+                            default=1, min=1)
+
+    overwritePosition = BoolProperty(name="Overwrite position",
+                                     description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
+                                     default=False)
+
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        layout.prop(self, "vcols")
+        layout.prop(self, "noToPlace")
+        layout.prop(self, "overwritePosition")
+
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
+
+    def getSettings(self):
+        return {"vcols": self.vcols,
+                "guideMesh": self.guideMesh,
+                "noToPlace": self.noToPlace,
+                "overwritePosition": self.overwritePosition,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
+
 
 class PathPositionNode(CrowdMasterAGenTreeNode):
     """The path positioning node"""
@@ -1051,6 +1109,7 @@ agen_node_categories = [
         NodeItem("MeshPositionNodeType"),
         NodeItem("ObstacleNodeType"),
         NodeItem("OffsetNodeType"),
+        NodeItem("PaintPositionNodeType"),
         NodeItem("PathPositionNodeType"),
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("TargetPositionNodeType", label="Target")
@@ -1093,6 +1152,7 @@ def register():
     bpy.utils.register_class(CombineNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(MeshPositionNode)
+    bpy.utils.register_class(PaintPositionNode)
     bpy.utils.register_class(PathPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
@@ -1137,6 +1197,7 @@ def unregister():
     bpy.utils.unregister_class(CombineNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(MeshPositionNode)
+    bpy.utils.unregister_class(PaintPositionNode)
     bpy.utils.unregister_class(PathPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)

@@ -857,6 +857,94 @@ class TemplateMESHPOSITIONING(Template):
             return False
         return True
 
+class TemplatePAINTPOSITIONING(Template):
+    """Place randomly over the surface of a mesh"""
+
+    def __init__(self, inputs, settings, bpyName):
+        Template.__init__(self, inputs, settings, bpyName)
+        self.bvhtree = None  # TODO use to relax points
+        self.totalArea = None
+
+    def build(self, buildRequest):
+        guide = bpy.data.objects[self.settings["guideMesh"]]
+        data = guide.data
+        polys = []
+        mesh = data
+
+        vcol_layer = mesh.vertex_colors[self.settings["vcols"]]
+        
+        for poly in mesh.polygons:
+            for loop_index in poly.loop_indices:
+                loop_vert_index = mesh.loops[loop_index].vertex_index
+                if vcol_layer.data[loop_index].color[0] == 0.0:
+                    polys.append(poly)
+                    break
+                else:
+                    continue
+
+        wrld = guide.matrix_world
+        if self.totalArea is None:
+            self.totalArea = sum(p.area for p in polys)
+        positions = []
+        for n in range(self.settings["noToPlace"]):
+            remaining = random.random() * self.totalArea
+            index = 0
+            while remaining > 0:
+                remaining -= polys[index].area
+                if remaining <= 0:
+                    a = data.vertices[polys[index].vertices[0]].co
+                    b = data.vertices[polys[index].vertices[1]].co
+                    c = data.vertices[polys[index].vertices[2]].co
+                    r1 = math.sqrt(random.random())
+                    r2 = random.random()
+                    pos = (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c
+                    if self.settings["overwritePosition"]:
+                        pos = wrld * pos
+                    else:
+                        pos.rotate(mathutils.Euler(buildRequest.rot))
+                        pos *= buildRequest.scale
+                        pos = buildRequest.pos + pos
+                    positions.append(pos)
+                index += 1
+
+        if self.settings["relax"]:
+            sce = bpy.context.scene
+            gnd = sce.objects[self.settings["guideMesh"]]
+            if self.bvhtree is None:
+                self.bvhtree = BVHTree.FromObject(gnd, sce)
+            radius = self.settings["relaxRadius"]
+            for i in range(self.settings["relaxIterations"]):
+                kd = KDTree(len(positions))
+                for n, p in enumerate(positions):
+                    kd.insert(p, n)
+                kd.balance()
+                for n, p in enumerate(positions):
+                    adjust = Vector()
+                    localPoints = kd.find_range(p, radius * 2)
+                    for (co, ind, dist) in localPoints:
+                        if ind != n:
+                            v = p - co
+                            adjust += v * ((2 * radius - v.length) / v.length)
+                    if len(localPoints) > 0:
+                        adjPos = positions[n] + adjust / len(localPoints)
+                        positions[n] = self.bvhtree.find_nearest(adjPos)[0]
+
+        for newPos in positions:
+            newBuildRequest = buildRequest.copy()
+            newBuildRequest.pos = newPos
+            self.inputs["Template"].build(newBuildRequest)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if self.settings["guideMesh"] not in bpy.context.scene.objects:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        return True
+
 
 class TemplatePATH(Template):
     """Place along a path"""
@@ -1129,6 +1217,7 @@ templates = OrderedDict([
     ("CombineNodeType", TemplateCOMBINE),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("MeshPositionNodeType", TemplateMESHPOSITIONING),
+    ("PaintPositionNodeType", TemplatePAINTPOSITIONING),
     ("PathPositionNodeType", TemplatePATH),
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),
