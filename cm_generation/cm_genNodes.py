@@ -1028,40 +1028,40 @@ class CrowdMasterAGenCategories(NodeCategory):
 
 agen_node_categories = [
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
-        NodeItem("ObjectInputNodeType"),
         NodeItem("GroupInputNodeType"),
         NodeItem("LinkGroupNodeType"),
         NodeItem("ModifyBoneNodeType"),
-        NodeItem("GeoSwitchNodeType", label="Switch"),
-        NodeItem("ParentNodeType")
+        NodeItem("ObjectInputNodeType"),
+        NodeItem("ParentNodeType"),
+        NodeItem("GeoSwitchNodeType", label="Switch")
     ]),
     CrowdMasterAGenCategories("template", "Template", items=[
         NodeItem("TemplateNodeType"),
-        NodeItem("TemplateSwitchNodeType", label="Switch"),
-        NodeItem("RandomNodeType"),
-        NodeItem("PointTowardsNodeType"),
-        NodeItem("CombineNodeType"),
         NodeItem("AddToGroupNodeType"),
+        NodeItem("CombineNodeType"),
+        NodeItem("PointTowardsNodeType"),
+        NodeItem("RandomNodeType"),
+        NodeItem("RandomMaterialNodeType"),
         NodeItem("SettagNodeType"),
-        NodeItem("RandomMaterialNodeType")
+        NodeItem("TemplateSwitchNodeType", label="Switch")
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
-        NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("TargetPositionNodeType", label="Target"),
-        NodeItem("ObstacleNodeType"),
-        NodeItem("OffsetNodeType"),
         NodeItem("GroundNodeType"),
         NodeItem("MeshPositionNodeType"),
+        NodeItem("ObstacleNodeType"),
+        NodeItem("OffsetNodeType"),
         NodeItem("PathPositionNodeType"),
+        NodeItem("RandomPositionNodeType", label="Random"),
+        NodeItem("TargetPositionNodeType", label="Target")
     ]),
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType")
     ]),
     CrowdMasterAGenCategories("layout", "Layout", items=[
         NodeItem("NodeFrame"),
-        NodeItem("NodeReroute"),
-        NodeItem("NoteNode")
+        NodeItem("NoteNode"),
+        NodeItem("NodeReroute")
     ])
 ]
 

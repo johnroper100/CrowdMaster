@@ -983,19 +983,19 @@ node_categories = [
         NodeItem("WeakNode")
     ]),
     MyNodeCategory("STATE", "State", items=[
-        NodeItem("StartState"),
-        NodeItem("ActionState")
+        NodeItem("ActionState"),
+        NodeItem("StartState")
     ]),
     MyNodeCategory("OTHER", "Other", items=[
-        NodeItem("SetTagNode"),
+        NodeItem("FilterNode"),
         NodeItem("MathNode"),
-        NodeItem("VariableNode"),
-        NodeItem("FilterNode")
+        NodeItem("SetTagNode"),
+        NodeItem("VariableNode")
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
+        NodeItem("LogicNoteNode"),
         NodeItem("NodeReroute"),
-        NodeItem("LogicNoteNode")
     ])
 ]
 

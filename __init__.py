@@ -20,7 +20,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 2, 5),
+    "version": (1, 3, 0),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
     "description": "Crowd generation and simulation for Blender 3D",
