@@ -764,7 +764,8 @@ class TemplateRANDOMPOSITIONING(Template):
                     for (co, ind, dist) in localPoints:
                         if ind != n:
                             v = p - co
-                            adjust += v * ((2 * radius - v.length) / v.length)
+                            if v.length > 0:
+                                adjust += v * ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         positions[n] += adjust / len(localPoints)
         for newPos in positions:
@@ -836,7 +837,8 @@ class TemplateMESHPOSITIONING(Template):
                     for (co, ind, dist) in localPoints:
                         if ind != n:
                             v = p - co
-                            adjust += v * ((2 * radius - v.length) / v.length)
+                            if v.length > 0:
+                                adjust += v * ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = positions[n] + adjust / len(localPoints)
                         positions[n] = self.bvhtree.find_nearest(adjPos)[0]
@@ -872,15 +874,12 @@ class TemplatePAINTPOSITIONING(Template):
         mesh = data
 
         vcol_layer = mesh.vertex_colors[self.settings["vcols"]]
-        
+
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
                 if vcol_layer.data[loop_index].color[0] == 0.0:
                     polys.append(poly)
-                    break
-                else:
-                    continue
 
         wrld = guide.matrix_world
         if self.totalArea is None:
@@ -913,6 +912,9 @@ class TemplatePAINTPOSITIONING(Template):
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
             radius = self.settings["relaxRadius"]
+            for n, p in enumerate(positions):
+                rvec = random.random() * mathutils.noise.random_unit_vector()
+                positions[n] = p + rvec * radius
             for i in range(self.settings["relaxIterations"]):
                 kd = KDTree(len(positions))
                 for n, p in enumerate(positions):
@@ -924,7 +926,8 @@ class TemplatePAINTPOSITIONING(Template):
                     for (co, ind, dist) in localPoints:
                         if ind != n:
                             v = p - co
-                            adjust += v * ((2 * radius - v.length) / v.length)
+                            if v.length > 0:
+                                adjust += v * ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = positions[n] + adjust / len(localPoints)
                         positions[n] = self.bvhtree.find_nearest(adjPos)[0]
@@ -997,7 +1000,8 @@ class TemplatePATH(Template):
                     for (co, ind, dist) in localPoints:
                         if ind != n:
                             v = p - co
-                            adjust += v * ((2 * radius - v.length) / v.length)
+                            if v.length > 0:
+                                adjust += v * ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = p + adjust / len(localPoints)
                         normal = Vector((0, 1, 0)).rotate(Euler(r))
