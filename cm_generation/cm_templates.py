@@ -859,7 +859,7 @@ class TemplateMESHPOSITIONING(Template):
             return False
         return True
 
-class TemplatePAINTPOSITIONING(Template):
+class TemplateVCOLPOSITIONING(Template):
     """Place randomly over the surface of a mesh"""
 
     def __init__(self, inputs, settings, bpyName):
@@ -1221,7 +1221,7 @@ templates = OrderedDict([
     ("CombineNodeType", TemplateCOMBINE),
     ("RandomPositionNodeType", TemplateRANDOMPOSITIONING),
     ("MeshPositionNodeType", TemplateMESHPOSITIONING),
-    ("PaintPositionNodeType", TemplatePAINTPOSITIONING),
+    ("VCOLPositionNodeType", TemplateVCOLPOSITIONING),
     ("PathPositionNodeType", TemplatePATH),
     ("FormationPositionNodeType", TemplateFORMATION),
     ("TargetPositionNodeType", TemplateTARGET),

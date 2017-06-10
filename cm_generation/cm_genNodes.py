@@ -709,17 +709,19 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
                 "relaxIterations": self.relaxIterations,
                 "relaxRadius": self.relaxRadius}
 
-class PaintPositionNode(CrowdMasterAGenTreeNode):
-    """The paint positioning node"""
-    bl_idname = 'PaintPositionNodeType'
-    bl_label = 'Paint'
+
+class VCOLPositionNode(CrowdMasterAGenTreeNode):
+    """The vertex colors positioning node"""
+    bl_idname = 'VCOLPositionNodeType'
+    bl_label = 'Vertex Colors'
     bl_icon = 'SOUND'
     bl_width_default = 150.0
 
     guideMesh = StringProperty(
         name="Guide mesh", description="The mesh to scatter points over")
 
-    vcols = IntProperty(name="Vcols")
+    vcols = IntProperty(
+        name="VCols ID", description="The ID of the vertex colors slot to use", default=0, min=0)
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -1109,10 +1111,10 @@ agen_node_categories = [
         NodeItem("MeshPositionNodeType"),
         NodeItem("ObstacleNodeType"),
         NodeItem("OffsetNodeType"),
-        NodeItem("PaintPositionNodeType"),
         NodeItem("PathPositionNodeType"),
         NodeItem("RandomPositionNodeType", label="Random"),
-        NodeItem("TargetPositionNodeType", label="Target")
+        NodeItem("TargetPositionNodeType", label="Target"),
+        NodeItem("VCOLPositionNodeType"),
     ]),
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType")
@@ -1152,7 +1154,7 @@ def register():
     bpy.utils.register_class(CombineNode)
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(MeshPositionNode)
-    bpy.utils.register_class(PaintPositionNode)
+    bpy.utils.register_class(VCOLPositionNode)
     bpy.utils.register_class(PathPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
@@ -1197,7 +1199,7 @@ def unregister():
     bpy.utils.unregister_class(CombineNode)
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(MeshPositionNode)
-    bpy.utils.unregister_class(PaintPositionNode)
+    bpy.utils.unregister_class(VCOLPositionNode)
     bpy.utils.unregister_class(PathPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
