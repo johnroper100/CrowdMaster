@@ -715,7 +715,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'VCOLPositionNodeType'
     bl_label = 'Vertex Colors'
     bl_icon = 'SOUND'
-    bl_width_default = 150.0
+    bl_width_default = 170.0
 
     guideMesh = StringProperty(
         name="Guide mesh", description="The mesh to scatter points over")
