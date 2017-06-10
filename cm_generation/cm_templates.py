@@ -765,7 +765,8 @@ class TemplateRANDOMPOSITIONING(Template):
                         if ind != n:
                             v = p - co
                             if v.length > 0:
-                                adjust += v * ((2 * radius - v.length) / v.length)
+                                adjust += v * \
+                                    ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         positions[n] += adjust / len(localPoints)
         for newPos in positions:
@@ -838,7 +839,8 @@ class TemplateMESHPOSITIONING(Template):
                         if ind != n:
                             v = p - co
                             if v.length > 0:
-                                adjust += v * ((2 * radius - v.length) / v.length)
+                                adjust += v * \
+                                    ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = positions[n] + adjust / len(localPoints)
                         positions[n] = self.bvhtree.find_nearest(adjPos)[0]
@@ -859,6 +861,7 @@ class TemplateMESHPOSITIONING(Template):
             return False
         return True
 
+
 class TemplateVCOLPOSITIONING(Template):
     """Place randomly over the surface of a mesh"""
 
@@ -878,7 +881,7 @@ class TemplateVCOLPOSITIONING(Template):
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color[0] == 0.0:
+                if vcol_layer.data[loop_index].color[0] == self.settings["vcolor"][0] and vcol_layer.data[loop_index].color[1] == self.settings["vcolor"][1] and vcol_layer.data[loop_index].color[2] == self.settings["vcolor"][2]:
                     polys.append(poly)
 
         wrld = guide.matrix_world
@@ -927,7 +930,8 @@ class TemplateVCOLPOSITIONING(Template):
                         if ind != n:
                             v = p - co
                             if v.length > 0:
-                                adjust += v * ((2 * radius - v.length) / v.length)
+                                adjust += v * \
+                                    ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = positions[n] + adjust / len(localPoints)
                         positions[n] = self.bvhtree.find_nearest(adjPos)[0]
@@ -1001,7 +1005,8 @@ class TemplatePATH(Template):
                         if ind != n:
                             v = p - co
                             if v.length > 0:
-                                adjust += v * ((2 * radius - v.length) / v.length)
+                                adjust += v * \
+                                    ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = p + adjust / len(localPoints)
                         normal = Vector((0, 1, 0)).rotate(Euler(r))

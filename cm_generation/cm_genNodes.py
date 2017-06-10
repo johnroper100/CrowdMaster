@@ -723,6 +723,9 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     vcols = IntProperty(
         name="VCols ID", description="The ID of the vertex colors slot to use", default=0, min=0)
 
+    vcolor = FloatVectorProperty(
+        name="Color", description="The the color on which the agents shoud be placed", subtype='COLOR', default=[0.0, 0.0, 0.0])
+
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
                             default=1, min=1)
@@ -752,6 +755,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
         layout.prop(self, "vcols")
+        layout.prop(self, "vcolor")
         layout.prop(self, "noToPlace")
         layout.prop(self, "overwritePosition")
 
