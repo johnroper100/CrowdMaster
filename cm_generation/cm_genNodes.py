@@ -375,7 +375,7 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     brainType = StringProperty(name="Brain Type")
     deferGeo = BoolProperty(name="Defer Geometry",
                             description="Don't place geometry until the Place Deffered Geometry utility function is used",
-                            default=True)
+                            default=False)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
