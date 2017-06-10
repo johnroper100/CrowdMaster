@@ -715,16 +715,21 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'VCOLPositionNodeType'
     bl_label = 'Vertex Colors'
     bl_icon = 'SOUND'
-    bl_width_default = 200.0
+    bl_width_default = 250.0
 
-    guideMesh = StringProperty(
-        name="Guide Mesh", description="The mesh to scatter points over")
+    guideMesh = StringProperty(name="Guide Mesh",
+                               description="The mesh to scatter points over")
 
-    vcols = IntProperty(
-        name="VCols ID", description="The ID of the vertex colors slot to use", default=0, min=0)
+    vcols = IntProperty(name="VCols ID",
+                        description="The ID of the vertex colors slot to use",
+                        default=0, min=0)
 
-    vcolor = FloatVectorProperty(
-        name="Color", description="The the color on which the agents shoud be placed", subtype='COLOR', default=[0.0, 0.0, 0.0])
+    vcolor = FloatVectorProperty(name="Color",
+                                 description="The the color on which the agents shoud be placed",
+                                 subtype='COLOR',
+                                 default=[1.0, 1.0, 1.0],
+                                 min=0.0,
+                                 max=1.0)
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -754,8 +759,10 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
-        layout.prop(self, "vcols")
-        layout.prop(self, "vcolor")
+
+        row = layout.row(align=True)
+        row.prop(self, "vcols")
+        row.prop(self, "vcolor", text="")
         layout.prop(self, "noToPlace")
         layout.prop(self, "overwritePosition")
 
@@ -766,6 +773,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
 
     def getSettings(self):
         return {"vcols": self.vcols,
+                "vcolor": self.vcolor,
                 "guideMesh": self.guideMesh,
                 "noToPlace": self.noToPlace,
                 "overwritePosition": self.overwritePosition,
