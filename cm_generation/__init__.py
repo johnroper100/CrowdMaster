@@ -25,7 +25,7 @@ from bpy.types import Operator
 
 from . import cm_genNodes
 from ..libs.ins_vector import Vector
-from .cm_templates import TemplateRequest, templates
+from .cm_templates import TemplateRequest, templates, tmpPathChannel
 
 
 class SCENE_OT_agent_nodes_generate(Operator):
@@ -44,6 +44,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
     def construct(self, current, cache):
         """returns: bool - successfully built, Template"""
+        tmpPathChannel.newframe()
 
         idName = current.bl_idname
         if idName in templates:
