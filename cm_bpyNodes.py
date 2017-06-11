@@ -475,7 +475,7 @@ class MathNode(LogicNode):
                              ("mul", "Multiply", "Multiply the two numbers"),
                              ("div", "Divide", "Divide the two numbers"),
                              ("set", "Set To", "Set all inputs to this number")],
-                             default="add",
+                             default="mul",
                              description="which mathematical operation to use.")
 
     num1 = FloatProperty(name="Number 1", default=1.0,
