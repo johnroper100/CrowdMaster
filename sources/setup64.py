@@ -6,7 +6,7 @@ import platform
 
 Cython.Compiler.Options.annotate = True
 
-if platform.system() == "Linux":
+if platform.system() != "Windows":
     extra_compile_args = []#['-openmp']
 else:
     extra_compile_args = ['/Ox','/openmp','/GT','/arch:SSE2','/fp:fast']
