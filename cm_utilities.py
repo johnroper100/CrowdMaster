@@ -331,6 +331,7 @@ class CrowdMaster_setup_agent(bpy.types.Operator):
 class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_idname = "scene.cm_place_deferred_geo"
     bl_label = "Place Deferred Geometry"
+    bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
         preferences = context.user_preferences.addons[__package__].preferences
