@@ -178,6 +178,10 @@ class Path(Mc):
         ab = nextVert - co
         ap = co_find - co
 
+        if ab.x == 0 and ab.y == 0 and ab.z == 0:
+            raise Exception("Path mesh must not have vertices with identical\
+                             positions. Verts: " + index + ", " + nextIndex)
+
         fac = ap.dot(ab) / ab.dot(ab)
         adjust = fac * ab
         # lVel += ab.length * fac
