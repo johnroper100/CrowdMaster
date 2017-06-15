@@ -276,6 +276,8 @@ class LogicGRAPH(Neuron):
                     elif settings["CurveType"] == "RANGE":
                         output[i] = (linear(into[i]) * settings["Multiply"])
                     # cubic bezier could also be an option here (1/2 sided)
+                    if settings["Invert"]:
+                        output[i] = ((0 - 1) / (1 - 0)) * (output[i] - 0) + 1
         return output
 
 

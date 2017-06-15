@@ -389,6 +389,7 @@ class GraphNode(LogicNode):
 
     Multiply = FloatProperty(
         name="Multiply", description="Multiply the outputted value by this number", default=1.0)
+    Invert = BoolProperty(name="Invert", description="Invert the output of the graph", default=False)
 
     CurveType = EnumProperty(name="Curve Type",
                              items=[("RBF", "RBF", "", 1),
@@ -407,41 +408,10 @@ class GraphNode(LogicNode):
     RBFMiddle = FloatProperty(default=0.0)
     RBFTenPP = FloatProperty(default=0.25)  # Ten percent point
 
-    """Testing to see if this would work, currently it breaks the texture preview in the properties editor
-    def init(self, context):
-        cm_tex1Path = os.path.dirname(__file__) + "/cm_graphics/images/range_function.jpg"
-        cm_tex2Path = os.path.dirname(__file__) + "/cm_graphics/images/rbf_function.jpg"
-        try:
-            cm_tex1Img = bpy.data.images.load(cm_tex1Path)
-            cm_tex2Img = bpy.data.images.load(cm_tex2Path)
-        except:
-            raise NameError("Cannot load image %s" % cm_tex1Path)
-            raise NameError("Cannot load image %s" % cm_tex2Path)
-
-        cm_tex1Name = 'CrowdMaster-Graph-Range-Do-Not-Delete'
-        cm_tex2Name = 'CrowdMaster-Graph-RBF-Do-Not-Delete'
-
-        if cm_tex1Name not in bpy.data.textures:
-            cm_tex1 = bpy.data.textures.new(cm_tex1Name, type='IMAGE')
-            cm_tex1.image = cm_tex1Img
-
-        if cm_tex2Name not in bpy.data.textures:
-            cm_tex2 = bpy.data.textures.new(cm_tex2Name, type='IMAGE')
-            cm_tex2.image = cm_tex2Img
-    """
-
     def draw_buttons(self, context, layout):
-        """if self.CurveType == "RANGE":
-            row = layout.row()
-            split = row.split(1000 / (context.region.width - 50))
-            split.template_preview(bpy.data.textures['CrowdMaster-Graph-Range-Do-Not-Delete'], show_buttons=False)
-
-        elif self.CurveType == "RBF":
-            row = layout.row()
-            split = row.split(1000 / (context.region.width - 50))
-            split.template_preview(bpy.data.textures['CrowdMaster-Graph-RBF-Do-Not-Delete'], show_buttons=False)"""
-
-        layout.prop(self, "Multiply")
+        row = layout.row()
+        row.prop(self, "Multiply")
+        row.prop(self, "Invert")
         layout.prop(self, "CurveType", expand=True)
         if self.CurveType == "RBF":
             layout.prop(self, "RBFMiddle")
@@ -454,6 +424,7 @@ class GraphNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["Multiply"] = self.Multiply
+        node.settings["Invert"] = self.Invert
         node.settings["CurveType"] = self.CurveType
         node.settings["LowerZero"] = self.LowerZero
         node.settings["LowerOne"] = self.LowerOne
