@@ -136,20 +136,6 @@ class LogicNode(CrowdMasterNode):
 # ============ End of super classes ============
 
 
-class InputNode(LogicNode):
-    """CrowdMaster input node."""
-    bl_label = "Old Input Node !UNSTABLE!"
-    bl_width_default = 200.0
-
-    Input = StringProperty(name="Input", default="Noise.random")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "Input")
-
-    def getSettings(self, node):
-        node.settings["Input"] = self.Input
-
-
 class NewInputNode(LogicNode):
     """CrowdMaster new input node."""
     bl_label = "Input"
@@ -389,7 +375,8 @@ class GraphNode(LogicNode):
 
     Multiply = FloatProperty(
         name="Multiply", description="Multiply the outputted value by this number", default=1.0)
-    Invert = BoolProperty(name="Invert", description="Invert the output of the graph", default=False)
+    Invert = BoolProperty(
+        name="Invert", description="Invert the output of the graph", default=False)
 
     CurveType = EnumProperty(name="Curve Type",
                              items=[("RBF", "RBF", "", 1),
@@ -979,7 +966,6 @@ def register():
     bpy.utils.register_class(LogicNode)
     bpy.utils.register_class(StateNode)
 
-    bpy.utils.register_class(InputNode)
     bpy.utils.register_class(NewInputNode)
     bpy.utils.register_class(GraphNode)
     bpy.utils.register_class(MathNode)
@@ -1016,7 +1002,6 @@ def unregister():
     bpy.utils.unregister_class(LogicNode)
     bpy.utils.unregister_class(StateNode)
 
-    bpy.utils.unregister_class(InputNode)
     bpy.utils.unregister_class(NewInputNode)
     bpy.utils.unregister_class(GraphNode)
     bpy.utils.unregister_class(MathNode)

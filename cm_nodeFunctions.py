@@ -38,17 +38,6 @@ class Logic{NAME}(Neuron):
 """
 
 
-class LogicINPUT(Neuron):
-    """Retrieve information from the scene or about the agent"""
-
-    def core(self, inps, settings):
-        lvars = copy.copy(self.brain.lvars)
-        lvars["math"] = math
-        lvars["inps"] = inps
-        result = eval(settings["Input"], lvars)
-        return result
-
-
 class LogicNEWINPUT(Neuron):
     """Retrieve information from the scene or about the agent"""
 
@@ -635,7 +624,6 @@ class LogicAction(Neuron):
 
 
 logictypes = OrderedDict([
-    ("InputNode", LogicINPUT),
     ("NewInputNode", LogicNEWINPUT),
     ("GraphNode", LogicGRAPH),
     ("MathNode", LogicMATH),
