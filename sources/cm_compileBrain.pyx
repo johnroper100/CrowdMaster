@@ -84,8 +84,6 @@ def compileBrain(nodeGroup, sim, userid):
             item = statetypes[node.bl_idname](result, node, node.name)
             node.getSettings(item)
             item.outputs = getOutputs(node.outputs["To"])
-            if preferences.show_debug_options:
-                print(node.name, "outputs", item.outputs)
             if node.bl_idname == "StartState":
                 result.setStartState(node.name)
             else:

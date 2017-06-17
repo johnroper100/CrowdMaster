@@ -35,7 +35,6 @@ class Agent:
                  tags=None, modifyBones=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
-            print("Blender id", blenderid)
             t = time.time()
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
