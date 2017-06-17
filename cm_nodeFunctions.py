@@ -363,7 +363,7 @@ class LogicNOT(Neuron):
         result = {}
         for into in inps:
             for i in into:
-                result[i] = ((0 - 1) / 1) * (into[i]) + 1
+                result[i] = -into[i] + 1
         return result
 
 
