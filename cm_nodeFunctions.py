@@ -356,6 +356,17 @@ class LogicOR(Neuron):
             return results
 
 
+class LogicNOT(Neuron):
+    """Flip the logic state"""
+
+    def core(self, inps, settings):
+        result = {}
+        for into in inps:
+            for i in into:
+                result[i] = ((0 - 1) / 1) * (into[i]) + 1
+        return result
+
+
 class LogicSTRONG(Neuron):
     """Make 1's and 0's stronger"""
     # https://www.desmos.com/calculator/izfhogpchr
@@ -629,6 +640,7 @@ logictypes = OrderedDict([
     ("MathNode", LogicMATH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
+    ("NotNode", LogicNOT),
     ("StrongNode", LogicSTRONG),
     ("WeakNode", LogicWEAK),
     ("SetTagNode", LogicSETTAG),

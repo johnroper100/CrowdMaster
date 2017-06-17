@@ -490,6 +490,11 @@ class OrNode(LogicNode):
         node.settings["IncludeAll"] = self.IncludeAll
 
 
+class NotNode(LogicNode):
+    """CrowdMaster not node"""
+    bl_label = "Not"
+
+
 class StrongNode(LogicNode):
     """CrowdMaster Strong node. Makes 1's and 0's stronger"""
     bl_label = "Strong"
@@ -934,7 +939,8 @@ node_categories = [
     ]),
     MyNodeCategory("LOGIC", "Logic", items=[
         NodeItem("AndNode"),
-        NodeItem("OrNode")
+        NodeItem("OrNode"),
+        NodeItem("NotNode")
     ]),
     MyNodeCategory("STRENGTH", "Strength", items=[
         NodeItem("StrongNode"),
@@ -971,6 +977,7 @@ def register():
     bpy.utils.register_class(MathNode)
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
+    bpy.utils.register_class(NotNode)
     bpy.utils.register_class(StrongNode)
     bpy.utils.register_class(WeakNode)
     bpy.utils.register_class(SetTagNode)
@@ -1007,6 +1014,7 @@ def unregister():
     bpy.utils.unregister_class(MathNode)
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
+    bpy.utils.unregister_class(NotNode)
     bpy.utils.unregister_class(StrongNode)
     bpy.utils.unregister_class(WeakNode)
     bpy.utils.unregister_class(SetTagNode)
