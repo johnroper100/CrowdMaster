@@ -449,12 +449,12 @@ class RandomNode(CrowdMasterAGenTreeNode):
 
     minRandRot = FloatProperty(name="Min Rand Rotation",
                                description="The minimum random rotation in the Z axis for each agent.",
-                               default=-10, min=-360.0, max=360,
+                               default=0, min=-360.0, max=360,
                                update=updateRandomNode)
 
     maxRandRot = FloatProperty(name="Max Rand Rotation",
                                description="The maximum random rotation in the Z axis for each agent.",
-                               default=10, min=-360, max=360.0,
+                               default=0, min=-360, max=360.0,
                                update=updateRandomNode)
 
     minRandSz = FloatProperty(name="Min Rand Scale",
