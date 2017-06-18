@@ -180,7 +180,7 @@ class Path(Mc):
 
         if ab.x == 0 and ab.y == 0 and ab.z == 0:
             raise Exception("Path mesh must not have vertices with identical\
-                             positions. Verts: " + index + ", " + nextIndex)
+                             positions. Verts: " + str(index) + ", " + str(nextIndex))
 
         fac = ap.dot(ab) / ab.dot(ab)
         adjust = fac * ab
@@ -458,6 +458,7 @@ class Path(Mc):
 
         return result
 
+
 class draw_path_directions_operator(Operator):
     bl_idname = "view3d.draw_path_operator"
     bl_label = "Draw the directions of a path"
@@ -488,13 +489,15 @@ class draw_path_directions_operator(Operator):
         context.area.tag_redraw()
 
         if event.type in {'ESC'}:
-            bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
+            bpy.types.SpaceView3D.draw_handler_remove(
+                self._handle_3d, 'WINDOW')
             activePath = None
             # Hack to force redraw
             bpy.context.scene.objects.active = bpy.context.scene.objects.active
             return {'CANCELLED'}
         if activePath != self.pathName:
-            bpy.types.SpaceView3D.draw_handler_remove(self._handle_3d, 'WINDOW')
+            bpy.types.SpaceView3D.draw_handler_remove(
+                self._handle_3d, 'WINDOW')
             # Hack to force redraw
             bpy.context.scene.objects.active = bpy.context.scene.objects.active
             return {'CANCELLED'}
@@ -621,7 +624,9 @@ class SCENE_PT_path(Panel):
 #                       Path editing operators
 # ==========================================================================
 
+
 activePath = None
+
 
 class Switch_Selected_Path(Operator):
     bl_idname = "view3d.cm_switch_selected_path"
@@ -655,6 +660,7 @@ class Switch_Selected_Path(Operator):
         # Hack to force redraw
         bpy.context.scene.objects.active = bpy.context.scene.objects.active
         return {'FINISHED'}
+
 
 class Switch_Connected_Path(Operator):
     bl_idname = "view3d.cm_switch_connected_path"
@@ -700,6 +706,7 @@ class Switch_Connected_Path(Operator):
         # Hack to force redraw
         bpy.context.scene.objects.active = bpy.context.scene.objects.active
         return {'FINISHED'}
+
 
 class cm_path_bfs(Operator):
     bl_idname = "view3d.cm_paths_bfs"
@@ -748,6 +755,7 @@ class cm_path_bfs(Operator):
         # Hack to force redraw
         bpy.context.scene.objects.active = bpy.context.scene.objects.active
         return {'FINISHED'}
+
 
 class cm_path_dfs(Operator):
     bl_idname = "view3d.cm_paths_dfs"
