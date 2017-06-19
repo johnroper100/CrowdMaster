@@ -156,11 +156,12 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
     bl_idname = 'LinkGroupNodeType'
     bl_label = 'Link Armature'
     bl_icon = 'SOUND'
+    bl_width_default = 300.0
 
-    groupFile = StringProperty(name="Group file", subtype='FILE_PATH')
-    groupName = StringProperty(name="Group name")
-    rigObject = StringProperty(name="Rig object")
-    constrainBone = StringProperty(name="Constrain bone")
+    groupFile = StringProperty(name="Group File", subtype='FILE_PATH')
+    groupName = StringProperty(name="Group Name")
+    rigObject = StringProperty(name="Rig Object")
+    constrainBone = StringProperty(name="Constrain Bone")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
@@ -185,6 +186,7 @@ class ModifyBoneNode(CrowdMasterAGenTreeNode):
     bl_idname = 'ModifyBoneNodeType'
     bl_label = 'Modify Bone'
     bl_icon = 'SOUND'
+    bl_width_default = 250.0
 
     boneName = StringProperty(name="Bone name")
     attribute = EnumProperty(name="Attribute", items=[("RX", "rx", "", 1),
@@ -370,7 +372,7 @@ class TemplateNode(CrowdMasterAGenTreeNode):
     bl_idname = 'TemplateNodeType'
     bl_label = 'Template'
     bl_icon = 'SOUND'
-    bl_width_default = 300.0
+    bl_width_default = 250.0
 
     brainType = StringProperty(name="Brain Type")
     deferGeo = BoolProperty(name="Defer Geometry",
@@ -445,7 +447,7 @@ class RandomNode(CrowdMasterAGenTreeNode):
     bl_idname = 'RandomNodeType'
     bl_label = 'Random'
     bl_icon = 'SOUND'
-    bl_width_default = 400.0
+    bl_width_default = 350.0
 
     minRandRot = FloatProperty(name="Min Rand Rotation",
                                description="The minimum random rotation in the Z axis for each agent.",
@@ -519,7 +521,7 @@ class PointTowardsNode(CrowdMasterAGenTreeNode):
     bl_idname = 'PointTowardsNodeType'
     bl_label = 'Point Towards'
     bl_icon = 'SOUND'
-    bl_width_default = 350.0
+    bl_width_default = 325.0
 
     PointObject = StringProperty(name="Point to Object")
     PointType = EnumProperty(name="Point Type",
@@ -573,7 +575,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'RandomPositionNodeType'
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
-    bl_width_default = 300.0
+    bl_width_default = 350.0
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -660,10 +662,10 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'MeshPositionNodeType'
     bl_label = 'Mesh'
     bl_icon = 'SOUND'
-    bl_width_default = 150.0
+    bl_width_default = 250.0
 
     guideMesh = StringProperty(
-        name="Guide mesh", description="The mesh to scatter points over")
+        name="Guide Mesh", description="The mesh to scatter points over")
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -787,8 +789,9 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'PathPositionNodeType'
     bl_label = 'Path'
     bl_icon = 'SOUND'
+    bl_width_default = 250.0
 
-    pathName = StringProperty(name="Path name")
+    pathName = StringProperty(name="Path Name")
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
                             default=1, min=1)
@@ -834,7 +837,7 @@ class FormationPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'FormationPositionNodeType'
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
-    bl_width_default = 400.0
+    bl_width_default = 375.0
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",

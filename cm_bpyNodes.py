@@ -139,7 +139,7 @@ class LogicNode(CrowdMasterNode):
 class NewInputNode(LogicNode):
     """CrowdMaster new input node."""
     bl_label = "Input"
-    bl_width_default = 275.0
+    bl_width_default = 350.0
 
     InputSource = EnumProperty(name="Input Channel",
                                items=[("AGENTINFO", "Agent Info", "", 1),
@@ -424,7 +424,7 @@ class GraphNode(LogicNode):
 class MathNode(LogicNode):
     """CrowdMaster math node."""
     bl_label = "Math"
-    bl_width_default = 200.0
+    bl_width_default = 225.0
 
     operation = EnumProperty(name="Operation", items=[
                              ("add", "Add", "Add the two numbers together"),
@@ -760,7 +760,7 @@ class StartState(StateNode):
 class ActionState(StateNode):
     """CrowdMaster Action State"""
     bl_label = "Action"
-    bl_width_default = 250.0
+    bl_width_default = 275.0
 
     stateLength = IntProperty(name="State Length", default=1)
     cycleState = BoolProperty(name="Cycle State", default=False)
