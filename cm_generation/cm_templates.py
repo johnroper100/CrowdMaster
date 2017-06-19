@@ -217,7 +217,7 @@ class GeoTemplateGROUP(GeoTemplate):
             if obj.parent in gp:
                 obj.parent = group_objects[gp.index(obj.parent)]
             else:
-                obj.rotation_euler = Vector(obj.rotation_euler) + rot
+                #obj.rotation_euler = Vector(obj.rotation_euler) + Vector(rot)
                 obj.scale = Vector((scale, scale, scale))
                 obj.location += pos
 
