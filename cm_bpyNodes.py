@@ -154,7 +154,7 @@ class NewInputNode(LogicNode):
                                       ("WORLD", "World", "", 10)],
                                description="Which channel the input data should be pulled from")
 
-    Constant = FloatProperty(name="Constant", precision=3)
+    Constant = FloatProperty(name="Constant", precision=5)
 
     Flocking = EnumProperty(name="Flocking Input",
                             items=[("SEPARATE", "Separate", "", 1),
