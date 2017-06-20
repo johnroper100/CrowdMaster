@@ -142,16 +142,16 @@ class NewInputNode(LogicNode):
     bl_width_default = 350.0
 
     InputSource = EnumProperty(name="Input Channel",
-                               items=[("AGENTINFO", "Agent Info", "", 1),
-                                      ("CONSTANT", "Constant", "", 2),
-                                      ("FLOCK", "Flock", "", 3),
-                                      ("FORMATION", "Formation", "", 4),
-                                      ("GROUND", "Ground", "", 5),
-                                      ("NOISE", "Noise", "", 6),
-                                      ("PATH", "Path", "", 7),
-                                      ("SOUND", "Sound", "", 8),
-                                      ("STATE", "State", "", 9),
-                                      ("WORLD", "World", "", 10)],
+                               items=[("AGENTINFO", "Agent Info", "", 10),
+                                      ("CONSTANT", "Constant", "", 1),
+                                      ("FLOCK", "Flock", "", 2),
+                                      ("FORMATION", "Formation", "", 3),
+                                      ("GROUND", "Ground", "", 4),
+                                      ("NOISE", "Noise", "", 5),
+                                      ("PATH", "Path", "", 6),
+                                      ("SOUND", "Sound", "", 7),
+                                      ("STATE", "State", "", 8),
+                                      ("WORLD", "World", "", 9)],
                                description="Which channel the input data should be pulled from")
 
     Constant = FloatProperty(name="Constant", precision=5)
