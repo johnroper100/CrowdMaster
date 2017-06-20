@@ -1,0 +1,1 @@
+CMakeLists.txt not found in /home/peter/Documents/BlenderAddons/addons/CrowdMaster/sources

@@ -20,7 +20,7 @@
 import bpy
 import mathutils
 
-from ..libs import cm_accelerate
+#from ..libs import cm_accelerate
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
@@ -61,13 +61,25 @@ class AgentInfo(Mc):
                 rotation = x * y * z
                 emitHead = Vector((0, 1, 0)) * rotation
 
-                headRz, headRx = cm_accelerate.relativeRotation(emitHead.x,
+                target = emitHead.location - ag.location
+
+                z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+                y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+                x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+
+                rotation = x * y * z
+                relative = target * rotation
+
+                changez = math.atan2(relative[0], relative[1])/math.pi
+                changex = math.atan2(relative[2], relative[1])/math.pi
+
+                """headRz, headRx = cm_accelerate.relativeRotation(emitHead.x,
                                                                 emitHead.y,
                                                                 emitHead.z,
                                                                 ag.location.x,
                                                                 ag.location.y,
                                                                 ag.location.z,
-                                                                rotMat)
+                                                                rotMat)"""
                 result[i] = headRz
         return result
 
@@ -89,12 +101,24 @@ class AgentInfo(Mc):
                 rotation = x * y * z
                 emitHead = Vector((0, 1, 0)) * rotation
 
-                headRz, headRx = cm_accelerate.relativeRotation(emitHead.x,
+                target = emitHead.location - ag.location
+
+                z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+                y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+                x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+
+                rotation = x * y * z
+                relative = target * rotation
+
+                changez = math.atan2(relative[0], relative[1])/math.pi
+                changex = math.atan2(relative[2], relative[1])/math.pi
+
+                """headRz, headRx = cm_accelerate.relativeRotation(emitHead.x,
                                                                 emitHead.y,
                                                                 emitHead.z,
                                                                 ag.location.x,
                                                                 ag.location.y,
                                                                 ag.location.z,
-                                                                rotMat)
+                                                                rotMat)"""
                 result[i] = headRx
         return result

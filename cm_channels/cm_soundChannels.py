@@ -23,7 +23,7 @@ import bpy
 import mathutils
 
 from ..libs import ins_octree as ot
-from ..libs import cm_accelerate
+#from ..libs import cm_accelerate
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
@@ -126,7 +126,17 @@ class Channel:
             if dist <= val:
                 to = O[emitterid]
 
-                rotMat = agent.rotationMatrix
+
+                target = to.location - ag.location
+                z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
+                y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
+                x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
+                rotation = x * y * z
+                relative = target * rotation
+                changez = math.atan2(relative[0], relative[1])/math.pi
+                changex = math.atan2(relative[2], relative[1])/math.pi
+
+                """rotMat = agent.rotationMatrix
                 changez, changex = cm_accelerate.relativeRotation(to.location.x,
                                                                   to.location.y,
                                                                   to.location.z,
@@ -134,6 +144,7 @@ class Channel:
                                                                   ag.location.y,
                                                                   ag.location.z,
                                                                   rotMat)
+                                                                  """
                 if minusRadius:
                     dist -= self.sim.agents[emitterid].radius
                     dist -= agent.radius

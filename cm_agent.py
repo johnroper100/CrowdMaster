@@ -25,7 +25,7 @@ import mathutils
 
 from . import cm_timings
 from .cm_compileBrain import compileBrain
-from .libs import cm_accelerate
+#from .libs import cm_accelerate
 
 
 class Agent:
@@ -114,9 +114,9 @@ class Agent:
 
         rot = objs[self.id].rotation_euler
 
-        self.rotationMatrix = cm_accelerate.makeRotationMatrix(rot[0],
+        """self.rotationMatrix = cm_accelerate.makeRotationMatrix(rot[0],
                                                                rot[1],
-                                                               rot[2])
+                                                               rot[2])"""
 
         if preferences.show_debug_options:
             t = time.time()

@@ -761,7 +761,7 @@ class StateAction(State):
             complete = self.currentFrame / self.length
             complete = 0.5 + complete / 2
         currentFrame = bpy.context.scene.frame_current
-        self.resultLog[currentFrame] = complete
+        self.resultLog[currentFrame] = ((0.15, 0.4, complete))
 
         if self.currentAction in self.brain.sim.actions:
             actionobj = self.brain.sim.actions[self.currentAction]
