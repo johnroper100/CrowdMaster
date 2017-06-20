@@ -156,7 +156,7 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
     bl_idname = 'LinkGroupNodeType'
     bl_label = 'Link Armature'
     bl_icon = 'SOUND'
-    bl_width_default = 300.0
+    bl_width_default = 320.0
 
     groupFile = StringProperty(name="Group File", subtype='FILE_PATH')
     groupName = StringProperty(name="Group Name")
@@ -188,11 +188,11 @@ class ModifyBoneNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     bl_width_default = 250.0
 
-    boneName = StringProperty(name="Bone name")
+    boneName = StringProperty(name="Bone Name")
     attribute = EnumProperty(name="Attribute", items=[("RX", "rx", "", 1),
                                                       ("RY", "ry", "", 2),
                                                       ("RZ", "rz", "", 3)])
-    tagName = StringProperty(name="Tag name")
+    tagName = StringProperty(name="Tag Name")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
