@@ -36,7 +36,7 @@ class Noise(Mc):
 
     @timeChannel("Noise")
     def agentRandom(self, offset=0):
-        """Return a random number that is consistent between frame but can
+        """Return a random number that is consistent between frames but can
         be offset by an integer"""
         state = random.getstate()
         random.seed(hash(self.userid) - 1 + offset)
