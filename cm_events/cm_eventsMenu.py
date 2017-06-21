@@ -33,7 +33,7 @@ class event_entry(PropertyGroup):
         ("Volume", "Volume", "Volume"),
         ("Time+Volume", "Time+Volume", "Time+Volume"))
     )
-    volume = StringProperty()
+    volume = StringProperty(name="Volume")
 
 
 class events_collection(PropertyGroup):
