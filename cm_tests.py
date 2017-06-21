@@ -22,7 +22,6 @@ import unittest
 import bpy
 
 from .cm_syncManager import SyncManagerTestCase
-from .libs import cm_testAccelerate
 
 
 class AddonRegisterTestCase(unittest.TestCase):
@@ -68,8 +67,6 @@ def createShortTestSuite():
     test_suite = unittest.TestSuite()
     test_suite.addTest(unittest.makeSuite(AddonRegisterTestCase))
     test_suite.addTest(unittest.makeSuite(SyncManagerTestCase))
-    test_suite.addTest(unittest.makeSuite(
-        cm_testAccelerate.AccelerateTestCase))
     return test_suite
 
 
