@@ -164,9 +164,6 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
     constrainBone = StringProperty(name="Constrain Bone")
 
     def init(self, context):
-        self.inputs.new('GeoSocketType', "Objects")
-        self.inputs[0].link_limit = 1
-
         self.outputs.new('GeoSocketType', "Objects")
 
     def draw_buttons(self, context, layout):
@@ -180,6 +177,27 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
                 "groupName": self.groupName,
                 "rigObject": self.rigObject,
                 "constrainBone": self.constrainBone}
+
+
+class ConstrainBoneNode(CrowdMasterAGenTreeNode):
+    bl_idname = 'ConstrainNodeType'
+    bl_label = 'ConstrainBone'
+    bl_icon = 'SOUND'
+    bl_width_default = 160.0
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Parent Group")
+        self.inputs.new('GeoSocketType', "Child Object")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
+
+        self.outputs.new('GeoSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        pass
+
+    def getSettings(self):
+        return {}
 
 
 class ModifyBoneNode(CrowdMasterAGenTreeNode):
@@ -1105,6 +1123,7 @@ agen_node_categories = [
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
         NodeItem("GroupInputNodeType"),
         NodeItem("LinkGroupNodeType"),
+        NodeItem("ConstrainNodeType"),
         NodeItem("ModifyBoneNodeType"),
         NodeItem("ObjectInputNodeType"),
         NodeItem("ParentNodeType"),
@@ -1153,6 +1172,7 @@ def register():
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
     bpy.utils.register_class(LinkGroupNode)
+    bpy.utils.register_class(ConstrainBoneNode)
     bpy.utils.register_class(ModifyBoneNode)
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
@@ -1198,6 +1218,7 @@ def unregister():
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
     bpy.utils.unregister_class(LinkGroupNode)
+    bpy.utils.unregister_class(ConstrainBoneNode)
     bpy.utils.unregister_class(ModifyBoneNode)
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
