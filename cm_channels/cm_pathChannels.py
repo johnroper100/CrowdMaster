@@ -345,7 +345,7 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 20  # Hard coded for simplicity
+            lookahead = 2  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
             target = self.calcRelativeTarget(pathEntry, lookahead)
             self.resultsCache[pathEntry.objectName] = target
@@ -356,7 +356,7 @@ class Path(Mc):
         if pathName in self.resultsCache:
             target = self.resultsCache[pathName]
         else:
-            lookahead = 20  # Hard coded for simplicity
+            lookahead = 2  # Hard coded for simplicity
             pathEntry = bpy.context.scene.cm_paths.coll.get(pathName)
             target = self.calcRelativeTarget(pathEntry, lookahead)
             self.resultsCache[pathEntry.objectName] = target
