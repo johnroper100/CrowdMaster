@@ -416,7 +416,7 @@ class Channel:
         """Return the certainty of a prediction 0-1"""
         items = self.calcAndGetItems(minusRadius)
         if items:
-            return self._buildDictFromProperty(items, "cert", default=1)
+            return self._buildDictFromProperty(items, "cert")
 
     @timeChannel("Sound")
     def acc(self, minusRadius):
