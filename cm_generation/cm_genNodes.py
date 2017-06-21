@@ -181,7 +181,7 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
 
 class ConstrainBoneNode(CrowdMasterAGenTreeNode):
     bl_idname = 'ConstrainNodeType'
-    bl_label = 'ConstrainBone'
+    bl_label = 'Constrain Bone'
     bl_icon = 'SOUND'
     bl_width_default = 160.0
 
