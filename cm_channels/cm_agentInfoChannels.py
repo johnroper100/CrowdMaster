@@ -20,7 +20,6 @@
 import bpy
 import mathutils
 
-#from ..libs import cm_accelerate
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
@@ -73,13 +72,6 @@ class AgentInfo(Mc):
                 changez = math.atan2(relative[0], relative[1])/math.pi
                 changex = math.atan2(relative[2], relative[1])/math.pi
 
-                """headRz, headRx = cm_accelerate.relativeRotation(emitHead.x,
-                                                                emitHead.y,
-                                                                emitHead.z,
-                                                                ag.location.x,
-                                                                ag.location.y,
-                                                                ag.location.z,
-                                                                rotMat)"""
                 result[i] = headRz
         return result
 
@@ -113,12 +105,5 @@ class AgentInfo(Mc):
                 changez = math.atan2(relative[0], relative[1])/math.pi
                 changex = math.atan2(relative[2], relative[1])/math.pi
 
-                """headRz, headRx = cm_accelerate.relativeRotation(emitHead.x,
-                                                                emitHead.y,
-                                                                emitHead.z,
-                                                                ag.location.x,
-                                                                ag.location.y,
-                                                                ag.location.z,
-                                                                rotMat)"""
                 result[i] = headRx
         return result
