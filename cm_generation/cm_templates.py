@@ -438,8 +438,8 @@ class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
 
     def build(self, buildRequest):
-        gret = self.inputs["Parent Group"].build(buildRequest.copy())
-        parent = gret.obj
+        gretp = self.inputs["Parent Group"].build(buildRequest.copy())
+        parent = gretp.obj
         gret = self.inputs["Child Object"].build(buildRequest.copy())
         child = gret.obj
         con = child.constraints.new("CHILD_OF")
@@ -449,7 +449,7 @@ class GeoTemplatePARENT(GeoTemplate):
         con.inverse_matrix = bone.matrix.inverted()
         if child.data:
             child.data.update()
-        return gret
+        return gretpc
         # TODO check if the object has an armature modifier
 
     def check(self):
