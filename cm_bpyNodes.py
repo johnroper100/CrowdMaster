@@ -341,7 +341,6 @@ class NewInputNode(LogicNode):
                 node.settings["SoundOptions"] = self.PredictionOptions
             elif self.SoundMode == "STEERING":
                 node.settings["SoundOptions"] = self.SteeringOptions
-            node.settings["StateTagName"] = self.StateTagName
             node.settings["MinusRadius"] = self.MinusRadius
         elif self.InputSource == "WORLD":
             node.settings["WorldOptions"] = self.WorldOptions
@@ -356,6 +355,7 @@ class NewInputNode(LogicNode):
             node.settings["GetTagName"] = self.GetTagName
         elif self.InputSource == "STATE":
             node.settings["StateOptions"] = self.StateOptions
+            node.settings["StateTagName"] = self.StateTagName
 
 
 def update_properties(self, context):
