@@ -19,6 +19,7 @@
 
 import bpy
 import mathutils
+import math
 
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
@@ -47,7 +48,6 @@ class AgentInfo(Mc):
         z axis"""
         result = {}
         ag = bpy.context.scene.objects[self.userid]
-        rotMat = self.sim.agents[self.userid].rotationMatrix
         for into in inputs:
             for i in into:
                 emitterAgent = self.sim.agents[i]
@@ -60,7 +60,7 @@ class AgentInfo(Mc):
                 rotation = x * y * z
                 emitHead = Vector((0, 1, 0)) * rotation
 
-                target = emitHead.location - ag.location
+                target = emitHead - ag.location
 
                 z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
                 y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
@@ -72,7 +72,7 @@ class AgentInfo(Mc):
                 changez = math.atan2(relative[0], relative[1])/math.pi
                 changex = math.atan2(relative[2], relative[1])/math.pi
 
-                result[i] = headRz
+                result[i] = changez
         return result
 
     @timeChannel("AgentInfo")
@@ -93,7 +93,7 @@ class AgentInfo(Mc):
                 rotation = x * y * z
                 emitHead = Vector((0, 1, 0)) * rotation
 
-                target = emitHead.location - ag.location
+                target = emitHead - ag.location
 
                 z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
                 y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
@@ -105,5 +105,5 @@ class AgentInfo(Mc):
                 changez = math.atan2(relative[0], relative[1])/math.pi
                 changex = math.atan2(relative[2], relative[1])/math.pi
 
-                result[i] = headRx
+                result[i] = changex
         return result
