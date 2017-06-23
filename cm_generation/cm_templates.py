@@ -263,15 +263,16 @@ def findUnusedGroup(searchDirectory, namePrefix, sourceGroup):
     return False
 
 
-def findUnusedFile(searchDirectory, namePrefix, sourceGroup):
+def findUnusedFile(searchDirectory, namePrefix, sourceGroup, additionalGroup):
     usedBlends = []
     for group in bpy.data.groups:
         if len(group.users_dupli_group) > 0 and group.name == sourceGroup:
             if group.library is not None:
-                linkedFileName = os.path.split(group.library.filepath)[0]
-                partialPath = os.path.join(searchDirectory, namePrefix)
-                if linkedFileName[:len(partialPath)] == partialPath:
-                    usedBlends.append(group.library.filepath)
+                partialPath, fileName = os.path.split(group.library.filepath)
+                linkedFileName = os.path.join(searchDirectory, namePrefix)
+                if os.path.normpath(searchDirectory) == os.path.normpath(partialPath):
+                    for f in fileName.split(","):
+                        usedBlends.append(f.strip())
 
     dupFiles = os.listdir(searchDirectory)
 
@@ -280,12 +281,15 @@ def findUnusedFile(searchDirectory, namePrefix, sourceGroup):
             if fileName not in usedBlends:
                 unusedFile = os.path.join(searchDirectory, fileName)
                 with bpy.data.libraries.load(unusedFile, link=True) as (data_src, data_dst):
-                    data_dst.groups = [group]
-                return data_dst.groups[0]
+                    data_dst.groups = [sourceGroup]
+                    if additionalGroup != "":
+                        data_dst.groups.append(additionalGroup)
+                return data_dst.groups[0], unusedFile
     return False
 
 
-def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig):
+def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig,
+                       additionalGroup):
     if not os.path.exists(dupDir):
         os.makedirs(dupDir)
 
@@ -294,7 +298,8 @@ def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig):
     dupliGroup = findUnusedGroup(dupDir, newNamePrefix, sourceGroup)
 
     if not dupliGroup:
-        dupliGroup = findUnusedFile(dupDir, newNamePrefix, sourceGroup)
+        dupliGroup, newName = findUnusedFile(dupDir, newNamePrefix, sourceGroup,
+                                             additionalGroup)
 
     if not dupliGroup:
         existingFiles = os.listdir(dupDir)
@@ -309,6 +314,8 @@ def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig):
         # append all groups from the .blend file
         with bpy.data.libraries.load(newfilepath, link=True) as (data_src, data_dst):
             data_dst.groups = [sourceGroup]
+            if additionalGroup != "":
+                data_dst.groups.append(additionalGroup)
 
         dupliGroup = data_dst.groups[0]
 
@@ -349,8 +356,10 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
         group = self.settings["groupName"]
         rigObject = self.settings["rigObject"]
+        additionalGroup = self.settings["additionalGroup"]
 
-        newObj, newRig = duplicateProxyLink(dupDir, blendfile, group, rigObject)
+        newObj, newRig = duplicateProxyLink(dupDir, blendfile, group, rigObject,
+                                            additionalGroup)
         buildRequest.group.objects.link(newObj)
         buildRequest.group.objects.link(newRig)
 

@@ -161,6 +161,7 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
     groupFile = StringProperty(name="Group File", subtype='FILE_PATH')
     groupName = StringProperty(name="Group Name")
     rigObject = StringProperty(name="Rig Object")
+    additionalGroup = StringProperty(name="Additional Groups")
     constrainBone = StringProperty(name="Constrain Bone")
 
     def init(self, context):
@@ -170,12 +171,14 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
         layout.prop(self, "groupFile")
         layout.prop(self, "groupName")
         layout.prop(self, "rigObject")
+        layout.prop(self, "additionalGroup")
         layout.prop(self, "constrainBone")
 
     def getSettings(self):
         return {"groupFile": self.groupFile,
                 "groupName": self.groupName,
                 "rigObject": self.rigObject,
+                "additionalGroup": self.additionalGroup,
                 "constrainBone": self.constrainBone}
 
 

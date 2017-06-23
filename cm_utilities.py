@@ -420,6 +420,26 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
         return {'FINISHED'}
 
 
+class Crowdmaster_switch_dupli_group(bpy.types.Operator):
+    bl_idname = "scene.cm_switch_dupli_groups"
+    bl_label = "Switch dupli groups"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        for obj in bpy.context.selected_objects:
+            if obj.dupli_type == "GROUP":
+                suffix = bpy.context.scene.cm_switch_dupli_group_suffix
+                if obj.dupli_group.name[-len(suffix):] == suffix:
+                    target = bpy.context.scene.cm_switch_dupli_group_target
+                    replaceName = obj.dupli_group.name[:-len(suffix)] + target
+                    replaceSource = obj.dupli_group.library
+                    for grp in bpy.data.groups:
+                        if grp.name == replaceName:
+                            if grp.library == replaceSource:
+                                obj.dupli_group = grp
+        return {'FINISHED'}
+
+
 def register():
     bpy.utils.register_class(CrowdMaster_setup_sample_nodes)
     bpy.utils.register_class(CrowdMaster_genNodes_pos_random_simple)
@@ -430,6 +450,7 @@ def register():
     bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.register_class(CrowdMaster_setup_agent)
     bpy.utils.register_class(Crowdmaster_place_deferred_geo)
+    bpy.utils.register_class(Crowdmaster_switch_dupli_group)
 
 
 def unregister():
@@ -442,6 +463,7 @@ def unregister():
     bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.unregister_class(CrowdMaster_setup_agent)
     bpy.utils.unregister_class(Crowdmaster_place_deferred_geo)
+    bpy.utils.unregister_class(Crowdmaster_switch_dupli_group)
 
 
 if __name__ == "__main__":
