@@ -316,7 +316,7 @@ class LogicAND(Neuron):
                 for k, v in results.items():
                     total *= v
             else:  # Method == "MIN"
-                total = min(results.values())
+                total = min(results.values()) if len(results) > 0 else 0
             return {"None": total}
         else:
             return results
