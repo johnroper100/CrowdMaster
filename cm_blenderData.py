@@ -80,17 +80,17 @@ def registerTypes():
     bpy.types.Scene.cm_groups = CollectionProperty(type=group_entry)
     bpy.types.Scene.cm_groups_index = IntProperty()
 
-    bpy.types.Scene.cm_view_details = BoolProperty(name="View group details",
+    bpy.types.Scene.cm_view_details = BoolProperty(name="View Group Details",
                                                    description="Show a breakdown of the agents in the selected group",
                                                    default=False)
     bpy.types.Scene.cm_view_details_index = IntProperty()
 
     bpy.utils.register_class(manual_props)
     bpy.types.Scene.cm_manual = PointerProperty(type=manual_props)
-    bpy.types.Scene.cm_linked_file_dir = StringProperty(name="Linked file directory",
+    bpy.types.Scene.cm_linked_file_dir = StringProperty(name="Linked File Directory",
                                                         subtype='FILE_PATH')
-    bpy.types.Scene.cm_switch_dupli_group_suffix = StringProperty(name="Switch dupli group suffix")
-    bpy.types.Scene.cm_switch_dupli_group_target = StringProperty(name="Switch dupli group target")
+    bpy.types.Scene.cm_switch_dupli_group_suffix = StringProperty(name="Switch Dupli Group Suffix")
+    bpy.types.Scene.cm_switch_dupli_group_target = StringProperty(name="Switch Dupli Group Target")
 
 
 def unregisterAllTypes():

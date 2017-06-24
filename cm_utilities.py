@@ -422,7 +422,7 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
 
 class Crowdmaster_switch_dupli_group(bpy.types.Operator):
     bl_idname = "scene.cm_switch_dupli_groups"
-    bl_label = "Switch dupli groups"
+    bl_label = "Switch Dupli Groups"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
