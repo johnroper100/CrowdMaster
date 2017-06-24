@@ -345,7 +345,7 @@ class SCENE_PT_CrowdMaster(Panel):
             row.prop(scene, "cm_switch_dupli_group_target")
             row = box.row()
             row.scale_y = 1.5
-            row.operator("scene.cm_switch_dupli_groups")
+            row.operator("scene.cm_switch_dupli_groups", icon="GROUP_VERTEX")
 
             box = layout.box()
             row = box.row()
