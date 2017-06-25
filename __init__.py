@@ -459,6 +459,14 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
         op.brainType = scene.cm_manual.brainType
 
 
+@bpy.app.handlers.persistent
+def nodeTreeSetFakeUser(scene):
+    for grp in bpy.data.node_groups:
+        if grp.bl_idname in ["CrowdMasterAGenTreeType", "CrowdMasterTreeType"]:
+            if not grp.savedOnce:
+                grp.savedOnce = True
+                grp.use_fake_user = True
+
 def register():
     global cm_documentation
     from . import cm_documentation
@@ -519,6 +527,9 @@ def register():
     from . import cm_tests
     cm_tests.register()
 
+    if nodeTreeSetFakeUser not in bpy.app.handlers.save_pre:
+        bpy.app.handlers.save_pre.append(nodeTreeSetFakeUser)
+
 
 def unregister():
     unregister_icons()
@@ -554,6 +565,9 @@ def unregister():
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
+
+    if nodeTreeSetFakeUser in bpy.app.handlers.save_pre:
+        bpy.app.handlers.save_pre.remove(nodeTreeSetFakeUser)
 
 
 if __name__ == "__main__":

@@ -37,6 +37,8 @@ class CrowdMasterAGenTree(NodeTree):
     bl_label = 'CrowdMaster Agent Generation'
     bl_icon = 'MOD_ARRAY'
 
+    savedOnce = BoolProperty()
+
 
 class GeoSocket(NodeSocket):
     """Geo node socket type"""

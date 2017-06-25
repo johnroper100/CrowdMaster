@@ -36,6 +36,8 @@ class CrowdMasterTree(NodeTree):
     bl_label = 'CrowdMaster Agent Simulation'
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
+    savedOnce = BoolProperty(default=False)
+
 
 class DefaultSocket(NodeSocket):
     """Default CrowdMaster socket type"""
