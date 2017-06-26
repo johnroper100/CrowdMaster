@@ -92,9 +92,9 @@ class Channel:
 
         to = O[self.target]
         ag = O[self.userid]
-        userDim = self.sim.agents[self.userid].dimensions
+        userDim = bpy.context.scene.objects[self.userid].dimensions
 
-        tDim = max(self.sim.agents[self.target].dimensions)
+        tDim = max(bpy.context.scene.objects[self.target].dimensions)
         uDim = max(userDim)
 
         difx = to.location.x - ag.location.x
