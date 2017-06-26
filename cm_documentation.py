@@ -53,6 +53,16 @@ documentation_mapping = (
     ("bpy.ops.scene.cm_events_move", "simulation/toolbars/events.html"),
     ("bpy.ops.scene.cm_paths_populate", "simulation/toolbars/paths.html"),
     ("bpy.ops.scene.cm_paths_remove", "simulation/toolbars/paths.html"),
+    ("bpy.ops.view3d.cm_paths_bfs",
+     "simulation/toolbars/paths.html#breadth-first-search-to-direct-edges"),
+    ("bpy.ops.view3d.cm_paths_dfs",
+     "simulation/toolbars/paths.html#depth-first-search-to-direct-edges"),
+    ("bpy.ops.view3d.cm_switch_connected_path",
+     "simulation/toolbars/paths.html#switch-the-direction-of-the-connected-edges"),
+    ("bpy.ops.view3d.cm_switch_selected_path",
+     "simulation/toolbars/paths.html#switch-the-direction-of-the-selected-edges"),
+    ("bpy.ops.view3d.draw_path_operator",
+     "simulation/toolbars/paths.html#draw-the-directions-of-a-path"),
     # TODO - nodes
 
     # PROPS
@@ -67,6 +77,12 @@ documentation_mapping = (
      "simulation/toolbars/manual_agents.html"),
     ("bpy.types.Scene.cm_manual.brainType",
      "simulation/toolbars/manual_agents.html"),
+    ("bpy.types.Scene.cm_linked_file_dir",
+     "simulation/toolbars/main/index.html#linked-file-directory"),
+    ("bpy.types.Scene.cm_switch_dupli_group_suffix",
+     "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-suffix"),
+    ("bpy.types.Scene.cm_switch_dupli_group_target",
+     "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-target"),
     # TODO - nodes
 )
 

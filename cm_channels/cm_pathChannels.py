@@ -461,9 +461,9 @@ class Path(Mc):
 
 class draw_path_directions_operator(Operator):
     bl_idname = "view3d.draw_path_operator"
-    bl_label = "Draw the directions of a path"
+    bl_label = "Draw The Directions Of A Path"
 
-    pathName = StringProperty(name="Name of path")
+    pathName = StringProperty(name="Name Of Path")
 
     def drawCallback(self, context, path):
         with cm_draw.bglWrapper:
@@ -540,7 +540,7 @@ class paths_collection(PropertyGroup):
 
 class SCENE_OT_cm_path_populate(Operator):
     bl_idname = "scene.cm_paths_populate"
-    bl_label = "Add a path"
+    bl_label = "Add A Path"
 
     def execute(self, context):
         item = context.scene.cm_paths.coll.add()
@@ -549,7 +549,7 @@ class SCENE_OT_cm_path_populate(Operator):
 
 class SCENE_OT_cm_path_remove(Operator):
     bl_idname = "scene.cm_paths_remove"
-    bl_label = "Remove a path"
+    bl_label = "Remove A Path"
 
     @classmethod
     def poll(cls, context):
@@ -630,7 +630,7 @@ activePath = None
 
 class Switch_Selected_Path(Operator):
     bl_idname = "view3d.cm_switch_selected_path"
-    bl_label = "Switch the direction of the selected edges"
+    bl_label = "Switch The Direction Of The Selected Edges"
 
     @classmethod
     def poll(cls, context):
@@ -664,7 +664,7 @@ class Switch_Selected_Path(Operator):
 
 class Switch_Connected_Path(Operator):
     bl_idname = "view3d.cm_switch_connected_path"
-    bl_label = "Switch the direction of the connected edges"
+    bl_label = "Switch The Direction Of The Connected Edges"
 
     @classmethod
     def poll(cls, context):
@@ -710,7 +710,7 @@ class Switch_Connected_Path(Operator):
 
 class cm_path_bfs(Operator):
     bl_idname = "view3d.cm_paths_bfs"
-    bl_label = "Breadth first search to direct edges"
+    bl_label = "Breadth First Search To Direct Edges"
 
     @classmethod
     def poll(cls, context):
@@ -759,7 +759,7 @@ class cm_path_bfs(Operator):
 
 class cm_path_dfs(Operator):
     bl_idname = "view3d.cm_paths_dfs"
-    bl_label = "Depth first search to direct edges"
+    bl_label = "Depth First Search To Direct Edges"
 
     @classmethod
     def poll(cls, context):
