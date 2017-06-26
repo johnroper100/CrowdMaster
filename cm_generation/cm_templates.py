@@ -476,7 +476,7 @@ class GeoTemplatePARENT(GeoTemplate):
         con.inverse_matrix = bone.matrix.inverted()
         if child.data:
             child.data.update()
-        return gretpc
+        return gretp
         # TODO check if the object has an armature modifier
 
     def check(self):
