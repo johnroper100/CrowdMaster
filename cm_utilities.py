@@ -313,21 +313,6 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
 
         return {'FINISHED'}
 
-
-class CrowdMaster_setup_agent(bpy.types.Operator):
-    bl_idname = "scene.cm_setup_agent"
-    bl_label = "Setup Agent"
-
-    def execute(self, context):
-
-        selected = bpy.context.selected_objects
-        for _ in selected:
-            bpy.ops.object.transform_apply(
-                location=True, rotation=True, scale=True)
-
-        return {'FINISHED'}
-
-
 class Crowdmaster_place_deferred_geo(bpy.types.Operator):
     bl_idname = "scene.cm_place_deferred_geo"
     bl_label = "Place Deferred Geometry"

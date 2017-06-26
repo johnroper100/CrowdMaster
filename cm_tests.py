@@ -55,7 +55,7 @@ class AddonRegisterTestCase(unittest.TestCase):
                     "cm_gennodes_pos_target_simple", "cm_groups_reset",
                     "cm_paths_populate", "cm_paths_remove",
                     "cm_place_deferred_geo", "cm_run_long_tests",
-                    "cm_run_short_tests", "cm_save_prefs", "cm_setup_agent",
+                    "cm_run_short_tests", "cm_save_prefs",
                     "cm_setup_sample_nodes", "cm_simnodes_action_random",
                     "cm_simnodes_mov_simple", "cm_start", "cm_stop"]
         for op in opsProps:
