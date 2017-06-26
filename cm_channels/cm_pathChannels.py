@@ -133,8 +133,8 @@ class Path(Mc):
                         otherVert = e.verts[0]
                     else:
                         otherVert = e.verts[1]
-                normNearestToOther = (
-                    otherVert.co - bm.verts[index].co).normalized()
+                nearestToOther = otherVert.co - bm.verts[index].co
+                normNearestToOther = nearestToOther.normalized()
                 score = normNearestToOther.dot(normNearestToAgent)
                 if score > bestScore:
                     bestScore = score
@@ -190,7 +190,7 @@ class Path(Mc):
         #   is behind the agent.
         start = co + adjust
 
-        return nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength
+        return nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength, index, co
 
     def followPath(self, bm, co, index, vel, co_find, radius, laneSeparation,
                    isDirectional, pathEntry):
@@ -208,7 +208,7 @@ class Path(Mc):
 
         res = self.firstPointOnPath(
             bm, co, index, co_find, nVel, isDirectional)
-        nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength = res
+        nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength, index, co = res
 
         lVel += adjustLength
 
