@@ -433,7 +433,6 @@ def register():
     bpy.utils.register_class(CrowdMaster_simNodes_mov_simple)
     bpy.utils.register_class(CrowdMaster_simNodes_action_random)
     bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
-    bpy.utils.register_class(CrowdMaster_setup_agent)
     bpy.utils.register_class(Crowdmaster_place_deferred_geo)
     bpy.utils.register_class(Crowdmaster_switch_dupli_group)
 
@@ -446,7 +445,6 @@ def unregister():
     bpy.utils.unregister_class(CrowdMaster_simNodes_mov_simple)
     bpy.utils.unregister_class(CrowdMaster_simNodes_action_random)
     bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
-    bpy.utils.unregister_class(CrowdMaster_setup_agent)
     bpy.utils.unregister_class(Crowdmaster_place_deferred_geo)
     bpy.utils.unregister_class(Crowdmaster_switch_dupli_group)
 
