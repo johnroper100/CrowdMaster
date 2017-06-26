@@ -75,6 +75,7 @@ coreNumber = OrderedDict([
     ("LogicMATH", 0),
     ("LogicAND", 0),
     ("LogicOR", 0),
+    ("LogicNOT", 0),
     ("LogicSTRONG", 0),
     ("LogicWEAK", 0),
     ("LogicSETTAG", 0),
