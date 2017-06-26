@@ -534,20 +534,6 @@ class SetTagNode(LogicNode):
         node.settings["Action"] = self.Action
 
 
-class VariableNode(LogicNode):
-    """CrowdMaster Variable node"""
-    bl_label = "Variable"
-    bl_width_default = 200.0
-
-    Variable = StringProperty(name="Variable", default="None")
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "Variable")
-
-    def getSettings(self, node):
-        node.settings["Variable"] = self.Variable
-
-
 class FilterNode(LogicNode):
     """CrowdMaster Filter node"""
     bl_label = "Filter"
@@ -956,7 +942,6 @@ node_categories = [
         NodeItem("FilterNode"),
         NodeItem("MathNode"),
         NodeItem("SetTagNode"),
-        NodeItem("VariableNode")
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
@@ -983,7 +968,6 @@ def register():
     bpy.utils.register_class(StrongNode)
     bpy.utils.register_class(WeakNode)
     bpy.utils.register_class(SetTagNode)
-    bpy.utils.register_class(VariableNode)
     bpy.utils.register_class(FilterNode)
     bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
@@ -1020,7 +1004,6 @@ def unregister():
     bpy.utils.unregister_class(StrongNode)
     bpy.utils.unregister_class(WeakNode)
     bpy.utils.unregister_class(SetTagNode)
-    bpy.utils.unregister_class(VariableNode)
     bpy.utils.unregister_class(FilterNode)
     bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
