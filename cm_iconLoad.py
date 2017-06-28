@@ -22,9 +22,9 @@ import os
 import bpy
 
 ICONS = 'start_sim stop_sim ' \
-        'agents reset instant_setup add_agents ' \
-        'plug code shuffle array target ' \
-        'motion dice house email'.split(' ')
+        'agents reset add_agents ' \
+        'plug code shuffle ' \
+        'dice house email'.split(' ')
 icon_collection = {}
 
 
