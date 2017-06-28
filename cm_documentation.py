@@ -36,8 +36,6 @@ documentation_mapping = (
     ("bpy.ops.scene.cm_stop", "simulation/toolbars/main/index.html#stop-simulation"),
     ("bpy.ops.scene.cm_place_deferred_geo",
      "simulation/toolbars/main/utilities/place_deferred_geo.html"),
-    ("bpy.ops.scene.cm_setup_sample_nodes",
-     "simulation/toolbars/main/utilities/sample_node_setups.html"),
     ("bpy.ops.scene.cm_convert_to_bound_box",
      "simulation/toolbars/main/utilities/conv_to_bound_box.html"),
     ("bpy.ops.scene.cm_switch_dupli_groups",
@@ -67,12 +65,6 @@ documentation_mapping = (
 
     # PROPS
     # toolbar
-    ("bpy.types.Scene.nodeTreeType",
-     "simulation/toolbars/main/utilities/sample_node_setups.html#node-tree-type"),
-    ("bpy.types.Scene.append_to_tree",
-     "simulation/toolbars/main/utilities/sample_node_setups.html#append-to-tree"),
-    ("bpy.types.Scene.node_tree_name",
-     "simulation/toolbars/main/utilities/sample_node_setups.html"),
     ("bpy.types.Scene.cm_manual.groupName",
      "simulation/toolbars/manual_agents.html"),
     ("bpy.types.Scene.cm_manual.brainType",

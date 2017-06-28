@@ -347,26 +347,6 @@ class SCENE_PT_CrowdMaster(Panel):
             row.scale_y = 1.5
             row.operator("scene.cm_switch_dupli_groups", icon="GROUP_VERTEX")
 
-            box = layout.box()
-            row = box.row()
-            row.prop(scene, "nodeTreeType")
-
-            row = box.row()
-            row.prop(scene, "append_to_tree")
-
-            if scene.append_to_tree:
-                row = box.row()
-                row.prop_search(scene, "node_tree_name",
-                                bpy.data, "node_groups")
-
-            row = box.row()
-            row.scale_y = 1.5
-            if preferences.use_custom_icons:
-                row.operator("scene.cm_setup_sample_nodes",
-                             icon_value=cicon('instant_setup'))
-            else:
-                row.operator("scene.cm_setup_sample_nodes", icon="NODETREE")
-
 
 class SCENE_PT_CrowdMasterAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
