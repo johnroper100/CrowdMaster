@@ -285,7 +285,7 @@ def findUnusedFile(searchDirectory, namePrefix, sourceGroup, additionalGroup):
                     if additionalGroup != "":
                         data_dst.groups.append(additionalGroup)
                 return data_dst.groups[0], unusedFile
-    return False
+    return False, None
 
 
 def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig,
