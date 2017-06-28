@@ -1036,7 +1036,8 @@ class TemplatePATH(Template):
                                     ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = p + adjust / len(localPoints)
-                        normal = Vector((0, 1, 0)).rotate(Euler(r))
+                        normal = Vector((0, 1, 0))
+                        normal.rotate(Euler(r))
                         pos, pointTowards = tmpPathChannel.alignToPath(pathEntry,
                                                                        adjPos,
                                                                        normal)
