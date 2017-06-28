@@ -71,6 +71,7 @@ class SCENE_OT_cm_groups_reset(Operator):
     groupName = StringProperty()
 
     def execute(self, context):
+        bpy.ops.object.mode_set(mode='OBJECT')
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
