@@ -898,7 +898,6 @@ class TemplateVCOLPOSITIONING(Template):
         self.totalArea = None
 
     def build(self, buildRequest):
-        bpy.ops.object.mode_set(mode='OBJECT')
         guide = bpy.data.objects[self.settings["guideMesh"]]
         data = guide.data
         polys = []

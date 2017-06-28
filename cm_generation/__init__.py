@@ -76,6 +76,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             return False, None
 
     def execute(self, context):
+        bpy.ops.object.mode_set(mode='OBJECT')
         startT = time.time()
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
