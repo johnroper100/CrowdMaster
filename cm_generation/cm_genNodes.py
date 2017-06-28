@@ -717,7 +717,7 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "guideMesh", bpy.data, "meshes")
+        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
         layout.prop(self, "noToPlace")
         layout.prop(self, "overwritePosition")
 
