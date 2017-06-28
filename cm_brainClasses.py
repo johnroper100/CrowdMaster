@@ -24,11 +24,11 @@ import bpy
 import mathutils
 
 from . import cm_timings
-import mathutils
 
 
 class Neuron():
     """The representation of the nodes. Not to be used on own"""
+
     def __init__(self, brain, bpyNode):
         self.brain = brain  # type: Brain
         self.neurons = self.brain.neurons  # type: List[Neuron]
@@ -93,18 +93,18 @@ class Neuron():
                 startHue = 0.5
 
             if av > 1:
-                hueChange = -(-(abs(av)+1)/abs(av) + 2) * (1/3)
+                hueChange = -(-(abs(av) + 1) / abs(av) + 2) * (1 / 3)
                 hue = 0.333 + hueChange
                 sat = 1
             elif av < -1:
-                hueChange = (-(abs(av)+1)/abs(av) + 2) * (1/3)
+                hueChange = (-(abs(av) + 1) / abs(av) + 2) * (1 / 3)
                 hue = 0.5 + hueChange
                 sat = 1
             else:
                 hue = startHue
 
             if abs(av) < 1:
-                sat = abs(av)**(1/2)
+                sat = abs(av)**(1 / 2)
             else:
                 sat = 1
         else:
@@ -135,6 +135,7 @@ class Neuron():
 
 class State:
     """The basic element of the state machine. Abstract class"""
+
     def __init__(self, brain, bpyNode, name):
         """A lot of the fields are modified by the compileBrain function"""
         self.name = name
@@ -270,6 +271,7 @@ class State:
 
 class Brain():
     """An executable brain object. One created per agent"""
+
     def __init__(self, sim, userid):
         self.userid = userid
         self.sim = sim

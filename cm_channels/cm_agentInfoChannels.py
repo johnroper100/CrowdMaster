@@ -17,9 +17,10 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import math
+
 import bpy
 import mathutils
-import math
 
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
@@ -69,8 +70,8 @@ class AgentInfo(Mc):
                 rotation = x * y * z
                 relative = target * rotation
 
-                changez = math.atan2(relative[0], relative[1])/math.pi
-                changex = math.atan2(relative[2], relative[1])/math.pi
+                changez = math.atan2(relative[0], relative[1]) / math.pi
+                changex = math.atan2(relative[2], relative[1]) / math.pi
 
                 result[i] = changez
         return result
@@ -102,8 +103,8 @@ class AgentInfo(Mc):
                 rotation = x * y * z
                 relative = target * rotation
 
-                changez = math.atan2(relative[0], relative[1])/math.pi
-                changex = math.atan2(relative[2], relative[1])/math.pi
+                changez = math.atan2(relative[0], relative[1]) / math.pi
+                changex = math.atan2(relative[2], relative[1]) / math.pi
 
                 result[i] = changex
         return result

@@ -447,6 +447,7 @@ def nodeTreeSetFakeUser(scene):
                 grp.savedOnce = True
                 grp.use_fake_user = True
 
+
 def register():
     global cm_documentation
     from . import cm_documentation

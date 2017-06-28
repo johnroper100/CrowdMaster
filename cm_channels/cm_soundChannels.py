@@ -125,15 +125,14 @@ class Channel:
             if dist <= val:
                 to = O[emitterid]
 
-
                 target = to.location - ag.location
                 z = mathutils.Matrix.Rotation(ag.rotation_euler[2], 4, 'Z')
                 y = mathutils.Matrix.Rotation(ag.rotation_euler[1], 4, 'Y')
                 x = mathutils.Matrix.Rotation(ag.rotation_euler[0], 4, 'X')
                 rotation = x * y * z
                 relative = target * rotation
-                changez = math.atan2(relative[0], relative[1])/math.pi
-                changex = math.atan2(relative[2], relative[1])/math.pi
+                changez = math.atan2(relative[0], relative[1]) / math.pi
+                changex = math.atan2(relative[2], relative[1]) / math.pi
 
                 if minusRadius:
                     dist -= self.sim.agents[emitterid].radius
