@@ -300,7 +300,7 @@ class Path(Mc):
 
         res = self.firstPointOnPath(
             bm, co, index, co_find, nDirec, isDirectional)
-        nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength = res
+        nextIndex, nextVert, nextDirec, nextRevDirec, start, adjustLength, index, co = res
 
         obj = bpy.context.scene.objects[pathObject]
         globalPos = start * obj.matrix_world
