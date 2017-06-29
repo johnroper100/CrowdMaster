@@ -28,7 +28,7 @@ from bpy.types import Operator
 from .cm_iconLoad import cicon
 
 # Documentation Links
-prefix = "http://crowdmaster.org/docs/new/"
+prefix = "http://crowdmaster.org/docs/"
 documentation_mapping = (
     # OPERATORS
     # toolbar
