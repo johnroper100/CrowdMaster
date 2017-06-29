@@ -510,8 +510,9 @@ class TemplateADDTOGROUP(Template):
             return
         newGroup = scene.cm_groups.add()
         newGroup.name = self.settings["groupName"]
-        buildRequest.cm_groups = self.settings["groupName"]
-        self.inputs["Template"].build(buildRequest)
+        newBuildRequest = buildRequest.copy()
+        newBuildRequest.cm_group = self.settings["groupName"]
+        self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
