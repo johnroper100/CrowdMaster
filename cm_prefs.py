@@ -46,7 +46,7 @@ class CMPreferences(AddonPreferences):
     auto_check_update = BoolProperty(
         name="Auto-check for Update",
         description="If enabled, auto-check for updates using an interval",
-        default=False,
+        default=True,
     )
 
     updater_intrval_months = IntProperty(
