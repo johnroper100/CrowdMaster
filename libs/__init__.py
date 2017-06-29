@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -31,3 +31,5 @@ try:
     from . import ins_octree
 except Exception:
     print("ERROR importing ins_octree")
+
+from . import cm_draw

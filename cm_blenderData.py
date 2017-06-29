@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -18,15 +18,33 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import IntProperty, EnumProperty, CollectionProperty
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       FloatProperty, IntProperty, PointerProperty,
+                       StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
+
+
+class modifyBoneProperty(bpy.types.PropertyGroup):
+    """For storing bone - tag pairs"""
+    # name - Name of the bone
+    tag = StringProperty()  # Name of tag to attach value to
+    attribute = StringProperty()
+
+
+class initialTagProperty(bpy.types.PropertyGroup):
+    """For storing a dictionary like structure of initial tags."""
+    # name - Name of the tag
+    value = FloatProperty()
 
 
 class agent_entry(PropertyGroup):
-    """The data structure for the agent entries"""
+    """The data structure for the agent entries."""
     # name - The name of the blender object
     geoGroup = StringProperty()
+    initialTags = CollectionProperty(type=initialTagProperty)
+    rigOverwrite = StringProperty()
+    constrainBone = StringProperty()
+    modifyBones = CollectionProperty(type=modifyBoneProperty)
 
 
 class agent_type_entry(PropertyGroup):
@@ -38,7 +56,7 @@ class agent_type_entry(PropertyGroup):
 
 
 class group_entry(PropertyGroup):
-    """For storing data about the groups created by the generation nodes"""
+    """For storing data about the groups created by the generation nodes."""
     # name - The label given to this group
     agentTypes = CollectionProperty(type=agent_type_entry)
     totalAgents = IntProperty(default=0)
@@ -48,30 +66,45 @@ class group_entry(PropertyGroup):
 
 
 class manual_props(PropertyGroup):
-    """All settings for manually adding agents"""
+    """All settings for manually adding agents."""
     groupName = StringProperty()
     brainType = StringProperty()
 
 
 def registerTypes():
+    bpy.utils.register_class(modifyBoneProperty)
+    bpy.utils.register_class(initialTagProperty)
     bpy.utils.register_class(agent_entry)
     bpy.utils.register_class(agent_type_entry)
     bpy.utils.register_class(group_entry)
     bpy.types.Scene.cm_groups = CollectionProperty(type=group_entry)
     bpy.types.Scene.cm_groups_index = IntProperty()
 
-    bpy.types.Scene.cm_view_details = BoolProperty(name="View group details",
+    bpy.types.Scene.cm_view_details = BoolProperty(name="View Group Details",
                                                    description="Show a breakdown of the agents in the selected group",
                                                    default=False)
     bpy.types.Scene.cm_view_details_index = IntProperty()
 
     bpy.utils.register_class(manual_props)
     bpy.types.Scene.cm_manual = PointerProperty(type=manual_props)
+    bpy.types.Scene.cm_linked_file_dir = StringProperty(name="Linked File Directory",
+                                                        subtype='FILE_PATH')
+    bpy.types.Scene.cm_switch_dupli_group_suffix = StringProperty(
+        name="Dupli Group Suffix")
+    bpy.types.Scene.cm_switch_dupli_group_target = StringProperty(
+        name="Dupli Group Target")
 
 
 def unregisterAllTypes():
+    bpy.utils.unregister_class(modifyBoneProperty)
+    bpy.utils.unregister_class(initialTagProperty)
     bpy.utils.unregister_class(agent_entry)
     bpy.utils.unregister_class(agent_type_entry)
     bpy.utils.unregister_class(group_entry)
 
     bpy.utils.unregister_class(manual_props)
+
+    del bpy.types.Scene.cm_manual
+    del bpy.types.Scene.cm_linked_file_dir
+    del bpy.types.Scene.cm_switch_proxy_suffix
+    del bpy.types.Scene.cm_switch_proxy_target

@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,44 +17,64 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import os
 import urllib.request
 from sys import platform
 
+import bpy
 from bpy.props import *
 from bpy.types import Operator
-from . icon_load import cicon
+
+from .cm_iconLoad import cicon
 
 # Documentation Links
-prefix = "http://jmroper.com/crowdmaster/docs/"
+prefix = "http://crowdmaster.org/docs/"
 documentation_mapping = (
     # OPERATORS
     # toolbar
-    ("bpy.ops.scene.cm_start", "simulation/toolbar/main.html"),
-    ("bpy.ops.scene.cm_stop", "simulation/toolbar/main.html"),
-    ("bpy.ops.scene.cm_place_deferred_geo", "getting_started/utilities/place_defered_geo.html"),
-    ("bpy.ops.scene.cm_setup_sample_nodes", "getting_started/utilities/sample_node_setups.html"),
-    ("bpy.ops.scene.cm_convert_to_bound_box", "getting_started/utilities/conv_to_bound_box.html"),
-    ("bpy.ops.scene.cm_groups_reset", "simulation/toolbar/agents.html#status"),
-    ("bpy.ops.scene.cm_agent_add_selected", "simulation/toolbar/manual_agents.html"),
-    ("bpy.ops.scene.cm_actions_populate", "simulation/toolbar/actions.html"),
-    ("bpy.ops.scene.cm_actions_remove", "simulation/toolbar/actions.html"),
-    ("bpy.ops.scene.cm_agents_move", "simulation/toolbar/actions.html"),
-    ("bpy.ops.scene.cm_events_populate", "simulation/toolbar/events.html"),
-    ("bpy.ops.scene.cm_events_remove", "simulation/toolbar/events.html"),
-    ("bpy.ops.scene.cm_events_move", "simulation/toolbar/events.html"),
-    ("bpy.ops.scene.cm_paths_populate", "simulation/toolbar/paths.html"),
-    ("bpy.ops.scene.cm_paths_remove", "simulation/toolbar/paths.html"),
+    ("bpy.ops.scene.cm_start", "simulation/toolbars/main/index.html#start-simulation"),
+    ("bpy.ops.scene.cm_stop", "simulation/toolbars/main/index.html#stop-simulation"),
+    ("bpy.ops.scene.cm_place_deferred_geo",
+     "simulation/toolbars/main/utilities/place_deferred_geo.html"),
+    ("bpy.ops.scene.cm_convert_to_bound_box",
+     "simulation/toolbars/main/utilities/conv_to_bound_box.html"),
+    ("bpy.ops.scene.cm_switch_dupli_groups",
+     "simulation/toolbars/main/utilities/switch_dupli_groups.html"),
+    ("bpy.ops.scene.cm_groups_reset", "simulation/toolbars/agents.html#reset-group"),
+    ("bpy.ops.scene.cm_agent_add_selected",
+     "simulation/toolbars/manual_agents.html"),
+    ("bpy.ops.scene.cm_actions_populate", "simulation/toolbars/actions.html"),
+    ("bpy.ops.scene.cm_actions_remove", "simulation/toolbars/actions.html"),
+    ("bpy.ops.scene.cm_agents_move", "simulation/toolbars/actions.html"),
+    ("bpy.ops.scene.cm_events_populate", "simulation/toolbars/events.html"),
+    ("bpy.ops.scene.cm_events_remove", "simulation/toolbars/events.html"),
+    ("bpy.ops.scene.cm_events_move", "simulation/toolbars/events.html"),
+    ("bpy.ops.scene.cm_paths_populate", "simulation/toolbars/paths.html"),
+    ("bpy.ops.scene.cm_paths_remove", "simulation/toolbars/paths.html"),
+    ("bpy.ops.view3d.cm_paths_bfs",
+     "simulation/toolbars/paths.html#breadth-first-search-to-direct-edges"),
+    ("bpy.ops.view3d.cm_paths_dfs",
+     "simulation/toolbars/paths.html#depth-first-search-to-direct-edges"),
+    ("bpy.ops.view3d.cm_switch_connected_path",
+     "simulation/toolbars/paths.html#switch-the-direction-of-the-connected-edges"),
+    ("bpy.ops.view3d.cm_switch_selected_path",
+     "simulation/toolbars/paths.html#switch-the-direction-of-the-selected-edges"),
+    ("bpy.ops.view3d.draw_path_operator",
+     "simulation/toolbars/paths.html#draw-the-directions-of-a-path"),
     # TODO - nodes
 
     # PROPS
     # toolbar
-    ("bpy.types.Scene.nodeTreeType", "getting_started/utilities/sample_node_setups.html#node-tree-type"),
-    ("bpy.types.Scene.append_to_tree", "getting_started/utilities/sample_node_setups.html"),
-    ("bpy.types.Scene.node_tree_name", "getting_started/utilities/sample_node_setups.html"),
-    ("bpy.types.Scene.cm_manual.groupName", "simulation/toolbar/manual_agents.html"),
-    ("bpy.types.Scene.cm_manual.brainType", "simulation/toolbar/manual_agents.html"),
+    ("bpy.types.Scene.cm_manual.groupName",
+     "simulation/toolbars/manual_agents.html"),
+    ("bpy.types.Scene.cm_manual.brainType",
+     "simulation/toolbars/manual_agents.html"),
+    ("bpy.types.Scene.cm_linked_file_dir",
+     "simulation/toolbars/main/index.html#linked-file-directory"),
+    ("bpy.types.Scene.cm_switch_dupli_group_suffix",
+     "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-suffix"),
+    ("bpy.types.Scene.cm_switch_dupli_group_target",
+     "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-target"),
     # TODO - nodes
 )
 
@@ -63,37 +83,16 @@ def doc_map():
     dm = (prefix, documentation_mapping)
     return dm
 
-class SCENE_OT_cm_download_docs(Operator):
-    bl_idname = "scene.cm_download_docs"
-    bl_label = "Download CrowdMaster Documentation"
-
-    def execute(self, context):
-        scene = context.scene
-        
-        if platform == "win32":
-            downloadLocation = os.path.expanduser("~")+"\Downloads\CrowdMasterDocumentation.zip"
-        else:
-            downloadLocation = os.path.expanduser("~")+"/Downloads/CrowdMasterDocumentation.zip"
-        zipPath = "http://jmroper.com/crowdmaster/docs/CrowdMasterDocumentation.zip"
-
-        urllib.request.urlretrieve(zipPath, downloadLocation)
-        
-        self.report({"INFO"}, "Documentation Downloaded!")
-
-        return {'FINISHED'}
 
 def register():
     # Register custom documentation mapping
     bpy.utils.register_manual_map(doc_map)
 
-    bpy.utils.register_class(SCENE_OT_cm_download_docs)
-
 
 def unregister():
-    bpy.utils.unregister_class(SCENE_OT_cm_download_docs)
-    
     # Unregister custom documentation mapping
     bpy.utils.unregister_manual_map(doc_map)
+
 
 if __name__ == "__main__":
     register()

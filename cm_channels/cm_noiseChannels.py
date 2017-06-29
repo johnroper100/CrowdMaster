@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,21 +17,26 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from .cm_masterChannels import MasterChannel as Mc
 import random
+
+from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 
 class Noise(Mc):
     """Used to generate randomness in a scene"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
+    @timeChannel("Noise")
     def random(self):
         """Returns a random number in range 0-1"""
         return random.random()
 
+    @timeChannel("Noise")
     def agentRandom(self, offset=0):
-        """Return a random number that is consistent between frame but can
+        """Return a random number that is consistent between frames but can
         be offset by an integer"""
         state = random.getstate()
         random.seed(hash(self.userid) - 1 + offset)

@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,8 +17,14 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import time
+
+import bpy
+
+
 class MasterChannel:
     """The parent class for all the channels"""
+
     def __init__(self, sim):
         self.sim = sim
         self.userid = ""
@@ -39,3 +45,31 @@ class MasterChannel:
     def setuser(self, userid):
         """Set up the channel to be used with a new agent"""
         self.userid = userid
+
+
+channelTimes = {}
+
+
+def timeChannel(classOverwrite=None):
+    def createDecorator(func):
+        def wrapped(self, *args, **kwargs):
+            prefs = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+            if prefs.show_debug_options and prefs.show_debug_timings:
+                t = time.time()
+                result = func(self, *args, **kwargs)
+                t = time.time() - t
+                if classOverwrite is None:
+                    cl = self.__class__.__name__
+                else:
+                    cl = classOverwrite
+                nm = func.__name__
+                if cl not in channelTimes:
+                    channelTimes[cl] = {}
+                if nm not in channelTimes[cl]:
+                    channelTimes[cl][nm] = 0
+                channelTimes[cl][nm] += t
+                return result
+            else:
+                return func(self, *args, **kwargs)
+        return wrapped
+    return createDecorator

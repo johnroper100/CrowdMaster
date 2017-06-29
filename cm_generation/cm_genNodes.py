@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,14 +17,18 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-from bpy.types import NodeTree, Node, NodeSocket
-from bpy.props import FloatProperty, StringProperty, BoolProperty
-from bpy.props import EnumProperty, IntProperty, FloatVectorProperty
-from .. icon_load import cicon
 import textwrap
+
+import bpy
 import nodeitems_utils
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       FloatProperty, FloatVectorProperty, IntProperty,
+                       StringProperty)
+from bpy.types import (Node, NodeSocket, NodeTree, Operator, PropertyGroup,
+                       UIList)
 from nodeitems_utils import NodeCategory, NodeItem
+
+from ..cm_iconLoad import cicon
 
 
 class CrowdMasterAGenTree(NodeTree):
@@ -32,6 +36,8 @@ class CrowdMasterAGenTree(NodeTree):
     bl_idname = 'CrowdMasterAGenTreeType'
     bl_label = 'CrowdMaster Agent Generation'
     bl_icon = 'MOD_ARRAY'
+
+    savedOnce = BoolProperty()
 
 
 class GeoSocket(NodeSocket):
@@ -148,13 +154,94 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
         return {"inputGroup": self.inputGroup}
 
 
+class LinkGroupNode(CrowdMasterAGenTreeNode):
+    bl_idname = 'LinkGroupNodeType'
+    bl_label = 'Link Armature'
+    bl_icon = 'SOUND'
+    bl_width_default = 320.0
+
+    groupFile = StringProperty(name="Group File", subtype='FILE_PATH')
+    groupName = StringProperty(name="Group Name")
+    rigObject = StringProperty(name="Rig Object")
+    additionalGroup = StringProperty(name="Additional Groups")
+    constrainBone = StringProperty(name="Constrain Bone")
+
+    def init(self, context):
+        self.outputs.new('GeoSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "groupFile")
+        layout.prop(self, "groupName")
+        layout.prop(self, "rigObject")
+        layout.prop(self, "additionalGroup")
+        layout.prop(self, "constrainBone")
+
+    def getSettings(self):
+        return {"groupFile": self.groupFile,
+                "groupName": self.groupName,
+                "rigObject": self.rigObject,
+                "additionalGroup": self.additionalGroup,
+                "constrainBone": self.constrainBone}
+
+
+class ConstrainBoneNode(CrowdMasterAGenTreeNode):
+    bl_idname = 'ConstrainNodeType'
+    bl_label = 'Constrain Bone'
+    bl_icon = 'SOUND'
+    bl_width_default = 160.0
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Parent Group")
+        self.inputs.new('GeoSocketType', "Child Object")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
+
+        self.outputs.new('GeoSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        pass
+
+    def getSettings(self):
+        return {}
+
+
+class ModifyBoneNode(CrowdMasterAGenTreeNode):
+    bl_idname = 'ModifyBoneNodeType'
+    bl_label = 'Modify Bone'
+    bl_icon = 'SOUND'
+    bl_width_default = 250.0
+
+    boneName = StringProperty(name="Bone Name")
+    attribute = EnumProperty(name="Attribute", items=[("RX", "rx", "", 1),
+                                                      ("RY", "ry", "", 2),
+                                                      ("RZ", "rz", "", 3)])
+    tagName = StringProperty(name="Tag Name")
+
+    def init(self, context):
+        self.inputs.new('GeoSocketType', "Objects")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('GeoSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "boneName")
+        layout.prop(self, "attribute")
+        layout.prop(self, "tagName")
+
+    def getSettings(self):
+        return {"boneName": self.boneName,
+                "attribute": self.attribute,
+                "tagName": self.tagName}
+
+
 class GeoSwitchNode(CrowdMasterAGenTreeNode):
     """The geo switch node"""
     bl_idname = 'GeoSwitchNodeType'
     bl_label = 'Geo Switch'
     bl_icon = 'SOUND'
 
-    switchAmount = FloatProperty(name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
+    switchAmount = FloatProperty(
+        name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Object 1")
@@ -177,7 +264,8 @@ class TemplateSwitchNode(CrowdMasterAGenTreeNode):
     bl_label = 'Template Switch'
     bl_icon = 'SOUND'
 
-    switchAmount = FloatProperty(name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
+    switchAmount = FloatProperty(
+        name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
 
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template 1")
@@ -201,7 +289,8 @@ class ParentNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     bl_width_default = 350.0
 
-    parentTo = StringProperty(name="Parent To (Bone)", description="The bone you want to parent to")
+    parentTo = StringProperty(name="Parent To (Bone)",
+                              description="The bone you want to parent to")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
@@ -218,17 +307,100 @@ class ParentNode(CrowdMasterAGenTreeNode):
         return {"parentTo": self.parentTo}
 
 
+class material_entry(PropertyGroup):
+    # name - StringProperty
+    weight = FloatProperty(name="Weight", default=1.0, min=0.0,
+                           description="Weight for weighted probability when randomly selecting material")
+
+
+class material_UIList(UIList):
+    """for drawing each row"""
+
+    def draw_item(self, context, layout, data, item, icon, active_data,
+                  active_propname):
+        layout.prop_search(item, "name", bpy.data, "materials", text="")
+        layout.prop(item, "weight")
+
+
+class SCENE_OT_cm_materialsNode_add(Operator):
+    bl_idname = "scene.cm_materialsnode_add"
+    bl_label = "Add"
+
+    nodeName = StringProperty(name="node name")
+    nodeTreeName = StringProperty(name="node tree")
+
+    def execute(self, context):
+        n = bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName]
+        n.materialList.add()
+        return {'FINISHED'}
+
+
+class SCENE_OT_cm_materialsNode_remove(Operator):
+    bl_idname = "scene.cm_materialsnode_remove"
+    bl_label = "Remove"
+
+    nodeName = StringProperty(name="node name")
+    nodeTreeName = StringProperty(name="node tree")
+
+    def execute(self, context):
+        n = bpy.data.node_groups[self.nodeTreeName].nodes[self.nodeName]
+        if n.materialIndex >= 0:
+            n.materialList.remove(n.materialIndex)
+            n.materialIndex -= 1
+        return {'FINISHED'}
+
+
+class RandomMaterialNode(CrowdMasterAGenTreeNode):
+    """The random material node"""
+    bl_idname = 'RandomMaterialNodeType'
+    bl_label = 'Random Material'
+    bl_icon = 'SOUND'
+    bl_width_default = 300
+
+    targetMaterial = StringProperty(
+        name="Target material", description="The name of the material to be randomised")
+    materialList = CollectionProperty(type=material_entry)
+    materialIndex = IntProperty()
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "targetMaterial", bpy.data, "materials")
+        row = layout.row()
+        row.template_list("material_UIList", "", self, "materialList", self,
+                          "materialIndex")
+        sub = row.column().column(True)
+        oper = sub.operator("scene.cm_materialsnode_add", text="",
+                            icon="ZOOMIN")
+        oper.nodeName = self.name
+        oper.nodeTreeName = self.id_data.name
+        oper = sub.operator("scene.cm_materialsnode_remove", text="",
+                            icon="ZOOMOUT")
+        oper.nodeName = self.name
+        oper.nodeTreeName = self.id_data.name
+
+    def getSettings(self):
+        matList = [(m.name, m.weight) for m in self.materialList]
+        return {"targetMaterial": self.targetMaterial,
+                "materialList": matList,
+                "totalWeight": sum([x[1] for x in matList])}
+
+
 class TemplateNode(CrowdMasterAGenTreeNode):
     """The template node"""
     bl_idname = 'TemplateNodeType'
     bl_label = 'Template'
     bl_icon = 'SOUND'
-    bl_width_default = 325.0
+    bl_width_default = 250.0
 
     brainType = StringProperty(name="Brain Type")
     deferGeo = BoolProperty(name="Defer Geometry",
                             description="Don't place geometry until the Place Deffered Geometry utility function is used",
-                            default=True)
+                            default=False)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Objects")
@@ -298,16 +470,16 @@ class RandomNode(CrowdMasterAGenTreeNode):
     bl_idname = 'RandomNodeType'
     bl_label = 'Random'
     bl_icon = 'SOUND'
-    bl_width_default = 400.0
+    bl_width_default = 350.0
 
     minRandRot = FloatProperty(name="Min Rand Rotation",
                                description="The minimum random rotation in the Z axis for each agent.",
-                               default=-10, min=-360.0, max=360,
+                               default=0, min=-360.0, max=360,
                                update=updateRandomNode)
 
     maxRandRot = FloatProperty(name="Max Rand Rotation",
                                description="The maximum random rotation in the Z axis for each agent.",
-                               default=10, min=-360, max=360.0,
+                               default=0, min=-360, max=360.0,
                                update=updateRandomNode)
 
     minRandSz = FloatProperty(name="Min Rand Scale",
@@ -321,15 +493,15 @@ class RandomNode(CrowdMasterAGenTreeNode):
                               update=updateRandomNode)
 
     randMat = BoolProperty(name="Random Material",
-                             description="Sould each agents have a random material?",
-                             default=False)
+                           description="Sould each agents have a random material?",
+                           default=False)
 
     randMatPrefix = StringProperty(name="Prefix",
-                                     description="The prefix which all materials must have to be chosen from randomly")
+                                   description="The prefix which all materials must have to be chosen from randomly")
 
     slotIndex = IntProperty(name="Slot Index",
-                              description="The material slot on the object(s) that you want to set randomly.",
-                              default=0, min=0)
+                            description="The material slot on the object(s) that you want to set randomly.",
+                            default=0, min=0)
 
     def init(self, context):
         self.inputs.new("TemplateSocketType", "Template")
@@ -372,7 +544,7 @@ class PointTowardsNode(CrowdMasterAGenTreeNode):
     bl_idname = 'PointTowardsNodeType'
     bl_label = 'Point Towards'
     bl_icon = 'SOUND'
-    bl_width_default = 350.0
+    bl_width_default = 325.0
 
     PointObject = StringProperty(name="Point to Object")
     PointType = EnumProperty(name="Point Type",
@@ -417,7 +589,8 @@ class CombineNode(CrowdMasterAGenTreeNode):
                        not inps[-2].is_linked):
                     inps.remove(inps[-1])
         if inps[-1].is_linked:
-            self.inputs.new("TemplateSocketType", "Template {}".format(len(inps)))
+            self.inputs.new("TemplateSocketType",
+                            "Template {}".format(len(inps)))
 
 
 class RandomPositionNode(CrowdMasterAGenTreeNode):
@@ -425,7 +598,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'RandomPositionNodeType'
     bl_label = 'Random Positioning'
     bl_icon = 'SOUND'
-    bl_width_default = 300.0
+    bl_width_default = 350.0
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -507,12 +680,187 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
                 "angle": self.angle}
 
 
+class MeshPositionNode(CrowdMasterAGenTreeNode):
+    """The mesh positioning node"""
+    bl_idname = 'MeshPositionNodeType'
+    bl_label = 'Mesh'
+    bl_icon = 'SOUND'
+    bl_width_default = 250.0
+
+    guideMesh = StringProperty(
+        name="Guide Mesh", description="The mesh to scatter points over")
+
+    noToPlace = IntProperty(name="Number of Agents",
+                            description="The number of agents to place",
+                            default=1, min=1)
+
+    overwritePosition = BoolProperty(name="Overwrite position",
+                                     description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
+                                     default=False)
+
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        layout.prop(self, "noToPlace")
+        layout.prop(self, "overwritePosition")
+
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
+
+    def getSettings(self):
+        return {"guideMesh": self.guideMesh,
+                "noToPlace": self.noToPlace,
+                "overwritePosition": self.overwritePosition,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
+
+
+class VCOLPositionNode(CrowdMasterAGenTreeNode):
+    """The vertex colors positioning node"""
+    bl_idname = 'VCOLPositionNodeType'
+    bl_label = 'Vertex Colors'
+    bl_icon = 'SOUND'
+    bl_width_default = 250.0
+
+    guideMesh = StringProperty(name="Guide Mesh",
+                               description="The mesh to scatter points over")
+
+    vcols = IntProperty(name="VCols ID",
+                        description="The ID of the vertex colors slot to use",
+                        default=0, min=0)
+
+    vcolor = FloatVectorProperty(name="Color",
+                                 description="The the color on which the agents shoud be placed",
+                                 subtype='COLOR',
+                                 default=[1.0, 1.0, 1.0],
+                                 min=0.0,
+                                 max=1.0)
+
+    noToPlace = IntProperty(name="Number of Agents",
+                            description="The number of agents to place",
+                            default=1, min=1)
+
+    overwritePosition = BoolProperty(name="Overwrite position",
+                                     description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
+                                     default=False)
+
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+
+        row = layout.row(align=True)
+        row.prop(self, "vcols")
+        row.prop(self, "vcolor", text="")
+        layout.prop(self, "noToPlace")
+        layout.prop(self, "overwritePosition")
+
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
+
+    def getSettings(self):
+        return {"vcols": self.vcols,
+                "vcolor": self.vcolor,
+                "guideMesh": self.guideMesh,
+                "noToPlace": self.noToPlace,
+                "overwritePosition": self.overwritePosition,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
+
+
+class PathPositionNode(CrowdMasterAGenTreeNode):
+    """The path positioning node"""
+    bl_idname = 'PathPositionNodeType'
+    bl_label = 'Path'
+    bl_icon = 'SOUND'
+    bl_width_default = 250.0
+
+    pathName = StringProperty(name="Path Name")
+    noToPlace = IntProperty(name="Number of Agents",
+                            description="The number of agents to place",
+                            default=1, min=1)
+
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop_search(
+            self, "pathName", bpy.context.scene.cm_paths, "coll")
+        layout.prop(self, "noToPlace")
+
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
+
+    def getSettings(self):
+        return {"pathName": self.pathName,
+                "noToPlace": self.noToPlace,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
+
+
 class FormationPositionNode(CrowdMasterAGenTreeNode):
     """The formation positioing node"""
     bl_idname = 'FormationPositionNodeType'
     bl_label = 'Formation Positioning'
     bl_icon = 'SOUND'
-    bl_width_default = 400.0
+    bl_width_default = 375.0
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -637,6 +985,31 @@ class GroundNode(CrowdMasterAGenTreeNode):
     def getSettings(self):
         return {"groundMesh": self.groundMesh}
 
+
+class SettagNode(CrowdMasterAGenTreeNode):
+    """The set tag node"""
+    bl_idname = 'SettagNodeType'
+    bl_label = 'Set Tag'
+    bl_icon = 'SOUND'
+    bl_width_default = 155
+
+    tagName = StringProperty(name="Name")
+    tagValue = FloatProperty(name="Value")
+
+    def init(self, context):
+        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new("TemplateSocketType", "Template")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "tagName")
+        layout.prop(self, "tagValue")
+
+    def getSettings(self):
+        return {"tagName": self.tagName, "tagValue": self.tagValue}
+
+
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
@@ -650,7 +1023,8 @@ class NoteNode(CrowdMasterAGenTreeNode):
     """For keeping the graph well organised"""
     bl_label = 'Note'
 
-    text = StringProperty(name='Note Text', description="Text to show, if set will overide file")
+    text = StringProperty(
+        name='Note Text', description="Text to show, if set will overide file")
 
     text_file = StringProperty(description="Textfile to show")
 
@@ -749,38 +1123,47 @@ class CrowdMasterAGenCategories(NodeCategory):
     def poll(cls, context):
         return context.space_data.tree_type == 'CrowdMasterAGenTreeType'
 
+
 agen_node_categories = [
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
-        NodeItem("ObjectInputNodeType"),
+        NodeItem("ConstrainNodeType"),
         NodeItem("GroupInputNodeType"),
-        NodeItem("GeoSwitchNodeType", label="Switch"),
-        NodeItem("ParentNodeType")
-        ]),
+        NodeItem("LinkGroupNodeType"),
+        NodeItem("ModifyBoneNodeType"),
+        NodeItem("ObjectInputNodeType"),
+        NodeItem("ParentNodeType"),
+        NodeItem("GeoSwitchNodeType", label="Switch")
+    ]),
     CrowdMasterAGenCategories("template", "Template", items=[
         NodeItem("TemplateNodeType"),
-        NodeItem("TemplateSwitchNodeType", label="Switch"),
-        NodeItem("RandomNodeType"),
+        NodeItem("AddToGroupNodeType"),
+        NodeItem("CombineNodeType"),
         NodeItem("PointTowardsNodeType"),
-        NodeItem("CombineNodeType")
-        ]),
+        NodeItem("RandomNodeType"),
+        NodeItem("RandomMaterialNodeType"),
+        NodeItem("SettagNodeType"),
+        NodeItem("TemplateSwitchNodeType", label="Switch")
+    ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
-        NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("TargetPositionNodeType", label="Target"),
+        NodeItem("GroundNodeType"),
+        NodeItem("MeshPositionNodeType"),
         NodeItem("ObstacleNodeType"),
         NodeItem("OffsetNodeType"),
-        NodeItem("GroundNodeType"),
-        ]),
-    CrowdMasterAGenCategories("other", "Other", items=[
-        NodeItem("GenerateNodeType"),
-        NodeItem("AddToGroupNodeType")
-        ]),
+        NodeItem("PathPositionNodeType"),
+        NodeItem("RandomPositionNodeType", label="Random"),
+        NodeItem("TargetPositionNodeType", label="Target"),
+        NodeItem("VCOLPositionNodeType"),
+    ]),
+    CrowdMasterAGenCategories("output", "Output", items=[
+        NodeItem("GenerateNodeType")
+    ]),
     CrowdMasterAGenCategories("layout", "Layout", items=[
         NodeItem("NodeFrame"),
-        NodeItem("NodeReroute"),
-        NodeItem("NoteNode")
+        NodeItem("NoteNode"),
+        NodeItem("NodeReroute")
     ])
-    ]
+]
 
 
 def register():
@@ -793,25 +1176,38 @@ def register():
 
     bpy.utils.register_class(ObjectInputNode)
     bpy.utils.register_class(GroupInputNode)
+    bpy.utils.register_class(LinkGroupNode)
+    bpy.utils.register_class(ConstrainBoneNode)
+    bpy.utils.register_class(ModifyBoneNode)
     bpy.utils.register_class(GeoSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
+    bpy.utils.register_class(material_entry)
+    bpy.utils.register_class(material_UIList)
+    bpy.utils.register_class(SCENE_OT_cm_materialsNode_add)
+    bpy.utils.register_class(SCENE_OT_cm_materialsNode_remove)
+    bpy.utils.register_class(RandomMaterialNode)
     bpy.utils.register_class(TemplateNode)
     bpy.utils.register_class(OffsetNode)
     bpy.utils.register_class(RandomNode)
     bpy.utils.register_class(PointTowardsNode)
     bpy.utils.register_class(CombineNode)
     bpy.utils.register_class(RandomPositionNode)
+    bpy.utils.register_class(MeshPositionNode)
+    bpy.utils.register_class(VCOLPositionNode)
+    bpy.utils.register_class(PathPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
     bpy.utils.register_class(ObstacleNode)
     bpy.utils.register_class(GroundNode)
+    bpy.utils.register_class(SettagNode)
 
     bpy.utils.register_class(NoteNode)
     bpy.utils.register_class(GenNoteTextFromClipboard)
     bpy.utils.register_class(GenNoteClear)
 
-    nodeitems_utils.register_node_categories("AGEN_CUSTOM_NODES", agen_node_categories)
+    nodeitems_utils.register_node_categories(
+        "AGEN_CUSTOM_NODES", agen_node_categories)
 
 
 def unregister():
@@ -826,19 +1222,31 @@ def unregister():
 
     bpy.utils.unregister_class(ObjectInputNode)
     bpy.utils.unregister_class(GroupInputNode)
+    bpy.utils.unregister_class(LinkGroupNode)
+    bpy.utils.unregister_class(ConstrainBoneNode)
+    bpy.utils.unregister_class(ModifyBoneNode)
     bpy.utils.unregister_class(GeoSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)
+    bpy.utils.unregister_class(material_entry)
+    bpy.utils.unregister_class(material_UIList)
+    bpy.utils.unregister_class(SCENE_OT_cm_materialsNode_add)
+    bpy.utils.unregister_class(SCENE_OT_cm_materialsNode_remove)
+    bpy.utils.unregister_class(RandomMaterialNode)
     bpy.utils.unregister_class(TemplateNode)
     bpy.utils.unregister_class(OffsetNode)
     bpy.utils.unregister_class(RandomNode)
     bpy.utils.unregister_class(PointTowardsNode)
     bpy.utils.unregister_class(CombineNode)
     bpy.utils.unregister_class(RandomPositionNode)
+    bpy.utils.unregister_class(MeshPositionNode)
+    bpy.utils.unregister_class(VCOLPositionNode)
+    bpy.utils.unregister_class(PathPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
     bpy.utils.unregister_class(ObstacleNode)
     bpy.utils.unregister_class(GroundNode)
+    bpy.utils.unregister_class(SettagNode)
 
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(GenNoteTextFromClipboard)

@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -65,11 +65,11 @@ except:
             """Returns the dot product of the two vectors. If one of the
             vectors has a higher dimension it will be reduced to the same
             dimension as the lower vector"""
-            return sum([a*b for a, b in zip(self, other)])
+            return sum([a * b for a, b in zip(self, other)])
 
         def __mul__(self, mul):
             if isinstance(mul, int) or isinstance(mul, float):
-                return Vector([x*mul for x in self])
+                return Vector([x * mul for x in self])
             else:
                 return self.dot(mul)
 
@@ -78,11 +78,11 @@ except:
 
         def __truediv__(self, div):
             if isinstance(div, int) or isinstance(div, float):
-                return Vector([x/div for x in self])
+                return Vector([x / div for x in self])
 
         def __itruediv__(self, div):
             if isinstance(div, int) or isinstance(div, float):
-                return Vector([x/div for x in self])
+                return Vector([x / div for x in self])
 
         @property
         def length(self):
@@ -120,7 +120,7 @@ def getClosestPoint(a, b, point, segmentClamp=False, returnFactor=False):
     ab = b - a
 
     ab2 = ab.length
-    ap_ab = ap*ab
+    ap_ab = ap * ab
 
     t = ap_ab / ab2  # type: float
     if segmentClamp:
@@ -151,12 +151,13 @@ def sortAlongLine(points, p1, p2, access=lambda x: x, incTValue=False):
     pointVals = []
     for point in points:
         pointVals.append((getClosestPoint(p1, p2, access(point),
-                         returnFactor=True), point))
+                                          returnFactor=True), point))
         # getClosestPoint returns a float when returnFactor is True
     pointVals = sorted(pointVals, key=lambda x: x[0])
     if incTValue:
         return pointVals
     return [x[1] for x in pointVals]
+
 
 # EXAMPLE - sort points along line
 """

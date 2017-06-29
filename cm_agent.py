@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,29 +17,42 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import copy
+import time
+
 import bpy
 import mathutils
-import copy
 
+from . import cm_timings
 from .cm_compileBrain import compileBrain
 
 
 class Agent:
-    """Represents each of the agents in the scene"""
-    def __init__(self, blenderid, nodeGroup, sim):
+    """Represents each of the agents in the scene."""
+
+    def __init__(self, blenderid, nodeGroup, sim, rigOverwrite, constrainBone,
+                 tags=None, modifyBones=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
-            print("Blender id", blenderid)
+            t = time.time()
         self.id = blenderid
         self.brain = compileBrain(nodeGroup, sim, blenderid)
         self.sim = sim
-        self.external = {"id": self.id, "tags": {}}
+        self.external = {"id": self.id, "tags": {
+            t.name: t.value for t in tags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
         self.access = copy.deepcopy(self.external)
-        self.agvars = {"None": None}
-        "agent variables. Don't access from other agents"
+
+        self.rigOverwrite = rigOverwrite
+        self.constrainBone = constrainBone
+        self.modifyBones = {}
+        if modifyBones is not None:
+            for m in modifyBones:
+                if m.name not in self.modifyBones:
+                    self.modifyBones[m.name] = {}
+                self.modifyBones[m.name][m.attribute] = m.tag
 
         objs = bpy.data.objects
 
@@ -89,18 +102,34 @@ class Agent:
         objs[blenderid].keyframe_insert(data_path="location", frame=1)
         objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
 
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.agent["init"] += time.time() - t
+
     def step(self):
+        """Called each frame of the simulation."""
+
         objs = bpy.data.objects
         preferences = bpy.context.user_preferences.addons[__package__].preferences
 
+        rot = objs[self.id].rotation_euler
+
+        if preferences.show_debug_options:
+            t = time.time()
         self.brain.execute()
-        if objs[self.id].select:
-            if preferences.show_debug_options:
+        if preferences.show_debug_options:
+            if preferences.show_debug_timings:
+                cm_timings.agent["brainExecute"] += time.time() - t
+            if objs[self.id].select:
                 print("ID: ", self.id, "Tags: ", self.brain.tags,
                       "outvars: ", self.brain.outvars)
             # TODO show this in the UI
+        if preferences.show_debug_options:
+            t = time.time()
         if objs[self.id] == bpy.context.active_object:
             self.brain.hightLight(bpy.context.scene.frame_current)
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.agent["highLight"] += time.time() - t
+            t = time.time()
 
         self.rx = self.brain.outvars["rx"] if self.brain.outvars["rx"] else 0
         self.ry = self.brain.outvars["ry"] if self.brain.outvars["ry"] else 0
@@ -120,7 +149,6 @@ class Agent:
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
 
         self.external["tags"] = self.brain.tags
-        self.agvars = self.brain.agvars
 
         move = mathutils.Vector((self.px + self.sx,
                                  self.py + self.sy,
@@ -141,9 +169,16 @@ class Agent:
 
         self.apz += result[2]
 
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.agent["setOutput"] += time.time() - t
+
     def apply(self):
         """Called in single thread after all agent.step() calls are done"""
         obj = bpy.data.objects[self.id]
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
+
+        if preferences.show_debug_options:
+            t = time.time()
 
         if obj.animation_data:
             obj.animation_data.action_extrapolation = 'HOLD_FORWARD'
@@ -157,7 +192,7 @@ class Agent:
             if not self.arxKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=0,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.arxKey = True
             obj.rotation_euler[0] = self.arx
             obj.keyframe_insert(data_path="rotation_euler",
@@ -170,7 +205,7 @@ class Agent:
             if not self.aryKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=1,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.aryKey = True
             obj.rotation_euler[1] = self.ary
             obj.keyframe_insert(data_path="rotation_euler",
@@ -183,7 +218,7 @@ class Agent:
             if not self.arzKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=2,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.arzKey = True
             obj.rotation_euler[2] = self.arz
             obj.keyframe_insert(data_path="rotation_euler",
@@ -196,7 +231,7 @@ class Agent:
             if not self.apxKey:
                 obj.keyframe_insert(data_path="location",
                                     index=0,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.apxKey = True
             obj.location[0] = self.apx
             obj.keyframe_insert(data_path="location",
@@ -209,7 +244,7 @@ class Agent:
             if not self.apyKey:
                 obj.keyframe_insert(data_path="location",
                                     index=1,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.apyKey = True
             obj.location[1] = self.apy
             obj.keyframe_insert(data_path="location",
@@ -222,7 +257,7 @@ class Agent:
             if not self.apzKey:
                 obj.keyframe_insert(data_path="location",
                                     index=2,
-                                    frame=bpy.context.scene.frame_current-1)
+                                    frame=bpy.context.scene.frame_current - 1)
                 self.apzKey = True
             obj.location[2] = self.apz
             obj.keyframe_insert(data_path="location",
@@ -231,7 +266,43 @@ class Agent:
         else:
             self.apzKey = False
 
+        objs = bpy.context.scene.objects
+
+        modArm = None
+        if objs[self.id].type == 'Armature':
+            modArm = objs[self.id]
+        if self.rigOverwrite is not None and self.rigOverwrite != "":
+            modArm = objs[self.rigOverwrite]
+
+        if modArm is not None:
+            for bone in self.modifyBones:
+                for attribute in self.modifyBones[bone]:
+                    tag = self.modifyBones[bone][attribute]
+                    tags = self.external["tags"]
+                    if tag in tags:
+                        tagVal = tags[tag]
+                        if bone in modArm.pose.bones:
+                            boneObj = modArm.pose.bones[bone]
+                            if attribute == "RX":
+                                boneObj.rotation_euler[0] = tagVal
+                                boneObj.keyframe_insert(data_path="rotation_euler",
+                                                        index=0,
+                                                        frame=bpy.context.scene.frame_current)
+                            if attribute == "RY":
+                                boneObj.rotation_euler[1] = tagVal
+                                boneObj.keyframe_insert(data_path="rotation_euler",
+                                                        index=1,
+                                                        frame=bpy.context.scene.frame_current)
+                            if attribute == "RZ":
+                                boneObj.rotation_euler[2] = tagVal
+                                boneObj.keyframe_insert(data_path="rotation_euler",
+                                                        index=2,
+                                                        frame=bpy.context.scene.frame_current)
+
         self.access = copy.deepcopy(self.external)
+
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.agent["applyOutput"] += time.time() - t
 
     def highLight(self):
         for n in self.brain.neurons.values():

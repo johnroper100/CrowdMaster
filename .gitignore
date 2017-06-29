@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 
 # C extensions
+*.c
 *.so
 
 # Distribution / packaging
@@ -88,3 +89,12 @@ ENV/
 # Rope project settings
 .ropeproject
 CrowdMaster_updater/updater_status.json
+crowdmaster_updater/updater_status.json
+
+crowdmaster_updater/
+
+sources/cm_nodeFunctions\.html
+
+sources/cm_accelerate\.html
+
+sources/cm_compileBrain\.html

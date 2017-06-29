@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,7 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from random import randrange, choice
+from random import choice, randrange
 
 try:
     from ins_vector import Vector, sortAlongLine
@@ -138,8 +138,8 @@ def matchGroups(sources, targets):
         # This occurs when there are more targets than sources
         return True, []
 
-    assert isinstance(targets[0][0], int), "Actual val"+str(targets[0])
-    assert isinstance(sources[0][0], int), "Actual val"+str(sources[0])
+    assert isinstance(targets[0][0], int), "Actual val" + str(targets[0])
+    assert isinstance(sources[0][0], int), "Actual val" + str(sources[0])
 
     if len(sources) > len(targets):
         return False, sources
@@ -164,6 +164,7 @@ def matchGroups(sources, targets):
 # ============================== TESTING ===============================
 
 # ======================================================================
+
 
 if __name__ == "__main__":
     # For testing purposes
@@ -203,8 +204,8 @@ if __name__ == "__main__":
 
         def move(self):
             if self.goingTo:
-                newX = (49*self.pos().x() + self.goingTo.x())/50
-                newY = (49*self.pos().y() + self.goingTo.y())/50
+                newX = (49 * self.pos().x() + self.goingTo.x()) / 50
+                newY = (49 * self.pos().y() + self.goingTo.y()) / 50
                 self.setPos(newX, newY)
 
     class target(QtGui.QGraphicsItem):
@@ -234,7 +235,8 @@ if __name__ == "__main__":
             self.update()
 
         def move(self):
-            self.setPos(self.pos().x() + randrange(-2, 2), self.pos().y() + randrange(-2, 2))
+            self.setPos(self.pos().x() + randrange(-2, 2),
+                        self.pos().y() + randrange(-2, 2))
             if self.pos().x() >= 600:
                 self.setPos(599, self.pos().y())
             elif self.pos().x() <= -600:
@@ -264,7 +266,7 @@ if __name__ == "__main__":
             self.setWindowTitle(self.tr("Clustering test"))
 
             self.agents = []
-            noofagents = 40*8
+            noofagents = 40 * 8
 
             for f in range(noofagents):
                 item = agent(5, (randrange(-800, 800)), (randrange(-600, 600)))
@@ -284,17 +286,17 @@ if __name__ == "__main__":
             columns = 8
             for row in range(rows):
                 for col in range(columns):
-                    item = target(7, -500 + 1100*row/rows,
-                                  -100 + 250*col/columns)
+                    item = target(7, -500 + 1100 * row / rows,
+                                  -100 + 250 * col / columns)
                     self.scene.addItem(item)
                     self.targets.append(item)
 
-            accessFunc = lambda x: (x.pos().x(), x.pos().y(), 0)
+            def accessFunc(x): return (x.pos().x(), x.pos().y(), 0)
 
             t = time.time()
             success, pairings = clusterMatch(self.agents, self.targets,
                                              accessFunc, accessFunc)
-            print(time.time()-t)
+            print(time.time() - t)
             assert success, "There was a problem executing clusterMatch"
 
             for p in pairings:

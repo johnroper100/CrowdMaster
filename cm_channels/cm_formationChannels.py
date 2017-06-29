@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,17 +17,19 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from .cm_masterChannels import MasterChannel as Mc
-import mathutils
 import math
 
-from ..libs.ins_clustering import clusterMatch
-
 import bpy
+import mathutils
+
+from ..libs.ins_clustering import clusterMatch
+from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
 
 class Formation(Mc):
     """Get and set data to allow agents to align themselves into formations"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.formations = {}
@@ -103,15 +105,16 @@ class Channel:
         self.targets = []
         for ob in self.targetObjects:
             wrld = ob.matrix_world
-            self.targets += [wrld*v.co for v in ob.data.vertices]
+            self.targets += [wrld * v.co for v in ob.data.vertices]
 
     def calculate(self):
         """Collect data and use clusterMatch to work out pairings"""
         objs = bpy.data.objects
 
-        agAccess = lambda x: (objs[x].location.x, objs[x].location.y,
-                              objs[x].location.z)
-        tgAccess = lambda x: (x.x, x.y, x.z)
+        def agAccess(x): return (objs[x].location.x, objs[x].location.y,
+                                 objs[x].location.z)
+
+        def tgAccess(x): return (x.x, x.y, x.z)
         setOfTargets = set([tgAccess(x) for x in self.targets])
         if self.lastCalcd:
             # TODO if the same agents are inputed the same result as last time
@@ -149,6 +152,7 @@ class Channel:
         else:
             return False
 
+    @timeChannel("Formation")
     def fixedDist(self, fixedPoint):
         """Distance from this agent to the position in formation.
         :type fixedPoint: int
@@ -164,6 +168,7 @@ class Channel:
             return None
 
     @property
+    @timeChannel("Formation")
     def dist(self):
         """Distance from this agent to the position in formation"""
         objs = bpy.data.objects
@@ -175,6 +180,7 @@ class Channel:
         else:
             return None
 
+    @timeChannel("Formation")
     def fixedRz(self, fixedPoint):
         """Horizontal rotation to be pointing at position in formation.
         :type fixedPoint: int
@@ -196,9 +202,10 @@ class Channel:
             rotation = x * y * z
             relative = target * rotation
 
-            return math.atan2(relative[0], relative[1])/math.pi
+            return math.atan2(relative[0], relative[1]) / math.pi
 
     @property
+    @timeChannel("Formation")
     def rz(self):
         """Horizontal rotation to be pointing at position in formation"""
         objs = bpy.data.objects
@@ -216,10 +223,11 @@ class Channel:
             rotation = x * y * z
             relative = target * rotation
 
-            return math.atan2(relative[0], relative[1])/math.pi
+            return math.atan2(relative[0], relative[1]) / math.pi
         else:
             return None
 
+    @timeChannel("Formation")
     def fixedRx(self, fixedPoint):
         """Vertical rotation to be pointing at position in formation.
         :type fixedPoint: int
@@ -241,9 +249,10 @@ class Channel:
             rotation = x * y * z
             relative = target * rotation
 
-            return math.atan2(relative[2], relative[1])/math.pi
+            return math.atan2(relative[2], relative[1]) / math.pi
 
     @property
+    @timeChannel("Formation")
     def rx(self):
         """Vertical rotation to be pointing at position in formation"""
         objs = bpy.data.objects
@@ -261,6 +270,6 @@ class Channel:
             rotation = x * y * z
             relative = target * rotation
 
-            return math.atan2(relative[2], relative[1])/math.pi
+            return math.atan2(relative[2], relative[1]) / math.pi
         else:
             return None

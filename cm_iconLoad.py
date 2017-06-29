@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -18,10 +18,13 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import os
+
 import bpy
 
-ICONS = 'node_tree_logo start_sim stop_sim ' \
-        'agents reset instant_setup add_agents plug code shuffle array target setup motion dice house email download'.split(' ')
+ICONS = 'start_sim stop_sim ' \
+        'agents reset add_agents ' \
+        'plug code shuffle ' \
+        'dice house email'.split(' ')
 icon_collection = {}
 
 
@@ -30,7 +33,8 @@ def register_icons():
     pcoll = bpy.utils.previews.new()
     icons_dir = os.path.join(os.path.dirname(__file__), "icons")
     for icon_name in ICONS:
-        pcoll.load(icon_name, os.path.join(icons_dir, icon_name + '.png'), 'IMAGE')
+        pcoll.load(icon_name, os.path.join(
+            icons_dir, icon_name + '.png'), 'IMAGE')
 
     icon_collection["main"] = pcoll
 

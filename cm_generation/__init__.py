@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,21 +17,21 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
 import time
-from bpy.types import Operator
+
+import bpy
 from bpy.props import StringProperty
+from bpy.types import Operator
 
-from .. libs.ins_vector import Vector
-
-from . cm_templates import templates, TemplateRequest
-from .. cm_graphics . cm_nodeHUD import update_hud_text, update_hud_text2
-from .. cm_graphics . utils import cm_redrawAll
+from . import cm_genNodes
+from ..libs.ins_vector import Vector
+from .cm_templates import TemplateRequest, templates, tmpPathChannel
 
 
 class SCENE_OT_agent_nodes_generate(Operator):
     bl_idname = "scene.cm_agent_nodes_generate"
     bl_label = "Generate Agents"
+    bl_options = {'REGISTER', 'UNDO'}
 
     nodeName = StringProperty(name="node name")
     nodeTreeName = StringProperty(name="node tree")
@@ -45,6 +45,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
     def construct(self, current, cache):
         """returns: bool - successfully built, Template"""
+        tmpPathChannel.newframe()
 
         idName = current.bl_idname
         if idName in templates:
@@ -75,9 +76,12 @@ class SCENE_OT_agent_nodes_generate(Operator):
             return False, None
 
     def execute(self, context):
+        if bpy.context.active_object is not None:
+            bpy.ops.object.mode_set(mode='OBJECT')
         startT = time.time()
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
+        preferences = context.user_preferences.addons["CrowdMaster"].preferences
 
         cache = {}
         genSpaces = {}
@@ -109,25 +113,9 @@ class SCENE_OT_agent_nodes_generate(Operator):
         else:
             return {'CANCELLED'}
 
-        if allSuccess:
-            newhudText = "Agents Generated!"
-            update_hud_text(newhudText)
-
-        else:
-            newhudText = "Agents Generated With Errors!"
-            update_hud_text(newhudText)
-
         endT = time.time() - startT
 
-        newhudText2 = "Time taken: {} seconds".format(str(endT))
-        update_hud_text2(newhudText2)
-
-        cm_redrawAll()
-
         return {'FINISHED'}
-
-
-from . import cm_genNodes
 
 
 def register():

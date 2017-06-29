@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,15 +17,19 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import math
+
 import bpy
 import mathutils
-import math
-from .cm_masterChannels import MasterChannel as Mc
 from mathutils import Vector
 
+from .cm_masterChannels import MasterChannel as Mc
+from .cm_masterChannels import timeChannel
 
-class Crowd(Mc):
-    """Used to access the data of other agents"""
+
+class Flock(Mc):
+    """Used for flocking behaviour"""
+
     def __init__(self, sim):
         Mc.__init__(self, sim)
 
@@ -38,12 +42,11 @@ class Crowd(Mc):
         self.alignCache = {}
         self.cohereCache = {}
 
-    def allagents(self):
-        return bpy.context.scene.cm_agents
-
     # ==== FLOCKING ====
 
     def _hashSet(self, s):
+        """An experiment for how to cache the results of calculations when the
+        input is a set"""
         s = 1
         for item in s:
             s *= hash(item) % (10**25) + 1
@@ -82,22 +85,22 @@ class Crowd(Mc):
         alnVec.y -= agents[self.userid].ary
         alnVec.z -= agents[self.userid].arz
 
-        alnVec.x %= 2*math.pi
-        alnVec.y %= 2*math.pi
-        alnVec.z %= 2*math.pi
+        alnVec.x %= 2 * math.pi
+        alnVec.y %= 2 * math.pi
+        alnVec.z %= 2 * math.pi
 
         if alnVec.x < math.pi:
-            alnVec.x = alnVec.x/math.pi
+            alnVec.x = alnVec.x / math.pi
         else:
-            alnVec.x = -2 + alnVec.x/math.pi
+            alnVec.x = -2 + alnVec.x / math.pi
         if alnVec.y < math.pi:
-            alnVec.y = alnVec.y/math.pi
+            alnVec.y = alnVec.y / math.pi
         else:
-            alnVec.y = -2 + alnVec.y/math.pi
+            alnVec.y = -2 + alnVec.y / math.pi
         if alnVec.z < math.pi:
-            alnVec.z = alnVec.z/math.pi
+            alnVec.z = alnVec.z / math.pi
         else:
-            alnVec.z = -2 + alnVec.z/math.pi
+            alnVec.z = -2 + alnVec.z / math.pi
         return alnVec
 
     def calcCohere(self, localArea):
@@ -122,7 +125,10 @@ class Crowd(Mc):
         relative = cohVec * rotation
         return relative
 
+    @timeChannel()
     def separateTx(self, inputs):
+        """The amount to move on the x axis (ie. left-right) away from the
+        average position of close neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -132,7 +138,10 @@ class Crowd(Mc):
         sepVec = self.calcSeparate(inSet)
         return sepVec[0]
 
+    @timeChannel()
     def separateTy(self, inputs):
+        """The amount to move on the y axis (ie. forward-backward) away from the
+        average position of close neighbours (ie. slow down - speed up)"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -142,7 +151,10 @@ class Crowd(Mc):
         sepVec = self.calcSeparate(inSet)
         return sepVec[1]
 
+    @timeChannel()
     def separateTz(self, inputs):
+        """The amount to move on the z axis (ie. up-down) away from the
+        average position of close neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -152,7 +164,10 @@ class Crowd(Mc):
         sepVec = self.calcSeparate(inSet)
         return sepVec[2]
 
+    @timeChannel()
     def alignRz(self, inputs):
+        """The amount to rotate about the z axis (ie. turn left-right) to
+        align with the direction of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -162,7 +177,10 @@ class Crowd(Mc):
         alnVec = self.calcAlign(inSet)
         return alnVec.z
 
+    @timeChannel()
     def alignRx(self, inputs):
+        """The amount to rotate about the x axis (ie. turn up-down) to
+        align with the direction of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -172,7 +190,10 @@ class Crowd(Mc):
         alnVec = self.calcAlign(inSet)
         return alnVec.x
 
+    @timeChannel()
     def cohereTx(self, inputs):
+        """The amount to move on the x axis (ie. left-right) towards the average
+        position of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -182,7 +203,10 @@ class Crowd(Mc):
         cohVec = self.calcCohere(inSet)
         return cohVec[0]
 
+    @timeChannel()
     def cohereTy(self, inputs):
+        """The amount to move on the y axis (ie. forward-backward) towards the
+        average position of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:
@@ -192,7 +216,10 @@ class Crowd(Mc):
         cohVec = self.calcCohere(inSet)
         return cohVec[1]
 
+    @timeChannel()
     def cohereTz(self, inputs):
+        """The amount to move on the z axis (ie. up-down) towards the average
+        position of neighbours"""
         inSet = set()
         for into in inputs:
             for i in into:

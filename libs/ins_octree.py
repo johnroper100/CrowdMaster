@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -29,6 +29,7 @@ except:
 
 import bpy
 
+
 #  TODO use Vector for locations and dimensions
 
 
@@ -45,9 +46,9 @@ def boundingBoxFromBPY(ob, overwriteRadii=None):
     miny = min([c[1] for c in corners])
     minz = min([c[2] for c in corners])
 
-    radiusx = (max([c[0] for c in corners]) - minx)/2
-    radiusy = (max([c[1] for c in corners]) - miny)/2
-    radiusz = (max([c[2] for c in corners]) - minz)/2
+    radiusx = (max([c[0] for c in corners]) - minx) / 2
+    radiusy = (max([c[1] for c in corners]) - miny) / 2
+    radiusz = (max([c[2] for c in corners]) - minz) / 2
 
     x = minx + radiusx
     y = miny + radiusy
@@ -101,7 +102,7 @@ class BoundingBox:
     def checkPoint(self, point):
         """Check if point is within the sphere or boundingbox"""
         if self.isSphere:
-            dist = sum([(a-b)**2 for a, b in zip(self.pos, point)])
+            dist = sum([(a - b)**2 for a, b in zip(self.pos, point)])
             # dist is actually distance**2
             if dist < self.sphereRadius**2:
                 return True
@@ -119,7 +120,7 @@ class BoundingBox:
         """Check if this sphere or box overlaps with another. If this or
         bb is not a sphere then it will default to boundingbox testing"""
         if self.isSphere and bb.isSphere:
-            dist = sum([(a-b)**2 for a, b in zip(self.pos, bb.pos)])
+            dist = sum([(a - b)**2 for a, b in zip(self.pos, bb.pos)])
             # Dist is actually distance**2
             if dist <= (self.sphereRadius + bb.sphereRadius)**2:
                 return True
@@ -181,21 +182,21 @@ class Octree:
     def __init__(self, position, dimensions):
         self.pos = position  # (float, float, float)
         self.dim = dimensions  # (float, float, float)
-        hdx = self.dim[0]/2
-        hdy = self.dim[1]/2
-        hdz = self.dim[2]/2
+        hdx = self.dim[0] / 2
+        hdy = self.dim[1] / 2
+        hdz = self.dim[2] / 2
         dims = (hdx, hdy, hdz)
         px = self.pos[0]
         py = self.pos[1]
         pz = self.pos[2]
-        self.cells = [Leaf((px      , py + hdy, pz + hdz), dims),
+        self.cells = [Leaf((px, py + hdy, pz + hdz), dims),
                       Leaf((px + hdx, py + hdy, pz + hdz), dims),
-                      Leaf((px      , py      , pz + hdz), dims),
-                      Leaf((px + hdx, py      , pz + hdz), dims),
-                      Leaf((px      , py + hdy, pz      ), dims),
-                      Leaf((px + hdx, py + hdy, pz      ), dims),
-                      Leaf((px      , py      , pz      ), dims),
-                      Leaf((px + hdx, py      , pz      ), dims)
+                      Leaf((px, py, pz + hdz), dims),
+                      Leaf((px + hdx, py, pz + hdz), dims),
+                      Leaf((px, py + hdy, pz), dims),
+                      Leaf((px + hdx, py + hdy, pz), dims),
+                      Leaf((px, py, pz), dims),
+                      Leaf((px + hdx, py, pz), dims)
                       ]
         # 0: Top front left, 1: top front right,
         # 2: top back left, 3: top back right,
@@ -219,9 +220,9 @@ class Octree:
         this octree along this axis"""
         greater = False
         less = False
-        if (pos[axis] - self.pos[axis] + dim[axis]) >= self.dim[axis]/2:
+        if (pos[axis] - self.pos[axis] + dim[axis]) >= self.dim[axis] / 2:
             greater = True
-        if (pos[axis] - self.pos[axis] - dim[axis]) <= self.dim[axis]/2:
+        if (pos[axis] - self.pos[axis] - dim[axis]) <= self.dim[axis] / 2:
             less = True
         return greater, less
 
@@ -281,13 +282,14 @@ class Octree:
         return collided
 
     def printTree(self, depth=0):
-        print(depth*"--" + "tree")
+        print(depth * "--" + "tree")
         for cell in self.cells:
-            cell.printTree(depth=depth+1)
+            cell.printTree(depth=depth + 1)
 
 
 class Leaf:
     """The lowest level of the octree which contains the actual objects"""
+
     def __init__(self, position, dimensions):
         self.pos = position
         self.dim = dimensions
@@ -311,7 +313,7 @@ class Leaf:
         self.minDim = [min(self.minDim[x], item.dim[x]) for x in range(3)]
         if len(self.contents) > 2:
             for minD, D in zip(self.minDim, self.dim):
-                if D/4 < minD:
+                if D / 4 < minD:
                     return False
             return True
         return False
@@ -329,7 +331,7 @@ class Leaf:
         for outer in self.contents:
             for inner in self.contents:
                 if outer != inner:
-                    f = lambda x: x.original
+                    def f(x): return x.original
                     key = (min(outer, inner, key=f), max(outer, inner, key=f))
                     if key not in failed and key not in collided:
                         if outer.checkCollisionWithBB(inner):
@@ -338,7 +340,7 @@ class Leaf:
                             failed.add(key)
 
     def printTree(self, depth=0):
-        print(depth*"--", [c.original for c in self.contents])
+        print(depth * "--", [c.original for c in self.contents])
 
 
 if __name__ == "__main__":
@@ -362,17 +364,19 @@ if __name__ == "__main__":
     bruteCheckAllCollisions = []
 
     for i in range(21):
-        n = i*400
+        n = i * 400
         t = time.time()
         for f in range(5):
             bbs = []
             for ob in bpy.context.scene.objects[:n]:
                 bbs.append(boundingSphereFromBPY(ob))
             O = createOctree(bbs)
-        constructTime.append((time.time() - t)/5)
+        constructTime.append((time.time() - t) / 5)
 
-        pos = [(random.random()*100-50, random.random()*100-50, random.random()*100-50) for x in range(10000)]
-        # Done so that the random number generation time isn't included in the timings.
+        pos = [(random.random() * 100 - 50, random.random() * 100 -
+                50, random.random() * 100 - 50) for x in range(10000)]
+        # Done so that the random number generation time isn't included in the
+        # timings.
         t = time.time()
         for f in range(10000):
             O.checkPoint(pos[f])
@@ -386,10 +390,11 @@ if __name__ == "__main__":
         t = time.time()
         for f in range(5):
             O.checkCollisions()
-        checkAllCollisions.append((time.time() - t)/5)
+        checkAllCollisions.append((time.time() - t) / 5)
 
         # The following do the same as above without the octree. It is not advised that you run them
-        #    for any large n (n>3000) since they take increasingly long to complete.
+        # for any large n (n>3000) since they take increasingly long to
+        # complete.
         """t = time.time()
         bbs = []
         for ob in bpy.context.scene.objects[:n]:

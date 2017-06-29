@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,14 +17,15 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-from collections import OrderedDict
-import math
-from .cm_brainClasses import Neuron, State
-from .cm_pythonEmbededInterpreter import Interpreter
 import copy
-import bpy
+import math
 import os
 import random
+from collections import OrderedDict
+
+import bpy
+
+from .cm_brainClasses import Neuron, State
 
 
 """
@@ -37,17 +38,6 @@ class Logic{NAME}(Neuron):
 """
 
 
-class LogicINPUT(Neuron):
-    """Retrieve information from the scene or about the agent"""
-
-    def core(self, inps, settings):
-        lvars = copy.copy(self.brain.lvars)
-        lvars["math"] = math
-        lvars["inps"] = inps
-        result = eval(settings["Input"], lvars)
-        return result
-
-
 class LogicNEWINPUT(Neuron):
     """Retrieve information from the scene or about the agent"""
 
@@ -56,75 +46,82 @@ class LogicNEWINPUT(Neuron):
         if settings["InputSource"] == "CONSTANT":
             return {"None": settings["Constant"]}
 
-        elif settings["InputSource"] == "CROWD":
+        elif settings["InputSource"] == "FLOCK":
             if settings["Flocking"] == "SEPARATE":
                 if settings["TranslationAxis"] == "TX":
-                    separateTx = channels["Crowd"].separateTx(inps)
+                    separateTx = channels["Flock"].separateTx(inps)
                     if separateTx is None:
-                        return None
+                        return {}
                     return {"None": separateTx}
                 elif settings["TranslationAxis"] == "TY":
-                    separateTy = channels["Crowd"].separateTy(inps)
+                    separateTy = channels["Flock"].separateTy(inps)
                     if separateTy is None:
-                        return None
+                        return {}
                     return {"None": separateTy}
                 elif settings["TranslationAxis"] == "TZ":
-                    separateTz = channels["Crowd"].separateTz(inps)
+                    separateTz = channels["Flock"].separateTz(inps)
                     if separateTz is None:
-                        return None
+                        return {}
                     return {"None": separateTz}
             elif settings["Flocking"] == "COHERE":
                 if settings["TranslationAxis"] == "TX":
-                    cohereTx = channels["Crowd"].cohereTx(inps)
+                    cohereTx = channels["Flock"].cohereTx(inps)
                     if cohereTx is None:
-                        return None
+                        return {}
                     return {"None": cohereTx}
                 elif settings["TranslationAxis"] == "TY":
-                    cohereTy = channels["Crowd"].cohereTy(inps)
+                    cohereTy = channels["Flock"].cohereTy(inps)
                     if cohereTy is None:
-                        return None
+                        return {}
                     return {"None": cohereTy}
                 elif settings["TranslationAxis"] == "TZ":
-                    cohereTz = channels["Crowd"].cohereTz(inps)
+                    cohereTz = channels["Flock"].cohereTz(inps)
                     if cohereTz is None:
-                        return None
+                        return {}
                     return {"None": cohereTz}
             else:  # ie. settings["Flocking"] == "ALIGN"
                 if settings["RotationAxis"] == "RZ":
-                    alignRz = channels["Crowd"].alignRz(inps)
+                    alignRz = channels["Flock"].alignRz(inps)
                     if alignRz is None:
-                        return None
+                        return {}
                     return {"None": alignRz}
                 elif settings["RotationAxis"] == "RX":
-                    alignRx = channels["Crowd"].alignRx(inps)
+                    alignRx = channels["Flock"].alignRx(inps)
                     if alignRx is None:
-                        return None
+                        return {}
                     return {"None": alignRx}
 
         elif settings["InputSource"] == "FORMATION":
             fChan = channels["Formation"].retrieve(settings["FormationGroup"])
             if fChan is None:
-                return None
+                return {}
             # TODO  Add fixed formations
             if settings["FormationOptions"] == "RZ":
                 rz = fChan.rz
                 if rz is None:
-                    return None
+                    return {}
                 return {"None": rz}
             elif settings["FormationOptions"] == "RX":
                 rx = fChan.rx
                 if rx is None:
-                    return None
+                    return {}
                 return {"None": rx}
             elif settings["FormationOptions"] == "DIST":
                 dist = fChan.dist
                 if dist is None:
-                    return None
+                    return {}
                 return {"None": dist}
 
         elif settings["InputSource"] == "GROUND":
-            gChan = channels["Ground"].retrieve(settings["GroundGroup"])
-            return {"None": gChan.dh()}
+            if settings["GroundOptions"] == "DH":
+                gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+                return {"None": gChan.dh()}
+            elif settings["GroundOptions"] == "ARZ":
+                gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+                return {"None": gChan.aheadRz(self.settings["GroundAheadOffset"])}
+            elif settings["GroundOptions"] == "ARX":
+                gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+                return {"None": gChan.aheadRx(self.settings["GroundAheadOffset"])}
 
         elif settings["InputSource"] == "NOISE":
             noise = channels["Noise"]
@@ -138,12 +135,20 @@ class LogicNEWINPUT(Neuron):
                 return {"None": channels["Path"].rz(settings["PathName"])}
             elif settings["PathOptions"] == "RX":
                 return {"None": channels["Path"].rx(settings["PathName"])}
+            elif settings["PathOptions"] == "INLANE":
+                agents = set()
+                for into in inps:
+                    for i in into:
+                        agents.add(i)
+                return channels["Path"].inlane(settings["PathName"],
+                                               settings["PathLaneSearchDistance"],
+                                               agents)
 
         elif settings["InputSource"] == "SOUND":
             sound = channels["Sound"]
             ch = sound.retrieve(settings["SoundFrequency"])
             if ch is None:
-                return None
+                return {}
             if settings["SoundMode"] == "BASIC":
                 ch.predictNext = False
                 ch.steeringNext = False
@@ -154,21 +159,25 @@ class LogicNEWINPUT(Neuron):
                 ch.predictNext = False
                 ch.steeringNext = True
             if settings["SoundOptions"] == "RZ":
-                return ch.rz
+                return ch.rz(settings["MinusRadius"])
             elif settings["SoundOptions"] == "RX":
-                return ch.rx
+                return ch.rx(settings["MinusRadius"])
             elif settings["SoundOptions"] == "DIST":
-                return ch.dist
+                return ch.dist(settings["MinusRadius"])
             elif settings["SoundOptions"] == "CLOSE":
-                return ch.close
+                return ch.close(settings["MinusRadius"])
             elif settings["SoundOptions"] == "DB":
-                return ch.db
+                return ch.db(settings["MinusRadius"])
             elif settings["SoundOptions"] == "CERT":
-                return ch.cert
+                return ch.cert(settings["MinusRadius"])
             elif settings["SoundOptions"] == "ACC":
-                return ch.acc
+                return ch.acc(settings["MinusRadius"])
             elif settings["SoundOptions"] == "OVER":
-                return ch.over
+                return ch.over(settings["MinusRadius"])
+            elif settings["SoundOptions"] == "HEADRZ":
+                return ch.headrz(settings["MinusRadius"])
+            elif settings["SoundOptions"] == "HEADRX":
+                return ch.headrx(settings["MinusRadius"])
 
         elif settings["InputSource"] == "STATE":
             state = channels["State"]
@@ -182,6 +191,8 @@ class LogicNEWINPUT(Neuron):
                 return {"None": state.velocity.y}
             elif settings["StateOptions"] == "GLOBALVELZ":
                 return {"None": state.velocity.z}
+            elif settings["StateOptions"] == "QUERYTAG":
+                return state.getTag(settings["StateTagName"])
 
         elif settings["InputSource"] == "WORLD":
             world = channels["World"]
@@ -197,6 +208,18 @@ class LogicNEWINPUT(Neuron):
                     return {"None": tgt.arrived}
             elif settings["WorldOptions"] == "TIME":
                 return {"None": channels["World"].time}
+            elif settings["WorldOptions"] == "EVENT":
+                return world.event(settings["EventName"])
+
+        elif settings["InputSource"] == "AGENTINFO":
+            agent = channels["AgentInfo"]
+            if settings["AgentInfoOptions"] == "GETTAG":
+                if settings["GetTagName"].strip() != "":
+                    return agent.getTag(inps, settings["GetTagName"].strip())
+            elif settings["AgentInfoOptions"] == "HEADRZ":
+                return agent.headingRz(inps)
+            elif settings["AgentInfoOptions"] == "HEADRX":
+                return agent.headingRx(inps)
 
 
 class LogicGRAPH(Neuron):
@@ -227,25 +250,29 @@ class LogicGRAPH(Neuron):
             TPP = settings["RBFTenPP"]
 
             a = math.log(0.1) / (TPP**2)
-            return math.e**(a*(value-u)**2)
+            return math.e**(a * (value - u)**2)
 
         output = {}
         for into in inps:
             for i in into:
                 if i in output:
                     if preferences.show_debug_options:
-                        print("""LogicGRAPH data lost due to multiple inputs with the same key""")
+                        print(
+                            """LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
-                        output[i] = (RBF(into[i])*settings["Multiply"])
+                        output[i] = (RBF(into[i]) * settings["Multiply"])
                     elif settings["CurveType"] == "RANGE":
-                        output[i] = (linear(into[i])*settings["Multiply"])
+                        output[i] = (linear(into[i]) * settings["Multiply"])
                     # cubic bezier could also be an option here (1/2 sided)
+                    if settings["Invert"]:
+                        output[i] = -output[i] + 1
         return output
+
 
 class LogicMATH(Neuron):
     """returns the values added/subtracted/multiplied/divided together"""
-    
+
     def core(self, inps, settings):
         result = {}
         for into in inps:
@@ -258,6 +285,8 @@ class LogicMATH(Neuron):
                     result[i] = into[i] * settings["num1"]
                 elif settings["operation"] == "div":
                     result[i] = into[i] / settings["num1"]
+                elif settings["operation"] == "set":
+                    result[i] = settings["num1"]
         return result
 
 
@@ -283,13 +312,11 @@ class LogicAND(Neuron):
 
         if settings["SingleOutput"]:
             total = 1
-            for k, v in results.items():
-                total *= v
             if settings["Method"] == "MUL":
                 for k, v in results.items():
                     total *= v
             else:  # Method == "MIN"
-                total = min(results)
+                total = min(results.values()) if len(results) > 0 else 0
             return {"None": total}
         else:
             return results
@@ -308,7 +335,7 @@ class LogicOR(Neuron):
             for into in inps:
                 if settings["Method"] == "MUL":
                     for i in [into[i] for i in into]:
-                        total *= (1-i)
+                        total *= (1 - i)
                 else:  # Method == "MAX"
                     total = max(list(into.values()) + [total])
             if settings["Method"] == "MUL":
@@ -320,13 +347,24 @@ class LogicOR(Neuron):
                 for i in into:
                     if i in results:
                         if settings["Method"] == "MUL":
-                            results[i] *= (1-into[i])
+                            results[i] *= (1 - into[i])
                         else:  # Method == "MAX"
-                            results[i] = min(1-results[i], 1-into[i])
+                            results[i] = min(1 - results[i], 1 - into[i])
                     else:
-                        results[i] = (1-into[i])
-            results.update((k, 1-v) for k, v in results.items())
+                        results[i] = (1 - into[i])
+            results.update((k, 1 - v) for k, v in results.items())
             return results
+
+
+class LogicNOT(Neuron):
+    """Flip the logic state"""
+
+    def core(self, inps, settings):
+        result = {}
+        for into in inps:
+            for i in into:
+                result[i] = -into[i] + 1
+        return result
 
 
 class LogicSTRONG(Neuron):
@@ -337,7 +375,7 @@ class LogicSTRONG(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                results[i] = into[i]**2 * (-2*into[i] + 3)
+                results[i] = into[i]**2 * (-2 * into[i] + 3)
         return results
 
 
@@ -349,19 +387,8 @@ class LogicWEAK(Neuron):
         results = {}
         for into in inps:
             for i in into:
-                results[i] = 2*into[i] - (into[i]**2 * (-2*into[i] + 3))
+                results[i] = 2 * into[i] - (into[i]**2 * (-2 * into[i] + 3))
         return results
-
-
-class LogicQUERYTAG(Neuron):
-    """Return the value of Tag (normally 1) or else 0"""
-
-    def core(self, inps, settings):
-        results = {}
-        if settings["Tag"] in self.brain.tags:
-            return self.brain.tags[settings["Tag"]]
-        else:
-            return 0
 
 
 class LogicSETTAG(Neuron):
@@ -394,54 +421,66 @@ class LogicSETTAG(Neuron):
         return settings["Threshold"]
 
 
-class LogicVARIABLE(Neuron):
-    """Set or retrieve (or both) an agent variable (0 if it doesn't exist)"""
-
-    def core(self, inps, settings):
-        count = 0
-        for into in inps:
-            for i in into:
-                self.brain.agvars[settings["Variable"]] += into[i]
-                count += 1
-        if count:
-            self.brain.agvars[settings["Variable"]] /= count
-        if settings["Variable"] in self.brain.agvars:
-            out = self.brain.agvars[settings["Variable"]]  # out is not actually used!
-        else:
-            out = 0  # out is not actually used!
-        # TODO Doesn't work
-        return self.brain.agvars[settings["Variable"]]
-
-
 class LogicFILTER(Neuron):
     """Only allow some values through"""
 
     def core(self, inps, settings):
         result = {}
 
+        allEmpty = True
+        for into in inps:
+            if len(into) > 0:
+                allEmpty = False
+        if allEmpty:
+            return result
+
+        useTag = settings["Tag"]
+        if useTag:
+            tagName = settings["TagName"]
+            if tagName in self.brain.tags:
+                tagValue = self.brain.tags[tagName]
+            else:
+                tagValue = None
+
         # TODO what if multiple inputs have the same keys?
         if self.settings["Operation"] == "EQUAL":
             for into in inps:
                 for i in into:
-                    if into[i] == self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] == tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] == self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "NOT EQUAL":
             for into in inps:
                 for i in into:
-                    if into[i] != self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] != tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] != self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "LESS":
             for into in inps:
                 for i in into:
-                    if into[i] <= self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] <= tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] <= self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "GREATER":
             for into in inps:
                 for i in into:
-                    if into[i] > self.settings["Value"]:
-                        result[i] = into[i]
+                    if useTag:
+                        if into[i] > tagValue:
+                            result[i] = into[i]
+                    else:
+                        if into[i] > self.settings["Value"]:
+                            result[i] = into[i]
         elif self.settings["Operation"] == "LEAST":
-            leastVal = -float("inf")
+            leastVal = float("inf")
             leastName = "None"
             for into in inps:
                 for i in into:
@@ -466,7 +505,7 @@ class LogicFILTER(Neuron):
                     total += into[i]
                     count += 1
             if count != 0:
-                result = {"None": total/count}
+                result = {"None": total / count}
         return result
 
 
@@ -500,7 +539,7 @@ class LogicOUTPUT(Neuron):
                 for i in into:
                     val += into[i]
                     count += 1
-            out = val/(max(1, count))
+            out = val / (max(1, count))
         elif settings["MultiInputType"] == "MAX":
             out = 0
             for into in inps:
@@ -538,11 +577,11 @@ class LogicPRIORITY(Neuron):
     def core(self, inps, settings):
         result = {}
         remaining = {}
-        for v in range((len(inps)+1)//2):
-            into = inps[2*v]
+        for v in range((len(inps) + 1) // 2):
+            into = inps[2 * v]
             # print("into", into)
-            if 2*v+1 < len(inps):
-                priority = inps[2*v+1]
+            if 2 * v + 1 < len(inps):
+                priority = inps[2 * v + 1]
                 usesPriority = True
             else:
                 priority = []
@@ -573,50 +612,6 @@ class LogicPRIORITY(Neuron):
         return result
 
 
-class LogicEVENT(Neuron):
-    """Check if an event is happening that frame"""
-
-    def core(self, inps, settings):
-        events = bpy.context.scene.cm_events.coll
-        en = settings["EventName"]
-        for e in events:
-            if e.eventname == en:
-                result = 1
-                if e.category == "Time" or e.category == "Time+Volume":
-                    if e.time != bpy.context.scene.frame_current:
-                        result = 0
-                if e.category == "Volume" or e.category == "Time+Volume":
-                    if result:
-                        pt = bpy.data.objects[self.brain.userid].location
-                        l = bpy.data.objects[e.volume].location
-                        d = bpy.data.objects[e.volume].dimensions
-
-                        if not (l.x-(d.x/2) <= pt.x <= l.x+(d.x/2) and
-                                l.y-(d.y/2) <= pt.y <= l.y+(d.y/2) and
-                                l.z-(d.z/2) <= pt.z <= l.z+(d.z/2)):
-                            result = 0
-                if result:
-                    return result
-        return 0
-
-
-class LogicPYTHON(Neuron):
-    """execute a python expression"""
-
-    def core(self, inps, settings):
-        global Inter
-        setup = copy.copy(self.brain.lvars)
-        setup["inps"] = inps
-        setup["settings"] = settings
-        Inter.setup(setup)
-        Inter.enter(settings["Expression"]["value"])
-        result = Inter.getoutput()
-        return result
-
-
-Inter = Interpreter()
-
-
 class LogicPRINT(Neuron):
     """print everything that is given to it"""
 
@@ -625,9 +620,10 @@ class LogicPRINT(Neuron):
         if self.brain.userid in selected:
             for into in inps:
                 for i in into:
-                    if settings["save_to_file"] == True:
+                    if settings["save_to_file"]:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            message = settings["Label"] + " >> " + str(i) + " " + str(into[i]) + "\n"
+                            message = settings["Label"] + " >> " + \
+                                str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
                         print(settings["Label"], ">>", i, into[i])
@@ -639,23 +635,19 @@ class LogicAction(Neuron):
 
 
 logictypes = OrderedDict([
-    ("InputNode", LogicINPUT),
     ("NewInputNode", LogicNEWINPUT),
     ("GraphNode", LogicGRAPH),
     ("MathNode", LogicMATH),
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
+    ("NotNode", LogicNOT),
     ("StrongNode", LogicSTRONG),
     ("WeakNode", LogicWEAK),
-    ("QueryTagNode", LogicQUERYTAG),
     ("SetTagNode", LogicSETTAG),
-    ("VariableNode", LogicVARIABLE),
     ("FilterNode", LogicFILTER),
     ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
-    ("EventNode", LogicEVENT),
-    ("PythonNode", LogicPYTHON),
     ("PrintNode", LogicPRINT)
 ])
 
@@ -663,33 +655,97 @@ logictypes = OrderedDict([
 class StateSTART(State):
     """Points to the first state for the agent to be in"""
 
+    def moveTo(self):
+        self.length = random.randint(self.settings["minRandWait"],
+                                     self.settings["maxRandWait"])
+        State.moveTo(self)
+
 
 class StateAction(State):
     """The normal state in a state machine"""
+
+    def __init__(self, *args, **kwargs):
+        self.action = None
+        State.__init__(self, *args, **kwargs)
+
+    def isGroup(self):
+        if len(self.actionName) > 0:
+            return self.actionName[0] == "[" and self.actionName[-1] == "]"
+        return False
+
     def moveTo(self):
         State.moveTo(self)
 
-        act = self.actionName
-        if act in self.brain.sim.actions:
-            actionobj = self.brain.sim.actions[act]  # from .cm_motion.py
+        if self.action in self.brain.sim.actions:
+            actionobj = self.brain.sim.actions[self.action]
+            # from .cm_motion.py
             obj = bpy.context.scene.objects[self.brain.userid]  # bpy object
 
             tr = obj.animation_data.nla_tracks.new()  # NLA track
             action = actionobj.action  # bpy action
             if action:
                 currentFrame = bpy.context.scene.frame_current
-                strip = tr.strips.new("", currentFrame, action)
-                strip.extrapolation = 'NOTHING'
-                strip.use_auto_blend = True
+                self.strip = tr.strips.new("", currentFrame, action)
+                self.strip.extrapolation = 'NOTHING'
+                self.strip.use_auto_blend = True
             self.length = actionobj.length
 
-            """tr = obj.animation_data.nla_tracks.new()  # NLA track
-            action = actionobj.motion
-            if action:
-                strip = tr.strips.new("", sce.frame_current, action)
-                strip.extrapolation = 'HOLD_FORWARD'
-                strip.use_auto_blend = False
-                strip.blend_type = 'ADD'"""
+        self.currentAction = self.action
+
+    def evaluate(self):
+        act = self.actionName
+        if self.syncState:
+            possible = False
+            for sInp in self.inputs:
+                if self.neurons[sInp].isCurrent:
+                    possible = True
+                    break
+
+            if not possible or len(self.valueInputs) == 0:
+                self.finalValue = 0
+                self.finalValueCalcd = True
+                return
+
+            sm = self.brain.sim.syncManager
+            userid = self.brain.userid
+
+            for inp in self.valueInputs:
+                vals = self.neurons[inp].evaluate()
+                for key, v in vals.items():
+                    if self.settings["RandomInput"]:
+                        val = v + (self.settings["ValueDefault"] *
+                                   v * random.random())
+                    else:
+                        val = v + (v * self.settings["ValueDefault"])
+                    if val > 0:
+                        if self.isGroup():
+                            acNm = self.actionName
+                            for act in self.brain.sim.actionGroups[acNm[1:-1]]:
+                                sm.tell(userid, key, act, val, self.name)
+                        else:
+                            sm.tell(userid, key, self.actionName,
+                                    val, self.name)
+
+            (state, action), pairedAgent = sm.getResult(userid)
+
+            if state == self.name:
+                self.finalValue = 1
+                self.action = action
+            else:
+                self.finalValue = 0
+            self.finalValueCalcd = True
+        elif self.isGroup():
+            State.evaluate(self)
+            acNm = self.actionName
+            state = random.getstate()
+            if not self.randomActionFromGroup:
+                random.seed(hash(self.brain.userid))
+            self.action = random.choice(
+                self.brain.sim.actionGroups[acNm[1:-1]])
+            random.setstate(state)
+        else:
+            State.evaluate(self)
+            self.action = self.actionName
 
     def evaluateState(self):
         self.currentFrame += 1
@@ -702,26 +758,73 @@ class StateAction(State):
         if self.length == 0:
             complete = 1
         else:
-            complete = self.currentFrame/self.length
-            complete = 0.5 + complete/2
+            complete = self.currentFrame / self.length
+            complete = 0.5 + complete / 2
         currentFrame = bpy.context.scene.frame_current
         self.resultLog[currentFrame] = ((0.15, 0.4, complete))
 
-        if self.actionName in self.brain.sim.actions:
-            actionobj = self.brain.sim.actions[self.actionName]
+        if self.currentAction in self.brain.sim.actions:
+            actionobj = self.brain.sim.actions[self.currentAction]
 
             for data_path, data in actionobj.motiondata.items():
                 x = data[0][self.currentFrame] - data[0][self.currentFrame - 1]
                 y = data[1][self.currentFrame] - data[1][self.currentFrame - 1]
                 z = data[2][self.currentFrame] - data[2][self.currentFrame - 1]
+                scale = bpy.context.scene.objects[self.brain.userid].scale
                 if data_path == "location":
-                    self.brain.outvars["px"] += x
-                    self.brain.outvars["py"] += y
-                    self.brain.outvars["pz"] += z
+                    self.brain.outvars["px"] += x * scale.x
+                    self.brain.outvars["py"] += y * scale.y
+                    self.brain.outvars["pz"] += z * scale.z
                 elif data_path == "rotation_euler":
-                    self.brain.outvars["rx"] += x
-                    self.brain.outvars["ry"] += y
-                    self.brain.outvars["rz"] += z
+                    self.brain.outvars["rx"] += x * scale.x
+                    self.brain.outvars["ry"] += y * scale.y
+                    self.brain.outvars["rz"] += z * scale.z
+
+        # Check to see if there is a valid sync state to move to
+
+        syncOptions = []
+        for con in self.outputs:
+            if self.neurons[con].interuptState and self.neurons[con].syncState:
+                val = self.neurons[con].query()
+                if val is not None and val > 0:
+                    syncOptions.append((con, val))
+
+        if len(syncOptions) > 0:
+            self.strip.action_frame_end = self.currentFrame + 1
+            if len(syncOptions) == 1:
+                return True, syncOptions[0][0]
+            else:
+                return True, max(syncOptions, key=lambda v: v[1])[0]
+
+        # Check to see if there is a valid interupt state to move to
+
+        interuptOptions = []
+        for con in self.outputs:
+            conNeu = self.neurons[con]
+            if conNeu.interuptState and not conNeu.syncState:
+                val = conNeu.query()
+                if val is not None and val > 0:
+                    interuptOptions.append((con, val))
+
+        if len(interuptOptions) > 0:
+            if len(interuptOptions) == 1:
+                nextState, nextVal = interuptOptions[0]
+                # return True, interuptOptions[0][0]
+            else:
+                nextState, nextVal = max(interuptOptions, key=lambda v: v[1])
+                # return True, max(interuptOptions, key=lambda v: v[1])[0]
+
+            moveToInterupt = True
+
+            val = self.neurons[self.name].query()
+            if val is not None and val >= nextVal:
+                moveToInterupt = False
+
+            if moveToInterupt:
+                self.strip.action_frame_end = self.currentFrame + 1
+                return True, nextState
+
+        # ==== Will stop here if there is a valid sync or interupt state ====
 
         if self.currentFrame < self.length - 1:
             return False, self.name
@@ -732,93 +835,14 @@ class StateAction(State):
         for con in self.outputs:
             val = self.neurons[con].query()
             # print(con, val)
-            if val is not None:
+            if val is not None and val > 0:
                 options.append((con, val))
 
-        # If the cycleState button is checked then add a contection back to
+        # If the cycleState button is checked then add a connection back to
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
             val = self.neurons[self.name].query()
-            if val is not None:
-                options.append((self.name, val))
-
-        if len(options) > 0:
-            if len(options) == 1:
-                return True, options[0][0]
-            else:
-                return True, max(options, key=lambda v: v[1])[0]
-
-        return False, None
-
-
-class StateActionGroup(State):
-    """A state in a state machine containing a group of actions"""
-    def moveTo(self):
-        State.moveTo(self)
-
-        actGp = self.brain.sim.actionGroups[self.settings["GroupName"]]
-
-        self.actionName = random.choice(actGp)
-
-        act = self.actionName
-        if act in self.brain.sim.actions:
-            actionobj = self.brain.sim.actions[act]  # from .cm_motion.py
-            obj = bpy.context.scene.objects[self.brain.userid]  # bpy object
-
-            tr = obj.animation_data.nla_tracks.new()  # NLA track
-            action = actionobj.action  # bpy action
-            if action:
-                currentFrame = bpy.context.scene.frame_current
-                strip = tr.strips.new("", currentFrame, action)
-                strip.extrapolation = 'NOTHING'
-                strip.use_auto_blend = True
-            self.length = actionobj.length
-
-    def evaluateState(self):
-        self.currentFrame += 1
-
-        """Check to see if the current state is still playing an animation"""
-        # The proportion of the way through the state
-        if self.length == 0:
-            complete = 1
-        else:
-            complete = self.currentFrame/self.length
-            complete = 0.5 + complete/2
-        currentFrame = bpy.context.scene.frame_current
-        self.resultLog[currentFrame] = ((0.15, 0.4, complete))
-
-        if self.actionName in self.brain.sim.actions:
-            actionobj = self.brain.sim.actions[self.actionName]
-
-            for data_path, data in actionobj.motiondata.items():
-                x = data[0][self.currentFrame] - data[0][self.currentFrame - 1]
-                y = data[1][self.currentFrame] - data[1][self.currentFrame - 1]
-                z = data[2][self.currentFrame] - data[2][self.currentFrame - 1]
-                if data_path == "location":
-                    self.brain.outvars["px"] += x
-                    self.brain.outvars["py"] += y
-                    self.brain.outvars["pz"] += z
-                elif data_path == "rotation_euler":
-                    self.brain.outvars["rx"] += x
-                    self.brain.outvars["ry"] += y
-                    self.brain.outvars["rz"] += z
-
-        if self.currentFrame < self.length - 1:
-            return False, self.name
-
-        # ==== Will stop here is this state hasn't reached its end ====
-
-        options = []
-        for con in self.outputs:
-            val = self.neurons[con].query()
-            if val is not None:
-                options.append((con, val))
-
-        # If the cycleState button is checked then add a contection back to
-        #    this state again.
-        if self.cycleState and self.name not in self.outputs:
-            val = self.neurons[self.name].query()
-            if val is not None:
+            if val is not None and val > 0:
                 options.append((self.name, val))
 
         if len(options) > 0:
@@ -832,6 +856,5 @@ class StateActionGroup(State):
 
 statetypes = OrderedDict([
     ("StartState", StateSTART),
-    ("ActionState", StateAction),
-    ("ActionGroupState", StateActionGroup)
+    ("ActionState", StateAction)
 ])

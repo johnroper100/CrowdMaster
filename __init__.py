@@ -1,4 +1,4 @@
-# Copyright 2016 CrowdMaster Developer Team
+# Copyright 2017 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -20,32 +20,32 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 2, 1),
+    "version": (1, 3, 0),
     "blender": (2, 78, 0),
-    "location": "Node Editor > CrowdMaster",
-    "description": "Blender crowd simulation",
+    "location": "Node Editor > CrowdMaster Node Trees",
+    "description": "Crowd generation and simulation for Blender 3D",
     "warning": "",
-    "wiki_url": "http://jmroper.com/crowdmaster/docs/",
+    "wiki_url": "http://crowdmaster.org/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
     "category": "Simulation"
 }
 
 import bpy
-from bpy.props import PointerProperty, BoolProperty, StringProperty
-from bpy.types import PropertyGroup, UIList, Panel, Operator
+from bpy.props import (BoolProperty, CollectionProperty, PointerProperty,
+                       StringProperty)
+from bpy.types import Operator, Panel, PropertyGroup, UIList
 
-from . import cm_prefs
-from . icon_load import register_icons, unregister_icons, cicon
-from . import addon_updater_ops
-from . cm_graphics import cm_nodeHUD
-from . cm_graphics . cm_nodeHUD import update_hud_text
-from . cm_graphics . utils import cm_redrawAll
+from . import addon_updater_ops, cm_prefs
+from .cm_blenderData import initialTagProperty, modifyBoneProperty
+from .cm_iconLoad import cicon, register_icons, unregister_icons
+
 
 # =============== GROUPS LIST START ===============#
 
 
 class SCENE_UL_group(UIList):
     """for drawing each row"""
+
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
         layout.label(item.name)
@@ -64,13 +64,15 @@ class SCENE_UL_agent_type(UIList):
 
 
 class SCENE_OT_cm_groups_reset(Operator):
-    """Delete a group and all the agent in it (including the agents geo)"""
+    """Delete the selected group and all the agents in it (including the agent's geometry)."""
     bl_idname = "scene.cm_groups_reset"
     bl_label = "Reset Group"
 
     groupName = StringProperty()
 
     def execute(self, context):
+        if bpy.context.active_object is not None:
+            bpy.ops.object.mode_set(mode='OBJECT')
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
 
@@ -97,11 +99,6 @@ class SCENE_OT_cm_groups_reset(Operator):
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
 
-        if preferences.show_node_hud:
-            newhudText = "Group {} reset!".format(self.groupName)
-            update_hud_text(newhudText)
-            cm_redrawAll()
-
         return {'FINISHED'}
 
 
@@ -111,6 +108,7 @@ class SCENE_OT_cm_groups_reset(Operator):
 
 
 class SCENE_OT_cm_agent_add(Operator):
+    """Add a single agent to the list of agents in the current group."""
     bl_idname = "scene.cm_agent_add"
     bl_label = "Add single agent to cm agents list"
 
@@ -118,6 +116,10 @@ class SCENE_OT_cm_agent_add(Operator):
     brainType = StringProperty()
     groupName = StringProperty()
     geoGroupName = StringProperty()
+    initialTags = CollectionProperty(type=initialTagProperty)
+    rigOverwrite = StringProperty()
+    constrainBone = StringProperty()
+    modifyBones = CollectionProperty(type=modifyBoneProperty)
 
     def execute(self, context):
         scene = context.scene
@@ -138,11 +140,23 @@ class SCENE_OT_cm_agent_add(Operator):
         newAgent = agentType.agents.add()
         newAgent.name = self.agentName
         newAgent.geoGroup = self.geoGroupName
+        newAgent.rigOverwrite = self.rigOverwrite
+        newAgent.constrainBone = self.constrainBone
+        for x in self.initialTags:
+            tag = newAgent.initialTags.add()
+            tag.name = x.name
+            tag.value = x.value
+        for x in self.modifyBones:
+            modify = newAgent.modifyBones.add()
+            modify.name = x.name
+            modify.tag = x.tag
+            modify.attribute = x.attribute
         group.totalAgents += 1
         return {'FINISHED'}
 
 
 class SCENE_OT_cm_agent_add_selected(Operator):
+    """Generate an agent group manually from the selected objects."""
     bl_idname = "scene.cm_agent_add_selected"
     bl_label = "Create Manual Agents"
 
@@ -175,11 +189,6 @@ class SCENE_OT_cm_agent_add_selected(Operator):
                 newAgent.name = obj.name
                 group.totalAgents += 1
 
-        if preferences.show_node_hud:
-            newhudText = "Manual Agents {} Created!".format(self.groupName)
-            update_hud_text(newhudText)
-            cm_redrawAll()
-
         return {'FINISHED'}
 
 
@@ -188,12 +197,13 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
 # =============== SIMULATION START ===============#
 
-customSyncMode = 'NONE' # This saves the sync_mode value
-customOutline = True # This saves the outline value
-customRLines = True # This saves the relationship lines value
+customSyncMode = 'NONE'  # This saves the sync_mode value
+customOutline = True  # This saves the outline value
+customRLines = True  # This saves the relationship lines value
+
 
 class SCENE_OT_cm_start(Operator):
-    """Start the CrowdMaster agent simulation."""
+    """Start to simulate the CrowdMaster agents."""
     bl_idname = "scene.cm_start"
     bl_label = "Start Simulation"
 
@@ -219,11 +229,6 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_outline_selected = False
                     area.spaces[0].show_relationship_lines = False
 
-        if preferences.show_node_hud:
-            newhudText = "Simulation Running!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
-
         scene.frame_current = scene.frame_start
 
         global sim
@@ -245,7 +250,7 @@ class SCENE_OT_cm_start(Operator):
 
 
 class SCENE_OT_cm_stop(Operator):
-    """Stop the CrowdMaster agent simulation."""
+    """Stop simulating the CrowdMaster agents."""
     bl_idname = "scene.cm_stop"
     bl_label = "Stop Simulation"
 
@@ -269,18 +274,13 @@ class SCENE_OT_cm_stop(Operator):
                     area.spaces[0].show_outline_selected = customOutline
                     area.spaces[0].show_relationship_lines = customRLines
 
-        if preferences.show_node_hud:
-            newhudText = "Simulation Stopped!"
-            update_hud_text(newhudText)
-            cm_redrawAll()
-
         return {'FINISHED'}
 
 # =============== SIMULATION END ===============#
 
 
 class SCENE_PT_CrowdMaster(Panel):
-    """Creates CrowdMaster Panel in the node editor."""
+    """Creates CrowdMaster main panel in the node editor."""
     bl_label = "Main"
     bl_idname = "SCENE_PT_CrowdMaster"
     bl_space_type = 'NODE_EDITOR'
@@ -302,14 +302,16 @@ class SCENE_PT_CrowdMaster(Panel):
         row = layout.row()
         row.scale_y = 1.5
         if preferences.use_custom_icons:
-            row.operator(SCENE_OT_cm_start.bl_idname, icon_value=cicon('start_sim'))
+            row.operator(SCENE_OT_cm_start.bl_idname,
+                         icon_value=cicon('start_sim'))
         else:
             row.operator(SCENE_OT_cm_start.bl_idname, icon='FILE_TICK')
 
         row = layout.row()
         row.scale_y = 1.25
         if preferences.use_custom_icons:
-            row.operator(SCENE_OT_cm_stop.bl_idname, icon_value=cicon('stop_sim'))
+            row.operator(SCENE_OT_cm_stop.bl_idname,
+                         icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
@@ -317,33 +319,21 @@ class SCENE_PT_CrowdMaster(Panel):
         row.separator()
 
         row = layout.row()
+        row.prop(scene, "cm_linked_file_dir")
+        row.separator()
+
+        row = layout.row()
         if not scene.show_utilities:
-            row.prop(scene, "show_utilities", icon="RIGHTARROW", text="Utilities")
+            row.prop(scene, "show_utilities",
+                     icon="RIGHTARROW", text="Utilities")
         else:
-            row.prop(scene, "show_utilities", icon="TRIA_DOWN", text="Utilities")
+            row.prop(scene, "show_utilities",
+                     icon="TRIA_DOWN", text="Utilities")
 
             box = layout.box()
             row = box.row()
             row.scale_y = 1.5
-            row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_VEC_HLT")
-
-            box = layout.box()
-            row = box.row()
-            row.prop(scene, "nodeTreeType")
-
-            row = box.row()
-            row.prop(scene, "append_to_tree")
-
-            if scene.append_to_tree:
-                row = box.row()
-                row.prop_search(scene, "node_tree_name", bpy.data, "node_groups")
-
-            row = box.row()
-            row.scale_y = 1.5
-            if preferences.use_custom_icons:
-                row.operator("scene.cm_setup_sample_nodes", icon_value=cicon('instant_setup'))
-            else:
-                row.operator("scene.cm_setup_sample_nodes", icon="NODETREE")
+            row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_HLT")
 
             box = layout.box()
             row = box.row()
@@ -352,10 +342,12 @@ class SCENE_PT_CrowdMaster(Panel):
 
             box = layout.box()
             row = box.row()
-            row.label("You must have the Simplify Curves addon enabled and an agent selected.")
+            row.prop(scene, "cm_switch_dupli_group_suffix")
+            row = box.row()
+            row.prop(scene, "cm_switch_dupli_group_target")
             row = box.row()
             row.scale_y = 1.5
-            row.operator("graph.simplify", icon="IPO")
+            row.operator("scene.cm_switch_dupli_groups", icon="GROUP_VERTEX")
 
 
 class SCENE_PT_CrowdMasterAgents(Panel):
@@ -408,7 +400,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                     box.prop(group, "freezePlacement")
 
                 if preferences.use_custom_icons:
-                    op = box.operator(SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
+                    op = box.operator(
+                        SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
                 else:
                     op = box.operator(SCENE_OT_cm_groups_reset.bl_idname)
                 op.groupName = group.name
@@ -440,11 +433,21 @@ class SCENE_PT_CrowdMasterManualAgents(Panel):
         layout.prop(scene.cm_manual, "groupName", text="Group Name")
         layout.prop(scene.cm_manual, "brainType", text="Brain Type")
         if preferences.use_custom_icons:
-            op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
+            op = layout.operator(
+                SCENE_OT_cm_agent_add_selected.bl_idname, icon_value=cicon('agents'))
         else:
             op = layout.operator(SCENE_OT_cm_agent_add_selected.bl_idname)
         op.groupName = "cm_" + scene.cm_manual.groupName
         op.brainType = scene.cm_manual.brainType
+
+
+@bpy.app.handlers.persistent
+def nodeTreeSetFakeUser(scene):
+    for grp in bpy.data.node_groups:
+        if grp.bl_idname in ["CrowdMasterAGenTreeType", "CrowdMasterTreeType"]:
+            if not grp.savedOnce:
+                grp.savedOnce = True
+                grp.use_fake_user = True
 
 
 def register():
@@ -453,10 +456,12 @@ def register():
     cm_documentation.register()
 
     register_icons()
-    cm_nodeHUD.register()
 
     addon_updater_ops.register(bl_info)
     cm_prefs.register()
+
+    from . import cm_blenderData
+    cm_blenderData.registerTypes()
 
     bpy.utils.register_class(SCENE_UL_group)
     bpy.utils.register_class(SCENE_UL_agent_type)
@@ -482,9 +487,6 @@ def register():
     global event_unregister
     from .cm_events import event_unregister
 
-    from . import cm_blenderData
-    cm_blenderData.registerTypes()
-
     global cm_bpyNodes
     from . import cm_bpyNodes
     cm_bpyNodes.register()
@@ -507,6 +509,9 @@ def register():
     global cm_tests
     from . import cm_tests
     cm_tests.register()
+
+    if nodeTreeSetFakeUser not in bpy.app.handlers.save_pre:
+        bpy.app.handlers.save_pre.append(nodeTreeSetFakeUser)
 
 
 def unregister():
@@ -534,8 +539,6 @@ def unregister():
     cm_utilities.unregister()
     cm_prefs.unregister()
 
-    cm_nodeHUD.unregister()
-
     cm_channels.unregister()
 
     cm_tests.unregister()
@@ -545,6 +548,10 @@ def unregister():
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
+
+    if nodeTreeSetFakeUser in bpy.app.handlers.save_pre:
+        bpy.app.handlers.save_pre.remove(nodeTreeSetFakeUser)
+
 
 if __name__ == "__main__":
     register()
