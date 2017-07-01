@@ -106,5 +106,5 @@ def unregisterAllTypes():
 
     del bpy.types.Scene.cm_manual
     del bpy.types.Scene.cm_linked_file_dir
-    del bpy.types.Scene.cm_switch_proxy_suffix
-    del bpy.types.Scene.cm_switch_proxy_target
+    del bpy.types.Scene.cm_switch_dupli_group_suffix
+    del bpy.types.Scene.cm_switch_dupli_group_target
