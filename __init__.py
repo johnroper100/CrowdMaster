@@ -48,7 +48,10 @@ class SCENE_UL_group(UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
-        layout.label(item.name)
+        #layout.label(item.name)
+        op = layout.operator(SCENE_OT_CrowdMasterSelectGroup.bl_idname,
+                             text=item.name)
+        op.groupName = item.name
         layout.label(str(item.totalAgents) + " | " + item.groupType)
         layout.label("Frozen" if item.freezePlacement else "Unlocked")
 
@@ -409,6 +412,34 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 box.label("No group selected")
 
 
+class SCENE_OT_CrowdMasterSelectGroup(Operator):
+    """Select only the objects that are part of an agent"""
+    bl_idname = "scene.cm_groups_select"
+    bl_label = "Select group"
+
+    groupName = StringProperty()
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.object is None or bpy.context.object.mode == "OBJECT"
+
+    def invoke(self, context, event):
+        if not event.shift:
+            for obj in bpy.context.selected_objects:
+                if obj.select:
+                    obj.select = False
+
+        scene = context.scene
+        group = scene.cm_groups.get(self.groupName)
+        for gtype in group.agentTypes:
+            for agent in gtype.agents:
+                agGroup = bpy.data.groups[agent.geoGroup]
+                for obj in agGroup.objects:
+                    obj.select = True
+
+        return {"FINISHED"}
+
+
 class SCENE_PT_CrowdMasterManualAgents(Panel):
     """Creates CrowdMaster agent panel in the node editor."""
     bl_label = "Manual Agents"
@@ -472,6 +503,7 @@ def register():
     bpy.utils.register_class(SCENE_OT_cm_stop)
     bpy.utils.register_class(SCENE_PT_CrowdMaster)
     bpy.utils.register_class(SCENE_PT_CrowdMasterAgents)
+    bpy.utils.register_class(SCENE_OT_CrowdMasterSelectGroup)
     bpy.utils.register_class(SCENE_PT_CrowdMasterManualAgents)
 
     global Simulation
@@ -526,6 +558,7 @@ def unregister():
     bpy.utils.unregister_class(SCENE_OT_cm_stop)
     bpy.utils.unregister_class(SCENE_PT_CrowdMaster)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterAgents)
+    bpy.utils.unregister_class(SCENE_OT_CrowdMasterSelectGroup)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterManualAgents)
 
     action_unregister()
