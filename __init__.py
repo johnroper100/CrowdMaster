@@ -223,7 +223,7 @@ class SCENE_OT_cm_start(Operator):
         global customRLines
 
         preferences = context.user_preferences.addons[__package__].preferences
-        if (bpy.data.is_dirty) and (preferences.ask_to_save):
+        if (preferences.ask_to_save) and (bpy.data.is_dirty):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
 
