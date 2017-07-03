@@ -52,7 +52,14 @@ class SCENE_UL_group(UIList):
                              text=item.name)
         op.groupName = item.name
         layout.label(str(item.totalAgents) + " | " + item.groupType)
-        layout.label("Frozen" if item.freezePlacement else "Unlocked")
+        if item.freezePlacement:
+            if item.freezeAnimation:
+                label = "Anim frozen"
+            else:
+                label = "Geo frozen"
+        else:
+            label = "Unlocked"
+        layout.label(label)
 
 
 class SCENE_UL_agent_type(UIList):
@@ -84,11 +91,10 @@ class SCENE_OT_cm_groups_reset(Operator):
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
-                    #if group.freezePlacement:
-                        #if agent.name in scene.objects:
-                        #    scene.objects[agent.name].animation_data_clear()
-                    #else:
-                    if not group.freezePlacement:
+                    if group.freezePlacement and group.freezeAnimation:
+                        if agent.name in scene.objects:
+                            scene.objects[agent.name].animation_data_clear()
+                    else:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
                                 obj.select = True
@@ -401,6 +407,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                     box.label("cm: To freeze use add to group")
                 else:
                     box.prop(group, "freezePlacement")
+                    if group.freezePlacement:
+                        box.prop(group, "freezeAnimation")
 
                 if preferences.use_custom_icons:
                     op = box.operator(

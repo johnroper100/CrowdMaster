@@ -666,6 +666,7 @@ class StateAction(State):
 
     def __init__(self, *args, **kwargs):
         self.action = None
+        self.strip = None
         State.__init__(self, *args, **kwargs)
 
     def isGroup(self):
@@ -688,6 +689,7 @@ class StateAction(State):
                 self.strip = tr.strips.new("", currentFrame, action)
                 self.strip.extrapolation = 'NOTHING'
                 self.strip.use_auto_blend = True
+                self.strip.mute = self.brain.freeze
             self.length = actionobj.length
 
         self.currentAction = self.action

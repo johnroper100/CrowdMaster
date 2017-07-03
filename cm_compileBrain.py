@@ -59,9 +59,9 @@ def getOutputs(out):
     return result
 
 
-def compileBrain(nodeGroup, sim, userid):
+def compileBrain(nodeGroup, sim, userid, freezeAnimation):
     """Compile the brain that defines how and agent moves and is animated"""
-    result = Brain(sim, userid)
+    result = Brain(sim, userid, freezeAnimation)
     preferences = bpy.context.user_preferences.addons[__package__].preferences
     """create the connections from the node"""
     for node in nodeGroup.nodes:
