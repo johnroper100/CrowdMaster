@@ -31,9 +31,8 @@ bl_info = {
 }
 
 import bpy
-from bpy.props import (BoolProperty, CollectionProperty, PointerProperty,
-                       StringProperty)
-from bpy.types import Operator, Panel, PropertyGroup, UIList
+from bpy.props import CollectionProperty, StringProperty
+from bpy.types import Operator, Panel, UIList
 
 from . import addon_updater_ops, cm_prefs
 from .cm_blenderData import initialTagProperty, modifyBoneProperty
