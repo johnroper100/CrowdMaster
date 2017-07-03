@@ -78,7 +78,6 @@ class SCENE_OT_agent_nodes_generate(Operator):
     def execute(self, context):
         if bpy.context.active_object is not None:
             bpy.ops.object.mode_set(mode='OBJECT')
-        startT = time.time()
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
         preferences = context.user_preferences.addons["CrowdMaster"].preferences
@@ -109,8 +108,6 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 genSpaces[tipNode].build(buildRequest)
         else:
             return {'CANCELLED'}
-
-        endT = time.time() - startT
 
         return {'FINISHED'}
 
