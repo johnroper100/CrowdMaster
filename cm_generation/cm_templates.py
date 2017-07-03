@@ -893,6 +893,8 @@ class TemplateMESHPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
+        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+            return False
         if not isinstance(self.inputs["Template"], Template):
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
@@ -983,6 +985,8 @@ class TemplateVCOLPOSITIONING(Template):
         if "Template" not in self.inputs:
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
+            return False
+        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
@@ -1178,6 +1182,8 @@ class TemplateTARGET(Template):
         elif self.settings["targetType"] == "vertex":
             if self.settings["targetObject"] not in bpy.context.scene.objects:
                 return False
+            if bpy.context.scene.objects[self.settings["targetObject"]].type != 'MESH':
+                return False
         return True
 
 
@@ -1247,6 +1253,8 @@ class TemplateGROUND(Template):
 
     def check(self):
         if self.settings["groundMesh"] not in bpy.context.scene.objects:
+            return False
+        if bpy.context.scene.objects[self.settings["groundMesh"]] != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
