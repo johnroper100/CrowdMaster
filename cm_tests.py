@@ -20,6 +20,7 @@
 import unittest
 
 import bpy
+from bpy.types import Operator
 
 from .cm_syncManager import SyncManagerTestCase
 
@@ -76,7 +77,7 @@ def createLongTestSuite():
     return test_suite
 
 
-class CrowdMaster_run_short_tests(bpy.types.Operator):
+class CrowdMaster_run_short_tests(Operator):
     """For tests cases that will run quickly.
     ie. that don't involve running simulations"""
     bl_idname = "scene.cm_run_short_tests"
@@ -91,7 +92,7 @@ class CrowdMaster_run_short_tests(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class CrowdMaster_run_long_tests(bpy.types.Operator):
+class CrowdMaster_run_long_tests(Operator):
     """For tests cases that will take a long time.
     ie. that involve simulation"""
     bl_idname = "scene.cm_run_long_tests"

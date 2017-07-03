@@ -20,14 +20,14 @@
 import os
 
 import bpy
-from bpy.props import *
-from bpy.types import AddonPreferences
+from bpy.props import BoolProperty, IntProperty
+from bpy.types import AddonPreferences, Operator
 
 from . import addon_updater_ops
 from .cm_iconLoad import cicon
 
 
-class CMSavePrefs(bpy.types.Operator):
+class CMSavePrefs(Operator):
     """Save the CrowdMaster preferences """
     bl_idname = "scene.cm_save_prefs"
     bl_label = "Save Settings"

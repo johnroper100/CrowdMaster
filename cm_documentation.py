@@ -17,15 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import os
-import urllib.request
-from sys import platform
-
 import bpy
-from bpy.props import *
-from bpy.types import Operator
-
-from .cm_iconLoad import cicon
 
 # Documentation Links
 prefix = "http://crowdmaster.org/docs/"

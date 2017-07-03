@@ -1098,7 +1098,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
         text.write(self.text)
 
 
-class GenNoteTextFromClipboard(bpy.types.Operator):
+class GenNoteTextFromClipboard(Operator):
     """Grab whatever text is in the clipboard"""
     bl_idname = "node.gen_note_from_clipboard"
     bl_label = "Grab Text From Clipboard"
@@ -1114,7 +1114,7 @@ class GenNoteTextFromClipboard(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class GenNoteClear(bpy.types.Operator):
+class GenNoteClear(Operator):
     """Clear Note Node"""
     bl_idname = "node.gen_note_clear"
     bl_label = "Clear Text"

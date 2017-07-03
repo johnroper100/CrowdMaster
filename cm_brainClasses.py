@@ -21,6 +21,7 @@ import random
 import time
 
 import bpy
+from bpy.props import BoolProperty
 import mathutils
 
 from . import cm_timings
@@ -35,7 +36,7 @@ class Neuron():
         self.inputs = []  # type: List[str] - strings are names of neurons
         self.result = None  # type: None | ImpulseContainer - Cache for current
         self.resultLog = [(0, 0, 0), (0, 0, 0)]  # type: List[(int, int, int)]
-        self.fillOutput = bpy.props.BoolProperty(default=True)
+        self.fillOutput = BoolProperty(default=True)
         self.bpyNode = bpyNode  # type: cm_bpyNodes.LogicNode
         self.settings = {}  # type: Dict[str, bpy.props.*]
         self.dependantOn = []  # type: List[str] - strings are names of neurons

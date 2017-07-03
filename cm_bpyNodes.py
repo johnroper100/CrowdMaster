@@ -24,7 +24,7 @@ import bpy
 import nodeitems_utils
 from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
                        FloatVectorProperty, IntProperty, StringProperty)
-from bpy.types import Node, NodeSocket, NodeTree
+from bpy.types import Node, NodeSocket, NodeTree, Operator
 from nodeitems_utils import NodeCategory, NodeItem
 
 from .cm_iconLoad import cicon
@@ -878,7 +878,7 @@ class NoteNode(CrowdMasterNode):
         text.write(self.text)
 
 
-class SimNoteTextFromClipboard(bpy.types.Operator):
+class SimNoteTextFromClipboard(Operator):
     """Grab whatever text is in the clipboard"""
     bl_idname = "node.sim_note_from_clipboard"
     bl_label = "Grab Text From Clipboard"
@@ -894,7 +894,7 @@ class SimNoteTextFromClipboard(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class SimNoteClear(bpy.types.Operator):
+class SimNoteClear(Operator):
     """Clear Note Node"""
     bl_idname = "node.sim_note_clear"
     bl_label = "Clear Text"

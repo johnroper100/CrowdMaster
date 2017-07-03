@@ -22,7 +22,7 @@ import math
 import bmesh
 import bpy
 import mathutils
-from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+from bpy.props import (CollectionProperty, EnumProperty,
                        FloatProperty, IntProperty, PointerProperty,
                        StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList

@@ -20,8 +20,8 @@
 import time
 
 import bpy
-from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
-                       FloatVectorProperty, IntProperty, StringProperty)
+from bpy.types import Operator
+from bpy.props import BoolProperty
 
 from .cm_iconLoad import cicon
 
@@ -33,7 +33,7 @@ bpy.types.Scene.show_utilities = BoolProperty(
 )
 
 
-class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
+class CrowdMaster_convert_to_bound_box(Operator):
     bl_idname = "scene.cm_convert_to_bound_box"
     bl_label = "Convert Selected To Bounding Box"
 
@@ -53,7 +53,7 @@ class CrowdMaster_convert_to_bound_box(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class Crowdmaster_place_deferred_geo(bpy.types.Operator):
+class Crowdmaster_place_deferred_geo(Operator):
     bl_idname = "scene.cm_place_deferred_geo"
     bl_label = "Place Deferred Geometry"
     bl_options = {'REGISTER', 'UNDO'}
@@ -145,7 +145,7 @@ class Crowdmaster_place_deferred_geo(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class Crowdmaster_switch_dupli_group(bpy.types.Operator):
+class Crowdmaster_switch_dupli_group(Operator):
     bl_idname = "scene.cm_switch_dupli_groups"
     bl_label = "Switch Dupli Groups"
     bl_options = {'REGISTER', 'UNDO'}
