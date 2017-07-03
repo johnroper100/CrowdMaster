@@ -85,10 +85,11 @@ class SCENE_OT_cm_groups_reset(Operator):
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
-                    if group.freezePlacement:
-                        if agent.name in scene.objects:
-                            scene.objects[agent.name].animation_data_clear()
-                    else:
+                    #if group.freezePlacement:
+                        #if agent.name in scene.objects:
+                        #    scene.objects[agent.name].animation_data_clear()
+                    #else:
+                    if not group.freezePlacement:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
                                 obj.select = True
@@ -397,8 +398,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 box.template_list("SCENE_UL_agent_type", "", group,
                                   "agentTypes", scene, "cm_view_details_index")
 
-                if group.name == "cm_allAgents":
-                    box.label("cm_allAgents: To freeze use Add To Group node")
+                if group.name == "cm":
+                    box.label("cm: To freeze use add to group")
                 else:
                     box.prop(group, "freezePlacement")
 

@@ -307,7 +307,7 @@ class Path(Mc):
 
         pointTowards = nextVert * obj.matrix_world
 
-        return globalPos, pointTowards
+        return globalPos, pointTowards, nextIndex
 
     def calcRelativeTarget(self, pathEntry, lookahead):
         context = bpy.context

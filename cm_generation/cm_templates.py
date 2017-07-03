@@ -72,7 +72,7 @@ class TemplateRequest():
         self.rot = Vector((0, 0, 0))
         self.scale = 1
         self.tags = {}
-        self.cm_group = "cm_allAgents"
+        self.cm_group = "cm"
 
         self.materials = {}
         # Key: material to replace. Value: material to replace with
@@ -105,9 +105,9 @@ class GeoTemplate(Template):
     GeoTemplates are a description of how to create some arrangement of
      geometry"""
 
-    def build(self, pos, rot, scale, group, deferGeo):
+    def build(self, buildRequest):
         """Called when this GeoTemplate is being used to modify the scene"""
-        self.buildCount += 1
+        pass
 
 
 class GeoRequest(TemplateRequest):
@@ -555,44 +555,47 @@ class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
 
     def build(self, buildRequest):
-        groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
-        newGp = bpy.data.groups.new(groupName)
-        defG = self.settings["deferGeo"]
-        pos = buildRequest.pos
-        rot = buildRequest.rot
-        scale = buildRequest.scale
-        geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
-        gret = self.inputs["Objects"].build(geoBuildRequest)
-        topObj = gret.obj
+        cm_groups = bpy.context.scene.cm_groups
+        gpName = buildRequest.cm_group
+        if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
+            groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
+            newGp = bpy.data.groups.new(groupName)
+            defG = self.settings["deferGeo"]
+            pos = buildRequest.pos
+            rot = buildRequest.rot
+            scale = buildRequest.scale
+            geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
+            gret = self.inputs["Objects"].build(geoBuildRequest)
+            topObj = gret.obj
 
-        topObj.location = pos
-        topObj.rotation_euler = rot
-        topObj.scale = Vector((scale, scale, scale))
+            topObj.location = pos
+            topObj.rotation_euler = rot
+            topObj.scale = Vector((scale, scale, scale))
 
-        topObj["cm_randomMaterial"] = buildRequest.materials
+            topObj["cm_randomMaterial"] = buildRequest.materials
 
-        tags = buildRequest.tags
-        packTags = [{"name": x, "value": tags[x]} for x in tags]
+            tags = buildRequest.tags
+            packTags = [{"name": x, "value": tags[x]} for x in tags]
 
-        rigOverwrite = gret.overwriteRig.name if gret.overwriteRig else ""
-        constrainBone = gret.constrainBone.name if gret.constrainBone else ""
+            rigOverwrite = gret.overwriteRig.name if gret.overwriteRig else ""
+            constrainBone = gret.constrainBone.name if gret.constrainBone else ""
 
-        packModifyBones = []
-        for b in gret.modifyBones:
-            for attribute in gret.modifyBones[b]:
-                tag = gret.modifyBones[b][attribute]
-                packModifyBones.append({"name": b,
-                                        "attribute": attribute,
-                                        "tag": tag})
+            packModifyBones = []
+            for b in gret.modifyBones:
+                for attribute in gret.modifyBones[b]:
+                    tag = gret.modifyBones[b][attribute]
+                    packModifyBones.append({"name": b,
+                                            "attribute": attribute,
+                                            "tag": tag})
 
-        bpy.ops.scene.cm_agent_add(agentName=topObj.name,
-                                   brainType=self.settings["brainType"],
-                                   groupName=buildRequest.cm_group,
-                                   geoGroupName=newGp.name,
-                                   initialTags=packTags,
-                                   rigOverwrite=rigOverwrite,
-                                   constrainBone=constrainBone,
-                                   modifyBones=packModifyBones)
+            bpy.ops.scene.cm_agent_add(agentName=topObj.name,
+                                       brainType=self.settings["brainType"],
+                                       groupName=buildRequest.cm_group,
+                                       geoGroupName=newGp.name,
+                                       initialTags=packTags,
+                                       rigOverwrite=rigOverwrite,
+                                       constrainBone=constrainBone,
+                                       modifyBones=packModifyBones)
 
     def check(self):
         if "Objects" not in self.inputs:
@@ -981,6 +984,13 @@ class TemplateVCOLPOSITIONING(Template):
         return True
 
 
+def assignConnectedToIsland(vert, islandID, islandNo):
+    if vert[islandID] == 0:
+        vert[islandID] = islandNo
+        for edge in vert.link_edges:
+            assignConnectedToIsland(edge.other_vert(vert), islandID, islandNo)
+
+
 class TemplatePATH(Template):
     """Place along a path"""
 
@@ -990,7 +1000,18 @@ class TemplatePATH(Template):
         obj = bpy.context.scene.objects[pathEntry.objectName]
         bm = bmesh.new()
         bm.from_mesh(obj.data)
+
+        if self.settings["groupByMeshIsland"]:
+            bm.verts.ensure_lookup_table()
+            islandID = bm.verts.layers.int.new('island')
+            islandNo = 1
+            for vert in bm.verts:
+                if vert[islandID] == 0:
+                    assignConnectedToIsland(vert, islandID, islandNo)
+                    islandNo += 1
+
         bm.edges.ensure_lookup_table()
+
         totalEdge = 0
         edgeWeights = []
         for e in bm.edges:
@@ -1011,22 +1032,27 @@ class TemplatePATH(Template):
             localPos = vs[0].co * weight + vs[1].co * (1 - weight)
             pos = localPos * obj.matrix_world
             # TODO look at path object and get rotation to align with path direction
-            globalPos, pointTowards = tmpPathChannel.alignToPath(pathEntry, pos,
-                                                                 Vector((1, 0, 0)))
+            globalPos, pointTowards, cid = tmpPathChannel.alignToPath(pathEntry, pos,
+                                                                      Vector((1, 0, 0)))
             diff = pointTowards - globalPos
             rot = diff.to_track_quat('Y', 'Z').to_euler()
 
-            positions.append((pos, rot))
+            if self.settings["groupByMeshIsland"]:
+                island = bm.verts[cid][islandID]
+            else:
+                island = 0
+
+            positions.append((pos, rot, island))
 
         if self.settings["relax"]:
             sce = bpy.context.scene
             radius = self.settings["relaxRadius"]
             for i in range(self.settings["relaxIterations"]):
                 kd = KDTree(len(positions))
-                for n, (p, r) in enumerate(positions):
+                for n, (p, r, island) in enumerate(positions):
                     kd.insert(p, n)
                 kd.balance()
-                for n, (p, r) in enumerate(positions):
+                for n, (p, r, island) in enumerate(positions):
                     adjust = Vector()
                     localPoints = kd.find_range(p, radius * 2)
                     for (co, ind, dist) in localPoints:
@@ -1034,25 +1060,26 @@ class TemplatePATH(Template):
                             v = p - co
                             if v.length > 0:
                                 adjust += v * \
-                                    ((2 * radius - v.length) / v.length)
+                                          ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = p + adjust / len(localPoints)
                         normal = Vector((0, 1, 0))
                         normal.rotate(Euler(r))
-                        pos, pointTowards = tmpPathChannel.alignToPath(pathEntry,
-                                                                       adjPos,
-                                                                       normal)
+                        pos, pointTowards, cid = tmpPathChannel.alignToPath(pathEntry,
+                                                                            adjPos,
+                                                                            normal)
                         diff = pointTowards - pos
                         rot = diff.to_track_quat('Y', 'Z').to_euler()
-                        positions[n] = (pos, rot)
+                        positions[n] = (pos, rot, bm.verts[cid][islandID])
 
-        for newPos, newRot in positions:
+        for newPos, newRot, island in positions:
             newBuildRequest = buildRequest.copy()
             newBuildRequest.pos = newPos + buildRequest.pos
             newBuildRequest.rot = newRot  # + buildRequest.rot
+            if self.settings["groupByMeshIsland"]:
+                newBuildRequest.cm_group += "_" + self.settings["nodeName"] + \
+                                            "_" + str(island)
             self.inputs["Template"].build(newBuildRequest)
-
-    # TODO Relax placement and use path channel to snap agents back to path.
 
 
 class TemplateFORMATION(Template):

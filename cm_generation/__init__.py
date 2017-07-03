@@ -98,11 +98,8 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 allSuccess = False
 
         if allSuccess:
-            if "cm_allAgents" in context.scene.cm_groups:
-                bpy.ops.scene.cm_groups_reset(groupName="cm_allAgents")
-            newGroup = context.scene.cm_groups.add()
-            newGroup.groupName = "cm_allAgents"
-            newGroup.name = "cm_allAgents"
+            for gpName in [g.name for g in context.scene.cm_groups]:
+                bpy.ops.scene.cm_groups_reset(groupName=gpName)
 
             for space in generateNode.inputs[0].links:
                 tipNode = space.from_node

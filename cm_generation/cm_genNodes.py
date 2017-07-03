@@ -831,6 +831,10 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
                                 description="Maximum radius for relax interactions",
                                 default=1, min=0)
 
+    groupByMeshIslands = BoolProperty(name="Group By Mesh Islands",
+                                      description="Place agents into groups based on the path mesh",
+                                      default=False)
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs[0].link_limit = 1
@@ -847,12 +851,16 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
             layout.prop(self, "relaxIterations")
             layout.prop(self, "relaxRadius")
 
+        layout.prop(self, "groupByMeshIslands")
+
     def getSettings(self):
         return {"pathName": self.pathName,
                 "noToPlace": self.noToPlace,
                 "relax": self.relax,
                 "relaxIterations": self.relaxIterations,
-                "relaxRadius": self.relaxRadius}
+                "relaxRadius": self.relaxRadius,
+                "groupByMeshIsland": self.groupByMeshIslands,
+                "nodeName": self.name}
 
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
