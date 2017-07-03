@@ -20,7 +20,7 @@
 import os
 
 import bpy
-from bpy.props import BoolProperty, IntProperty
+from bpy.props import BoolProperty, IntProperty, EnumProperty
 from bpy.types import AddonPreferences, Operator
 
 from . import addon_updater_ops
