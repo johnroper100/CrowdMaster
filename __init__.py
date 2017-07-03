@@ -423,7 +423,7 @@ class SCENE_PT_CrowdMasterAgents(Panel):
 class SCENE_OT_CrowdMasterSelectGroup(Operator):
     """Select only the objects that are part of an agent"""
     bl_idname = "scene.cm_groups_select"
-    bl_label = "Select group"
+    bl_label = "Select Group"
 
     groupName = StringProperty()
 
