@@ -75,7 +75,9 @@ class Neuron():
                 cm_timings.coreTimes[self.__class__.__name__] += time.time() - \
                     coreT
                 cm_timings.coreNumber[self.__class__.__name__] += 1
-            if not (isinstance(output, dict) or output is None):
+            if output is None:
+                output = {}
+            elif not (isinstance(output, dict) or output is None):
                 output = {"None": output}
         else:
             output = None

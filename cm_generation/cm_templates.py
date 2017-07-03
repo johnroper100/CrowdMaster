@@ -564,6 +564,13 @@ class TemplateAGENT(Template):
         if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
             groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
             newGp = bpy.data.groups.new(groupName)
+
+            # Put into group by agent group
+            if gpName in bpy.data.groups:
+                typeGroup = bpy.data.groups[gpName]
+            else:
+                typeGroup = bpy.data.groups.new(gpName)
+
             defG = self.settings["deferGeo"]
             pos = buildRequest.pos
             rot = buildRequest.rot
