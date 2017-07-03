@@ -165,7 +165,10 @@ class GeoTemplateOBJECT(GeoTemplate):
         return GeoReturn(cp)
 
     def check(self):
-        return self.settings["inputObject"] in bpy.context.scene.objects
+        if self.settings["inputObject"] in bpy.context.scene.objects:
+            if bpy.context.scene.objects[self.settings["inputObject"]].type == 'MESH':
+                return True
+        return False
 
 
 class GeoTemplateGROUP(GeoTemplate):
