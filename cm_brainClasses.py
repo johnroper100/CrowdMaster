@@ -272,13 +272,14 @@ class State:
 class Brain():
     """An executable brain object. One created per agent"""
 
-    def __init__(self, sim, userid):
+    def __init__(self, sim, userid, freezeAnimation):
         self.userid = userid
         self.sim = sim
         self.lvars = self.sim.lvars
         self.outvars = {}
         self.tags = {}
         self.isActiveSelection = False
+        self.freeze = freezeAnimation
 
         self.currentState = None
         self.startState = None
