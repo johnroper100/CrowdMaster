@@ -425,18 +425,29 @@ class SCENE_OT_CrowdMasterSelectGroup(Operator):
         return bpy.context.object is None or bpy.context.object.mode == "OBJECT"
 
     def invoke(self, context, event):
+        scene = context.scene
+        group = scene.cm_groups.get(self.groupName)
+
+        allSelected = True
+
+        for gtype in group.agentTypes:
+            for agent in gtype.agents:
+                agGroup = bpy.data.groups[agent.geoGroup]
+                for obj in agGroup.objects:
+                    allSelected &= obj.select
+
         if not event.shift:
             for obj in bpy.context.selected_objects:
                 if obj.select:
                     obj.select = False
 
-        scene = context.scene
-        group = scene.cm_groups.get(self.groupName)
+        setTo = not allSelected
+
         for gtype in group.agentTypes:
             for agent in gtype.agents:
                 agGroup = bpy.data.groups[agent.geoGroup]
                 for obj in agGroup.objects:
-                    obj.select = True
+                    obj.select = setTo
 
         return {"FINISHED"}
 
