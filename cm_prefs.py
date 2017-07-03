@@ -58,7 +58,7 @@ class CMPreferences(AddonPreferences):
     updater_intrval_days = IntProperty(
         name='Days',
         description="Number of days between checking for updates",
-        default=7,
+        default=5,
         min=0,
     )
     updater_intrval_hours = IntProperty(
