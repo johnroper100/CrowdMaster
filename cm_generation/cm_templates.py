@@ -168,7 +168,7 @@ class GeoTemplateOBJECT(GeoTemplate):
         nobject = self.settings["inputObject"]
         objects = bpy.context.scene.objects
         if (nobject in objects) and (objects[nobject].type == 'MESH'):
-            return True
+            return self.settings["inputObject"] in bpy.context.scene.objects
         return False
 
 
@@ -724,6 +724,9 @@ class TemplatePOINTTOWARDS(Template):
     def check(self):
         if self.settings["PointObject"] not in bpy.context.scene.objects:
             return False
+        if self.settings["PointType"] == "MESH":
+            if bpy.context.scene.objects[self.settings["PointObject"]] != 'MESH':
+                return False
         if "Template" not in self.inputs:
             return False
         if not isinstance(self.inputs["Template"], Template):
