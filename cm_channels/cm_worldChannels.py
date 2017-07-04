@@ -64,13 +64,17 @@ class World(Mc):
                         result = 0
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
+                        volObj = bpy.data.objects[e.volume]
                         pt = bpy.data.objects[self.userid].location
-                        l = bpy.data.objects[e.volume].location
-                        d = bpy.data.objects[e.volume].dimensions
+                        localPt = volObj.matrix_world.inverted() * pt
+                        d = mathutils.Vector()
+                        d.x = volObj.dimensions.x / volObj.scale.x
+                        d.y = volObj.dimensions.y / volObj.scale.y
+                        d.z = volObj.dimensions.z / volObj.scale.z
 
-                        if not (l.x - (d.x / 2) <= pt.x <= l.x + (d.x / 2) and
-                                l.y - (d.y / 2) <= pt.y <= l.y + (d.y / 2) and
-                                l.z - (d.z / 2) <= pt.z <= l.z + (d.z / 2)):
+                        if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                                -(d.y / 2) <= localPt.y <= (d.y / 2) and
+                                -(d.z / 2) <= localPt.z <= (d.z / 2)):
                             result = 0
                 if result:
                     return {"None": 1}
