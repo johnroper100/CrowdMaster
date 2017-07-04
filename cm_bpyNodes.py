@@ -23,11 +23,16 @@ import textwrap
 import bpy
 import nodeitems_utils
 from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
-                       FloatVectorProperty, IntProperty, StringProperty)
-from bpy.types import Node, NodeSocket, NodeTree, Operator
+                       FloatVectorProperty, IntProperty, StringProperty,
+                       CollectionProperty)
+from bpy.types import Node, NodeSocket, NodeTree, Operator, PropertyGroup
 from nodeitems_utils import NodeCategory, NodeItem
 
 from .cm_iconLoad import cicon
+
+
+class GroupIOListing(PropertyGroup):
+    name = StringProperty(name="Name")
 
 
 class CrowdMasterTree(NodeTree):
@@ -37,6 +42,8 @@ class CrowdMasterTree(NodeTree):
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
     savedOnce = BoolProperty(default=False)
+    groupIn = CollectionProperty(type=GroupIOListing)
+    groupOut = CollectionProperty(type=GroupIOListing)
 
 
 class DefaultSocket(NodeSocket):
@@ -797,6 +804,125 @@ class ActionState(StateNode):
             layout.prop(self, "syncState")
 
 
+class GroupInputs(CrowdMasterNode):
+    """CrowdMaster Inputs Group Node"""
+    bl_label = "GroupInputs"
+
+    def init(self, context):
+        # Input and self.outputs not a typo! Think about what this node is!
+        self.outputs.new('DefaultSocketType', "Input 0")
+
+    def getSettings(self, item):
+        pass
+
+    def draw_buttons(self, context, layout):
+        pass
+
+    def update(self):
+        # TODO multiple group input nodes
+        changedConnected = False
+        if self.outputs[-1].is_linked:
+            n = len(self.outputs)
+            self.outputs.new("DefaultSocketType", "Input {}".format(n))
+            changedConnected = True
+        elif len(self.outputs) > 1 and not self.outputs[-1].is_linked:
+            while len(self.outputs) > 1 and not self.outputs[-2].is_linked:
+                self.outputs.remove(self.outputs[-1])
+                changedConnected = True
+
+        if changedConnected:
+            self.id_data.groupIn.clear()
+            # inp and self.outputs not a typo! Think about what this node is!
+            for inp in self.outputs[:-1]:
+                i = self.id_data.groupIn.add()
+                i.name = inp.name
+
+
+class GroupOutputs(CrowdMasterNode):
+    """CrowdMaster Output Group Node"""
+    bl_label = "GroupOutputs"
+
+    def init(self, context):
+        # Output and self.inputs not a typo! Think about what this node is!
+        self.inputs.new('DefaultSocketType', "Output 0")
+
+    def getSettings(self, item):
+        pass
+
+    def draw_buttons(self, context, layout):
+        pass
+
+    def update(self):
+        # TODO multiple group output nodes
+        changedConnected = False
+        if self.inputs[-1].is_linked:
+            n = len(self.inputs)
+            self.inputs.new("DefaultSocketType", "Output {}".format(n))
+            changedConnected = True
+        elif len(self.inputs) > 1 and not self.inputs[-1].is_linked:
+            while len(self.inputs) > 1 and not self.inputs[-2].is_linked:
+                self.inputs.remove(self.inputs[-1])
+                changedConnected = True
+
+        if changedConnected:
+            self.id_data.groupOut.clear()
+            # out and self.inputs not a typo! Think about what this node is!
+            for out in self.inputs[:-1]:
+                i = self.id_data.groupOut.add()
+                i.name = out.name
+
+
+def updateGroupNodeName(self, context):
+    correctTree = False
+    if self.groupName in bpy.data.node_groups:
+        tree = bpy.data.node_groups[self.groupName]
+        if tree.bl_idname == 'CrowdMasterTreeType':
+            correctTree = True
+
+            # set input sockets
+            i = 0
+            while i < len(self.inputs) and i < len(tree.groupIn):
+                i += 1
+            while i < len(tree.groupIn):
+                self.inputs.new("DefaultSocketType", tree.groupIn[i].name)
+                i += 1
+            while i < len(self.inputs):
+                self.inputs.remove(self.inputs[-1])
+                i += 1
+
+            # set output sockets
+            i = 0
+            while i < len(self.outputs) and i < len(tree.groupOut):
+                i += 1
+            while i < len(tree.groupOut):
+                self.outputs.new("DefaultSocketType", tree.groupOut[i].name)
+                i += 1
+            while i < len(self.outputs):
+                self.outputs.remove(self.outputs[-1])
+                i += 1
+
+    if not correctTree:
+        self.inputs.clear()
+        self.outputs.clear()
+
+class GroupNode(CrowdMasterNode):
+    """CrowdMaster Group Node"""
+    bl_label = "GroupNode"
+
+    groupName = StringProperty(name="Group Name",
+                               update=updateGroupNodeName)
+
+    def init(self, context):
+        # TODO get from group
+        pass
+
+    def getSettings(self, item):
+        pass
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "groupName")
+
+
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
@@ -947,11 +1073,17 @@ node_categories = [
         NodeItem("NodeFrame"),
         NodeItem("LogicNoteNode"),
         NodeItem("NodeReroute"),
+    ]),
+    MyNodeCategory("GROUP", "Group", items=[
+        NodeItem("GroupNode"),
+        NodeItem("GroupInputs"),
+        NodeItem("GroupOutputs"),
     ])
 ]
 
 
 def register():
+    bpy.utils.register_class(GroupIOListing)
     bpy.utils.register_class(CrowdMasterTree)
     bpy.utils.register_class(DefaultSocket)
     bpy.utils.register_class(StateSocket)
@@ -981,6 +1113,10 @@ def register():
     bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
+    bpy.utils.register_class(GroupInputs)
+    bpy.utils.register_class(GroupOutputs)
+    bpy.utils.register_class(GroupNode)
+
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
 
@@ -988,6 +1124,7 @@ def register():
 def unregister():
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
 
+    bpy.utils.unregister_class(GroupIOListing)
     bpy.utils.unregister_class(CrowdMasterTree)
     bpy.utils.unregister_class(DefaultSocket)
     bpy.utils.unregister_class(StateSocket)
@@ -1016,6 +1153,10 @@ def unregister():
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
+
+    bpy.utils.unregister_class(GroupInputs)
+    bpy.utils.unregister_class(GroupOutputs)
+    bpy.utils.unregister_class(GroupNode)
 
 
 if __name__ == "__main__":
