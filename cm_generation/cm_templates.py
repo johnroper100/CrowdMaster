@@ -1006,19 +1006,14 @@ class TemplateVCOLPOSITIONING(Template):
             self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
-        print("template")
         if "Template" not in self.inputs:
             return False
-        print("mesh exists")
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        print("mesh is mesh")
         if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
-        print("Template is instance")
         if not isinstance(self.inputs["Template"], Template):
             return False
-        print("geotemplate isinstance")
         if isinstance(self.inputs["Template"], GeoTemplate):
             return False
         return True
