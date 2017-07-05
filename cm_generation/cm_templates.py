@@ -992,6 +992,11 @@ class TemplateVCOLPOSITIONING(Template):
                 newBuildRequest.pos = newPos
                 self.inputs["Template"].build(newBuildRequest)
 
+        elif placeMode == 'edit':
+             if self.bvhtree is None:
+                self.bvhtree = BVHTree.FromPolygons(polys)
+            self.inputs["Template"].build(newBuildRequest)
+
     def check(self):
         if "Template" not in self.inputs:
             return False
