@@ -734,7 +734,7 @@ class TemplatePOINTTOWARDS(Template):
         if self.settings["PointObject"] not in bpy.context.scene.objects:
             return False
         if self.settings["PointType"] == "MESH":
-            if bpy.context.scene.objects[self.settings["PointObject"]] != 'MESH':
+            if bpy.context.scene.objects[self.settings["PointObject"]].type != 'MESH':
                 return False
         if "Template" not in self.inputs:
             return False
@@ -902,7 +902,7 @@ class TemplateMESHPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
@@ -1006,14 +1006,19 @@ class TemplateVCOLPOSITIONING(Template):
             self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
+        print("template")
         if "Template" not in self.inputs:
             return False
+        print("mesh exists")
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+        print("mesh is mesh")
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
+        print("Template is instance")
         if not isinstance(self.inputs["Template"], Template):
             return False
+        print("geotemplate isinstance")
         if isinstance(self.inputs["Template"], GeoTemplate):
             return False
         return True
@@ -1278,7 +1283,7 @@ class TemplateGROUND(Template):
     def check(self):
         if self.settings["groundMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["groundMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["groundMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
