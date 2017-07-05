@@ -993,8 +993,9 @@ class TemplateVCOLPOSITIONING(Template):
                 self.inputs["Template"].build(newBuildRequest)
 
         elif placeMode == 'edit':
+            gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
-                self.bvhtree = BVHTree.FromPolygons(polys)
+                self.bvhtree = BVHTree.FromObject(gnd, sce)
             self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
