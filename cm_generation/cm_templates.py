@@ -563,7 +563,8 @@ class TemplateAGENT(Template):
         cm_groups = bpy.context.scene.cm_groups
         gpName = buildRequest.cm_group
         if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
-            groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
+            groupName = buildRequest.cm_group + \
+                "/" + self.settings["brainType"]
             newGp = bpy.data.groups.new(groupName)
 
             # Put into group by agent group
@@ -936,7 +937,7 @@ class TemplateVCOLPOSITIONING(Template):
         wrld = guide.matrix_world
         if self.totalArea is None:
             self.totalArea = sum(p.area for p in polys)
-        
+
         if paintMode == 'place':
             positions = []
             for n in range(self.settings["noToPlace"]):
@@ -950,7 +951,8 @@ class TemplateVCOLPOSITIONING(Template):
                         c = data.vertices[polys[index].vertices[2]].co
                         r1 = math.sqrt(random.random())
                         r2 = random.random()
-                        pos = (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c
+                        pos = (1 - r1) * a + (r1 * (1 - r2)) * \
+                            b + (r1 * r2) * c
                         if self.settings["overwritePosition"]:
                             pos = wrld * pos
                         else:
@@ -993,9 +995,14 @@ class TemplateVCOLPOSITIONING(Template):
                 self.inputs["Template"].build(newBuildRequest)
 
         elif placeMode == 'edit':
+            sce = bpy.context.scene
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
+            
+            point = buildRequest.pos
+            loc, norm, ind, dist = self.bvhtree.find_nearest(point)
+            print(ind)
             self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
@@ -1088,7 +1095,7 @@ class TemplatePATH(Template):
                             v = p - co
                             if v.length > 0:
                                 adjust += v * \
-                                          ((2 * radius - v.length) / v.length)
+                                    ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = p + adjust / len(localPoints)
                         normal = Vector((0, 1, 0))
