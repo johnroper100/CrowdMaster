@@ -918,6 +918,7 @@ class TemplateVCOLPOSITIONING(Template):
         self.totalArea = None
 
     def build(self, buildRequest):
+        paintMode = self.settings["paintMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
         data = guide.data
         polys = []
