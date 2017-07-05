@@ -1002,8 +1002,11 @@ class TemplateVCOLPOSITIONING(Template):
             
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
-            print(ind)
-            self.inputs["Template"].build(newBuildRequest)
+            poly = mesh.polygons[ind]
+            for loop_index in poly.loop_indices:
+                loop_vert_index = mesh.loops[loop_index].vertex_index
+                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                    self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
