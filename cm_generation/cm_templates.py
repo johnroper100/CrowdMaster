@@ -928,7 +928,7 @@ class TemplateVCOLPOSITIONING(Template):
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color[0] == self.settings["vcolor"][0] and vcol_layer.data[loop_index].color[1] == self.settings["vcolor"][1] and vcol_layer.data[loop_index].color[2] == self.settings["vcolor"][2]:
+                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                     polys.append(poly)
 
         wrld = guide.matrix_world
