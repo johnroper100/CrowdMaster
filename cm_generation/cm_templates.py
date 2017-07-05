@@ -284,7 +284,7 @@ def findUnusedFile(searchDirectory, namePrefix, sourceGroup, additionalGroup):
         if fileName[:len(namePrefix)] == namePrefix:
             if fileName not in usedBlends:
                 unusedFile = os.path.join(searchDirectory, fileName)
-                with bpy.data.libraries.load(unusedFile, link=True) as (data_src, data_dst):
+                with bpy.data.libraries.load(unusedFile, link=True, relative=True) as (data_src, data_dst):
                     data_dst.groups = [sourceGroup]
                     if additionalGroup != "":
                         data_dst.groups.append(additionalGroup)
