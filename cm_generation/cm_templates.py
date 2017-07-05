@@ -733,7 +733,7 @@ class TemplatePOINTTOWARDS(Template):
         if self.settings["PointObject"] not in bpy.context.scene.objects:
             return False
         if self.settings["PointType"] == "MESH":
-            if bpy.context.scene.objects[self.settings["PointObject"]] != 'MESH':
+            if bpy.context.scene.objects[self.settings["PointObject"]].type != 'MESH':
                 return False
         if "Template" not in self.inputs:
             return False
@@ -901,7 +901,7 @@ class TemplateMESHPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
@@ -994,7 +994,7 @@ class TemplateVCOLPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
@@ -1262,7 +1262,7 @@ class TemplateGROUND(Template):
     def check(self):
         if self.settings["groundMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["groundMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["groundMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
