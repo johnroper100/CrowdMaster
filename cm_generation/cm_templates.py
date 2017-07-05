@@ -994,7 +994,7 @@ class TemplateVCOLPOSITIONING(Template):
                 newBuildRequest.pos = newPos
                 self.inputs["Template"].build(newBuildRequest)
 
-        elif placeMode == 'edit':
+        elif paintMode == 'edit':
             sce = bpy.context.scene
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
