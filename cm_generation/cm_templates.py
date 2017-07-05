@@ -284,7 +284,7 @@ def findUnusedFile(searchDirectory, namePrefix, sourceGroup, additionalGroup):
         if fileName[:len(namePrefix)] == namePrefix:
             if fileName not in usedBlends:
                 unusedFile = os.path.join(searchDirectory, fileName)
-                with bpy.data.libraries.load(unusedFile, link=True) as (data_src, data_dst):
+                with bpy.data.libraries.load(unusedFile, link=True, relative=True) as (data_src, data_dst):
                     data_dst.groups = [sourceGroup]
                     if additionalGroup != "":
                         data_dst.groups.append(additionalGroup)
@@ -352,7 +352,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 blendfile = os.path.join(blendfile, d)
 
         dupDir = os.path.split(bpy.data.filepath)[0]
-        for d in bpy.context.scene.cm_linked_file_dir[2:].split("/"):
+        for d in self.settings["duplicatesDirectory"][2:].split("/"):
             if d == "..":
                 dupDir = os.path.split(dupDir)[0]
             else:
@@ -375,7 +375,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         return gret
 
     def check(self):
-        return True
+        # TODO check if file exists
+        return self.settings["duplicatesDirectory"] != ""
 
 
 class GeoTemplateCONSTRAINBONE(GeoTemplate):

@@ -61,8 +61,6 @@ documentation_mapping = (
      "simulation/toolbars/manual_agents.html"),
     ("bpy.types.Scene.cm_manual.brainType",
      "simulation/toolbars/manual_agents.html"),
-    ("bpy.types.Scene.cm_linked_file_dir",
-     "simulation/toolbars/main/index.html#linked-file-directory"),
     ("bpy.types.Scene.cm_switch_dupli_group_suffix",
      "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-suffix"),
     ("bpy.types.Scene.cm_switch_dupli_group_target",
