@@ -352,7 +352,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 blendfile = os.path.join(blendfile, d)
 
         dupDir = os.path.split(bpy.data.filepath)[0]
-        for d in bpy.context.scene.cm_linked_file_dir[2:].split("/"):
+        for d in self.settings["duplicatesDirectory"][2:].split("/"):
             if d == "..":
                 dupDir = os.path.split(dupDir)[0]
             else:
@@ -375,7 +375,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         return gret
 
     def check(self):
-        return True
+        # TODO check if file exists
+        return self.settings["duplicatesDirectory"] != ""
 
 
 class GeoTemplateCONSTRAINBONE(GeoTemplate):

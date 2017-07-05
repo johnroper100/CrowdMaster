@@ -328,10 +328,6 @@ class SCENE_PT_CrowdMaster(Panel):
         row.separator()
 
         row = layout.row()
-        row.prop(scene, "cm_linked_file_dir")
-        row.separator()
-
-        row = layout.row()
         if not scene.show_utilities:
             row.prop(scene, "show_utilities",
                      icon="RIGHTARROW", text="Utilities")
