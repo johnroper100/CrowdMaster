@@ -54,8 +54,7 @@ class AddonRegisterTestCase(unittest.TestCase):
                     "cm_gennodes_pos_formation_simple",
                     "cm_gennodes_pos_random_simple",
                     "cm_gennodes_pos_target_simple", "cm_groups_reset",
-                    "cm_paths_populate", "cm_paths_remove",
-                    "cm_place_deferred_geo", "cm_run_long_tests",
+                    "cm_paths_populate", "cm_paths_remove", "cm_run_long_tests",
                     "cm_run_short_tests", "cm_save_prefs",
                     "cm_simnodes_action_random", "cm_simnodes_mov_simple",
                     "cm_start", "cm_stop"]

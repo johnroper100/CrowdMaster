@@ -41,7 +41,7 @@ tmpPathChannel = Path(None)
 # ==================== Some base classes ====================
 
 
-class Template():
+class Template:
     """Abstract super class.
     Templates are a description of how to create some arrangement of agents"""
 
@@ -64,7 +64,7 @@ class Template():
         return True
 
 
-class TemplateRequest():
+class TemplateRequest:
     """Passed between the children of Template"""
 
     def __init__(self):
@@ -130,6 +130,26 @@ class GeoRequest(TemplateRequest):
         new.deferGeo = self.deferGeo
         return new
 
+    def storeWithObject(self, obj):
+        store = {}
+        store["posx"], store["posy"], store["posz"] = self.pos
+        store["rotx"], store["roty"], store["rotz"] = self.rot
+        store["scale"] = self.scale
+        store["tags"] = self.tags
+        store["cm_group"] = self.cm_group
+        store["materials"] = self.materials
+        obj["cmTemplateRequest"] = store
+
+    @staticmethod
+    def fromObject(obj):
+        t = GeoRequest()
+        t.pos = Vector((obj.store["posx"], obj.store["posy"], obj.store["posz"]))
+        t.rot = Vector((obj.store["rotx"], obj.store["roty"], obj.store["rotz"]))
+        t.scale = obj.store["scale"]
+        t.tags = obj.store["tags"]
+        t.cm_group = obj.store["cm_group"]
+        t.materials = obj.store["materials"]
+        return t
 
 class GeoReturn:
     """Object that is passed back by geo template nodes"""
