@@ -787,7 +787,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "paintMode", align=True)
+        layout.prop(self, "paintMode", expand=True)
         layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
 
         row = layout.row(align=True)

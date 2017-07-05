@@ -834,7 +834,7 @@ class TemplateMESHPOSITIONING(Template):
 
     def __init__(self, inputs, settings, bpyName):
         Template.__init__(self, inputs, settings, bpyName)
-        self.bvhtree = None  # TODO use to relax points
+        self.bvhtree = None
         self.totalArea = None
 
     def build(self, buildRequest):
@@ -914,7 +914,7 @@ class TemplateVCOLPOSITIONING(Template):
 
     def __init__(self, inputs, settings, bpyName):
         Template.__init__(self, inputs, settings, bpyName)
-        self.bvhtree = None  # TODO use to relax points
+        self.bvhtree = None
         self.totalArea = None
 
     def build(self, buildRequest):
