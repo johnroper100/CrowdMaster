@@ -993,7 +993,7 @@ class TemplateVCOLPOSITIONING(Template):
                 self.inputs["Template"].build(newBuildRequest)
 
         elif placeMode == 'edit':
-             if self.bvhtree is None:
+            if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromPolygons(polys)
             self.inputs["Template"].build(newBuildRequest)
 
