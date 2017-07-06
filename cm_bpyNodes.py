@@ -807,7 +807,7 @@ class ActionState(StateNode):
 
 class GroupInputs(CrowdMasterNode):
     """CrowdMaster Inputs Group Node"""
-    bl_label = "GroupInputs"
+    bl_label = "Group Inputs"
 
     def init(self, context):
         # Input and self.outputs not a typo! Think about what this node is!
@@ -841,7 +841,7 @@ class GroupInputs(CrowdMasterNode):
 
 class GroupOutputs(CrowdMasterNode):
     """CrowdMaster Output Group Node"""
-    bl_label = "GroupOutputs"
+    bl_label = "Group Outputs"
 
     def init(self, context):
         # Output and self.inputs not a typo! Think about what this node is!
@@ -908,7 +908,8 @@ def updateGroupNodeName(self, context):
 
 class GroupNode(CrowdMasterNode):
     """CrowdMaster Group Node"""
-    bl_label = "GroupNode"
+    bl_label = "Group"
+    bl_width_default = 275.0
 
     groupName = StringProperty(name="Group Name",
                                update=updateGroupNodeName)
@@ -919,6 +920,9 @@ class GroupNode(CrowdMasterNode):
 
     def getSettings(self, item):
         pass
+    
+    def update(self):
+        self.groupName = self.groupName
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "groupName")
