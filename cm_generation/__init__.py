@@ -106,7 +106,6 @@ class SCENE_OT_agent_nodes_generate(Operator):
                     tipNode = self.getInput(tipNode.inputs[0])
                 buildRequest = TemplateRequest()
                 genSpaces[tipNode].build(buildRequest)
-                bpy.ops.file.make_paths_relative()
         else:
             return {'CANCELLED'}
 

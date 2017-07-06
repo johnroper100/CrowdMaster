@@ -161,7 +161,8 @@ class NewInputNode(LogicNode):
                                       ("SOUND", "Sound", "", 7),
                                       ("STATE", "State", "", 8),
                                       ("WORLD", "World", "", 9)],
-                               description="Which channel the input data should be pulled from")
+                               description="Which channel the input data should be pulled from",
+                               default="CONSTANT")
 
     Constant = FloatProperty(name="Constant", precision=5)
 

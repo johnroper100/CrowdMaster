@@ -20,7 +20,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 3, 0),
+    "version": (1, 3, 1),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
     "description": "Crowd generation and simulation for Blender 3D",
@@ -325,10 +325,6 @@ class SCENE_PT_CrowdMaster(Panel):
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
         row = layout.row()
-        row.separator()
-
-        row = layout.row()
-        row.prop(scene, "cm_linked_file_dir")
         row.separator()
 
         row = layout.row()

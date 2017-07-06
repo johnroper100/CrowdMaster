@@ -88,8 +88,6 @@ def registerTypes():
 
     bpy.utils.register_class(manual_props)
     bpy.types.Scene.cm_manual = PointerProperty(type=manual_props)
-    bpy.types.Scene.cm_linked_file_dir = StringProperty(name="Linked File Directory",
-                                                        subtype='FILE_PATH')
     bpy.types.Scene.cm_switch_dupli_group_suffix = StringProperty(
         name="Dupli Group Suffix")
     bpy.types.Scene.cm_switch_dupli_group_target = StringProperty(
@@ -106,6 +104,5 @@ def unregisterAllTypes():
     bpy.utils.unregister_class(manual_props)
 
     del bpy.types.Scene.cm_manual
-    del bpy.types.Scene.cm_linked_file_dir
     del bpy.types.Scene.cm_switch_dupli_group_suffix
     del bpy.types.Scene.cm_switch_dupli_group_target

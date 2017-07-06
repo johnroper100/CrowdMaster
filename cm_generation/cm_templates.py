@@ -284,7 +284,7 @@ def findUnusedFile(searchDirectory, namePrefix, sourceGroup, additionalGroup):
         if fileName[:len(namePrefix)] == namePrefix:
             if fileName not in usedBlends:
                 unusedFile = os.path.join(searchDirectory, fileName)
-                with bpy.data.libraries.load(unusedFile, link=True) as (data_src, data_dst):
+                with bpy.data.libraries.load(unusedFile, link=True, relative=True) as (data_src, data_dst):
                     data_dst.groups = [sourceGroup]
                     if additionalGroup != "":
                         data_dst.groups.append(additionalGroup)
@@ -352,7 +352,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 blendfile = os.path.join(blendfile, d)
 
         dupDir = os.path.split(bpy.data.filepath)[0]
-        for d in bpy.context.scene.cm_linked_file_dir[2:].split("/"):
+        for d in self.settings["duplicatesDirectory"][2:].split("/"):
             if d == "..":
                 dupDir = os.path.split(dupDir)[0]
             else:
@@ -375,7 +375,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         return gret
 
     def check(self):
-        return True
+        # TODO check if file exists
+        return self.settings["duplicatesDirectory"] != ""
 
 
 class GeoTemplateCONSTRAINBONE(GeoTemplate):
@@ -562,7 +563,8 @@ class TemplateAGENT(Template):
         cm_groups = bpy.context.scene.cm_groups
         gpName = buildRequest.cm_group
         if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
-            groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
+            groupName = buildRequest.cm_group + \
+                "/" + self.settings["brainType"]
             newGp = bpy.data.groups.new(groupName)
 
             # Put into group by agent group
@@ -732,7 +734,7 @@ class TemplatePOINTTOWARDS(Template):
         if self.settings["PointObject"] not in bpy.context.scene.objects:
             return False
         if self.settings["PointType"] == "MESH":
-            if bpy.context.scene.objects[self.settings["PointObject"]] != 'MESH':
+            if bpy.context.scene.objects[self.settings["PointObject"]].type != 'MESH':
                 return False
         if "Template" not in self.inputs:
             return False
@@ -834,7 +836,7 @@ class TemplateMESHPOSITIONING(Template):
 
     def __init__(self, inputs, settings, bpyName):
         Template.__init__(self, inputs, settings, bpyName)
-        self.bvhtree = None  # TODO use to relax points
+        self.bvhtree = None
         self.totalArea = None
 
     def build(self, buildRequest):
@@ -900,7 +902,7 @@ class TemplateMESHPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
@@ -914,10 +916,11 @@ class TemplateVCOLPOSITIONING(Template):
 
     def __init__(self, inputs, settings, bpyName):
         Template.__init__(self, inputs, settings, bpyName)
-        self.bvhtree = None  # TODO use to relax points
+        self.bvhtree = None
         self.totalArea = None
 
     def build(self, buildRequest):
+        paintMode = self.settings["paintMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
         data = guide.data
         polys = []
@@ -928,72 +931,89 @@ class TemplateVCOLPOSITIONING(Template):
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color[0] == self.settings["vcolor"][0] and vcol_layer.data[loop_index].color[1] == self.settings["vcolor"][1] and vcol_layer.data[loop_index].color[2] == self.settings["vcolor"][2]:
+                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                     polys.append(poly)
 
         wrld = guide.matrix_world
         if self.totalArea is None:
             self.totalArea = sum(p.area for p in polys)
-        positions = []
-        for n in range(self.settings["noToPlace"]):
-            remaining = random.random() * self.totalArea
-            index = 0
-            while remaining > 0:
-                remaining -= polys[index].area
-                if remaining <= 0:
-                    a = data.vertices[polys[index].vertices[0]].co
-                    b = data.vertices[polys[index].vertices[1]].co
-                    c = data.vertices[polys[index].vertices[2]].co
-                    r1 = math.sqrt(random.random())
-                    r2 = random.random()
-                    pos = (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c
-                    if self.settings["overwritePosition"]:
-                        pos = wrld * pos
-                    else:
-                        pos.rotate(mathutils.Euler(buildRequest.rot))
-                        pos *= buildRequest.scale
-                        pos = buildRequest.pos + pos
-                    positions.append(pos)
-                index += 1
 
-        if self.settings["relax"]:
+        if paintMode == 'place':
+            positions = []
+            for n in range(self.settings["noToPlace"]):
+                remaining = random.random() * self.totalArea
+                index = 0
+                while remaining > 0:
+                    remaining -= polys[index].area
+                    if remaining <= 0:
+                        a = data.vertices[polys[index].vertices[0]].co
+                        b = data.vertices[polys[index].vertices[1]].co
+                        c = data.vertices[polys[index].vertices[2]].co
+                        r1 = math.sqrt(random.random())
+                        r2 = random.random()
+                        pos = (1 - r1) * a + (r1 * (1 - r2)) * \
+                            b + (r1 * r2) * c
+                        if self.settings["overwritePosition"]:
+                            pos = wrld * pos
+                        else:
+                            pos.rotate(mathutils.Euler(buildRequest.rot))
+                            pos *= buildRequest.scale
+                            pos = buildRequest.pos + pos
+                        positions.append(pos)
+                    index += 1
+
+            if self.settings["relax"]:
+                sce = bpy.context.scene
+                gnd = sce.objects[self.settings["guideMesh"]]
+                if self.bvhtree is None:
+                    self.bvhtree = BVHTree.FromObject(gnd, sce)
+                radius = self.settings["relaxRadius"]
+                for n, p in enumerate(positions):
+                    rvec = random.random() * mathutils.noise.random_unit_vector()
+                    positions[n] = p + rvec * radius
+                for i in range(self.settings["relaxIterations"]):
+                    kd = KDTree(len(positions))
+                    for n, p in enumerate(positions):
+                        kd.insert(p, n)
+                    kd.balance()
+                    for n, p in enumerate(positions):
+                        adjust = Vector()
+                        localPoints = kd.find_range(p, radius * 2)
+                        for (co, ind, dist) in localPoints:
+                            if ind != n:
+                                v = p - co
+                                if v.length > 0:
+                                    adjust += v * \
+                                        ((2 * radius - v.length) / v.length)
+                        if len(localPoints) > 0:
+                            adjPos = positions[n] + adjust / len(localPoints)
+                            positions[n] = self.bvhtree.find_nearest(adjPos)[0]
+
+            for newPos in positions:
+                newBuildRequest = buildRequest.copy()
+                newBuildRequest.pos = newPos
+                self.inputs["Template"].build(newBuildRequest)
+
+        elif paintMode == 'edit':
             sce = bpy.context.scene
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
-            radius = self.settings["relaxRadius"]
-            for n, p in enumerate(positions):
-                rvec = random.random() * mathutils.noise.random_unit_vector()
-                positions[n] = p + rvec * radius
-            for i in range(self.settings["relaxIterations"]):
-                kd = KDTree(len(positions))
-                for n, p in enumerate(positions):
-                    kd.insert(p, n)
-                kd.balance()
-                for n, p in enumerate(positions):
-                    adjust = Vector()
-                    localPoints = kd.find_range(p, radius * 2)
-                    for (co, ind, dist) in localPoints:
-                        if ind != n:
-                            v = p - co
-                            if v.length > 0:
-                                adjust += v * \
-                                    ((2 * radius - v.length) / v.length)
-                    if len(localPoints) > 0:
-                        adjPos = positions[n] + adjust / len(localPoints)
-                        positions[n] = self.bvhtree.find_nearest(adjPos)[0]
-
-        for newPos in positions:
-            newBuildRequest = buildRequest.copy()
-            newBuildRequest.pos = newPos
-            self.inputs["Template"].build(newBuildRequest)
+            
+            point = buildRequest.pos
+            loc, norm, ind, dist = self.bvhtree.find_nearest(point)
+            poly = mesh.polygons[ind]
+            for loop_index in poly.loop_indices:
+                loop_vert_index = mesh.loops[loop_index].vertex_index
+                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                    self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["guideMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
@@ -1078,7 +1098,7 @@ class TemplatePATH(Template):
                             v = p - co
                             if v.length > 0:
                                 adjust += v * \
-                                          ((2 * radius - v.length) / v.length)
+                                    ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         adjPos = p + adjust / len(localPoints)
                         normal = Vector((0, 1, 0))
@@ -1261,7 +1281,7 @@ class TemplateGROUND(Template):
     def check(self):
         if self.settings["groundMesh"] not in bpy.context.scene.objects:
             return False
-        if bpy.context.scene.objects[self.settings["groundMesh"]] != 'MESH':
+        if bpy.context.scene.objects[self.settings["groundMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False
