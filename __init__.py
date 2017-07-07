@@ -561,6 +561,10 @@ def register():
     from . import cm_tests
     cm_tests.register()
 
+    global cm_pieMenus
+    from . import cm_pieMenus
+    cm_pieMenus.register()
+
     if nodeTreeSetFakeUser not in bpy.app.handlers.save_pre:
         bpy.app.handlers.save_pre.append(nodeTreeSetFakeUser)
 
@@ -594,6 +598,8 @@ def unregister():
     cm_channels.unregister()
 
     cm_tests.unregister()
+    
+    cm_pieMenus.unregister()
 
     if "sim" in globals():
         if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
