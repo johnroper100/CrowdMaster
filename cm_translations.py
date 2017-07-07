@@ -77,7 +77,7 @@ translations = {
         ("Operator", "Run Long Tests"): "Spanish Here",
         ("*", "Show Debug Timings"): "Spanish Here",
         ("*", "Enable Show Debug Options to access these settings (only for developers)."): "Spanish Here",
-        # Nodes
+        # Node names
         # generation
         ("*", "Constrain Bone"): "Spanish Here",
         ("*", "Link Armature"): "Spanish Here",
@@ -90,6 +90,13 @@ translations = {
         ("*", "Positioning"): "Spanish Here",
         ("*", "Formation"): "Spanish Here",
         ("*", "Ground"): "Spanish Here",
+        # simulation
+        ("*", "Print"): "Spanish Here",
+        ("*", "Graph"): "Spanish Here",
+        ("*", "Map"): "Spanish Here",
+        ("*", "Logic"): "Spanish Here",
+        ("*", "Strong"): "Spanish Here",
+        ("*", "Weak"): "Spanish Here",
     }
 }
 
