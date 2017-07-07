@@ -371,7 +371,7 @@ class RandomMaterialNode(CrowdMasterAGenTreeNode):
     bl_width_default = 300
 
     targetMaterial = StringProperty(
-        name="Target material", description="The name of the material to be randomised")
+        name="Target Material", description="The name of the material to be randomised")
     materialList = CollectionProperty(type=material_entry)
     materialIndex = IntProperty()
 
