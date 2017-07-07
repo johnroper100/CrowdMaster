@@ -89,7 +89,7 @@ class CMPreferences(AddonPreferences):
     )
 
     show_debug_timings = BoolProperty(
-        name="Show debug timings",
+        name="Show Debug Timings",
         description="Time and print to console the times taken by elements of the system.",
         default=False,
     )
