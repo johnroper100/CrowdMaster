@@ -233,7 +233,7 @@ class NewInputNode(LogicNode):
                                        ("GLOBALVELY", "Global Vel Y", "", 4),
                                        ("GLOBALVELZ", "Global Vel Z", "", 5),
                                        ("QUERYTAG", "Query tag", "", 6)])
-    StateTagName = StringProperty(name="Tag name")
+    StateTagName = StringProperty(name="Tag Name")
 
     WorldOptions = EnumProperty(name="World Options",
                                 items=[("TIME", "Time", "", 1),
@@ -244,10 +244,10 @@ class NewInputNode(LogicNode):
                                  items=[("RZ", "rz", "", 1),
                                         ("RX", "rx", "", 2),
                                         ("ARRIVED", "Arrived", "", 3)])
-    EventName = StringProperty(name="Event name")
+    EventName = StringProperty(name="Event Name")
 
     AgentInfoOptions = EnumProperty(name="Agent Info Options",
-                                    items=[("GETTAG", "Get tag", "", 1),
+                                    items=[("GETTAG", "Get Tag", "", 1),
                                            ("HEADRZ", "Heading rz", "", 2),
                                            ("HEADRX", "Heading rx", "", 3)])
     GetTagName = StringProperty(name="Get Tag Name")
