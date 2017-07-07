@@ -376,8 +376,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         preferences = context.user_preferences.addons[__package__].preferences
 
         row = layout.row()
-        row.label("Group name")
-        row.label("Number | origin")
+        row.label("Group Name")
+        row.label("Number | Origin")
         row.label("Status")
 
         layout.template_list("SCENE_UL_group", "", scene,
@@ -501,6 +501,10 @@ def register():
     from . import cm_documentation
     cm_documentation.register()
 
+    global cm_translations
+    from . import cm_translations
+    cm_translations.register()
+
     register_icons()
 
     addon_updater_ops.register(bl_info)
@@ -596,6 +600,7 @@ def unregister():
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
+    cm_translations.unregister()
 
     if nodeTreeSetFakeUser in bpy.app.handlers.save_pre:
         bpy.app.handlers.save_pre.remove(nodeTreeSetFakeUser)
