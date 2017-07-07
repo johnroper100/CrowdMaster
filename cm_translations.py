@@ -205,6 +205,8 @@ translations = {
         ("*", "Place"): "Spanish Here",
         ("*", "Guide Mesh"): "Spanish Here",
         ("Operator", "Generate Agents"): "Spanish Here",
+        ("*", "Random Positioning"): "Spanish Here",
+        ("*", "Location Type"): "Spanish Here",
     }
 }
 
