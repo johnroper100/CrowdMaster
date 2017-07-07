@@ -227,7 +227,7 @@ class SCENE_OT_cm_start(Operator):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
 
-        customSyncMode = bpy.context.scene.sync_mode
+        customSyncMode = scene.sync_mode
         bpy.context.scene.sync_mode = 'NONE'
 
         if bpy.context.screen is not None:
@@ -238,7 +238,7 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_outline_selected = False
                     area.spaces[0].show_relationship_lines = False
 
-        scene.frame_current = scene.frame_start
+        scene.frame_current = scene.cm_sim_start_frame
 
         global sim
         if "sim" in globals():
@@ -323,6 +323,9 @@ class SCENE_PT_CrowdMaster(Panel):
                          icon_value=cicon('stop_sim'))
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
+
+        row = layout.row()
+        row.prop(scene, "cm_sim_start_frame")
 
         row = layout.row()
         row.separator()
