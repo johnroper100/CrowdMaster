@@ -65,7 +65,6 @@ documentation_mapping = (
      "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-suffix"),
     ("bpy.types.Scene.cm_switch_dupli_group_target",
      "simulation/toolbars/main/utilities/switch_dupli_groups.html#dupli-group-target"),
-    # TODO - nodes
 )
 
 
