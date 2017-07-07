@@ -1108,7 +1108,11 @@ class TemplatePATH(Template):
                                                                             normal)
                         diff = pointTowards - pos
                         rot = diff.to_track_quat('Y', 'Z').to_euler()
-                        positions[n] = (pos, rot, bm.verts[cid][islandID])
+                        if self.settings["groupByMeshIsland"]:
+                            island = bm.verts[cid][islandID]
+                        else:
+                            island = 0
+                        positions[n] = (pos, rot, island)
 
         for newPos, newRot, island in positions:
             newBuildRequest = buildRequest.copy()
