@@ -21,6 +21,7 @@ import bpy
 
 translations = {
     'es': {
+        # Toolbars
         ("Operator", "Start Simulation"): "Spanish Here",
         ("Operator", "Stop Simulation"): "Spanish Here",
         ("*", "Utilities"): "Spanish Here",
@@ -50,6 +51,7 @@ translations = {
         ("Operator", "Switch The Direction Of The Selected Edges"): "Spanish Here",
         ("*", "Lane Separation"): "Spanish Here",
         ("Operator", "Draw The Directions Of A Path"): "Spanish Here",
+        # User Prefs
         ("*", "General Settings"): "Spanish Here",
         ("*", "Addon Update Settings"): "Spanish Here",
         ("*", "Debug Options"): "Spanish Here",
@@ -75,6 +77,19 @@ translations = {
         ("Operator", "Run Long Tests"): "Spanish Here",
         ("*", "Show Debug Timings"): "Spanish Here",
         ("*", "Enable Show Debug Options to access these settings (only for developers)."): "Spanish Here",
+        # Nodes
+        # generation
+        ("*", "Constrain Bone"): "Spanish Here",
+        ("*", "Link Armature"): "Spanish Here",
+        ("*", "Modify Bone"): "Spanish Here",
+        ("*", "Add To Group"): "Spanish Here",
+        ("*", "Combine"): "Spanish Here",
+        ("*", "Point Towards"): "Spanish Here",
+        ("*", "Random Material"): "Spanish Here",
+        ("*", "Set Tag"): "Spanish Here",
+        ("*", "Positioning"): "Spanish Here",
+        ("*", "Formation"): "Spanish Here",
+        ("*", "Ground"): "Spanish Here",
     }
 }
 
