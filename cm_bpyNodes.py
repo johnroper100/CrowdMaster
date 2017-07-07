@@ -804,6 +804,14 @@ class ActionState(StateNode):
         if self.interuptState:
             layout.prop(self, "syncState")
 
+def updateGroups():
+    node_trees = bpy.data.node_groups
+ 
+    for tree in node_trees:
+        if tree.bl_idname == "CrowdMasterTreeType":
+            for node in tree.nodes:
+                if node.bl_idname == "GroupNode":
+                    node.update()
 
 class GroupInputs(CrowdMasterNode):
     """CrowdMaster Inputs Group Node"""
@@ -837,6 +845,7 @@ class GroupInputs(CrowdMasterNode):
             for inp in self.outputs[:-1]:
                 i = self.id_data.groupIn.add()
                 i.name = inp.name
+            updateGroups()
 
 
 class GroupOutputs(CrowdMasterNode):
@@ -871,6 +880,7 @@ class GroupOutputs(CrowdMasterNode):
             for out in self.inputs[:-1]:
                 i = self.id_data.groupOut.add()
                 i.name = out.name
+            updateGroups()
 
 
 def updateGroupNodeName(self, context):
