@@ -481,13 +481,22 @@ class GeoTemplatePARENT(GeoTemplate):
         parent = gretp.obj
         gret = self.inputs["Child Object"].build(buildRequest.copy())
         child = gret.obj
-        con = child.constraints.new("CHILD_OF")
-        con.target = parent
-        con.subtarget = self.settings["parentTo"]
-        bone = parent.pose.bones[self.settings["parentTo"]]
-        con.inverse_matrix = bone.matrix.inverted()
-        if child.data:
-            child.data.update()
+
+        if self.settings["parentMode"] == "bone":
+            con = child.constraints.new("CHILD_OF")
+            con.target = parent
+            con.subtarget = self.settings["parentTo"]
+            bone = parent.pose.bones[self.settings["parentTo"]]
+            con.inverse_matrix = bone.matrix.inverted()
+            if child.data:
+                child.data.update()
+        else:
+            mod = child.modifiers.get("Armature")
+            if mod is None:
+                mod = child.modifiers.new("Armature", 'ARMATURE')
+            mod.object = parent
+            mod.use_vertex_groups = self.settings["bindToVGroups"]
+            mod.use_bone_envelopes = self.settings["bindToBEnvelops"]
         return gretp
         # TODO check if the object has an armature modifier
 
