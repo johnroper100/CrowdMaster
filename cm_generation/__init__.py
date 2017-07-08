@@ -24,8 +24,48 @@ from bpy.props import StringProperty
 from bpy.types import Operator
 
 from . import cm_genNodes
-from ..libs.ins_vector import Vector
-from .cm_templates import TemplateRequest, templates, tmpPathChannel
+from .cm_templates import TemplateRequest, templates, tmpPathChannel, GeoRequest
+
+
+def getInput(inp):
+    fr = inp.links[0].from_node
+    if fr.bl_idname == "NodeReroute":
+        return getInput(fr.inputs[0])
+    else:
+        return fr
+
+def construct(current, cache):
+    """returns: bool - successfully built, Template"""
+    tmpPathChannel.newframe()
+
+    idName = current.bl_idname
+    if idName in templates:
+        inps = {}
+        for i in current.inputs:
+            nm = i.name
+            if i.is_linked:
+                from_node = getInput(i)
+                if from_node in cache:
+                    inps[nm] = cache[from_node.name]
+                else:
+                    suc, temp = construct(from_node, cache)
+                    if not suc:
+                        return False, None
+                    inps[nm] = temp
+        tmpt = templates[idName](inps, current.getSettings(), current)
+        if not tmpt.check():
+            current.use_custom_color = True
+            current.color = (255, 0, 0)
+            return False, None
+        # if len(current.outputs[0].links) > 1:
+        #    cache[self.name] = tmpt
+        # TODO caching not working
+        current.use_custom_color = False
+        return True, tmpt
+    else:
+        current.use_custom_color = True
+        current.color = (255, 0, 0)
+        return False, None
 
 
 class SCENE_OT_agent_nodes_generate(Operator):
@@ -35,45 +75,6 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
     nodeName = StringProperty(name="node name")
     nodeTreeName = StringProperty(name="node tree")
-
-    def getInput(self, inp):
-        fr = inp.links[0].from_node
-        if fr.bl_idname == "NodeReroute":
-            return self.getInput(fr.inputs[0])
-        else:
-            return fr
-
-    def construct(self, current, cache):
-        """returns: bool - successfully built, Template"""
-        tmpPathChannel.newframe()
-
-        idName = current.bl_idname
-        if idName in templates:
-            inps = {}
-            for i in current.inputs:
-                nm = i.name
-                if i.is_linked:
-                    from_node = self.getInput(i)
-                    if from_node in cache:
-                        inps[nm] = cache[from_node.name]
-                    else:
-                        suc, temp = self.construct(from_node, cache)
-                        if not suc:
-                            return False, None
-                        inps[nm] = temp
-            tmpt = templates[idName](inps, current.getSettings(), current.name)
-            if not tmpt.check():
-                current.use_custom_color = True
-                current.color = (255, 0, 0)
-                return False, None
-            if len(current.outputs[0].links) > 1:
-                cache[self.name] = tmpt
-            current.use_custom_color = False
-            return True, tmpt
-        else:
-            current.use_custom_color = True
-            current.color = (255, 0, 0)
-            return False, None
 
     def execute(self, context):
         if bpy.context.active_object is not None:
@@ -90,7 +91,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             tipNode = space.from_node
             if tipNode.bl_idname == "NodeReroute":
                 tipNode = self.getInput(tipNode.inputs[0])
-            suc, temp = self.construct(tipNode, cache)
+            suc, temp = construct(tipNode, cache)
             if suc:
                 genSpaces[tipNode] = temp
             else:
@@ -103,7 +104,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             for space in generateNode.inputs[0].links:
                 tipNode = space.from_node
                 if tipNode.bl_idname == "NodeReroute":
-                    tipNode = self.getInput(tipNode.inputs[0])
+                    tipNode = getInput(tipNode.inputs[0])
                 buildRequest = TemplateRequest()
                 genSpaces[tipNode].build(buildRequest)
         else:
@@ -112,11 +113,39 @@ class SCENE_OT_agent_nodes_generate(Operator):
         return {'FINISHED'}
 
 
+class SCENE_OT_agent_nodes_place_defer_geo(Operator):
+    bl_idname = "scene.cm_agent_nodes_place_defer_geo"
+    bl_label = "Place defer geo"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    obj = StringProperty()
+
+    def execute(self, context):
+        obj = bpy.context.scene.objects[self.obj]
+        if obj["cm_deferGeo"]:
+            obj["cm_deferGeo"] = True
+            buildRequest = GeoRequest.fromObject(obj)
+            cache = {}
+            suc, temp = construct(buildRequest.bpyNode, cache)
+            if suc:
+                gr = temp.build(buildRequest)
+                for o in bpy.context.selected_objects:
+                    o.select = False
+                gr.obj.select = True
+                bpy.context.scene.objects.active = obj
+                bpy.ops.object.make_links_data(type="ANIMATION")
+            else:
+                return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 def register():
     bpy.utils.register_class(SCENE_OT_agent_nodes_generate)
+    bpy.utils.register_class(SCENE_OT_agent_nodes_place_defer_geo)
     cm_genNodes.register()
 
 
 def unregister():
     bpy.utils.unregister_class(SCENE_OT_agent_nodes_generate)
+    bpy.utils.unregister_class(SCENE_OT_agent_nodes_place_defer_geo)
     cm_genNodes.unregister()
