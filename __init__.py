@@ -324,8 +324,8 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
-        row = layout.row()
-        row.prop(scene, "cm_sim_start_frame")
+        #row = layout.row()
+        #row.prop(scene, "cm_sim_start_frame")
 
         row = layout.row()
         row.separator()
