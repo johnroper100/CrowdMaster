@@ -755,6 +755,10 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     bl_width_default = 250.0
 
+    paintMode = EnumProperty(name="Paint Mode", description="Decide how the node acts", items=[
+        ('place', "Place", 'Place agents based on the vertex colors'),
+        ('edit', "Edit", 'Edit the positions inputter from other nodes')])
+
     guideMesh = StringProperty(name="Guide Mesh",
                                description="The mesh to scatter points over")
 
@@ -796,21 +800,25 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "paintMode", expand=True)
         layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
 
         row = layout.row(align=True)
         row.prop(self, "vcols")
         row.prop(self, "vcolor", text="")
-        layout.prop(self, "noToPlace")
-        layout.prop(self, "overwritePosition")
 
-        layout.prop(self, "relax")
-        if self.relax:
-            layout.prop(self, "relaxIterations")
-            layout.prop(self, "relaxRadius")
+        if self.paintMode == 'place':
+            layout.prop(self, "noToPlace")
+            layout.prop(self, "overwritePosition")
+
+            layout.prop(self, "relax")
+            if self.relax:
+                layout.prop(self, "relaxIterations")
+                layout.prop(self, "relaxRadius")
 
     def getSettings(self):
-        return {"vcols": self.vcols,
+        return {"paintMode": self.paintMode,
+                "vcols": self.vcols,
                 "vcolor": self.vcolor,
                 "guideMesh": self.guideMesh,
                 "noToPlace": self.noToPlace,
