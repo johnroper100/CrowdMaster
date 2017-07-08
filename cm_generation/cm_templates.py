@@ -282,6 +282,12 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         self.linkedGroup = None
 
     def build(self, buildRequest):
+        obj = bpy.context.scene.objects[self.settings["boundingBox"]]
+        cp = obj.copy()
+        buildRequest.group.objects.link(cp)
+        bpy.context.scene.objects.link(cp)
+        gret = GeoReturn(cp)
+
         blendfile = os.path.split(bpy.data.filepath)[0]
         for d in self.settings["groupFile"][2:].split("/"):
             if d == "..":
@@ -305,10 +311,32 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         buildRequest.group.objects.link(newObj)
         buildRequest.group.objects.link(newRig)
 
-        gret = GeoReturn(newObj)
+
+        boneName = self.settings["constrainBone"]
+        constrainBone = gret.constrainBone
+
+        lastActive = bpy.context.scene.objects.active
+        bpy.context.scene.objects.active = newRig
+        bpy.ops.object.posemode_toggle()
+        armature = newRig.data.bones
+        armature.active = armature[boneName]
+        bpy.ops.pose.constraint_add(type="COPY_LOCATION")
+        bpy.ops.pose.constraint_add(type="COPY_ROTATION")
+
+        Cloc = newRig.pose.bones[boneName].constraints[-2]
+        Crot = newRig.pose.bones[boneName].constraints[-1]
+
+        Cloc.target = cp
+        Cloc.use_z = False
+
+        Crot.target = cp
+        # Crot.use_offset = True
+
+        bpy.ops.object.posemode_toggle()
+        bpy.context.scene.objects.active = lastActive
 
         gret.overwriteRig = newRig
-        gret.constrainBone = newRig.pose.bones[self.settings["constrainBone"]]
+        gret.constrainBone = newRig.pose.bones[boneName]
 
         return gret
 
@@ -404,54 +432,6 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         bpy.context.scene.objects.active = activeStore
 
         return ob, rigObj
-
-
-class GeoTemplateCONSTRAINBONE(GeoTemplate):
-    def build(self, buildRequest):
-        gretp = self.inputs["Parent Group"].build(buildRequest.copy())
-        gret = self.inputs["Child Object"].build(buildRequest.copy())
-
-        boneName = gret.constrainBone.name
-
-        newRig = gret.overwriteRig
-        constrainBone = gret.constrainBone
-
-        lastActive = bpy.context.scene.objects.active
-        bpy.context.scene.objects.active = newRig
-        bpy.ops.object.posemode_toggle()
-        armature = newRig.data.bones
-        armature.active = armature[boneName]
-        bpy.ops.pose.constraint_add(type="COPY_LOCATION")
-        bpy.ops.pose.constraint_add(type="COPY_ROTATION")
-
-        Cloc = newRig.pose.bones[boneName].constraints[-2]
-        Crot = newRig.pose.bones[boneName].constraints[-1]
-
-        Cloc.target = gretp.obj
-        Cloc.use_z = False
-
-        Crot.target = gretp.obj
-        # Crot.use_offset = True
-
-        bpy.ops.object.posemode_toggle()
-        bpy.context.scene.objects.active = lastActive
-
-        gretp.overwriteRig = newRig
-        gretp.constrainBone = newRig.pose.bones[boneName]
-
-        return gretp
-
-    def check(self):
-        if "Parent Group" not in self.inputs:
-            return False
-        if "Child Object" not in self.inputs:
-            return False
-        if not isinstance(self.inputs["Parent Group"], GeoTemplate):
-            return False
-        if not isinstance(self.inputs["Child Object"], GeoTemplate):
-            return False
-        # TODO check that object is in parent group
-        return True
 
 
 class GeoTemplateMODIFYBONE(GeoTemplate):
@@ -1342,7 +1322,6 @@ templates = OrderedDict([
     ("ObjectInputNodeType", GeoTemplateOBJECT),
     ("GroupInputNodeType", GeoTemplateGROUP),
     ("LinkGroupNodeType", GeoTemplateLINKGROUPNODE),
-    ("ConstrainNodeType", GeoTemplateCONSTRAINBONE),
     ("ModifyBoneNodeType", GeoTemplateMODIFYBONE),
     ("GeoSwitchNodeType", GeoTemplateSWITCH),
     ("AddToGroupNodeType", TemplateADDTOGROUP),
