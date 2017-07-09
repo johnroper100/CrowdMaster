@@ -491,7 +491,7 @@ class GeoTemplatePARENT(GeoTemplate):
             if child.data:
                 child.data.update()
         else:
-            child.location = parent.location
+            child.parent = parent
             mod = child.modifiers.get("Armature")
             if mod is None:
                 mod = child.modifiers.new("Armature", 'ARMATURE')
