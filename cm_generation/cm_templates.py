@@ -307,7 +307,12 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         bpy.context.scene.objects.link(cp)
         gret = GeoReturn(cp)
 
-        if not buildRequest.deferGeo:
+        if buildRequest.deferGeo:
+            bpy.ops.object.armature_add(location=(0,0,0))
+            newRig = bpy.context.active_object
+            newRig.data.bones[0].name = self.settings["constrainBone"]
+            buildRequest.group.objects.link(newRig)
+        else:
             blendfile = os.path.split(bpy.data.filepath)[0]
             for d in self.settings["groupFile"][2:].split("/"):
                 if d == "..":
@@ -332,31 +337,31 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             buildRequest.group.objects.link(newRig)
 
 
-            boneName = self.settings["constrainBone"]
-            constrainBone = gret.constrainBone
+        boneName = self.settings["constrainBone"]
+        constrainBone = gret.constrainBone
 
-            lastActive = bpy.context.scene.objects.active
-            bpy.context.scene.objects.active = newRig
-            bpy.ops.object.posemode_toggle()
-            armature = newRig.data.bones
-            armature.active = armature[boneName]
-            bpy.ops.pose.constraint_add(type="COPY_LOCATION")
-            bpy.ops.pose.constraint_add(type="COPY_ROTATION")
+        lastActive = bpy.context.scene.objects.active
+        bpy.context.scene.objects.active = newRig
+        bpy.ops.object.posemode_toggle()
+        armature = newRig.data.bones
+        armature.active = armature[boneName]
+        bpy.ops.pose.constraint_add(type="COPY_LOCATION")
+        bpy.ops.pose.constraint_add(type="COPY_ROTATION")
 
-            Cloc = newRig.pose.bones[boneName].constraints[-2]
-            Crot = newRig.pose.bones[boneName].constraints[-1]
+        Cloc = newRig.pose.bones[boneName].constraints[-2]
+        Crot = newRig.pose.bones[boneName].constraints[-1]
 
-            Cloc.target = cp
-            Cloc.use_z = False
+        Cloc.target = cp
+        Cloc.use_z = False
 
-            Crot.target = cp
-            # Crot.use_offset = True
+        Crot.target = cp
+        # Crot.use_offset = True
 
-            bpy.ops.object.posemode_toggle()
-            bpy.context.scene.objects.active = lastActive
+        bpy.ops.object.posemode_toggle()
+        bpy.context.scene.objects.active = lastActive
 
-            gret.overwriteRig = newRig
-            gret.constrainBone = newRig.pose.bones[boneName]
+        gret.overwriteRig = newRig
+        #gret.constrainBone = newRig.pose.bones[boneName]
 
         return gret
 
