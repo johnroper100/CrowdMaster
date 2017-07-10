@@ -302,8 +302,17 @@ class ParentNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     bl_width_default = 350.0
 
-    parentTo = StringProperty(name="Parent To (Bone)",
+    parentMode = EnumProperty(name="Parent Mode",
+                              items=[
+                                  ("bone", "Bone", ""),
+                                  ("armature", "Armature", "")
+                              ])
+
+    parentTo = StringProperty(name="Bone Name",
                               description="The bone you want to parent to")
+    
+    bindToVGroups = BoolProperty(name="Vertex Groups", default=True)
+    bindToBEnvelopes = BoolProperty(name="Bone Envelopes")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
@@ -314,10 +323,20 @@ class ParentNode(CrowdMasterAGenTreeNode):
         self.outputs.new('GeoSocketType', "Objects")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "parentTo")
+        layout.prop(self, "parentMode", expand=True)
+        if self.parentMode == "bone":
+            layout.prop(self, "parentTo")
+        else:
+            layout.label("Bind To:")
+            row = layout.row(align=True)
+            row.prop(self, "bindToVGroups")
+            row.prop(self, "bindToBEnvelopes")
 
     def getSettings(self):
-        return {"parentTo": self.parentTo}
+        return {"parentTo": self.parentTo,
+                "parentMode": self.parentMode,
+                "bindToVGroups": self.bindToVGroups,
+                "bindToBEnvelops": self.bindToBEnvelopes}
 
 
 class material_entry(PropertyGroup):

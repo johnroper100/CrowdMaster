@@ -111,7 +111,7 @@ class Simulation:
         if preferences.show_debug_options:
             t = time.time()
             print("NEWFRAME", bpy.context.scene.frame_current)
-            if preferences.show_debug_options and preferences.show_debug_timings:
+            if preferences.show_debug_timings:
                 if self.lastFrameTime is not None:
                     between = time.time() - self.lastFrameTime
                     cm_timings.simulation["betweenFrames"] += between

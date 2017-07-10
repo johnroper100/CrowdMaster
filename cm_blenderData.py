@@ -23,6 +23,11 @@ from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
                        StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
+bpy.types.Scene.cm_sim_start_frame = IntProperty(
+    name="Simulation Start Frame",
+    default=1,
+)
+
 
 class modifyBoneProperty(PropertyGroup):
     """For storing bone - tag pairs"""
@@ -78,6 +83,7 @@ def registerTypes():
     bpy.utils.register_class(agent_entry)
     bpy.utils.register_class(agent_type_entry)
     bpy.utils.register_class(group_entry)
+
     bpy.types.Scene.cm_groups = CollectionProperty(type=group_entry)
     bpy.types.Scene.cm_groups_index = IntProperty()
 
@@ -103,6 +109,10 @@ def unregisterAllTypes():
 
     bpy.utils.unregister_class(manual_props)
 
+    del bpy.types.Scene.cm_groups
+    del bpy.types.Scene.cm_groups_index
+    del bpy.types.Scene.cm_view_details
+    del bpy.types.Scene.cm_view_details_index
     del bpy.types.Scene.cm_manual
     del bpy.types.Scene.cm_switch_dupli_group_suffix
     del bpy.types.Scene.cm_switch_dupli_group_target
