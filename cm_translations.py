@@ -26,7 +26,7 @@ translations = {
         ("Operator", "Stop Simulation"): "Detener Simulación",
         ("*", "Utilities"): "Utilitarios",
         ("Operator", "Place Deferred Geometry"): "Lugar sin Geometría",
-        ("Operator", "Convert Selected To Bounding Box"): "Convertir selección a 																Cuadro Delimitador",
+        ("Operator", "Convert Selected To Bounding Box"): "Convertir selección a Cuadro Delimitador",
         ("Operator", "Switch Dupli Groups"): "Cambiar Grupos Duplicados",
         ("*", "Dupli Group Suffix"): "Duplicar Grupos Por Sufijo",
         ("*", "Dupli Group Target"): "Duplicar Grupos Por objetivo",
@@ -45,10 +45,10 @@ translations = {
         ("*", "Time+Volume"): "Tiempo y Volumen",
         ("*", "Road"): "Camino",
         ("*", "Bidirectional"): "Bidireccional",
-        ("Operator", "Breadth First Search To Direct Edges"): "Primera búsqueda de 												aplitud para Direccionar Bordes",
-        ("Operator", "Depth First Search To Direct Edges"): "Primera búsqueda de 										profundidad para direccionar Bordes",
-        ("Operator", "Switch The Direction Of The Connected Edges"): "Cambio de 										dirección de los bordes conectados",
-        ("Operator", "Switch The Direction Of The Selected Edges"): "Cambio de 											dirección de los bordes seleccionados",
+        ("Operator", "Breadth First Search To Direct Edges"): "Primera búsqueda de aplitud para Direccionar Bordes",
+        ("Operator", "Depth First Search To Direct Edges"): "Primera búsqueda de profundidad para direccionar Bordes",
+        ("Operator", "Switch The Direction Of The Connected Edges"): "Cambio de dirección de los bordes conectados",
+        ("Operator", "Switch The Direction Of The Selected Edges"): "Cambio de dirección de los bordes seleccionados",
         ("*", "Lane Separation"): "Separación de carriles",
         ("Operator", "Draw The Directions Of A Path"): "Dibujar dirección de la ruta",
         # User Prefs
@@ -70,13 +70,13 @@ translations = {
         ("*", "Days"): "Días",
         ("*", "Hours"): "Horas",
         ("*", "Minutes"): "Minutos",
-        ("Operator", "Check now for crowdmaster update"): "Comprobar para Actualizar 																CrowdMatser",
-        ("Operator", "Install latest develop / old version"): "Instalar versión de 														desarrollo / Versión anterior",
-        ("Operator", "Restore addon backup (none found)"): "Restaurar Resguardo del 													Addon (No encontrado)",
+        ("Operator", "Check now for crowdmaster update"): "Comprobar para Actualizar CrowdMaster",
+        ("Operator", "Install latest develop / old version"): "Instalar versión de desarrollo / Versión anterior",
+        ("Operator", "Restore addon backup (none found)"): "Restaurar Resguardo del Addon (No encontrado)",
         ("Operator", "Run Short Tests"): "Ejecutar Tests Cortos",
         ("Operator", "Run Long Tests"): "Ejecutar Tests Largos",
         ("*", "Show Debug Timings"): "Ejecutar Debug por Horarios",
-        ("*", "Enable Show Debug Options to access these settings (only for 			developers)."): "Activar: Mostrar opciones de Debug para acceder a estas 									Configuraciones (Sólo para Desarrolladores)",
+        ("*", "Enable Show Debug Options to access these settings (only for developers)."): "Activar: Mostrar opciones de Debug para acceder a estas Configuraciones (Sólo para Desarrolladores)",
         # Node names
         # generation
         ("*", "Constrain Bone"): "Coacción del Hueso",
@@ -209,6 +209,7 @@ translations = {
         ("*", "Location Type"): "Tipo de Locación",
     }
 }
+
 
 def register():
     # Register translations
