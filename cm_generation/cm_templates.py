@@ -395,15 +395,14 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             dupFiles = os.listdir(dupDir)
             sourceDir, source = os.path.split(sourceBlend)
             source = source[:-len(".blend")]
-            for fileName in dupFiles:
-                targetBlendName = "{0}_{1:0>3}.blend".format(source, count)
-                if targetBlendName in dupFiles:
-                    targetPath = os.path.join(dupDir, targetBlendName)
-                    with bpy.data.libraries.load(targetPath, link=True) as (data_src, data_dst):
-                        data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
-                        #if additionalGroup != "":
-                        #    data_dst.groups.append(additionalGroup)
-                    dupliGroup = data_dst.groups[0]
+            targetBlendName = "{0}_{1:0>3}.blend".format(source, count)
+            if targetBlendName in dupFiles:
+                targetPath = os.path.join(dupDir, targetBlendName)
+                with bpy.data.libraries.load(targetPath, link=True) as (data_src, data_dst):
+                    data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
+                    #if additionalGroup != "":
+                    #    data_dst.groups.append(additionalGroup)
+                dupliGroup = data_dst.groups[0]
 
         # Create a new file
         if dupliGroup is None:
