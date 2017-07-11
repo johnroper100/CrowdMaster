@@ -182,8 +182,6 @@ class SCENE_OT_agent_nodes_remove_defer_geo(Operator):
                                 if obj.name != agent.rigOverwrite:
                                     bpy.data.objects.remove(obj,
                                                             do_unlink=True)
-                        else:
-                            return {'CANCELLED'}
         return {'FINISHED'}
 
 
