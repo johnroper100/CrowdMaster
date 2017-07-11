@@ -348,11 +348,6 @@ class SCENE_PT_CrowdMaster(Panel):
 
             box = layout.box()
             row = box.row()
-            row.scale_y = 1.5
-            row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
-
-            box = layout.box()
-            row = box.row()
             row.prop(scene, "cm_switch_dupli_group_suffix")
             row = box.row()
             row.prop(scene, "cm_switch_dupli_group_target")
