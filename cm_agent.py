@@ -283,29 +283,34 @@ class Agent:
             modArm = objs[self.rigOverwrite]
 
         if modArm is not None:
+            animData = modArm.animation_data
             for bone in self.modifyBones:
                 for attribute in self.modifyBones[bone]:
                     tag = self.modifyBones[bone][attribute]
                     tags = self.external["tags"]
                     if tag in tags:
                         tagVal = tags[tag]
-                        if bone in modArm.pose.bones:
-                            boneObj = modArm.pose.bones[bone]
-                            if attribute == "RX":
-                                boneObj.rotation_euler[0] = tagVal
-                                boneObj.keyframe_insert(data_path="rotation_euler",
-                                                        index=0,
-                                                        frame=bpy.context.scene.frame_current)
-                            if attribute == "RY":
-                                boneObj.rotation_euler[1] = tagVal
-                                boneObj.keyframe_insert(data_path="rotation_euler",
-                                                        index=1,
-                                                        frame=bpy.context.scene.frame_current)
-                            if attribute == "RZ":
-                                boneObj.rotation_euler[2] = tagVal
-                                boneObj.keyframe_insert(data_path="rotation_euler",
-                                                        index=2,
-                                                        frame=bpy.context.scene.frame_current)
+                        if animData is None:
+                            modArm.animation_data_create()
+                            animData = modArm.animation_data
+                        if animData.action is None:
+                            action = bpy.data.actions.new(name=modArm.name+".Action")
+                            animData.action = action
+                        dp = 'pose.bones["{0}"].rotation_euler'.format(bone)
+                        if attribute == "RX":
+                            index = 0
+                        if attribute == "RY":
+                            index = 1
+                        if attribute == "RZ":
+                            index = 2
+                        fc = animData.action.fcurves.find(data_path=dp,
+                                                          index=index)
+                        if fc is None:
+                            fc = animData.action.fcurves.new(data_path=dp,
+                                                             index=index,
+                                                             action_group=bone)
+                        fc.keyframe_points.insert(bpy.context.scene.frame_current,
+                                                  tagVal)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["applyOutput"] += time.time() - t

@@ -118,24 +118,47 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
     bl_label = "Place defer geo"
     bl_options = {'REGISTER', 'UNDO'}
 
-    obj = StringProperty()
-
     def execute(self, context):
-        obj = bpy.context.scene.objects[self.obj]
-        if obj["cm_deferGeo"]:
-            obj["cm_deferGeo"] = True
-            buildRequest = GeoRequest.fromObject(obj)
-            cache = {}
-            suc, temp = construct(buildRequest.bpyNode, cache)
-            if suc:
-                gr = temp.build(buildRequest)
-                for o in bpy.context.selected_objects:
-                    o.select = False
-                gr.obj.select = True
-                bpy.context.scene.objects.active = obj
-                bpy.ops.object.make_links_data(type="ANIMATION")
-            else:
-                return {'CANCELLED'}
+        for agentGroup in bpy.context.scene.cm_groups:
+            for agentType in agentGroup.agentTypes:
+                for agent in agentType.agents:
+                    obj = bpy.context.scene.objects[agent.name]
+                    rig = bpy.context.scene.objects[agent.rigOverwrite]
+                    if obj["cm_deferGeo"]:
+                        obj["cm_deferGeo"] = True
+                        buildRequest = GeoRequest.fromObject(obj)
+                        cache = {}
+                        suc, temp = construct(buildRequest.bpyNode, cache)
+                        if suc:
+                            gr = temp.build(buildRequest)
+                            for o in bpy.context.selected_objects:
+                                o.select = False
+                            gr.obj.select = True
+                            bpy.context.scene.objects.active = obj
+                            bpy.ops.object.make_links_data(type="ANIMATION")
+                            gr.obj.select = False
+
+                            if gr.overwriteRig.proxy is None:
+                                gr.overwriteRig.select = True
+                                bpy.context.scene.objects.active = rig
+                                bpy.ops.object.make_links_data(type="ANIMATION")
+                            else:
+                                bpy.context.scene.objects.active = rig
+                                if rig.animation_data is None:
+                                    rig.animation_data_create()
+                                if rig.animation_data.action is None:
+                                    action = bpy.data.actions.new(name=rig.name+".Action")
+                                    rig.animation_data.action = action
+                                else:
+                                    action = rig.animation_data.action
+                                if gr.overwriteRig.animation_data is None:
+                                    gr.overwriteRig.animation_data_create()
+
+                                gr.overwriteRig.animation_data.action = action
+                        else:
+                            return {'CANCELLED'}
+        # For rig update
+        bpy.context.scene.frame_current = bpy.context.scene.frame_current
         return {'FINISHED'}
 
 
