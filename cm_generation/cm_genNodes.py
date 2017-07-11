@@ -1137,7 +1137,6 @@ class CrowdMasterAGenCategories(NodeCategory):
 
 agen_node_categories = [
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
-        NodeItem("ConstrainNodeType"),
         NodeItem("GroupInputNodeType"),
         NodeItem("LinkGroupNodeType"),
         NodeItem("ModifyBoneNodeType"),
