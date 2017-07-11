@@ -34,7 +34,7 @@ class Simulation:
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         self.agents = {}
-        self.framelast = 1
+        self.framelast = bpy.context.scene.cm_sim_start_frame
         self.compbrains = {}
         Noise = chan.Noise(self)
         Sound = chan.Sound(self)
@@ -146,7 +146,10 @@ class Simulation:
 
     def frameChangeHandler(self, scene):
         """Given to Blender to call whenever the scene moves to a new frame"""
-        if self.framelast + 1 == bpy.context.scene.frame_current:
+        if bpy.context.scene.cm_sim_end_frame <= bpy.context.scene.frame_current:
+            self.stopFrameHandler()
+            bpy.ops.screen.animation_cancel(restore_frame=False)
+        elif self.framelast + 1 == bpy.context.scene.frame_current:
             self.framelast = bpy.context.scene.frame_current
             self.step(scene)
 

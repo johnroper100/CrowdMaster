@@ -324,8 +324,9 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
-        #row = layout.row()
-        #row.prop(scene, "cm_sim_start_frame")
+        row = layout.row(align=True)
+        row.prop(scene, "cm_sim_start_frame")
+        row.prop(scene, "cm_sim_end_frame")
 
         row = layout.row()
         row.separator()
@@ -342,11 +343,6 @@ class SCENE_PT_CrowdMaster(Panel):
             row = box.row()
             row.scale_y = 1.5
             row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_HLT")
-
-            box = layout.box()
-            row = box.row()
-            row.scale_y = 1.5
-            row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
 
             box = layout.box()
             row = box.row()

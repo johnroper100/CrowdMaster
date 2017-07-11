@@ -27,6 +27,10 @@ bpy.types.Scene.cm_sim_start_frame = IntProperty(
     name="Simulation Start Frame",
     default=1,
 )
+bpy.types.Scene.cm_sim_end_frame = IntProperty(
+    name="Simulation End Frame",
+    default=100,
+)
 
 
 class modifyBoneProperty(PropertyGroup):
