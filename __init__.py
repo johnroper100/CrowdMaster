@@ -341,6 +341,14 @@ class SCENE_PT_CrowdMaster(Panel):
             box = layout.box()
             row = box.row()
             row.scale_y = 1.5
+            row.operator("scene.cm_agent_nodes_place_defer_geo",
+                         icon="OUTLINER_OB_MESH")
+            row.operator("scene.cm_agent_nodes_remove_defer_geo",
+                         icon="OUTLINER_DATA_MESH")
+
+            box = layout.box()
+            row = box.row()
+            row.scale_y = 1.5
             row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
 
             box = layout.box()

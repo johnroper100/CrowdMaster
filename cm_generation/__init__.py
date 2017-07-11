@@ -125,7 +125,7 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
                     obj = bpy.context.scene.objects[agent.name]
                     rig = bpy.context.scene.objects[agent.rigOverwrite]
                     if obj["cm_deferGeo"]:
-                        obj["cm_deferGeo"] = True
+                        obj["cm_deferGeo"] = False
                         buildRequest = GeoRequest.fromObject(obj)
                         cache = {}
                         suc, temp = construct(buildRequest.bpyNode, cache)
@@ -162,13 +162,40 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
         return {'FINISHED'}
 
 
+class SCENE_OT_agent_nodes_remove_defer_geo(Operator):
+    bl_idname = "scene.cm_agent_nodes_remove_defer_geo"
+    bl_label = "Remove defer geo"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    def execute(self, context):
+        for agentGroup in bpy.context.scene.cm_groups:
+            for agentType in agentGroup.agentTypes:
+                for agent in agentType.agents:
+                    obj = bpy.context.scene.objects[agent.name]
+                    rig = bpy.context.scene.objects[agent.rigOverwrite]
+                    if not obj["cm_deferGeo"]:
+                        obj["cm_deferGeo"] = True
+
+                        geoGroup = bpy.data.groups[agent.geoGroup]
+                        for obj in list(geoGroup.objects):
+                            if obj.name != agent.name:
+                                if obj.name != agent.rigOverwrite:
+                                    bpy.data.objects.remove(obj,
+                                                            do_unlink=True)
+                        else:
+                            return {'CANCELLED'}
+        return {'FINISHED'}
+
+
 def register():
     bpy.utils.register_class(SCENE_OT_agent_nodes_generate)
     bpy.utils.register_class(SCENE_OT_agent_nodes_place_defer_geo)
+    bpy.utils.register_class(SCENE_OT_agent_nodes_remove_defer_geo)
     cm_genNodes.register()
 
 
 def unregister():
     bpy.utils.unregister_class(SCENE_OT_agent_nodes_generate)
     bpy.utils.unregister_class(SCENE_OT_agent_nodes_place_defer_geo)
+    bpy.utils.unregister_class(SCENE_OT_agent_nodes_remove_defer_geo)
     cm_genNodes.unregister()

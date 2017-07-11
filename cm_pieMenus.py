@@ -39,7 +39,10 @@ class SCENE_PT_CrowdMaster_SimTools_Pie(Menu):
         else:
             pie.operator("scene.cm_start", icon='FILE_TICK')
             pie.operator("scene.cm_stop", icon='CANCEL')
-        pie.operator("scene.cm_place_deferred_geo", icon="EDITMODE_HLT")
+        pie.operator("scene.cm_agent_nodes_place_defer_geo",
+                     icon="OUTLINER_OB_MESH")
+        pie.operator("scene.cm_agent_nodes_remove_defer_geo",
+                     icon="OUTLINER_DATA_MESH")
 
 
 def register():
