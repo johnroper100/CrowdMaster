@@ -23,13 +23,30 @@ from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
                        StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
+
+def updateStartFrame(self, context):
+    start = context.scene.cm_sim_start_frame
+    end = context.scene.cm_sim_end_frame
+    if start >= end:
+        start = end
+
+
+def updateEndFrame(self, context):
+    start = context.scene.cm_sim_start_frame
+    end = context.scene.cm_sim_end_frame
+    if end <= start:
+        end = start
+
+
 bpy.types.Scene.cm_sim_start_frame = IntProperty(
     name="Simulation Start Frame",
     default=1,
+    update=updateStartFrame,
 )
 bpy.types.Scene.cm_sim_end_frame = IntProperty(
     name="Simulation End Frame",
-    default=100,
+    default=250,
+    update=updateEndFrame,
 )
 
 
