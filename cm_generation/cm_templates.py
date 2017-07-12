@@ -173,10 +173,9 @@ class GeoRequest(TemplateRequest):
 class GeoReturn:
     """Object that is passed back by geo template nodes"""
 
-    def __init__(self, obj):
+    def __init__(self, obj, rig):
         self.obj = obj
-        self.overwriteRig = None
-        self.constrainBone = None
+        self.overwriteRig = rig
         self.modifyBones = {}
 
 
@@ -223,76 +222,91 @@ class GeoTemplateGROUP(GeoTemplate):
         group = buildRequest.group
         deferGeo = buildRequest.deferGeo
 
-        gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
-        group_objects = [o.copy() for o in gp]
-
-        def zaxis(x): return x.location[2]
+        grpObjs = dat.groups[self.settings["inputGroup"]].objects
 
         if deferGeo:
-            for obj in dat.groups[self.settings["inputGroup"]].objects:
-                if obj.type == 'ARMATURE':
-                    newObj = obj.copy()
-                    newObj.rotation_euler = rot
-                    newObj.scale = Vector((scale, scale, scale))
-                    newObj.location = pos
-                    group.objects.link(newObj)
-                    bpy.context.scene.objects.link(newObj)
-                    newObj["cm_deferGroup"] = {"group": self.settings["inputGroup"],
-                                               "aName": obj.name}
-                    newObj["cm_materials"] = buildRequest.materials
-                    return GeoReturn(newObj)
-            bpy.ops.object.add(type='EMPTY',
-                               location=min(group_objects, key=zaxis).location)
-            e = bpy.context.object
-            group.objects.link(e)
-            e["cm_deferGroup"] = {"group": self.settings["inputGroup"]}
-            e["cm_materials"] = buildRequest.materials
-            return GeoReturn(e)
+            bb = grpObjs[self.settings["boundingObj"]]
+            newBB = bb.copy()
+            newBB.rotation_euler = rot
+            newBB.scale = Vector((scale, scale, scale))
+            newBB.location = pos
+            newBB["cm_deferOriginal"] = bb.name
+            group.objects.link(newBB)
+            bpy.context.scene.objects.link(newBB)
 
-        topObj = None
+            arm = grpObjs[self.settings["armatureObj"]]
+            newArm = arm.copy()
+            newArm["cm_deferOriginal"] = arm.name
+            group.objects.link(newArm)
+            bpy.context.scene.objects.link(newArm)
+            newArm.parent = newBB
+
+            return GeoReturn(newBB, newArm)
+
+        bb = None
+        arm = None
+        for placedObj in group.objects:
+            if "cm_deferOriginal" in placedObj:
+                pName = placedObj["cm_deferOriginal"]
+                if placedObj.type == "MESH":
+                    bb = placedObj
+                elif placedObj.type == "ARMATURE":
+                    arm = placedObj
+
+        group_objects = [o.copy() for o in grpObjs if o != bb and o != arm]
+        group_objects = []
+        for o in grpObjs:
+            if o == bb:
+                group_objects.append(bb)
+            elif o == arm:
+                group_objects.append(arm)
+            else:
+                group_objects.append(o.copy())
 
         for obj in group_objects:
+            if obj == bb or obj == arm:
+                continue
+
             for m in obj.material_slots:
                 if m.name in buildRequest.materials:
                     replacement = buildRequest.materials[m.name]
                     m.material = bpy.data.materials[replacement]
 
-            if obj.parent in gp:
-                obj.parent = group_objects[gp.index(obj.parent)]
+            if obj.parent is not None and obj.parent.name in grpObjs:
+                i = 0
+                for parentObj in grpObjs:
+                    if parentObj.name == obj.parent.name:
+                        obj.parent = group_objects[i]
+                        break
+                    i += 1
             else:
-                #obj.rotation_euler = Vector(obj.rotation_euler) + Vector(rot)
                 obj.scale = Vector((scale, scale, scale))
                 obj.location += pos
 
             group.objects.link(obj)
             bpy.context.scene.objects.link(obj)
-            if obj.type == 'ARMATURE':
-                aName = obj.name
-                # TODO what if there is more than one armature?
             if obj.type == 'MESH':
-                if len(obj.modifiers) > 0:
-                    for mod in obj.modifiers:
-                        if mod.type == "ARMATURE":
-                            modName = mod.name
-                            obj.modifiers[modName].object = dat.objects[aName]
+                for mod in obj.modifiers:
+                    if mod.type == "ARMATURE":
+                        obj.modifiers[mod.name].object = dat.objects[arm.name]
 
-            if obj.type == 'ARMATURE':
-                topObj = obj
-
-        if topObj is None:  # For if there is no armature object in the group
-            bpy.ops.object.add(type='EMPTY',
-                               location=min(group_objects, key=zaxis).location)
-            e = bpy.context.object
-            group.objects.link(e)
-            for obj in group_objects:
-                if obj.parent not in group_objects:
-                    obj.location -= pos
-                    obj.parent = e
-            topObj = e
-        return GeoReturn(topObj)
+        return GeoReturn(bb, arm)
 
     def check(self):
-        return self.settings["inputGroup"] in bpy.data.groups
+        if self.settings["boundingObj"] == self.settings["armatureObj"]:
+            return False
+        if self.settings["boundingObj"] == "":
+            return False
+        if self.settings["armatureObj"] == "":
+            return False
+        if self.settings["inputGroup"] not in bpy.data.groups:
+            return False
+        grp = bpy.data.groups[self.settings["inputGroup"]]
+        if grp.objects[self.settings["armatureObj"]].type != "ARMATURE":
+            return False
+        if grp.objects[self.settings["boundingObj"]].type != "MESH":
+            return False
+        return True
 
 
 class GeoTemplateLINKGROUPNODE(GeoTemplate):
@@ -361,7 +375,6 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         bpy.context.scene.objects.active = lastActive
 
         gret.overwriteRig = newRig
-        #gret.constrainBone = newRig.pose.bones[boneName]
 
         return gret
 
@@ -625,7 +638,6 @@ class TemplateAGENT(Template):
             packTags = [{"name": x, "value": tags[x]} for x in tags]
 
             rigOverwrite = gret.overwriteRig.name if gret.overwriteRig else ""
-            constrainBone = gret.constrainBone.name if gret.constrainBone else ""
 
             packModifyBones = []
             for b in gret.modifyBones:
@@ -647,7 +659,6 @@ class TemplateAGENT(Template):
                                        geoGroupName=newGp.name,
                                        initialTags=packTags,
                                        rigOverwrite=rigOverwrite,
-                                       constrainBone=constrainBone,
                                        modifyBones=packModifyBones)
 
     def check(self):

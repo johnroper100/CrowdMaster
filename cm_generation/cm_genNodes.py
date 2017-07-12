@@ -145,15 +145,27 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
     bl_width_default = 200.0
 
     inputGroup = StringProperty(name="Group")
+    boundingObj = StringProperty(name="Bounding Object")
+    armatureObj = StringProperty(name="Armature Object")
 
     def init(self, context):
         self.outputs.new('GeoSocketType', "Geometry")
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "inputGroup", bpy.data, "groups")
+        if self.inputGroup in bpy.data.groups:
+            layout.prop_search(self, "boundingObj",
+                               bpy.data.groups[self.inputGroup], "objects")
+            layout.prop_search(self, "armatureObj",
+                               bpy.data.groups[self.inputGroup], "objects")
+        else:
+            sb = layout.prop_search(self, "boundingObj", bpy.data, "objects")
+            sb = layout.prop_search(self, "armatureObj", bpy.data, "objects")
 
     def getSettings(self):
-        return {"inputGroup": self.inputGroup}
+        return {"inputGroup": self.inputGroup,
+                "boundingObj": self.boundingObj,
+                "armatureObj": self.armatureObj}
 
 
 def updateDupDir(self, context):

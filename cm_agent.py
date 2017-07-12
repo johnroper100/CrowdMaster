@@ -30,7 +30,7 @@ from .cm_compileBrain import compileBrain
 class Agent:
     """Represents each of the agents in the scene."""
 
-    def __init__(self, blenderid, nodeGroup, sim, rigOverwrite, constrainBone,
+    def __init__(self, blenderid, nodeGroup, sim, rigOverwrite,
                  tags=None, modifyBones=None, freezeAnimation=False):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
@@ -48,7 +48,6 @@ class Agent:
         self.freezeAnimation = freezeAnimation
 
         self.rigOverwrite = rigOverwrite
-        self.constrainBone = constrainBone
         self.modifyBones = {}
         if modifyBones is not None:
             for m in modifyBones:

@@ -127,7 +127,6 @@ class SCENE_OT_cm_agent_add(Operator):
     geoGroupName = StringProperty()
     initialTags = CollectionProperty(type=initialTagProperty)
     rigOverwrite = StringProperty()
-    constrainBone = StringProperty()
     modifyBones = CollectionProperty(type=modifyBoneProperty)
 
     def execute(self, context):
@@ -150,7 +149,6 @@ class SCENE_OT_cm_agent_add(Operator):
         newAgent.name = self.agentName
         newAgent.geoGroup = self.geoGroupName
         newAgent.rigOverwrite = self.rigOverwrite
-        newAgent.constrainBone = self.constrainBone
         for x in self.initialTags:
             tag = newAgent.initialTags.add()
             tag.name = x.name

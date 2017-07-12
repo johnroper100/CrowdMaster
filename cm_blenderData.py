@@ -48,7 +48,6 @@ class agent_entry(PropertyGroup):
     geoGroup = StringProperty()
     initialTags = CollectionProperty(type=initialTagProperty)
     rigOverwrite = StringProperty()
-    constrainBone = StringProperty()
     modifyBones = CollectionProperty(type=modifyBoneProperty)
 
 
