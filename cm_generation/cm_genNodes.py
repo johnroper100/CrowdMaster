@@ -370,10 +370,10 @@ class RandomMaterialNode(CrowdMasterAGenTreeNode):
     materialIndex = IntProperty()
 
     def init(self, context):
-        self.inputs.new("TemplateSocketType", "Template")
+        self.inputs.new("GeoSocketType", "Template")
         self.inputs[0].link_limit = 1
 
-        self.outputs.new("TemplateSocketType", "Template")
+        self.outputs.new("GeoSocketType", "Template")
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "targetMaterial", bpy.data, "materials")
@@ -1154,7 +1154,8 @@ agen_node_categories = [
         NodeItem("ModifyBoneNodeType"),
         NodeItem("ObjectInputNodeType"),
         NodeItem("ParentNodeType"),
-        NodeItem("GeoSwitchNodeType", label="Switch")
+        NodeItem("GeoSwitchNodeType", label="Switch"),
+        NodeItem("RandomMaterialNodeType"),
     ]),
     CrowdMasterAGenCategories("template", "Template", items=[
         NodeItem("TemplateNodeType"),
@@ -1162,7 +1163,6 @@ agen_node_categories = [
         NodeItem("CombineNodeType"),
         NodeItem("PointTowardsNodeType"),
         NodeItem("RandomNodeType"),
-        NodeItem("RandomMaterialNodeType"),
         NodeItem("SettagNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch")
     ]),

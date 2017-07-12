@@ -168,6 +168,7 @@ class SCENE_OT_agent_nodes_remove_defer_geo(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        bpy.context.scene.frame_current = bpy.context.scene.cm_sim_start_frame
         for agentGroup in bpy.context.scene.cm_groups:
             for agentType in agentGroup.agentTypes:
                 for agent in agentType.agents:

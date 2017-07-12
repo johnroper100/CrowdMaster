@@ -74,7 +74,7 @@ class TemplateRequest:
         self.tags = {}
         self.cm_group = "cm"
 
-        self.materials = {}
+        #self.materials = {}
         # Key: material to replace. Value: material to replace with
 
     def copy(self):
@@ -84,7 +84,7 @@ class TemplateRequest:
         new.scale = self.scale
         new.tags = self.tags.copy()
         new.cm_group = self.cm_group
-        new.materials = self.materials.copy()
+        #new.materials = self.materials.copy()
         return new
 
     def toGeoTemplate(self, deferGeo, group, seed):
@@ -95,7 +95,7 @@ class TemplateRequest:
         new.tags = self.tags.copy()
         new.cm_group = self.cm_group
         new.group = group
-        new.materials = self.materials.copy()
+        #new.materials = self.materials.copy()
         new.deferGeo = deferGeo
         new.seed = seed
         return new
@@ -123,7 +123,8 @@ class GeoRequest(TemplateRequest):
         self.scale = None
         self.tags = None
         self.cm_group = None
-        self.materials = None
+        self.materials = {}
+        # Key: material to replace. Value: material to replace with
         self.seed = None
 
     def copy(self):
@@ -227,38 +228,42 @@ class GeoTemplateGROUP(GeoTemplate):
         if deferGeo:
             bb = grpObjs[self.settings["boundingObj"]]
             newBB = bb.copy()
-            newBB.rotation_euler = rot
-            newBB.scale = Vector((scale, scale, scale))
-            newBB.location = pos
-            newBB["cm_deferOriginal"] = bb.name
+            newBB["cm_deferOriginal"] = self.settings["boundingObj"]
             group.objects.link(newBB)
             bpy.context.scene.objects.link(newBB)
 
             arm = grpObjs[self.settings["armatureObj"]]
             newArm = arm.copy()
-            newArm["cm_deferOriginal"] = arm.name
+            newArm["cm_deferOriginal"] = self.settings["armatureObj"]
+            newArm.parent = newBB
             group.objects.link(newArm)
             bpy.context.scene.objects.link(newArm)
-            newArm.parent = newBB
+
+            newBB.rotation_euler = rot
+            newBB.scale = Vector((scale, scale, scale))
+            newBB.location = pos
 
             return GeoReturn(newBB, newArm)
 
         bb = None
+        bbOriginal = ""
         arm = None
+        armOriginal = ""
         for placedObj in group.objects:
             if "cm_deferOriginal" in placedObj:
                 pName = placedObj["cm_deferOriginal"]
                 if placedObj.type == "MESH":
                     bb = placedObj
+                    bbOriginal = pName
                 elif placedObj.type == "ARMATURE":
                     arm = placedObj
+                    armOriginal = pName
 
-        group_objects = [o.copy() for o in grpObjs if o != bb and o != arm]
         group_objects = []
         for o in grpObjs:
-            if o == bb:
+            if o.name == bbOriginal:
                 group_objects.append(bb)
-            elif o == arm:
+            elif o.name == armOriginal:
                 group_objects.append(arm)
             else:
                 group_objects.append(o.copy())
@@ -316,10 +321,9 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
     def build(self, buildRequest):
         obj = bpy.context.scene.objects[self.settings["boundingBox"]]
-        cp = obj.copy()
-        buildRequest.group.objects.link(cp)
-        bpy.context.scene.objects.link(cp)
-        gret = GeoReturn(cp)
+        newObj = obj.copy()
+        buildRequest.group.objects.link(newObj)
+        bpy.context.scene.objects.link(newObj)
 
         if buildRequest.deferGeo:
             bpy.ops.object.armature_add(location=(0,0,0))
@@ -345,38 +349,32 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             rigObject = self.settings["rigObject"]
             additionalGroup = self.settings["additionalGroup"]
 
-            newObj, newRig = self.duplicateProxyLink(dupDir, blendfile, group, rigObject,
-                                                     additionalGroup)
+            newObj, newRig = self.duplicateProxyLink(dupDir, blendfile, group,
+                                                     rigObject, additionalGroup)
             buildRequest.group.objects.link(newObj)
             buildRequest.group.objects.link(newRig)
-
-
-        boneName = self.settings["constrainBone"]
-        constrainBone = gret.constrainBone
 
         lastActive = bpy.context.scene.objects.active
         bpy.context.scene.objects.active = newRig
         bpy.ops.object.posemode_toggle()
         armature = newRig.data.bones
-        armature.active = armature[boneName]
+        armature.active = armature[self.settings["constrainBone"]]
         bpy.ops.pose.constraint_add(type="COPY_LOCATION")
         bpy.ops.pose.constraint_add(type="COPY_ROTATION")
 
-        Cloc = newRig.pose.bones[boneName].constraints[-2]
-        Crot = newRig.pose.bones[boneName].constraints[-1]
+        Cloc = newRig.pose.bones[self.settings["constrainBone"]].constraints[-2]
+        Crot = newRig.pose.bones[self.settings["constrainBone"]].constraints[-1]
 
-        Cloc.target = cp
+        Cloc.target = newObj
         Cloc.use_z = False
 
-        Crot.target = cp
+        Crot.target = newObj
         # Crot.use_offset = True
 
         bpy.ops.object.posemode_toggle()
         bpy.context.scene.objects.active = lastActive
 
-        gret.overwriteRig = newRig
-
-        return gret
+        return GeoReturn(newObj, newRig)
 
     def check(self):
         # TODO check if file exists
@@ -575,7 +573,7 @@ class TemplateADDTOGROUP(Template):
         return True
 
 
-class TemplateRANDOMMATERIAL(Template):
+class TemplateRANDOMMATERIAL(GeoTemplate):
     """Assign random materials"""
 
     def build(self, buildRequest):
@@ -588,14 +586,12 @@ class TemplateRANDOMMATERIAL(Template):
                 mat = self.settings["materialList"][index][0]
             index += 1
         buildRequest.materials[self.settings["targetMaterial"]] = mat
-        self.inputs["Template"].build(buildRequest)
+        return self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
             return False
-        if not isinstance(self.inputs["Template"], Template):
-            return False
-        if isinstance(self.inputs["Template"], GeoTemplate):
+        if not isinstance(self.inputs["Template"], GeoTemplate):
             return False
         return True
 
@@ -624,6 +620,7 @@ class TemplateAGENT(Template):
             geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp, seed)
             gret = self.inputs["Objects"].build(geoBuildRequest)
             topObj = gret.obj
+            arm = gret.overwriteRig
 
             geoBuildRequest.storeWithObject(topObj, self.inputs["Objects"].bpyNode)
             topObj["cm_deferGeo"] = defG
@@ -632,7 +629,41 @@ class TemplateAGENT(Template):
             topObj.rotation_euler = rot
             topObj.scale = Vector((scale, scale, scale))
 
-            topObj["cm_randomMaterial"] = buildRequest.materials
+            if topObj.animation_data is None:
+                topObj.animation_data_create()
+            if topObj.animation_data.action is None:
+                action = bpy.data.actions.new(name=topObj.name + ".cm")
+                topObj.animation_data.action = action
+                action.fcurves.new(data_path="location", index=0)
+                action.fcurves.new(data_path="location", index=1)
+                action.fcurves.new(data_path="location", index=2)
+                action.fcurves.new(data_path="rotation_euler", index=0)
+                action.fcurves.new(data_path="rotation_euler", index=1)
+                action.fcurves.new(data_path="rotation_euler", index=2)
+                action.fcurves[0].keyframe_points.insert(0, pos[0])
+                action.fcurves[1].keyframe_points.insert(0, pos[1])
+                action.fcurves[2].keyframe_points.insert(0, pos[2])
+                action.fcurves[3].keyframe_points.insert(0, rot[0])
+                action.fcurves[4].keyframe_points.insert(0, rot[1])
+                action.fcurves[5].keyframe_points.insert(0, rot[2])
+
+            if arm.animation_data is None:
+                arm.animation_data_create()
+            if arm.animation_data.action is None:
+                action = bpy.data.actions.new(name=arm.name + ".cm")
+                arm.animation_data.action = action
+                action.fcurves.new(data_path="location", index=0)
+                action.fcurves.new(data_path="location", index=1)
+                action.fcurves.new(data_path="location", index=2)
+                action.fcurves.new(data_path="rotation_euler", index=0)
+                action.fcurves.new(data_path="rotation_euler", index=1)
+                action.fcurves.new(data_path="rotation_euler", index=2)
+                action.fcurves[0].keyframe_points.insert(0, 0)
+                action.fcurves[1].keyframe_points.insert(0, 0)
+                action.fcurves[2].keyframe_points.insert(0, 0)
+                action.fcurves[3].keyframe_points.insert(0, 0)
+                action.fcurves[4].keyframe_points.insert(0, 0)
+                action.fcurves[5].keyframe_points.insert(0, 0)
 
             tags = buildRequest.tags
             packTags = [{"name": x, "value": tags[x]} for x in tags]

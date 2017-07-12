@@ -236,7 +236,7 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_outline_selected = False
                     area.spaces[0].show_relationship_lines = False
 
-        scene.frame_current = scene.cm_sim_start_frame
+        scene.frame_set(scene.cm_sim_start_frame)
 
         global sim
         if "sim" in globals():

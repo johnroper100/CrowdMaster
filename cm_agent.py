@@ -100,9 +100,20 @@ class Agent:
         if not freezeAnimation:
             objs = bpy.data.objects
 
-            objs[blenderid].animation_data_clear()
-            objs[blenderid].keyframe_insert(data_path="location", frame=1)
-            objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
+            # objs[blenderid].animation_data_clear()
+            action = objs[blenderid].animation_data.action
+            # TODO delete nla data without unlinked defer geo
+            for fcurve in action.fcurves:
+                while len(fcurve.keyframe_points) >= 2:
+                    fcurve.keyframe_points.remove(fcurve.keyframe_points[1])
+            action = objs[rigOverwrite].animation_data.action
+            for fcurve in action.fcurves:
+                while len(fcurve.keyframe_points) >= 2:
+                    fcurve.keyframe_points.remove(fcurve.keyframe_points[1])
+            #objs[blenderid].keyframe_insert(data_path="location",
+            #                                frame=bpy.context.scene.cm_sim_start_frame)
+            #objs[blenderid].keyframe_insert(data_path="rotation_euler",
+            #                                frame=bpy.context.scene.cm_sim_start_frame)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
