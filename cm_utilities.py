@@ -33,26 +33,6 @@ bpy.types.Scene.show_utilities = BoolProperty(
 )
 
 
-class CrowdMaster_convert_to_bound_box(Operator):
-    bl_idname = "scene.cm_convert_to_bound_box"
-    bl_label = "Convert Selected To Bounding Box"
-
-    def execute(self, context):
-        preferences = context.user_preferences.addons[__package__].preferences
-
-        selected = bpy.context.selected_objects
-        for obj in selected:
-            bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY', center='BOUNDS')
-            bpy.ops.mesh.primitive_cube_add()
-            bound_box = bpy.context.active_object
-
-            bound_box.location = obj.location
-            bound_box.rotation_euler = obj.rotation_euler
-            bound_box.select = True
-
-        return {'FINISHED'}
-
-
 class Crowdmaster_place_deferred_geo(Operator):
     bl_idname = "scene.cm_place_deferred_geo"
     bl_label = "Place Deferred Geometry"
@@ -166,13 +146,11 @@ class Crowdmaster_switch_dupli_group(Operator):
 
 
 def register():
-    bpy.utils.register_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.register_class(Crowdmaster_place_deferred_geo)
     bpy.utils.register_class(Crowdmaster_switch_dupli_group)
 
 
 def unregister():
-    bpy.utils.unregister_class(CrowdMaster_convert_to_bound_box)
     bpy.utils.unregister_class(Crowdmaster_place_deferred_geo)
     bpy.utils.unregister_class(Crowdmaster_switch_dupli_group)
 

@@ -26,7 +26,6 @@ translations = {
         ("Operator", "Stop Simulation"): "Detener Simulación",
         ("*", "Utilities"): "Utilitarios",
         ("Operator", "Place Deferred Geometry"): "Lugar sin Geometría",
-        ("Operator", "Convert Selected To Bounding Box"): "Convertir selección a Cuadro Delimitador",
         ("Operator", "Switch Dupli Groups"): "Cambiar Grupos Duplicados",
         ("*", "Dupli Group Suffix"): "Duplicar Grupos Por Sufijo",
         ("*", "Dupli Group Target"): "Duplicar Grupos Por objetivo",

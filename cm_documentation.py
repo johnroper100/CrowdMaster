@@ -28,8 +28,6 @@ documentation_mapping = (
     ("bpy.ops.scene.cm_stop", "simulation/toolbars/main/index.html#stop-simulation"),
     ("bpy.ops.scene.cm_place_deferred_geo",
      "simulation/toolbars/main/utilities/place_deferred_geo.html"),
-    ("bpy.ops.scene.cm_convert_to_bound_box",
-     "simulation/toolbars/main/utilities/conv_to_bound_box.html"),
     ("bpy.ops.scene.cm_switch_dupli_groups",
      "simulation/toolbars/main/utilities/switch_dupli_groups.html"),
     ("bpy.ops.scene.cm_groups_reset", "simulation/toolbars/agents.html#reset-group"),
