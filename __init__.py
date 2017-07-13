@@ -191,7 +191,13 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             at.name = self.brainType
             ty = group.agentTypes.find(at.name)
         agentType = group.agentTypes[ty]
+
+        bpy.ops.group.create(name=self.groupName)
         for obj in context.selected_objects:
+            bpy.context.scene.objects[obj].select=True
+            bpy.ops.object.group_link(group=self.groupName)
+            bpy.context.scene.objects[obj].select=False
+
             inGroup = agentType.agents.find(obj.name)
             if inGroup == -1:
                 newAgent = agentType.agents.add()
