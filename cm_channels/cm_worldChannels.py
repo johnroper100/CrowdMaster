@@ -64,17 +64,21 @@ class World(Mc):
                         result = 0
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
-                        volObj = bpy.data.objects[e.volume]
-                        pt = bpy.data.objects[self.userid].location
-                        localPt = volObj.matrix_world.inverted() * pt
-                        d = mathutils.Vector()
-                        d.x = volObj.dimensions.x / volObj.scale.x
-                        d.y = volObj.dimensions.y / volObj.scale.y
-                        d.z = volObj.dimensions.z / volObj.scale.z
+                        try:
+                            volObj = bpy.data.objects[e.volume]
+                            pt = bpy.data.objects[self.userid].location
+                            localPt = volObj.matrix_world.inverted() * pt
+                            d = mathutils.Vector()
+                            d.x = volObj.dimensions.x / volObj.scale.x
+                            d.y = volObj.dimensions.y / volObj.scale.y
+                            d.z = volObj.dimensions.z / volObj.scale.z
 
-                        if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
-                                -(d.y / 2) <= localPt.y <= (d.y / 2) and
-                                -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                            if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                                    -(d.y / 2) <= localPt.y <= (d.y / 2) and
+                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                                result = 0
+                        except KeyError:
+                            print("Event volume object not found!")
                             result = 0
                 if result:
                     return {"None": 1}
