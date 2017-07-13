@@ -939,6 +939,7 @@ class TemplateVCOLPOSITIONING(Template):
     def build(self, buildRequest):
         paintMode = self.settings["paintMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
+        invert = self.settings["invert"]
         data = guide.data
         polys = []
         mesh = data
@@ -948,8 +949,12 @@ class TemplateVCOLPOSITIONING(Template):
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                    polys.append(poly)
+                if not invert:
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        polys.append(poly)
+                else:
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        polys.append(poly)
 
         wrld = guide.matrix_world
         if self.totalArea is None:
@@ -1022,8 +1027,12 @@ class TemplateVCOLPOSITIONING(Template):
             poly = mesh.polygons[ind]
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                    self.inputs["Template"].build(buildRequest)
+                if not invert:
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        self.inputs["Template"].build(buildRequest)
+                else:
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:

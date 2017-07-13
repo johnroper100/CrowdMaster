@@ -791,6 +791,10 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
                                  default=[1.0, 1.0, 1.0],
                                  min=0.0,
                                  max=1.0)
+    
+    invert = BoolProperty(name="Invert",
+                         description="Place agents outside of the painted area",
+                         default=False)
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -826,6 +830,9 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
         row.prop(self, "vcols")
         row.prop(self, "vcolor", text="")
 
+        row = layout.row()
+        row.prop(self, "invert")
+
         if self.paintMode == 'place':
             layout.prop(self, "noToPlace")
             layout.prop(self, "overwritePosition")
@@ -840,6 +847,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
                 "vcols": self.vcols,
                 "vcolor": self.vcolor,
                 "guideMesh": self.guideMesh,
+                "invert": self.invert,
                 "noToPlace": self.noToPlace,
                 "overwritePosition": self.overwritePosition,
                 "relax": self.relax,
