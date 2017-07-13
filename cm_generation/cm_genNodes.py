@@ -827,7 +827,10 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
 
         row = layout.row(align=True)
         row.prop_search(self, "guideMesh", bpy.context.scene, "objects")
-        row.prop(self, "invert")
+        if self.invert:
+            row.prop(self, "invert", icon="STICKY_UVS_VERT", icon_only=True)
+        else:
+            row.prop(self, "invert", icon="STICKY_UVS_LOC", icon_only=True)
 
         row = layout.row(align=True)
         row.prop(self, "vcols")
