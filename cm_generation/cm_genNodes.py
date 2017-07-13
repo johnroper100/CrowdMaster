@@ -824,14 +824,14 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "paintMode", expand=True)
-        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+
+        row = layout.row(align=True)
+        row.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        row.prop(self, "invert")
 
         row = layout.row(align=True)
         row.prop(self, "vcols")
         row.prop(self, "vcolor", text="")
-
-        row = layout.row()
-        row.prop(self, "invert")
 
         if self.paintMode == 'place':
             layout.prop(self, "noToPlace")
