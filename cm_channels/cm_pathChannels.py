@@ -223,7 +223,7 @@ class Path(Mc):
             if laneSeparation is not None:
                 zaxis = Vector((0, 0, 1))
                 if isDirectional:
-                    laneSeparation = None
+                    laneSeparation = 0.0
                 sepVec = direc.cross(zaxis).normalized() * laneSeparation
 
             length = direc.length
