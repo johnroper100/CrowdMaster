@@ -144,32 +144,32 @@ class NewInputNode(LogicNode):
     bl_width_default = 350.0
 
     InputSource = EnumProperty(name="Input Channel",
-                               items=[("AGENTINFO", "Agent Info", "", 10),
-                                      ("CONSTANT", "Constant", "", 1),
-                                      ("FLOCK", "Flock", "", 2),
-                                      ("FORMATION", "Formation", "", 3),
-                                      ("GROUND", "Ground", "", 4),
-                                      ("NOISE", "Noise", "", 5),
-                                      ("PATH", "Path", "", 6),
-                                      ("SOUND", "Sound", "", 7),
-                                      ("STATE", "State", "", 8),
-                                      ("WORLD", "World", "", 9)],
+                               items=[("AGENTINFO", "Agent Info", "Get information about other agents in the scene", 10),
+                                      ("CONSTANT", "Constant", "Get a single value that does not change per frame", 1),
+                                      ("FLOCK", "Flock", "Get information relating to flocking agents", 2),
+                                      ("FORMATION", "Formation", "Get information relating to formation agents", 3),
+                                      ("GROUND", "Ground", "Get information about ground objects", 4),
+                                      ("NOISE", "Noise", "Get random values that change over time", 5),
+                                      ("PATH", "Path", "Get information relating to path following", 6),
+                                      ("SOUND", "Sound", "Get sound information from each agent", 7),
+                                      ("STATE", "State", "Get state information from each agent", 8),
+                                      ("WORLD", "World", "Get world information from the scene", 9)],
                                description="Which channel the input data should be pulled from",
                                default="CONSTANT")
 
     Constant = FloatProperty(name="Constant", precision=5)
 
     Flocking = EnumProperty(name="Flocking Input",
-                            items=[("SEPARATE", "Separate", "", 1),
-                                   ("ALIGN", "Align", "", 2),
-                                   ("COHERE", "Cohere", "", 3)])
+                            items=[("SEPARATE", "Separate", "The direction the agent needs to move to move away from other nearby agent", 1),
+                                   ("ALIGN", "Align", "The rotation about the X and Z axes needed to align to the average heading of nearby agents", 2),
+                                   ("COHERE", "Cohere", "The direction the agent needs to move to move towards the average position of neighbours", 3)])
     RotationAxis = EnumProperty(name="Rotation Axis",
-                                items=[("RZ", "rz", "", 1),
-                                       ("RX", "rx", "", 2)])
+                                items=[("RZ", "rz", "Rotate on the z axis", 1),
+                                       ("RX", "rx", "Rotate on the x axis", 2)])
     TranslationAxis = EnumProperty(name="Translation Axis",
-                                   items=[("TX", "tx", "", 1),
-                                          ("TY", "ty", "", 2),
-                                          ("TZ", "tz", "", 3)])
+                                   items=[("TX", "tx", "Translate on the x axis", 1),
+                                          ("TY", "ty", "Translate on the y axis", 2),
+                                          ("TZ", "tz", "Translate on the z axis", 3)])
 
     FormationGroup = StringProperty(name="Formation Group")
     FormationOptions = EnumProperty(name="Formation Options",
