@@ -192,7 +192,8 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             ty = group.agentTypes.find(at.name)
         agentType = group.agentTypes[ty]
 
-        bpy.ops.group.create(name=self.groupName)
+        if not self.groupName in bpy.data.groups:
+            bpy.ops.group.create(name=self.groupName)
         for obj in context.selected_objects:
             bpy.context.scene.objects[obj.name].select=True
             bpy.ops.object.group_link(group=self.groupName)
