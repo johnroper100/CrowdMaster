@@ -320,12 +320,12 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         self.linkedGroup = None
 
     def build(self, buildRequest):
-        obj = bpy.context.scene.objects[self.settings["boundingBox"]]
-        newObj = obj.copy()
-        buildRequest.group.objects.link(newObj)
-        bpy.context.scene.objects.link(newObj)
-
         if buildRequest.deferGeo:
+            obj = bpy.context.scene.objects[self.settings["boundingBox"]]
+            newObj = obj.copy()
+            newObj["cm_deferOriginal"] = self.settings["boundingBox"]
+            buildRequest.group.objects.link(newObj)
+            bpy.context.scene.objects.link(newObj)
             bpy.ops.object.armature_add(location=(0,0,0))
             newRig = bpy.context.active_object
             newRig.data.bones[0].name = self.settings["constrainBone"]
@@ -349,10 +349,14 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             rigObject = self.settings["rigObject"]
             additionalGroup = self.settings["additionalGroup"]
 
-            newObj, newRig = self.duplicateProxyLink(dupDir, blendfile, group,
+            dupObj, newRig = self.duplicateProxyLink(dupDir, blendfile, group,
                                                      rigObject, additionalGroup)
-            buildRequest.group.objects.link(newObj)
+            buildRequest.group.objects.link(dupObj)
             buildRequest.group.objects.link(newRig)
+
+            for placedObj in buildRequest.group.objects:
+                if "cm_deferOriginal" in placedObj:
+                    newObj = placedObj
 
         lastActive = bpy.context.scene.objects.active
         bpy.context.scene.objects.active = newRig
