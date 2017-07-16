@@ -318,6 +318,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
     def __init__(self, *args):
         GeoTemplate.__init__(self, *args)
         self.linkedGroup = None
+        self.additional = {}  # {"original name": <group>}
 
     def build(self, buildRequest):
         if buildRequest.deferGeo:
@@ -398,9 +399,23 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         count = 0
         while "{0}.{1:0>3}".format(sourceGroup, count) in dtGrp and dupliGroup is None:
             searchGroup = "{0}.{1:0>3}".format(sourceGroup, count)
-            if len(dtGrp[searchGroup].users_dupli_group) == 0:
-                dupliGroup = dtGrp[searchGroup]
-            else:
+            found = False
+            if dtGrp[searchGroup].library is not None:
+                fp = dtGrp[searchGroup].library.filepath
+                if not os.path.isabs(fp):
+                    rel = fp
+                    fp = os.path.split(bpy.data.filepath)[0]
+                    for d in rel[2:].split("/"):
+                        if d == "..":
+                            fp = os.path.split(fp)[0]
+                        else:
+                            fp = os.path.join(fp, d)
+                if os.path.isfile(fp):
+                    if len(dtGrp[searchGroup].users_dupli_group) == 0:
+                        dupliGroup = dtGrp[searchGroup]
+                        count = True
+                        break
+            if not found:
                 count += 1
         # If no unused group is found then count has the value for what the
         #   group should be.
@@ -415,32 +430,51 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 targetPath = os.path.join(dupDir, targetBlendName)
                 with bpy.data.libraries.load(targetPath, link=True) as (data_src, data_dst):
                     data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
-                    #if additionalGroup != "":
-                    #    data_dst.groups.append(additionalGroup)
+                    for adGrp in additionalGroup.split(","):
+                        if adGrp.split() != "":
+                            adGrpNm = "{0}.{1:0>3}".format(adGrp.strip(), count)
+                            data_dst.groups.append(adGrpNm)
                 dupliGroup = data_dst.groups[0]
 
         # Create a new file
         if dupliGroup is None:
             if self.linkedGroup is None:
+                missedGroups = []
+                missingMainGroup = True
                 if sourceGroup in bpy.data.groups:
                     if bpy.data.groups[sourceGroup].library is None:
                         self.linkedGroup = bpy.data.groups[sourceGroup]
-                    else:
-                        # TODO handle this properly
-                        raise Exception("CrowdMaster - Duplicate groups in file")
-                else:
+                        missingMainGroup = False
+                for adGrp in additionalGroup.split(","):
+                    adtGrpNm = adGrp.strip()
+                    if adtGrpNm != "":
+                        if adtGrpNm in bpy.data.groups:
+                            self.additional[adtGrpNm] = dtGrp[adtGrpNm]
+                        else:
+                            missedGroups.append(adtGrpNm)
+                if missingMainGroup or len(missedGroups) > 0:
                     with bpy.data.libraries.load(sourceBlend, link=False) as (data_src, data_dst):
-                        data_dst.groups = [sourceGroup]
-                        #if additionalGroup != "":
-                        #    data_dst.groups.append(additionalGroup)
-
-                    self.linkedGroup = data_dst.groups[0]
+                        if missingMainGroup:
+                            data_dst.groups = [sourceGroup]
+                        for mGrp in missedGroups:
+                            data_dst.groups.append(mGrp)
+                    if missingMainGroup:
+                        self.linkedGroup = data_dst.groups[0]
+                    offset = 1 if missingMainGroup else 0
+                    for n, mGrp in enumerate(missedGroups):
+                        self.additional[mGrp] = data_dst.groups[n + offset]
 
             self.linkedGroup.name = "{0}.{1:0>3}".format(sourceGroup, count)
             newRigName = "{0}.{1:0>3}".format(sourceRig, count)
             self.linkedGroup.objects[sourceRig].name = newRigName
 
+            for originalGroup in self.additional:
+                newName = "{0}.{1:0>3}".format(originalGroup, count)
+                self.additional[originalGroup].name = newName
+
             datablocks = {self.linkedGroup}
+            for aGrp in self.additional:
+                datablocks.add(self.additional[aGrp])
             newFileName = "{0}_{1:0>3}.blend".format(source, count)
             newFilePath = os.path.join(dupDir, newFileName)
             bpy.data.libraries.write(newFilePath, datablocks, relative_remap=True,
@@ -448,11 +482,15 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
             self.linkedGroup.name = sourceGroup
             self.linkedGroup.objects[newRigName].name = sourceRig
+            for adtGrpNm in self.additional:
+                self.additional[adtGrpNm].name = adtGrpNm
 
             with bpy.data.libraries.load(newFilePath, link=True) as (data_src, data_dst):
                 data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
-                # if additionalGroup != "":
-                #    data_dst.groups.append(additionalGroup)
+                if additionalGroup != "":
+                    for adGrp in additionalGroup.split(","):
+                        adGrpNm = "{0}.{1:0>3}".format(adGrp.strip(), count)
+                        data_dst.groups.append(adGrpNm)
             dupliGroup = data_dst.groups[0]
 
         # add the group instance to the scene
