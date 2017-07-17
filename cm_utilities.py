@@ -18,7 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import time
-
+import re
 import bpy
 from bpy.types import Operator
 from bpy.props import BoolProperty
@@ -38,15 +38,18 @@ class Crowdmaster_switch_dupli_group(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        suffix = bpy.context.scene.cm_switch_dupli_group_suffix
+        repRegex = re.compile("(?P<prefix>.*)({})(?P<number>.\d*)?".format(suffix))
         for obj in bpy.context.selected_objects:
             if obj.dupli_type == "GROUP":
-                suffix = bpy.context.scene.cm_switch_dupli_group_suffix
-                if obj.dupli_group.name[-len(suffix):] == suffix:
+                match = repRegex.match(obj.dupli_group.name)
+                if match:
+                    parts = match.groupdict(default="")
                     target = bpy.context.scene.cm_switch_dupli_group_target
-                    replaceName = obj.dupli_group.name[:-len(suffix)] + target
+                    searchRegex = re.compile(parts["prefix"] + target + parts["number"])
                     replaceSource = obj.dupli_group.library
                     for grp in bpy.data.groups:
-                        if grp.name == replaceName:
+                        if searchRegex.match(grp.name):
                             if grp.library == replaceSource:
                                 obj.dupli_group = grp
         return {'FINISHED'}
