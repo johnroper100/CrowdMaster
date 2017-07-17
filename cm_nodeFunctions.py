@@ -352,7 +352,7 @@ class LogicOR(Neuron):
                         if settings["Method"] == "MUL":
                             results[i] *= (1 - into[i])
                         else:  # Method == "MAX"
-                            results[i] = min(1 - results[i], 1 - into[i])
+                            results[i] = min(results[i], 1 - into[i])
                     else:
                         results[i] = (1 - into[i])
             results.update((k, 1 - v) for k, v in results.items())
