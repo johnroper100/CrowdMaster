@@ -120,6 +120,8 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
 
     def execute(self, context):
         for agentGroup in bpy.context.scene.cm_groups:
+            if agentGroup.groupType != "auto":
+                continue
             for agentType in agentGroup.agentTypes:
                 for agent in agentType.agents:
                     obj = bpy.context.scene.objects[agent.name]
