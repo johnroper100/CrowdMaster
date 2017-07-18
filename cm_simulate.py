@@ -152,6 +152,8 @@ class Simulation:
         elif self.framelast + 1 == bpy.context.scene.frame_current:
             self.framelast = bpy.context.scene.frame_current
             self.step(scene)
+        elif self.framelast + 1 <= 0:
+            scene.frame_set(self.framelast + 1)
 
     def frameChangeHighlight(self, scene):
         """Not unregistered when simulation stopped"""
