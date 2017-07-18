@@ -49,8 +49,8 @@ class AddonRegisterTestCase(unittest.TestCase):
 
         opsProps = ["cm_actions_populate", "cm_actions_remove", "cm_agent_add",
                     "cm_agent_add_selected", "cm_agent_nodes_generate",
-                    "cm_agents_move",
-                    "cm_events_move", "cm_events_populate", "cm_events_remove",
+                    "cm_agents_move", "cm_events_move",
+                    "cm_events_populate", "cm_events_remove",
                     "cm_gennodes_pos_formation_simple",
                     "cm_gennodes_pos_random_simple",
                     "cm_gennodes_pos_target_simple", "cm_groups_reset",

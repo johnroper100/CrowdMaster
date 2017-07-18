@@ -558,13 +558,23 @@ class GeoTemplatePARENT(GeoTemplate):
         parent = gretp.obj
         gret = self.inputs["Child Object"].build(buildRequest.copy())
         child = gret.obj
-        con = child.constraints.new("CHILD_OF")
-        con.target = parent
-        con.subtarget = self.settings["parentTo"]
-        bone = parent.pose.bones[self.settings["parentTo"]]
-        con.inverse_matrix = bone.matrix.inverted()
-        if child.data:
-            child.data.update()
+
+        if self.settings["parentMode"] == "bone":
+            con = child.constraints.new("CHILD_OF")
+            con.target = parent
+            con.subtarget = self.settings["parentTo"]
+            bone = parent.pose.bones[self.settings["parentTo"]]
+            con.inverse_matrix = bone.matrix.inverted()
+            if child.data:
+                child.data.update()
+        else:
+            child.parent = parent
+            mod = child.modifiers.get("Armature")
+            if mod is None:
+                mod = child.modifiers.new("Armature", 'ARMATURE')
+            mod.object = parent
+            mod.use_vertex_groups = self.settings["bindToVGroups"]
+            mod.use_bone_envelopes = self.settings["bindToBEnvelops"]
         return gretp
         # TODO check if the object has an armature modifier
 
@@ -1046,6 +1056,7 @@ class TemplateVCOLPOSITIONING(Template):
     def build(self, buildRequest):
         paintMode = self.settings["paintMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
+        invert = self.settings["invert"]
         data = guide.data
         polys = []
         mesh = data
@@ -1055,8 +1066,12 @@ class TemplateVCOLPOSITIONING(Template):
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                    polys.append(poly)
+                if not invert:
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        polys.append(poly)
+                else:
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        polys.append(poly)
 
         wrld = guide.matrix_world
         if self.totalArea is None:
@@ -1129,8 +1144,12 @@ class TemplateVCOLPOSITIONING(Template):
             poly = mesh.polygons[ind]
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                    self.inputs["Template"].build(buildRequest)
+                if not invert:
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        self.inputs["Template"].build(buildRequest)
+                else:
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:

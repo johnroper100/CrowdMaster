@@ -68,7 +68,7 @@ class Neuron():
                 input in not a dictionary then it is made into one"""
                 if got is not None:
                     inps.append(got)
-            if preferences.show_debug_options:
+            if preferences.show_debug_options and preferences.show_debug_timings:
                 coreT = time.time()
             output = self.core(inps, self.settings)
             if preferences.show_debug_options and preferences.show_debug_timings:

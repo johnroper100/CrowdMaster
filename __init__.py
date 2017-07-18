@@ -91,9 +91,10 @@ class SCENE_OT_cm_groups_reset(Operator):
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
-                    if group.freezePlacement and group.freezeAnimation:
-                        if agent.name in scene.objects:
-                            scene.objects[agent.name].animation_data_clear()
+                    if group.freezePlacement:
+                        if not group.freezeAnimation:
+                            if agent.name in scene.objects:
+                                scene.objects[agent.name].animation_data_clear()
                     else:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
@@ -101,9 +102,10 @@ class SCENE_OT_cm_groups_reset(Operator):
                             bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
                                                    do_unlink=True)
                 elif group.groupType == "manual":
-                    if agent.name in scene.objects:
-                        scene.objects[agent.name].animation_data_clear()
-        if not group.freezePlacement:
+                    if not group.freezeAnimation:
+                        if agent.name in scene.objects:
+                            scene.objects[agent.name].animation_data_clear()
+        if not group.freezePlacement and group.groupType == "auto":
             bpy.ops.object.delete(use_global=True)
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
@@ -189,11 +191,19 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             at.name = self.brainType
             ty = group.agentTypes.find(at.name)
         agentType = group.agentTypes[ty]
+
+        if not self.groupName in bpy.data.groups:
+            bpy.ops.group.create(name=self.groupName)
         for obj in context.selected_objects:
+            bpy.context.scene.objects[obj.name].select=True
+            bpy.ops.object.group_link(group=self.groupName)
+            bpy.context.scene.objects[obj.name].select=False
+
             inGroup = agentType.agents.find(obj.name)
             if inGroup == -1:
                 newAgent = agentType.agents.add()
                 newAgent.name = obj.name
+                newAgent.geoGroup = self.groupName
                 group.totalAgents += 1
 
         return {'FINISHED'}
@@ -322,8 +332,9 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
-        row = layout.row()
+        row = layout.row(align=True)
         row.prop(scene, "cm_sim_start_frame")
+        row.prop(scene, "cm_sim_end_frame")
 
         row = layout.row()
         row.separator()
@@ -375,8 +386,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         preferences = context.user_preferences.addons[__package__].preferences
 
         row = layout.row()
-        row.label("Group name")
-        row.label("Number | origin")
+        row.label("Group Name")
+        row.label("Number | Origin")
         row.label("Status")
 
         layout.template_list("SCENE_UL_group", "", scene,
@@ -401,10 +412,12 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 if group.name == "cm":
                     box.label("cm: To freeze use add to group")
                 else:
-                    box.prop(group, "freezePlacement")
-                    if group.freezePlacement:
+                    if group.groupType == "auto":
+                        box.prop(group, "freezePlacement")
+                        if group.freezePlacement:
+                            box.prop(group, "freezeAnimation")
+                    else:
                         box.prop(group, "freezeAnimation")
-
                 if preferences.use_custom_icons:
                     op = box.operator(
                         SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
@@ -499,6 +512,10 @@ def register():
     global cm_documentation
     from . import cm_documentation
     cm_documentation.register()
+
+    global cm_translations
+    from . import cm_translations
+    cm_translations.register()
 
     register_icons()
 
@@ -601,6 +618,7 @@ def unregister():
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
+    cm_translations.unregister()
 
     if nodeTreeSetFakeUser in bpy.app.handlers.save_pre:
         bpy.app.handlers.save_pre.remove(nodeTreeSetFakeUser)

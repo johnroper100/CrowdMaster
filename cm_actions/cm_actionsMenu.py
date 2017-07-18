@@ -220,8 +220,8 @@ class SCENE_PT_action(Panel):
 
         row = layout.row()
         row.label("Name")
-        row.label("Armature action")
-        row.label("Motion action")
+        row.label("Armature Action")
+        row.label("Motion Action")
         row.label("Groups")
 
         row = layout.row()
