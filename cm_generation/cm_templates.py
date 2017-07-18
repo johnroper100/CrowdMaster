@@ -692,12 +692,13 @@ class TemplateAGENT(Template):
                 action.fcurves.new(data_path="rotation_euler", index=0)
                 action.fcurves.new(data_path="rotation_euler", index=1)
                 action.fcurves.new(data_path="rotation_euler", index=2)
-                action.fcurves[0].keyframe_points.insert(0, pos[0])
-                action.fcurves[1].keyframe_points.insert(0, pos[1])
-                action.fcurves[2].keyframe_points.insert(0, pos[2])
-                action.fcurves[3].keyframe_points.insert(0, rot[0])
-                action.fcurves[4].keyframe_points.insert(0, rot[1])
-                action.fcurves[5].keyframe_points.insert(0, rot[2])
+                frame = bpy.context.scene.cm_sim_start_frame
+                action.fcurves[0].keyframe_points.insert(frame, pos[0])
+                action.fcurves[1].keyframe_points.insert(frame, pos[1])
+                action.fcurves[2].keyframe_points.insert(frame, pos[2])
+                action.fcurves[3].keyframe_points.insert(frame, rot[0])
+                action.fcurves[4].keyframe_points.insert(frame, rot[1])
+                action.fcurves[5].keyframe_points.insert(frame, rot[2])
 
             if arm.animation_data is None:
                 arm.animation_data_create()
@@ -710,12 +711,13 @@ class TemplateAGENT(Template):
                 action.fcurves.new(data_path="rotation_euler", index=0)
                 action.fcurves.new(data_path="rotation_euler", index=1)
                 action.fcurves.new(data_path="rotation_euler", index=2)
-                action.fcurves[0].keyframe_points.insert(0, 0)
-                action.fcurves[1].keyframe_points.insert(0, 0)
-                action.fcurves[2].keyframe_points.insert(0, 0)
-                action.fcurves[3].keyframe_points.insert(0, 0)
-                action.fcurves[4].keyframe_points.insert(0, 0)
-                action.fcurves[5].keyframe_points.insert(0, 0)
+                frame = bpy.context.scene.cm_sim_start_frame
+                action.fcurves[0].keyframe_points.insert(frame, 0)
+                action.fcurves[1].keyframe_points.insert(frame, 0)
+                action.fcurves[2].keyframe_points.insert(frame, 0)
+                action.fcurves[3].keyframe_points.insert(frame, 0)
+                action.fcurves[4].keyframe_points.insert(frame, 0)
+                action.fcurves[5].keyframe_points.insert(frame, 0)
 
             tags = buildRequest.tags
             packTags = [{"name": x, "value": tags[x]} for x in tags]

@@ -35,7 +35,9 @@ class Neuron():
         self.neurons = self.brain.neurons  # type: List[Neuron]
         self.inputs = []  # type: List[str] - strings are names of neurons
         self.result = None  # type: None | ImpulseContainer - Cache for current
-        self.resultLog = [(0, 0, 0), (0, 0, 0)]  # type: List[(int, int, int)]
+        frame = bpy.context.scene.cm_sim_start_frame
+        self.resultLog = {frame: (0, 0, 0),
+                          frame+1: (0, 0, 0)}  # type: {(int, int, int)}
         self.fillOutput = BoolProperty(default=True)
         self.bpyNode = bpyNode  # type: cm_bpyNodes.LogicNode
         self.settings = {}  # type: Dict[str, bpy.props.*]
@@ -43,6 +45,7 @@ class Neuron():
 
     def evaluate(self):
         """Called by any neurons that take this neuron as an input"""
+        self.lastcalled = bpy.context.scene.frame_current
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
@@ -72,8 +75,7 @@ class Neuron():
                 coreT = time.time()
             output = self.core(inps, self.settings)
             if preferences.show_debug_options and preferences.show_debug_timings:
-                cm_timings.coreTimes[self.__class__.__name__] += time.time() - \
-                    coreT
+                cm_timings.coreTimes[self.__class__.__name__] += time.time() - coreT
                 cm_timings.coreNumber[self.__class__.__name__] += 1
             if output is None:
                 output = {}
@@ -116,18 +118,20 @@ class Neuron():
             val = 0.5
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.neuron["sumColour"] += time.time() - t
-        self.resultLog[-1] = (hue, sat, val)
+        self.resultLog[bpy.context.scene.frame_current] = (hue, sat, val)
 
         return output
 
     def newFrame(self):
         self.result = None
-        self.resultLog.append((0, 0, 0.5))
+        # self.resultLog.append((0, 0, 0.5))
 
     def highLight(self, frame):
         """Colour the nodes in the interface to reflect the output"""
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.use_node_color:
+            if frame not in self.resultLog:
+                self.resultLog[frame] = (0, 0, 0.5)
             hue, sat, val = self.resultLog[frame]
             self.bpyNode.use_custom_color = True
             c = mathutils.Color()
@@ -156,7 +160,8 @@ class State:
         self.currentFrame = 0
 
         self.bpyNode = bpyNode
-        self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}
+        self.resultLog = {bpy.context.scene.cm_sim_start_frame: (0, 0, 0),
+                          bpy.context.scene.cm_sim_start_frame + 1: (0, 0, 0)}
 
     def query(self):
         """If this state is a valid next move return float > 0"""
