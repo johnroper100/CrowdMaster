@@ -136,9 +136,14 @@ class Channel:
 
                 if minusRadius:
                     dist -= self.sim.agents[emitterid].radius
+                    val -= self.sim.agents[emitterid].radius
                     dist -= agent.radius
+                    val -= agent.radius
                     if dist < 0:
                         dist = 0
+                    if val <= 0:
+                        dist = 0
+                        val = 1 # To avoid division by zero
                 self.store[emitterid] = {"rz": changez,
                                          "rx": changex,
                                          "distProp": dist / val}
