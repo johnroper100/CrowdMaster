@@ -91,9 +91,10 @@ class SCENE_OT_cm_groups_reset(Operator):
         for agentType in group.agentTypes:
             for agent in agentType.agents:
                 if group.groupType == "auto":
-                    if group.freezePlacement and group.freezeAnimation:
-                        if agent.name in scene.objects:
-                            scene.objects[agent.name].animation_data_clear()
+                    if group.freezePlacement:
+                        if not group.freezeAnimation:
+                            if agent.name in scene.objects:
+                                scene.objects[agent.name].animation_data_clear()
                     else:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
@@ -101,9 +102,10 @@ class SCENE_OT_cm_groups_reset(Operator):
                             bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
                                                    do_unlink=True)
                 elif group.groupType == "manual":
-                    if agent.name in scene.objects:
-                        scene.objects[agent.name].animation_data_clear()
-        if not group.freezePlacement:
+                    if not group.freezeAnimation:
+                        if agent.name in scene.objects:
+                            scene.objects[agent.name].animation_data_clear()
+        if not group.freezePlacement and group.groupType == "auto":
             bpy.ops.object.delete(use_global=True)
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
@@ -409,10 +411,12 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 if group.name == "cm":
                     box.label("cm: To freeze use add to group")
                 else:
-                    box.prop(group, "freezePlacement")
-                    if group.freezePlacement:
+                    if group.groupType == "auto":
+                        box.prop(group, "freezePlacement")
+                        if group.freezePlacement:
+                            box.prop(group, "freezeAnimation")
+                    else:
                         box.prop(group, "freezeAnimation")
-
                 if preferences.use_custom_icons:
                     op = box.operator(
                         SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
