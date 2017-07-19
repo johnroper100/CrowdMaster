@@ -227,74 +227,80 @@ class GeoTemplateGROUP(GeoTemplate):
 
         if deferGeo:
             bb = grpObjs[self.settings["boundingObj"]]
-            newBB = bb.copy()
-            newBB["cm_deferOriginal"] = self.settings["boundingObj"]
-            group.objects.link(newBB)
-            bpy.context.scene.objects.link(newBB)
+            bb = bb.copy()
+            group.objects.link(bb)
+            bpy.context.scene.objects.link(bb)
 
-            arm = grpObjs[self.settings["armatureObj"]]
-            newArm = arm.copy()
-            newArm["cm_deferOriginal"] = self.settings["armatureObj"]
-            newArm.parent = newBB
-            group.objects.link(newArm)
-            bpy.context.scene.objects.link(newArm)
+            armOrig = grpObjs[self.settings["armatureObj"]]
+            arm = armOrig.copy()
+            group.objects.link(arm)
+            bpy.context.scene.objects.link(arm)
+        else:
+            bb = None
+            bbOriginal = self.settings["boundingObj"]
+            arm = None
+            armOriginal = self.settings["armatureObj"]
+            for placedObj in group.objects:
+                if "cm_deferOriginal" in placedObj:
+                    pName = placedObj["cm_deferOriginal"]
+                    if placedObj.type == "MESH":
+                        bb = placedObj
+                        bbOriginal = pName
+                    elif placedObj.type == "ARMATURE":
+                        arm = placedObj
+                        armOriginal = pName
 
-            newBB.rotation_euler = rot
-            newBB.scale = Vector((scale, scale, scale))
-            newBB.location = pos
+            group_objects = []
+            for o in grpObjs:
+                if o.name == bbOriginal:
+                    if bb is None:
+                        bb = o.copy()
+                    group_objects.append(bb)
+                    group.objects.link(bb)
+                    bpy.context.scene.objects.link(bb)
+                elif o.name == armOriginal:
+                    if arm is None:
+                        arm = o.copy()
+                    group_objects.append(arm)
+                    group.objects.link(arm)
+                    bpy.context.scene.objects.link(arm)
+                else:
+                    obj = o.copy()
+                    group_objects.append(obj)
+                    group.objects.link(obj)
+                    bpy.context.scene.objects.link(obj)
 
-            return GeoReturn(newBB, newArm)
+            for obj in group_objects:
+                if obj == bb or obj == arm:
+                    continue
 
-        bb = None
-        bbOriginal = ""
-        arm = None
-        armOriginal = ""
-        for placedObj in group.objects:
-            if "cm_deferOriginal" in placedObj:
-                pName = placedObj["cm_deferOriginal"]
-                if placedObj.type == "MESH":
-                    bb = placedObj
-                    bbOriginal = pName
-                elif placedObj.type == "ARMATURE":
-                    arm = placedObj
-                    armOriginal = pName
+                for m in obj.material_slots:
+                    if m.name in buildRequest.materials:
+                        replacement = buildRequest.materials[m.name]
+                        m.material = bpy.data.materials[replacement]
 
-        group_objects = []
-        for o in grpObjs:
-            if o.name == bbOriginal:
-                group_objects.append(bb)
-            elif o.name == armOriginal:
-                group_objects.append(arm)
-            else:
-                group_objects.append(o.copy())
+                if obj.parent is not None and obj.parent.name in grpObjs:
+                    i = 0
+                    for parentObj in grpObjs:
+                        if parentObj.name == obj.parent.name:
+                            obj.parent = group_objects[i]
+                            break
+                        i += 1
+                else:
+                    obj.scale = Vector((scale, scale, scale))
+                    obj.location += pos
 
-        for obj in group_objects:
-            if obj == bb or obj == arm:
-                continue
+                if obj.type == 'MESH':
+                    for mod in obj.modifiers:
+                        if mod.type == "ARMATURE":
+                            obj.modifiers[mod.name].object = dat.objects[arm.name]
 
-            for m in obj.material_slots:
-                if m.name in buildRequest.materials:
-                    replacement = buildRequest.materials[m.name]
-                    m.material = bpy.data.materials[replacement]
-
-            if obj.parent is not None and obj.parent.name in grpObjs:
-                i = 0
-                for parentObj in grpObjs:
-                    if parentObj.name == obj.parent.name:
-                        obj.parent = group_objects[i]
-                        break
-                    i += 1
-            else:
-                obj.scale = Vector((scale, scale, scale))
-                obj.location += pos
-
-            group.objects.link(obj)
-            bpy.context.scene.objects.link(obj)
-            if obj.type == 'MESH':
-                for mod in obj.modifiers:
-                    if mod.type == "ARMATURE":
-                        obj.modifiers[mod.name].object = dat.objects[arm.name]
-
+        bb["cm_deferOriginal"] = self.settings["boundingObj"]
+        arm["cm_deferOriginal"] = self.settings["armatureObj"]
+        arm.parent = bb
+        bb.rotation_euler = rot
+        bb.scale = Vector((scale, scale, scale))
+        bb.location = pos
         return GeoReturn(bb, arm)
 
     def check(self):
@@ -413,7 +419,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 if os.path.isfile(fp):
                     if len(dtGrp[searchGroup].users_dupli_group) == 0:
                         dupliGroup = dtGrp[searchGroup]
-                        count = True
+                        found = True
                         break
             if not found:
                 count += 1
@@ -466,7 +472,17 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
             self.linkedGroup.name = "{0}.{1:0>3}".format(sourceGroup, count)
             newRigName = "{0}.{1:0>3}".format(sourceRig, count)
-            self.linkedGroup.objects[sourceRig].name = newRigName
+            regex = re.compile("{}(?P<num>.\d*)?".format(sourceRig))
+            for obj in self.linkedGroup.objects:
+                match = regex.match(obj.name)
+                if match:
+                    #num = match.groupdict(default="")["num"]
+                    tgtObj = self.linkedGroup.objects[obj.name]
+                    tgtObj.name = newRigName
+                    if tgtObj.name != newRigName:
+                        raise Exception()
+                    break
+            #self.linkedGroup.objects[sourceRig].name = newRigName
 
             for originalGroup in self.additional:
                 newName = "{0}.{1:0>3}".format(originalGroup, count)
