@@ -54,6 +54,18 @@ class GeoSocket(NodeSocket):
         return (0.125, 0.125, 0.575, 1.0)
 
 
+class ObjSocket(NodeSocket):
+    """Geo node socket type"""
+    bl_idname = 'ObjSocketType'
+    bl_label = 'Obj Node Socket'
+
+    def draw(self, context, layout, node, text):
+        layout.label(text)
+
+    def draw_color(self, context, node):
+        return (0.575, 0.125, 0.125, 1.0)
+
+
 class TemplateSocket(NodeSocket):
     """Template node socket type"""
     bl_idname = 'TemplateSocketType'
@@ -118,7 +130,7 @@ class AddToGroupNode(CrowdMasterAGenTreeNode):
 
 
 class ObjectInputNode(CrowdMasterAGenTreeNode):
-    '''The object input node'''
+    """The object input node"""
     bl_idname = 'ObjectInputNodeType'
     bl_label = 'Object'
     bl_icon = 'SOUND'
@@ -127,8 +139,7 @@ class ObjectInputNode(CrowdMasterAGenTreeNode):
     inputObject = StringProperty(name="Object")
 
     def init(self, context):
-        self.outputs.new('GeoSocketType', "Geometry")
-        # self.outputs.new('VectorSocketType', "Location")
+        self.outputs.new('ObjSocketType', "Geometry")
 
     def draw_buttons(self, context, layout):
         layout.prop_search(self, "inputObject", context.scene, "objects")
@@ -265,6 +276,30 @@ class GeoSwitchNode(CrowdMasterAGenTreeNode):
         return {"switchAmout": self.switchAmount}
 
 
+class ObjSwitchNode(CrowdMasterAGenTreeNode):
+    """The obj switch node"""
+    bl_idname = 'ObjSwitchNodeType'
+    bl_label = 'Obj Switch'
+    bl_icon = 'SOUND'
+
+    switchAmount = FloatProperty(
+        name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
+
+    def init(self, context):
+        self.inputs.new('ObjSocketType', "Object 1")
+        self.inputs.new('ObjSocketType', "Object 2")
+        self.inputs[0].link_limit = 1
+        self.inputs[1].link_limit = 1
+
+        self.outputs.new('ObjSocketType', "Objects")
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "switchAmount")
+
+    def getSettings(self):
+        return {"switchAmout": self.switchAmount}
+
+
 class TemplateSwitchNode(CrowdMasterAGenTreeNode):
     """The template switch node"""
     bl_idname = 'TemplateSwitchNodeType'
@@ -310,7 +345,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
-        self.inputs.new('GeoSocketType', "Child Object")
+        self.inputs.new('ObjSocketType', "Child Object")
         self.inputs[0].link_limit = 1
         self.inputs[1].link_limit = 1
 
@@ -1178,11 +1213,14 @@ class CrowdMasterAGenCategories(NodeCategory):
 
 
 agen_node_categories = [
+    CrowdMasterAGenCategories("objects", "Objects", items=[
+        NodeItem("ObjectInputNodeType"),
+        NodeItem("ObjSwitchNodeType"),
+    ]),
     CrowdMasterAGenCategories("geometry", "Geometry", items=[
         NodeItem("GroupInputNodeType"),
         NodeItem("LinkGroupNodeType"),
         NodeItem("ModifyBoneNodeType"),
-        NodeItem("ObjectInputNodeType"),
         NodeItem("ParentNodeType"),
         NodeItem("GeoSwitchNodeType", label="Switch"),
         NodeItem("RandomMaterialNodeType"),
@@ -1221,6 +1259,7 @@ agen_node_categories = [
 def register():
     bpy.utils.register_class(CrowdMasterAGenTree)
     bpy.utils.register_class(GeoSocket)
+    bpy.utils.register_class(ObjSocket)
     bpy.utils.register_class(TemplateSocket)
 
     bpy.utils.register_class(GenerateNode)
@@ -1231,6 +1270,7 @@ def register():
     bpy.utils.register_class(LinkGroupNode)
     bpy.utils.register_class(ModifyBoneNode)
     bpy.utils.register_class(GeoSwitchNode)
+    bpy.utils.register_class(ObjSwitchNode)
     bpy.utils.register_class(TemplateSwitchNode)
     bpy.utils.register_class(ParentNode)
     bpy.utils.register_class(material_entry)
@@ -1266,6 +1306,7 @@ def unregister():
 
     bpy.utils.unregister_class(CrowdMasterAGenTree)
     bpy.utils.unregister_class(GeoSocket)
+    bpy.utils.unregister_class(ObjSocket)
     bpy.utils.unregister_class(TemplateSocket)
 
     bpy.utils.unregister_class(GenerateNode)
@@ -1276,6 +1317,7 @@ def unregister():
     bpy.utils.unregister_class(LinkGroupNode)
     bpy.utils.unregister_class(ModifyBoneNode)
     bpy.utils.unregister_class(GeoSwitchNode)
+    bpy.utils.unregister_class(ObjSwitchNode)
     bpy.utils.unregister_class(TemplateSwitchNode)
     bpy.utils.unregister_class(ParentNode)
     bpy.utils.unregister_class(material_entry)

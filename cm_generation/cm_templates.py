@@ -104,7 +104,7 @@ class TemplateRequest:
 class GeoTemplate(Template):
     """Abstract super class.
     GeoTemplates are a description of how to create some arrangement of
-     geometry"""
+     geometry and an armature"""
 
     def build(self, buildRequest):
         """Called when this GeoTemplate is being used to modify the scene"""
@@ -180,10 +180,56 @@ class GeoReturn:
         self.modifyBones = {}
 
 
+class ObjTemplate(Template):
+    """Abstract super class.
+    ObjTemplates are a description of how to create some arrangement of
+     geometry"""
+
+    def build(self, buildRequest):
+        """Called when this GeoTemplate is being used to modify the scene"""
+        pass
+
+class ObjRequest(TemplateRequest):
+    """Passed between the children of ObjTemplate"""
+
+    def __init__(self):
+        TemplateRequest.__init__(self)
+        self.deferGeo = False
+        self.group = None
+        self.pos = None
+        self.rot = None
+        self.scale = None
+        self.tags = None
+        self.cm_group = None
+        self.materials = {}
+        # Key: material to replace. Value: material to replace with
+        self.seed = None
+
+    def copy(self):
+        new = ObjRequest()
+        new.pos = self.pos
+        new.rot = self.rot
+        new.scale = self.scale
+        new.tags = self.tags.copy()
+        new.cm_group = self.cm_group
+        new.group = self.group
+        new.materials = self.materials.copy()
+        new.deferGeo = self.deferGeo
+        new.seed = self.seed
+        return new
+
+
+class ObjReturn:
+    """Object that is passed back by geo template nodes"""
+
+    def __init__(self, obj):
+        self.obj = obj
+
+
 # ==================== End of base classes ====================
 
 
-class GeoTemplateOBJECT(GeoTemplate):
+class GeoTemplateOBJECT(ObjTemplate):
     """For placing objects into the scene"""
 
     def build(self, buildRequest):
@@ -201,7 +247,7 @@ class GeoTemplateOBJECT(GeoTemplate):
                     m.material = bpy.data.materials[replacement]
         buildRequest.group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
-        return GeoReturn(cp)
+        return ObjReturn(cp)
 
     def check(self):
         nobject = self.settings["inputObject"]
@@ -566,12 +612,33 @@ class GeoTemplateSWITCH(GeoTemplate):
         return True
 
 
+class ObjTemplateSWITCH(ObjTemplate):
+    """Randomly (biased by "switchAmout") pick which of the inputs to use"""
+
+    def build(self, buildRequest):
+        if random.random() < self.settings["switchAmout"]:
+            return self.inputs["Object 1"].build(buildRequest)
+        else:
+            return self.inputs["Object 2"].build(buildRequest)
+
+    def check(self):
+        if "Object 1" not in self.inputs:
+            return False
+        if "Object 2" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Object 1"], ObjTemplate):
+            return False
+        if not isinstance(self.inputs["Object 2"], ObjTemplate):
+            return False
+        return True
+
+
 class GeoTemplatePARENT(GeoTemplate):
     """Attach a piece of geo to a bone from the parent geo"""
 
     def build(self, buildRequest):
         gretp = self.inputs["Parent Group"].build(buildRequest.copy())
-        parent = gretp.obj
+        parent = gretp.overwriteRig
         gret = self.inputs["Child Object"].build(buildRequest.copy())
         child = gret.obj
 
@@ -601,7 +668,7 @@ class GeoTemplatePARENT(GeoTemplate):
             return False
         if not isinstance(self.inputs["Parent Group"], GeoTemplate):
             return False
-        if not isinstance(self.inputs["Child Object"], GeoTemplate):
+        if not isinstance(self.inputs["Child Object"], ObjTemplate):
             return False
         # TODO check that object is in parent group
         return True
@@ -1478,6 +1545,7 @@ templates = OrderedDict([
     ("LinkGroupNodeType", GeoTemplateLINKGROUPNODE),
     ("ModifyBoneNodeType", GeoTemplateMODIFYBONE),
     ("GeoSwitchNodeType", GeoTemplateSWITCH),
+    ("ObjSwitchNodeType", ObjTemplateSWITCH),
     ("AddToGroupNodeType", TemplateADDTOGROUP),
     ("TemplateSwitchNodeType", TemplateSWITCH),
     ("ParentNodeType", GeoTemplatePARENT),
