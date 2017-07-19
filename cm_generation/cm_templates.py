@@ -540,7 +540,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             newFileName = "{0}_{1:0>3}.blend".format(source, count)
             newFilePath = os.path.join(dupDir, newFileName)
             bpy.data.libraries.write(newFilePath, datablocks, relative_remap=True,
-                                     fake_user=True, compress=False)
+                                     fake_user=True, compress=True)
 
             self.linkedGroup.name = sourceGroup
             self.linkedGroup.objects[newRigName].name = sourceRig
