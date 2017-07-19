@@ -172,6 +172,8 @@ class SCENE_OT_agent_nodes_remove_defer_geo(Operator):
     def execute(self, context):
         bpy.context.scene.frame_current = bpy.context.scene.cm_sim_start_frame
         for agentGroup in bpy.context.scene.cm_groups:
+            if agentGroup.groupType != "auto":
+                continue
             for agentType in agentGroup.agentTypes:
                 for agent in agentType.agents:
                     obj = bpy.context.scene.objects[agent.name]
