@@ -310,16 +310,19 @@ class LogicAND(Neuron):
                     if inAll:
                         results[i] = into[i]
 
-        if settings["SingleOutput"]:
-            total = 1
-            if settings["Method"] == "MUL":
-                for k, v in results.items():
-                    total *= v
-            else:  # Method == "MIN"
-                total = min(results.values()) if len(results) > 0 else 0
-            return {"None": total}
+        if len(results) > 0:
+            if settings["SingleOutput"]:
+                total = 1
+                if settings["Method"] == "MUL":
+                    for k, v in results.items():
+                        total *= v
+                else:  # Method == "MIN"
+                    total = min(results.values()) if len(results) > 0 else 0
+                return {"None": total}
+            else:
+                return results
         else:
-            return results
+            return {}
 
 
 class LogicOR(Neuron):
@@ -666,6 +669,7 @@ class StateAction(State):
 
     def __init__(self, *args, **kwargs):
         self.action = None
+        self.strip = None
         State.__init__(self, *args, **kwargs)
 
     def isGroup(self):
@@ -688,6 +692,7 @@ class StateAction(State):
                 self.strip = tr.strips.new("", currentFrame, action)
                 self.strip.extrapolation = 'NOTHING'
                 self.strip.use_auto_blend = True
+                self.strip.mute = self.brain.freeze
             self.length = actionobj.length
 
         self.currentAction = self.action

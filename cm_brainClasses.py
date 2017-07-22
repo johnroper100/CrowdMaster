@@ -21,6 +21,7 @@ import random
 import time
 
 import bpy
+from bpy.props import BoolProperty
 import mathutils
 
 from . import cm_timings
@@ -35,7 +36,7 @@ class Neuron():
         self.inputs = []  # type: List[str] - strings are names of neurons
         self.result = None  # type: None | ImpulseContainer - Cache for current
         self.resultLog = [(0, 0, 0), (0, 0, 0)]  # type: List[(int, int, int)]
-        self.fillOutput = bpy.props.BoolProperty(default=True)
+        self.fillOutput = BoolProperty(default=True)
         self.bpyNode = bpyNode  # type: cm_bpyNodes.LogicNode
         self.settings = {}  # type: Dict[str, bpy.props.*]
         self.dependantOn = []  # type: List[str] - strings are names of neurons
@@ -67,14 +68,16 @@ class Neuron():
                 input in not a dictionary then it is made into one"""
                 if got is not None:
                     inps.append(got)
-            if preferences.show_debug_options:
+            if preferences.show_debug_options and preferences.show_debug_timings:
                 coreT = time.time()
             output = self.core(inps, self.settings)
             if preferences.show_debug_options and preferences.show_debug_timings:
                 cm_timings.coreTimes[self.__class__.__name__] += time.time() - \
                     coreT
                 cm_timings.coreNumber[self.__class__.__name__] += 1
-            if not (isinstance(output, dict) or output is None):
+            if output is None:
+                output = {}
+            elif not (isinstance(output, dict) or output is None):
                 output = {"None": output}
         else:
             output = None
@@ -272,13 +275,14 @@ class State:
 class Brain():
     """An executable brain object. One created per agent"""
 
-    def __init__(self, sim, userid):
+    def __init__(self, sim, userid, freezeAnimation):
         self.userid = userid
         self.sim = sim
         self.lvars = self.sim.lvars
         self.outvars = {}
         self.tags = {}
         self.isActiveSelection = False
+        self.freeze = freezeAnimation
 
         self.currentState = None
         self.startState = None

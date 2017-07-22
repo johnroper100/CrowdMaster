@@ -20,7 +20,7 @@
 bl_info = {
     "name": "CrowdMaster",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 3, 0),
+    "version": (1, 3, 1),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
     "description": "Crowd generation and simulation for Blender 3D",
@@ -31,9 +31,8 @@ bl_info = {
 }
 
 import bpy
-from bpy.props import (BoolProperty, CollectionProperty, PointerProperty,
-                       StringProperty)
-from bpy.types import Operator, Panel, PropertyGroup, UIList
+from bpy.props import CollectionProperty, StringProperty
+from bpy.types import Operator, Panel, UIList
 
 from . import addon_updater_ops, cm_prefs
 from .cm_blenderData import initialTagProperty, modifyBoneProperty
@@ -48,9 +47,19 @@ class SCENE_UL_group(UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
-        layout.label(item.name)
+        #layout.label(item.name)
+        op = layout.operator(SCENE_OT_CrowdMasterSelectGroup.bl_idname,
+                             text=item.name)
+        op.groupName = item.name
         layout.label(str(item.totalAgents) + " | " + item.groupType)
-        layout.label("Frozen" if item.freezePlacement else "Unlocked")
+        if item.freezePlacement:
+            if item.freezeAnimation:
+                label = "Anim frozen"
+            else:
+                label = "Geo frozen"
+        else:
+            label = "Unlocked"
+        layout.label(label)
 
 
 class SCENE_UL_agent_type(UIList):
@@ -83,8 +92,9 @@ class SCENE_OT_cm_groups_reset(Operator):
             for agent in agentType.agents:
                 if group.groupType == "auto":
                     if group.freezePlacement:
-                        if agent.name in scene.objects:
-                            scene.objects[agent.name].animation_data_clear()
+                        if not group.freezeAnimation:
+                            if agent.name in scene.objects:
+                                scene.objects[agent.name].animation_data_clear()
                     else:
                         if agent.geoGroup in bpy.data.groups:
                             for obj in bpy.data.groups[agent.geoGroup].objects:
@@ -92,9 +102,10 @@ class SCENE_OT_cm_groups_reset(Operator):
                             bpy.data.groups.remove(bpy.data.groups[agent.geoGroup],
                                                    do_unlink=True)
                 elif group.groupType == "manual":
-                    if agent.name in scene.objects:
-                        scene.objects[agent.name].animation_data_clear()
-        if not group.freezePlacement:
+                    if not group.freezeAnimation:
+                        if agent.name in scene.objects:
+                            scene.objects[agent.name].animation_data_clear()
+        if not group.freezePlacement and group.groupType == "auto":
             bpy.ops.object.delete(use_global=True)
             groupIndex = scene.cm_groups.find(self.groupName)
             scene.cm_groups.remove(groupIndex)
@@ -182,11 +193,19 @@ class SCENE_OT_cm_agent_add_selected(Operator):
             at.name = self.brainType
             ty = group.agentTypes.find(at.name)
         agentType = group.agentTypes[ty]
+
+        if not self.groupName in bpy.data.groups:
+            bpy.ops.group.create(name=self.groupName)
         for obj in context.selected_objects:
+            bpy.context.scene.objects[obj.name].select=True
+            bpy.ops.object.group_link(group=self.groupName)
+            bpy.context.scene.objects[obj.name].select=False
+
             inGroup = agentType.agents.find(obj.name)
             if inGroup == -1:
                 newAgent = agentType.agents.add()
                 newAgent.name = obj.name
+                newAgent.geoGroup = self.groupName
                 group.totalAgents += 1
 
         return {'FINISHED'}
@@ -214,11 +233,11 @@ class SCENE_OT_cm_start(Operator):
         global customRLines
 
         preferences = context.user_preferences.addons[__package__].preferences
-        if (bpy.data.is_dirty) and (preferences.ask_to_save):
+        if (preferences.ask_to_save) and (bpy.data.is_dirty):
             self.report({'ERROR'}, "You must save your file first!")
             return {'CANCELLED'}
 
-        customSyncMode = bpy.context.scene.sync_mode
+        customSyncMode = scene.sync_mode
         bpy.context.scene.sync_mode = 'NONE'
 
         if bpy.context.screen is not None:
@@ -229,7 +248,7 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_outline_selected = False
                     area.spaces[0].show_relationship_lines = False
 
-        scene.frame_current = scene.frame_start
+        scene.frame_current = scene.cm_sim_start_frame
 
         global sim
         if "sim" in globals():
@@ -315,11 +334,11 @@ class SCENE_PT_CrowdMaster(Panel):
         else:
             row.operator(SCENE_OT_cm_stop.bl_idname, icon='CANCEL')
 
-        row = layout.row()
-        row.separator()
+        row = layout.row(align=True)
+        row.prop(scene, "cm_sim_start_frame")
+        row.prop(scene, "cm_sim_end_frame")
 
         row = layout.row()
-        row.prop(scene, "cm_linked_file_dir")
         row.separator()
 
         row = layout.row()
@@ -334,11 +353,6 @@ class SCENE_PT_CrowdMaster(Panel):
             row = box.row()
             row.scale_y = 1.5
             row.operator("scene.cm_place_deferred_geo", icon="EDITMODE_HLT")
-
-            box = layout.box()
-            row = box.row()
-            row.scale_y = 1.5
-            row.operator("scene.cm_convert_to_bound_box", icon="BBOX")
 
             box = layout.box()
             row = box.row()
@@ -371,8 +385,8 @@ class SCENE_PT_CrowdMasterAgents(Panel):
         preferences = context.user_preferences.addons[__package__].preferences
 
         row = layout.row()
-        row.label("Group name")
-        row.label("Number | origin")
+        row.label("Group Name")
+        row.label("Number | Origin")
         row.label("Status")
 
         layout.template_list("SCENE_UL_group", "", scene,
@@ -394,11 +408,15 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 box.template_list("SCENE_UL_agent_type", "", group,
                                   "agentTypes", scene, "cm_view_details_index")
 
-                if group.name == "cm_allAgents":
-                    box.label("cm_allAgents: To freeze use Add To Group node")
+                if group.name == "cm":
+                    box.label("cm: To freeze use add to group")
                 else:
-                    box.prop(group, "freezePlacement")
-
+                    if group.groupType == "auto":
+                        box.prop(group, "freezePlacement")
+                        if group.freezePlacement:
+                            box.prop(group, "freezeAnimation")
+                    else:
+                        box.prop(group, "freezeAnimation")
                 if preferences.use_custom_icons:
                     op = box.operator(
                         SCENE_OT_cm_groups_reset.bl_idname, icon_value=cicon('reset'))
@@ -407,6 +425,45 @@ class SCENE_PT_CrowdMasterAgents(Panel):
                 op.groupName = group.name
             else:
                 box.label("No group selected")
+
+
+class SCENE_OT_CrowdMasterSelectGroup(Operator):
+    """Select only the objects that are part of an agent"""
+    bl_idname = "scene.cm_groups_select"
+    bl_label = "Select Group"
+
+    groupName = StringProperty()
+
+    @classmethod
+    def poll(cls, context):
+        return bpy.context.object is None or bpy.context.object.mode == "OBJECT"
+
+    def invoke(self, context, event):
+        scene = context.scene
+        group = scene.cm_groups.get(self.groupName)
+
+        allSelected = True
+
+        for gtype in group.agentTypes:
+            for agent in gtype.agents:
+                agGroup = bpy.data.groups[agent.geoGroup]
+                for obj in agGroup.objects:
+                    allSelected &= obj.select
+
+        if not event.shift:
+            for obj in bpy.context.selected_objects:
+                if obj.select:
+                    obj.select = False
+
+        setTo = not allSelected
+
+        for gtype in group.agentTypes:
+            for agent in gtype.agents:
+                agGroup = bpy.data.groups[agent.geoGroup]
+                for obj in agGroup.objects:
+                    obj.select = setTo
+
+        return {"FINISHED"}
 
 
 class SCENE_PT_CrowdMasterManualAgents(Panel):
@@ -455,6 +512,10 @@ def register():
     from . import cm_documentation
     cm_documentation.register()
 
+    global cm_translations
+    from . import cm_translations
+    cm_translations.register()
+
     register_icons()
 
     addon_updater_ops.register(bl_info)
@@ -472,6 +533,7 @@ def register():
     bpy.utils.register_class(SCENE_OT_cm_stop)
     bpy.utils.register_class(SCENE_PT_CrowdMaster)
     bpy.utils.register_class(SCENE_PT_CrowdMasterAgents)
+    bpy.utils.register_class(SCENE_OT_CrowdMasterSelectGroup)
     bpy.utils.register_class(SCENE_PT_CrowdMasterManualAgents)
 
     global Simulation
@@ -510,6 +572,10 @@ def register():
     from . import cm_tests
     cm_tests.register()
 
+    global cm_pieMenus
+    from . import cm_pieMenus
+    cm_pieMenus.register()
+
     if nodeTreeSetFakeUser not in bpy.app.handlers.save_pre:
         bpy.app.handlers.save_pre.append(nodeTreeSetFakeUser)
 
@@ -526,6 +592,7 @@ def unregister():
     bpy.utils.unregister_class(SCENE_OT_cm_stop)
     bpy.utils.unregister_class(SCENE_PT_CrowdMaster)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterAgents)
+    bpy.utils.unregister_class(SCENE_OT_CrowdMasterSelectGroup)
     bpy.utils.unregister_class(SCENE_PT_CrowdMasterManualAgents)
 
     action_unregister()
@@ -542,12 +609,15 @@ def unregister():
     cm_channels.unregister()
 
     cm_tests.unregister()
+    
+    cm_pieMenus.unregister()
 
     if "sim" in globals():
         if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
             bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
+    cm_translations.unregister()
 
     if nodeTreeSetFakeUser in bpy.app.handlers.save_pre:
         bpy.app.handlers.save_pre.remove(nodeTreeSetFakeUser)

@@ -24,14 +24,40 @@ from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
-class modifyBoneProperty(bpy.types.PropertyGroup):
+def updateStartFrame(self, context):
+    start = context.scene.cm_sim_start_frame
+    end = context.scene.cm_sim_end_frame
+    if start >= end:
+        start = end
+
+
+def updateEndFrame(self, context):
+    start = context.scene.cm_sim_start_frame
+    end = context.scene.cm_sim_end_frame
+    if end <= start:
+        end = start
+
+
+bpy.types.Scene.cm_sim_start_frame = IntProperty(
+    name="Simulation Start Frame",
+    default=1,
+    update=updateStartFrame,
+)
+bpy.types.Scene.cm_sim_end_frame = IntProperty(
+    name="Simulation End Frame",
+    default=250,
+    update=updateEndFrame,
+)
+
+
+class modifyBoneProperty(PropertyGroup):
     """For storing bone - tag pairs"""
     # name - Name of the bone
     tag = StringProperty()  # Name of tag to attach value to
     attribute = StringProperty()
 
 
-class initialTagProperty(bpy.types.PropertyGroup):
+class initialTagProperty(PropertyGroup):
     """For storing a dictionary like structure of initial tags."""
     # name - Name of the tag
     value = FloatProperty()
@@ -63,6 +89,7 @@ class group_entry(PropertyGroup):
     groupType = EnumProperty(items=[("auto", "Auto", "Created by nodes"),
                                     ("manual", "Manual", "Manually added")], default="auto")
     freezePlacement = BoolProperty(name="Freeze Placement", default=False)
+    freezeAnimation = BoolProperty(name="Freeze Animation", default=False)
 
 
 class manual_props(PropertyGroup):
@@ -77,6 +104,7 @@ def registerTypes():
     bpy.utils.register_class(agent_entry)
     bpy.utils.register_class(agent_type_entry)
     bpy.utils.register_class(group_entry)
+
     bpy.types.Scene.cm_groups = CollectionProperty(type=group_entry)
     bpy.types.Scene.cm_groups_index = IntProperty()
 
@@ -87,8 +115,6 @@ def registerTypes():
 
     bpy.utils.register_class(manual_props)
     bpy.types.Scene.cm_manual = PointerProperty(type=manual_props)
-    bpy.types.Scene.cm_linked_file_dir = StringProperty(name="Linked File Directory",
-                                                        subtype='FILE_PATH')
     bpy.types.Scene.cm_switch_dupli_group_suffix = StringProperty(
         name="Dupli Group Suffix")
     bpy.types.Scene.cm_switch_dupli_group_target = StringProperty(
@@ -104,7 +130,10 @@ def unregisterAllTypes():
 
     bpy.utils.unregister_class(manual_props)
 
+    del bpy.types.Scene.cm_groups
+    del bpy.types.Scene.cm_groups_index
+    del bpy.types.Scene.cm_view_details
+    del bpy.types.Scene.cm_view_details_index
     del bpy.types.Scene.cm_manual
-    del bpy.types.Scene.cm_linked_file_dir
-    del bpy.types.Scene.cm_switch_proxy_suffix
-    del bpy.types.Scene.cm_switch_proxy_target
+    del bpy.types.Scene.cm_switch_dupli_group_suffix
+    del bpy.types.Scene.cm_switch_dupli_group_target

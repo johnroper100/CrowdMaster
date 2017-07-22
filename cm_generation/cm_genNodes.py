@@ -19,6 +19,8 @@
 
 import textwrap
 
+import os
+
 import bpy
 import nodeitems_utils
 from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
@@ -154,23 +156,33 @@ class GroupInputNode(CrowdMasterAGenTreeNode):
         return {"inputGroup": self.inputGroup}
 
 
+def updateDupDir(self, context):
+    if self.duplicatesDirectory == "":
+        common = os.path.split(self.groupFile)[0]
+        self.duplicatesDirectory = os.path.join(common, "cm_duplicates")
+
+
 class LinkGroupNode(CrowdMasterAGenTreeNode):
     bl_idname = 'LinkGroupNodeType'
     bl_label = 'Link Armature'
     bl_icon = 'SOUND'
     bl_width_default = 320.0
 
-    groupFile = StringProperty(name="Group File", subtype='FILE_PATH')
+    groupFile = StringProperty(name="Group File", subtype="FILE_PATH",
+                               update=updateDupDir)
     groupName = StringProperty(name="Group Name")
     rigObject = StringProperty(name="Rig Object")
     additionalGroup = StringProperty(name="Additional Groups")
     constrainBone = StringProperty(name="Constrain Bone")
+    duplicatesDirectory = StringProperty(name="Duplicates Directory",
+                                         subtype="FILE_PATH")
 
     def init(self, context):
         self.outputs.new('GeoSocketType', "Objects")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "groupFile")
+        layout.prop(self, "duplicatesDirectory")
         layout.prop(self, "groupName")
         layout.prop(self, "rigObject")
         layout.prop(self, "additionalGroup")
@@ -181,7 +193,8 @@ class LinkGroupNode(CrowdMasterAGenTreeNode):
                 "groupName": self.groupName,
                 "rigObject": self.rigObject,
                 "additionalGroup": self.additionalGroup,
-                "constrainBone": self.constrainBone}
+                "constrainBone": self.constrainBone,
+                "duplicatesDirectory": self.duplicatesDirectory}
 
 
 class ConstrainBoneNode(CrowdMasterAGenTreeNode):
@@ -289,8 +302,17 @@ class ParentNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     bl_width_default = 350.0
 
-    parentTo = StringProperty(name="Parent To (Bone)",
+    parentMode = EnumProperty(name="Parent Mode",
+                              items=[
+                                  ("bone", "Bone", ""),
+                                  ("armature", "Armature", "")
+                              ])
+
+    parentTo = StringProperty(name="Bone Name",
                               description="The bone you want to parent to")
+    
+    bindToVGroups = BoolProperty(name="Vertex Groups", default=True)
+    bindToBEnvelopes = BoolProperty(name="Bone Envelopes")
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Parent Group")
@@ -301,10 +323,20 @@ class ParentNode(CrowdMasterAGenTreeNode):
         self.outputs.new('GeoSocketType', "Objects")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "parentTo")
+        layout.prop(self, "parentMode", expand=True)
+        if self.parentMode == "bone":
+            layout.prop(self, "parentTo")
+        else:
+            layout.label("Bind To:")
+            row = layout.row(align=True)
+            row.prop(self, "bindToVGroups")
+            row.prop(self, "bindToBEnvelopes")
 
     def getSettings(self):
-        return {"parentTo": self.parentTo}
+        return {"parentTo": self.parentTo,
+                "parentMode": self.parentMode,
+                "bindToVGroups": self.bindToVGroups,
+                "bindToBEnvelops": self.bindToBEnvelopes}
 
 
 class material_entry(PropertyGroup):
@@ -358,7 +390,7 @@ class RandomMaterialNode(CrowdMasterAGenTreeNode):
     bl_width_default = 300
 
     targetMaterial = StringProperty(
-        name="Target material", description="The name of the material to be randomised")
+        name="Target Material", description="The name of the material to be randomised")
     materialList = CollectionProperty(type=material_entry)
     materialIndex = IntProperty()
 
@@ -740,7 +772,11 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'VCOLPositionNodeType'
     bl_label = 'Vertex Colors'
     bl_icon = 'SOUND'
-    bl_width_default = 250.0
+    bl_width_default = 260.0
+
+    paintMode = EnumProperty(name="Paint Mode", description="Decide how the node acts", items=[
+        ('place', "Place", 'Place agents based on the vertex colors'),
+        ('edit', "Edit", 'Edit the positions inputter from other nodes')])
 
     guideMesh = StringProperty(name="Guide Mesh",
                                description="The mesh to scatter points over")
@@ -755,6 +791,10 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
                                  default=[1.0, 1.0, 1.0],
                                  min=0.0,
                                  max=1.0)
+    
+    invert = BoolProperty(name="Invert",
+                         description="Place agents outside of the painted area",
+                         default=False)
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",
@@ -783,23 +823,34 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        layout.prop(self, "paintMode", expand=True)
+
+        row = layout.row(align=True)
+        row.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        if self.invert:
+            row.prop(self, "invert", icon="STICKY_UVS_VERT", icon_only=True)
+        else:
+            row.prop(self, "invert", icon="STICKY_UVS_LOC", icon_only=True)
 
         row = layout.row(align=True)
         row.prop(self, "vcols")
         row.prop(self, "vcolor", text="")
-        layout.prop(self, "noToPlace")
-        layout.prop(self, "overwritePosition")
 
-        layout.prop(self, "relax")
-        if self.relax:
-            layout.prop(self, "relaxIterations")
-            layout.prop(self, "relaxRadius")
+        if self.paintMode == 'place':
+            layout.prop(self, "noToPlace")
+            layout.prop(self, "overwritePosition")
+
+            layout.prop(self, "relax")
+            if self.relax:
+                layout.prop(self, "relaxIterations")
+                layout.prop(self, "relaxRadius")
 
     def getSettings(self):
-        return {"vcols": self.vcols,
+        return {"paintMode": self.paintMode,
+                "vcols": self.vcols,
                 "vcolor": self.vcolor,
                 "guideMesh": self.guideMesh,
+                "invert": self.invert,
                 "noToPlace": self.noToPlace,
                 "overwritePosition": self.overwritePosition,
                 "relax": self.relax,
@@ -831,6 +882,10 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
                                 description="Maximum radius for relax interactions",
                                 default=1, min=0)
 
+    groupByMeshIslands = BoolProperty(name="Group By Mesh Islands",
+                                      description="Place agents into groups based on the path mesh",
+                                      default=False)
+
     def init(self, context):
         self.inputs.new('TemplateSocketType', "Template")
         self.inputs[0].link_limit = 1
@@ -847,12 +902,16 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
             layout.prop(self, "relaxIterations")
             layout.prop(self, "relaxRadius")
 
+        layout.prop(self, "groupByMeshIslands")
+
     def getSettings(self):
         return {"pathName": self.pathName,
                 "noToPlace": self.noToPlace,
                 "relax": self.relax,
                 "relaxIterations": self.relaxIterations,
-                "relaxRadius": self.relaxRadius}
+                "relaxRadius": self.relaxRadius,
+                "groupByMeshIsland": self.groupByMeshIslands,
+                "nodeName": self.name}
 
 
 class FormationPositionNode(CrowdMasterAGenTreeNode):
@@ -1090,7 +1149,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
         text.write(self.text)
 
 
-class GenNoteTextFromClipboard(bpy.types.Operator):
+class GenNoteTextFromClipboard(Operator):
     """Grab whatever text is in the clipboard"""
     bl_idname = "node.gen_note_from_clipboard"
     bl_label = "Grab Text From Clipboard"
@@ -1106,7 +1165,7 @@ class GenNoteTextFromClipboard(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class GenNoteClear(bpy.types.Operator):
+class GenNoteClear(Operator):
     """Clear Note Node"""
     bl_idname = "node.gen_note_clear"
     bl_label = "Clear Text"

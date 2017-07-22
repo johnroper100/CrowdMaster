@@ -18,7 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+from bpy.props import (CollectionProperty, EnumProperty,
                        IntProperty, PointerProperty, StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 

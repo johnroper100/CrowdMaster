@@ -34,7 +34,7 @@ class Simulation:
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         self.agents = {}
-        self.framelast = 1
+        self.framelast = bpy.context.scene.cm_sim_start_frame
         self.compbrains = {}
         Noise = chan.Noise(self)
         Sound = chan.Sound(self)
@@ -84,13 +84,14 @@ class Simulation:
                     self.syncManager.actionPair(t, s)
 
     def newagent(self, name, brain, rigOverwrite, constrainBone, initialTags,
-                 modifyBones):
+                 modifyBones, freezeAnimation):
         """Set up an agent"""
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
             ag = Agent(name, nGps[brain], self, rigOverwrite, constrainBone,
-                       tags=initialTags, modifyBones=modifyBones)
+                       tags=initialTags, modifyBones=modifyBones,
+                       freezeAnimation=freezeAnimation)
             self.agents[name] = ag
         else:
             if preferences.show_debug_options:
@@ -102,7 +103,7 @@ class Simulation:
             for ag in ty.agents:
                 self.newagent(ag.name, ty.name, ag.rigOverwrite,
                               ag.constrainBone, ag.initialTags,
-                              ag.modifyBones)
+                              ag.modifyBones, group.freezeAnimation)
 
     def step(self, scene):
         """Called when the next frame is moved to"""
@@ -110,7 +111,7 @@ class Simulation:
         if preferences.show_debug_options:
             t = time.time()
             print("NEWFRAME", bpy.context.scene.frame_current)
-            if preferences.show_debug_options and preferences.show_debug_timings:
+            if preferences.show_debug_timings:
                 if self.lastFrameTime is not None:
                     between = time.time() - self.lastFrameTime
                     cm_timings.simulation["betweenFrames"] += between
@@ -145,7 +146,10 @@ class Simulation:
 
     def frameChangeHandler(self, scene):
         """Given to Blender to call whenever the scene moves to a new frame"""
-        if self.framelast + 1 == bpy.context.scene.frame_current:
+        if bpy.context.scene.cm_sim_end_frame <= bpy.context.scene.frame_current:
+            self.stopFrameHandler()
+            bpy.ops.screen.animation_cancel(restore_frame=False)
+        elif self.framelast + 1 == bpy.context.scene.frame_current:
             self.framelast = bpy.context.scene.frame_current
             self.step(scene)
 

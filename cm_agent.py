@@ -31,12 +31,12 @@ class Agent:
     """Represents each of the agents in the scene."""
 
     def __init__(self, blenderid, nodeGroup, sim, rigOverwrite, constrainBone,
-                 tags=None, modifyBones=None):
+                 tags=None, modifyBones=None, freezeAnimation=False):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
         self.id = blenderid
-        self.brain = compileBrain(nodeGroup, sim, blenderid)
+        self.brain = compileBrain(nodeGroup, sim, blenderid, freezeAnimation)
         self.sim = sim
         self.external = {"id": self.id, "tags": {
             t.name: t.value for t in tags}}
@@ -44,6 +44,8 @@ class Agent:
         at the end of the frame so that the updated values can be accessed by
         other agents"""
         self.access = copy.deepcopy(self.external)
+
+        self.freezeAnimation = freezeAnimation
 
         self.rigOverwrite = rigOverwrite
         self.constrainBone = constrainBone
@@ -96,11 +98,12 @@ class Agent:
         self.globalVelocity = mathutils.Vector([0, 0, 0])
 
         """Clear out the nla"""
-        objs = bpy.data.objects
+        if not freezeAnimation:
+            objs = bpy.data.objects
 
-        objs[blenderid].animation_data_clear()
-        objs[blenderid].keyframe_insert(data_path="location", frame=1)
-        objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
+            objs[blenderid].animation_data_clear()
+            objs[blenderid].keyframe_insert(data_path="location", frame=1)
+            objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
@@ -176,6 +179,11 @@ class Agent:
         """Called in single thread after all agent.step() calls are done"""
         obj = bpy.data.objects[self.id]
         preferences = bpy.context.user_preferences.addons[__package__].preferences
+
+        self.access = copy.deepcopy(self.external)
+
+        if self.freezeAnimation:
+            return
 
         if preferences.show_debug_options:
             t = time.time()
@@ -298,8 +306,6 @@ class Agent:
                                 boneObj.keyframe_insert(data_path="rotation_euler",
                                                         index=2,
                                                         frame=bpy.context.scene.frame_current)
-
-        self.access = copy.deepcopy(self.external)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["applyOutput"] += time.time() - t

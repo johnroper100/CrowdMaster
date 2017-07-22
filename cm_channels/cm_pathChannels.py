@@ -22,7 +22,7 @@ import math
 import bmesh
 import bpy
 import mathutils
-from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+from bpy.props import (CollectionProperty, EnumProperty,
                        FloatProperty, IntProperty, PointerProperty,
                        StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
@@ -222,6 +222,8 @@ class Path(Mc):
 
             if laneSeparation is not None:
                 zaxis = Vector((0, 0, 1))
+                if isDirectional:
+                    laneSeparation = 0.0
                 sepVec = direc.cross(zaxis).normalized() * laneSeparation
 
             length = direc.length
@@ -307,7 +309,7 @@ class Path(Mc):
 
         pointTowards = nextVert * obj.matrix_world
 
-        return globalPos, pointTowards
+        return globalPos, pointTowards, nextIndex
 
     def calcRelativeTarget(self, pathEntry, lookahead):
         context = bpy.context

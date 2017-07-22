@@ -20,7 +20,7 @@
 import math
 import os
 import random
-import shutil
+import re
 from collections import OrderedDict
 from math import radians
 
@@ -72,7 +72,7 @@ class TemplateRequest():
         self.rot = Vector((0, 0, 0))
         self.scale = 1
         self.tags = {}
-        self.cm_group = "cm_allAgents"
+        self.cm_group = "cm"
 
         self.materials = {}
         # Key: material to replace. Value: material to replace with
@@ -105,9 +105,9 @@ class GeoTemplate(Template):
     GeoTemplates are a description of how to create some arrangement of
      geometry"""
 
-    def build(self, pos, rot, scale, group, deferGeo):
+    def build(self, buildRequest):
         """Called when this GeoTemplate is being used to modify the scene"""
-        self.buildCount += 1
+        pass
 
 
 class GeoRequest(TemplateRequest):
@@ -165,7 +165,11 @@ class GeoTemplateOBJECT(GeoTemplate):
         return GeoReturn(cp)
 
     def check(self):
-        return self.settings["inputObject"] in bpy.context.scene.objects
+        nobject = self.settings["inputObject"]
+        objects = bpy.context.scene.objects
+        if (nobject in objects) and (objects[nobject].type == 'MESH'):
+            return self.settings["inputObject"] in bpy.context.scene.objects
+        return False
 
 
 class GeoTemplateGROUP(GeoTemplate):
@@ -252,93 +256,11 @@ class GeoTemplateGROUP(GeoTemplate):
         return self.settings["inputGroup"] in bpy.data.groups
 
 
-def findUnusedGroup(searchDirectory, namePrefix, sourceGroup):
-    for group in bpy.data.groups:
-        if len(group.users_dupli_group) == 0 and group.name == sourceGroup:
-            if group.library is not None:
-                linkedFileName = os.path.split(group.library.filepath)[0]
-                partialPath = os.path.join(searchDirectory, namePrefix)
-                if linkedFileName[:len(partialPath)] == partialPath:
-                    return group
-    return False
-
-
-def findUnusedFile(searchDirectory, namePrefix, sourceGroup, additionalGroup):
-    usedBlends = []
-    for group in bpy.data.groups:
-        if len(group.users_dupli_group) > 0 and group.name == sourceGroup:
-            if group.library is not None:
-                partialPath, fileName = os.path.split(group.library.filepath)
-                linkedFileName = os.path.join(searchDirectory, namePrefix)
-                if os.path.normpath(searchDirectory) == os.path.normpath(partialPath):
-                    for f in fileName.split(","):
-                        usedBlends.append(f.strip())
-
-    dupFiles = os.listdir(searchDirectory)
-
-    for fileName in dupFiles:
-        if fileName[:len(namePrefix)] == namePrefix:
-            if fileName not in usedBlends:
-                unusedFile = os.path.join(searchDirectory, fileName)
-                with bpy.data.libraries.load(unusedFile, link=True) as (data_src, data_dst):
-                    data_dst.groups = [sourceGroup]
-                    if additionalGroup != "":
-                        data_dst.groups.append(additionalGroup)
-                return data_dst.groups[0], unusedFile
-    return False, None
-
-
-def duplicateProxyLink(dupDir, sourceBlend, sourceGroup, sourceRig,
-                       additionalGroup):
-    if not os.path.exists(dupDir):
-        os.makedirs(dupDir)
-
-    newNamePrefix = "cm_" + os.path.split(sourceBlend)[1][:-6]
-
-    dupliGroup = findUnusedGroup(dupDir, newNamePrefix, sourceGroup)
-
-    if not dupliGroup:
-        dupliGroup, newName = findUnusedFile(dupDir, newNamePrefix, sourceGroup,
-                                             additionalGroup)
-
-    if not dupliGroup:
-        existingFiles = os.listdir(dupDir)
-        count = 0
-        while newNamePrefix + "_" + str(count) + ".blend" in existingFiles:
-            count += 1
-        newName = newNamePrefix + "_" + str(count) + ".blend"
-        newfilepath = os.path.join(dupDir, newName)
-
-        shutil.copyfile(sourceBlend, newfilepath)
-
-        # append all groups from the .blend file
-        with bpy.data.libraries.load(newfilepath, link=True) as (data_src, data_dst):
-            data_dst.groups = [sourceGroup]
-            if additionalGroup != "":
-                data_dst.groups.append(additionalGroup)
-
-        dupliGroup = data_dst.groups[0]
-
-    # add the group instance to the scene
-    scene = bpy.context.scene
-    ob = bpy.data.objects.new(newName, None)
-    # data_dst.groups[0].name = "cm_" + newName + newName
-    ob.dupli_group = dupliGroup
-    ob.dupli_type = 'GROUP'
-    scene.objects.link(ob)
-
-    activeStore = bpy.context.scene.objects.active
-    bpy.context.scene.objects.active = ob
-
-    bpy.ops.object.proxy_make(object=sourceRig)
-    rigObj = bpy.context.scene.objects.active
-
-    bpy.context.scene.objects.active = activeStore
-
-    return ob, rigObj
-
-
 class GeoTemplateLINKGROUPNODE(GeoTemplate):
+    def __init__(self, *args):
+        GeoTemplate.__init__(self, *args)
+        self.linkedGroup = None
+
     def build(self, buildRequest):
         blendfile = os.path.split(bpy.data.filepath)[0]
         for d in self.settings["groupFile"][2:].split("/"):
@@ -348,7 +270,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 blendfile = os.path.join(blendfile, d)
 
         dupDir = os.path.split(bpy.data.filepath)[0]
-        for d in bpy.context.scene.cm_linked_file_dir[2:].split("/"):
+        for d in self.settings["duplicatesDirectory"][2:].split("/"):
             if d == "..":
                 dupDir = os.path.split(dupDir)[0]
             else:
@@ -358,8 +280,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         rigObject = self.settings["rigObject"]
         additionalGroup = self.settings["additionalGroup"]
 
-        newObj, newRig = duplicateProxyLink(dupDir, blendfile, group, rigObject,
-                                            additionalGroup)
+        newObj, newRig = self.duplicateProxyLink(dupDir, blendfile, group, rigObject,
+                                                 additionalGroup)
         buildRequest.group.objects.link(newObj)
         buildRequest.group.objects.link(newRig)
 
@@ -371,7 +293,97 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         return gret
 
     def check(self):
-        return True
+        # TODO check if file exists
+        return self.settings["duplicatesDirectory"] != ""
+
+    def duplicateProxyLink(self, dupDir, sourceBlend, sourceGroup, sourceRig,
+                           additionalGroup):
+        dtGrp = bpy.data.groups
+        if not os.path.exists(dupDir):
+            os.makedirs(dupDir)
+
+        assetName = sourceGroup.split("-")[0]
+
+        dupliGroup = None
+
+        # Search for unused groups in the current file
+        count = 0
+        while "{0}.{1:0>3}".format(sourceGroup, count) in dtGrp and dupliGroup is None:
+            searchGroup = "{0}.{1:0>3}".format(sourceGroup, count)
+            if len(dtGrp[searchGroup].users_dupli_group) == 0:
+                dupliGroup = dtGrp[searchGroup]
+            else:
+                count += 1
+        # If no unused group is found then count has the value for what the
+        #   group should be.
+
+        # Search for unused duplicate file
+        if dupliGroup is None:
+            dupFiles = os.listdir(dupDir)
+            sourceDir, source = os.path.split(sourceBlend)
+            source = source[:-len(".blend")]
+            for fileName in dupFiles:
+                targetBlendName = "{0}_{1:0>3}.blend".format(source, count)
+                if targetBlendName in dupFiles:
+                    targetPath = os.path.join(dupDir, targetBlendName)
+                    with bpy.data.libraries.load(targetPath, link=True) as (data_src, data_dst):
+                        data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
+                        #if additionalGroup != "":
+                        #    data_dst.groups.append(additionalGroup)
+                    dupliGroup = data_dst.groups[0]
+
+        # Create a new file
+        if dupliGroup is None:
+            if self.linkedGroup is None:
+                if sourceGroup in bpy.data.groups:
+                    if bpy.data.groups[sourceGroup].library is None:
+                        self.linkedGroup = bpy.data.groups[sourceGroup]
+                    else:
+                        # TODO handle this properly
+                        raise Exception("CrowdMaster - Duplicate groups in file")
+                else:
+                    with bpy.data.libraries.load(sourceBlend, link=False) as (data_src, data_dst):
+                        data_dst.groups = [sourceGroup]
+                        #if additionalGroup != "":
+                        #    data_dst.groups.append(additionalGroup)
+
+                    self.linkedGroup = data_dst.groups[0]
+
+            self.linkedGroup.name = "{0}.{1:0>3}".format(sourceGroup, count)
+            newRigName = "{0}.{1:0>3}".format(sourceRig, count)
+            self.linkedGroup.objects[sourceRig].name = newRigName
+
+            datablocks = {self.linkedGroup}
+            newFileName = "{0}_{1:0>3}.blend".format(source, count)
+            newFilePath = os.path.join(dupDir, newFileName)
+            bpy.data.libraries.write(newFilePath, datablocks, relative_remap=True,
+                                     fake_user=True, compress=False)
+
+            self.linkedGroup.name = sourceGroup
+            self.linkedGroup.objects[newRigName].name = sourceRig
+
+            with bpy.data.libraries.load(newFilePath, link=True) as (data_src, data_dst):
+                data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
+                # if additionalGroup != "":
+                #    data_dst.groups.append(additionalGroup)
+            dupliGroup = data_dst.groups[0]
+
+        # add the group instance to the scene
+        scene = bpy.context.scene
+        ob = bpy.data.objects.new("cm_{0}.{1:0>3}".format(assetName, count), None)
+        ob.dupli_group = dupliGroup
+        ob.dupli_type = 'GROUP'
+        scene.objects.link(ob)
+
+        activeStore = bpy.context.scene.objects.active
+        bpy.context.scene.objects.active = ob
+
+        bpy.ops.object.proxy_make(object="{0}.{1:0>3}".format(sourceRig, count))
+        rigObj = bpy.context.scene.objects.active
+
+        bpy.context.scene.objects.active = activeStore
+
+        return ob, rigObj
 
 
 class GeoTemplateCONSTRAINBONE(GeoTemplate):
@@ -469,13 +481,23 @@ class GeoTemplatePARENT(GeoTemplate):
         parent = gretp.obj
         gret = self.inputs["Child Object"].build(buildRequest.copy())
         child = gret.obj
-        con = child.constraints.new("CHILD_OF")
-        con.target = parent
-        con.subtarget = self.settings["parentTo"]
-        bone = parent.pose.bones[self.settings["parentTo"]]
-        con.inverse_matrix = bone.matrix.inverted()
-        if child.data:
-            child.data.update()
+
+        if self.settings["parentMode"] == "bone":
+            con = child.constraints.new("CHILD_OF")
+            con.target = parent
+            con.subtarget = self.settings["parentTo"]
+            bone = parent.pose.bones[self.settings["parentTo"]]
+            con.inverse_matrix = bone.matrix.inverted()
+            if child.data:
+                child.data.update()
+        else:
+            child.parent = parent
+            mod = child.modifiers.get("Armature")
+            if mod is None:
+                mod = child.modifiers.new("Armature", 'ARMATURE')
+            mod.object = parent
+            mod.use_vertex_groups = self.settings["bindToVGroups"]
+            mod.use_bone_envelopes = self.settings["bindToBEnvelops"]
         return gretp
         # TODO check if the object has an armature modifier
 
@@ -555,44 +577,55 @@ class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
 
     def build(self, buildRequest):
-        groupName = buildRequest.cm_group + "/" + self.settings["brainType"]
-        newGp = bpy.data.groups.new(groupName)
-        defG = self.settings["deferGeo"]
-        pos = buildRequest.pos
-        rot = buildRequest.rot
-        scale = buildRequest.scale
-        geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
-        gret = self.inputs["Objects"].build(geoBuildRequest)
-        topObj = gret.obj
+        cm_groups = bpy.context.scene.cm_groups
+        gpName = buildRequest.cm_group
+        if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
+            groupName = buildRequest.cm_group + \
+                "/" + self.settings["brainType"]
+            newGp = bpy.data.groups.new(groupName)
 
-        topObj.location = pos
-        topObj.rotation_euler = rot
-        topObj.scale = Vector((scale, scale, scale))
+            # Put into group by agent group
+            if gpName in bpy.data.groups:
+                typeGroup = bpy.data.groups[gpName]
+            else:
+                typeGroup = bpy.data.groups.new(gpName)
 
-        topObj["cm_randomMaterial"] = buildRequest.materials
+            defG = self.settings["deferGeo"]
+            pos = buildRequest.pos
+            rot = buildRequest.rot
+            scale = buildRequest.scale
+            geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
+            gret = self.inputs["Objects"].build(geoBuildRequest)
+            topObj = gret.obj
 
-        tags = buildRequest.tags
-        packTags = [{"name": x, "value": tags[x]} for x in tags]
+            topObj.location = pos
+            topObj.rotation_euler = rot
+            topObj.scale = Vector((scale, scale, scale))
 
-        rigOverwrite = gret.overwriteRig.name if gret.overwriteRig else ""
-        constrainBone = gret.constrainBone.name if gret.constrainBone else ""
+            topObj["cm_randomMaterial"] = buildRequest.materials
 
-        packModifyBones = []
-        for b in gret.modifyBones:
-            for attribute in gret.modifyBones[b]:
-                tag = gret.modifyBones[b][attribute]
-                packModifyBones.append({"name": b,
-                                        "attribute": attribute,
-                                        "tag": tag})
+            tags = buildRequest.tags
+            packTags = [{"name": x, "value": tags[x]} for x in tags]
 
-        bpy.ops.scene.cm_agent_add(agentName=topObj.name,
-                                   brainType=self.settings["brainType"],
-                                   groupName=buildRequest.cm_group,
-                                   geoGroupName=newGp.name,
-                                   initialTags=packTags,
-                                   rigOverwrite=rigOverwrite,
-                                   constrainBone=constrainBone,
-                                   modifyBones=packModifyBones)
+            rigOverwrite = gret.overwriteRig.name if gret.overwriteRig else ""
+            constrainBone = gret.constrainBone.name if gret.constrainBone else ""
+
+            packModifyBones = []
+            for b in gret.modifyBones:
+                for attribute in gret.modifyBones[b]:
+                    tag = gret.modifyBones[b][attribute]
+                    packModifyBones.append({"name": b,
+                                            "attribute": attribute,
+                                            "tag": tag})
+
+            bpy.ops.scene.cm_agent_add(agentName=topObj.name,
+                                       brainType=self.settings["brainType"],
+                                       groupName=buildRequest.cm_group,
+                                       geoGroupName=newGp.name,
+                                       initialTags=packTags,
+                                       rigOverwrite=rigOverwrite,
+                                       constrainBone=constrainBone,
+                                       modifyBones=packModifyBones)
 
     def check(self):
         if "Objects" not in self.inputs:
@@ -717,6 +750,9 @@ class TemplatePOINTTOWARDS(Template):
     def check(self):
         if self.settings["PointObject"] not in bpy.context.scene.objects:
             return False
+        if self.settings["PointType"] == "MESH":
+            if bpy.context.scene.objects[self.settings["PointObject"]].type != 'MESH':
+                return False
         if "Template" not in self.inputs:
             return False
         if not isinstance(self.inputs["Template"], Template):
@@ -817,7 +853,7 @@ class TemplateMESHPOSITIONING(Template):
 
     def __init__(self, inputs, settings, bpyName):
         Template.__init__(self, inputs, settings, bpyName)
-        self.bvhtree = None  # TODO use to relax points
+        self.bvhtree = None
         self.totalArea = None
 
     def build(self, buildRequest):
@@ -883,6 +919,8 @@ class TemplateMESHPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
+            return False
         if not isinstance(self.inputs["Template"], Template):
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
@@ -895,11 +933,13 @@ class TemplateVCOLPOSITIONING(Template):
 
     def __init__(self, inputs, settings, bpyName):
         Template.__init__(self, inputs, settings, bpyName)
-        self.bvhtree = None  # TODO use to relax points
+        self.bvhtree = None
         self.totalArea = None
 
     def build(self, buildRequest):
+        paintMode = self.settings["paintMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
+        invert = self.settings["invert"]
         data = guide.data
         polys = []
         mesh = data
@@ -909,76 +949,110 @@ class TemplateVCOLPOSITIONING(Template):
         for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
-                if vcol_layer.data[loop_index].color[0] == self.settings["vcolor"][0] and vcol_layer.data[loop_index].color[1] == self.settings["vcolor"][1] and vcol_layer.data[loop_index].color[2] == self.settings["vcolor"][2]:
-                    polys.append(poly)
+                if not invert:
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        polys.append(poly)
+                else:
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        polys.append(poly)
 
         wrld = guide.matrix_world
         if self.totalArea is None:
             self.totalArea = sum(p.area for p in polys)
-        positions = []
-        for n in range(self.settings["noToPlace"]):
-            remaining = random.random() * self.totalArea
-            index = 0
-            while remaining > 0:
-                remaining -= polys[index].area
-                if remaining <= 0:
-                    a = data.vertices[polys[index].vertices[0]].co
-                    b = data.vertices[polys[index].vertices[1]].co
-                    c = data.vertices[polys[index].vertices[2]].co
-                    r1 = math.sqrt(random.random())
-                    r2 = random.random()
-                    pos = (1 - r1) * a + (r1 * (1 - r2)) * b + (r1 * r2) * c
-                    if self.settings["overwritePosition"]:
-                        pos = wrld * pos
-                    else:
-                        pos.rotate(mathutils.Euler(buildRequest.rot))
-                        pos *= buildRequest.scale
-                        pos = buildRequest.pos + pos
-                    positions.append(pos)
-                index += 1
 
-        if self.settings["relax"]:
+        if paintMode == 'place':
+            positions = []
+            for n in range(self.settings["noToPlace"]):
+                remaining = random.random() * self.totalArea
+                index = 0
+                while remaining > 0:
+                    remaining -= polys[index].area
+                    if remaining <= 0:
+                        a = data.vertices[polys[index].vertices[0]].co
+                        b = data.vertices[polys[index].vertices[1]].co
+                        c = data.vertices[polys[index].vertices[2]].co
+                        r1 = math.sqrt(random.random())
+                        r2 = random.random()
+                        pos = (1 - r1) * a + (r1 * (1 - r2)) * \
+                            b + (r1 * r2) * c
+                        if self.settings["overwritePosition"]:
+                            pos = wrld * pos
+                        else:
+                            pos.rotate(mathutils.Euler(buildRequest.rot))
+                            pos *= buildRequest.scale
+                            pos = buildRequest.pos + pos
+                        positions.append(pos)
+                    index += 1
+
+            if self.settings["relax"]:
+                sce = bpy.context.scene
+                gnd = sce.objects[self.settings["guideMesh"]]
+                if self.bvhtree is None:
+                    self.bvhtree = BVHTree.FromObject(gnd, sce)
+                radius = self.settings["relaxRadius"]
+                for n, p in enumerate(positions):
+                    rvec = random.random() * mathutils.noise.random_unit_vector()
+                    positions[n] = p + rvec * radius
+                for i in range(self.settings["relaxIterations"]):
+                    kd = KDTree(len(positions))
+                    for n, p in enumerate(positions):
+                        kd.insert(p, n)
+                    kd.balance()
+                    for n, p in enumerate(positions):
+                        adjust = Vector()
+                        localPoints = kd.find_range(p, radius * 2)
+                        for (co, ind, dist) in localPoints:
+                            if ind != n:
+                                v = p - co
+                                if v.length > 0:
+                                    adjust += v * \
+                                        ((2 * radius - v.length) / v.length)
+                        if len(localPoints) > 0:
+                            adjPos = positions[n] + adjust / len(localPoints)
+                            positions[n] = self.bvhtree.find_nearest(adjPos)[0]
+
+            for newPos in positions:
+                newBuildRequest = buildRequest.copy()
+                newBuildRequest.pos = newPos
+                self.inputs["Template"].build(newBuildRequest)
+
+        elif paintMode == 'edit':
             sce = bpy.context.scene
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
-            radius = self.settings["relaxRadius"]
-            for n, p in enumerate(positions):
-                rvec = random.random() * mathutils.noise.random_unit_vector()
-                positions[n] = p + rvec * radius
-            for i in range(self.settings["relaxIterations"]):
-                kd = KDTree(len(positions))
-                for n, p in enumerate(positions):
-                    kd.insert(p, n)
-                kd.balance()
-                for n, p in enumerate(positions):
-                    adjust = Vector()
-                    localPoints = kd.find_range(p, radius * 2)
-                    for (co, ind, dist) in localPoints:
-                        if ind != n:
-                            v = p - co
-                            if v.length > 0:
-                                adjust += v * \
-                                    ((2 * radius - v.length) / v.length)
-                    if len(localPoints) > 0:
-                        adjPos = positions[n] + adjust / len(localPoints)
-                        positions[n] = self.bvhtree.find_nearest(adjPos)[0]
-
-        for newPos in positions:
-            newBuildRequest = buildRequest.copy()
-            newBuildRequest.pos = newPos
-            self.inputs["Template"].build(newBuildRequest)
+            
+            point = buildRequest.pos
+            loc, norm, ind, dist = self.bvhtree.find_nearest(point)
+            poly = mesh.polygons[ind]
+            for loop_index in poly.loop_indices:
+                loop_vert_index = mesh.loops[loop_index].vertex_index
+                if not invert:
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        self.inputs["Template"].build(buildRequest)
+                else:
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
+                        self.inputs["Template"].build(buildRequest)
 
     def check(self):
         if "Template" not in self.inputs:
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
+        if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
+            return False
         if not isinstance(self.inputs["Template"], Template):
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
             return False
         return True
+
+
+def assignConnectedToIsland(vert, islandID, islandNo):
+    if vert[islandID] == 0:
+        vert[islandID] = islandNo
+        for edge in vert.link_edges:
+            assignConnectedToIsland(edge.other_vert(vert), islandID, islandNo)
 
 
 class TemplatePATH(Template):
@@ -990,7 +1064,18 @@ class TemplatePATH(Template):
         obj = bpy.context.scene.objects[pathEntry.objectName]
         bm = bmesh.new()
         bm.from_mesh(obj.data)
+
+        if self.settings["groupByMeshIsland"]:
+            bm.verts.ensure_lookup_table()
+            islandID = bm.verts.layers.int.new('island')
+            islandNo = 1
+            for vert in bm.verts:
+                if vert[islandID] == 0:
+                    assignConnectedToIsland(vert, islandID, islandNo)
+                    islandNo += 1
+
         bm.edges.ensure_lookup_table()
+
         totalEdge = 0
         edgeWeights = []
         for e in bm.edges:
@@ -1011,22 +1096,27 @@ class TemplatePATH(Template):
             localPos = vs[0].co * weight + vs[1].co * (1 - weight)
             pos = localPos * obj.matrix_world
             # TODO look at path object and get rotation to align with path direction
-            globalPos, pointTowards = tmpPathChannel.alignToPath(pathEntry, pos,
-                                                                 Vector((1, 0, 0)))
+            globalPos, pointTowards, cid = tmpPathChannel.alignToPath(pathEntry, pos,
+                                                                      Vector((1, 0, 0)))
             diff = pointTowards - globalPos
             rot = diff.to_track_quat('Y', 'Z').to_euler()
 
-            positions.append((pos, rot))
+            if self.settings["groupByMeshIsland"]:
+                island = bm.verts[cid][islandID]
+            else:
+                island = 0
+
+            positions.append((pos, rot, island))
 
         if self.settings["relax"]:
             sce = bpy.context.scene
             radius = self.settings["relaxRadius"]
             for i in range(self.settings["relaxIterations"]):
                 kd = KDTree(len(positions))
-                for n, (p, r) in enumerate(positions):
+                for n, (p, r, island) in enumerate(positions):
                     kd.insert(p, n)
                 kd.balance()
-                for n, (p, r) in enumerate(positions):
+                for n, (p, r, island) in enumerate(positions):
                     adjust = Vector()
                     localPoints = kd.find_range(p, radius * 2)
                     for (co, ind, dist) in localPoints:
@@ -1039,20 +1129,25 @@ class TemplatePATH(Template):
                         adjPos = p + adjust / len(localPoints)
                         normal = Vector((0, 1, 0))
                         normal.rotate(Euler(r))
-                        pos, pointTowards = tmpPathChannel.alignToPath(pathEntry,
-                                                                       adjPos,
-                                                                       normal)
+                        pos, pointTowards, cid = tmpPathChannel.alignToPath(pathEntry,
+                                                                            adjPos,
+                                                                            normal)
                         diff = pointTowards - pos
                         rot = diff.to_track_quat('Y', 'Z').to_euler()
-                        positions[n] = (pos, rot)
+                        if self.settings["groupByMeshIsland"]:
+                            island = bm.verts[cid][islandID]
+                        else:
+                            island = 0
+                        positions[n] = (pos, rot, island)
 
-        for newPos, newRot in positions:
+        for newPos, newRot, island in positions:
             newBuildRequest = buildRequest.copy()
             newBuildRequest.pos = newPos + buildRequest.pos
             newBuildRequest.rot = newRot  # + buildRequest.rot
+            if self.settings["groupByMeshIsland"]:
+                newBuildRequest.cm_group += "_" + self.settings["nodeName"] + \
+                                            "_" + str(island)
             self.inputs["Template"].build(newBuildRequest)
-
-    # TODO Relax placement and use path channel to snap agents back to path.
 
 
 class TemplateFORMATION(Template):
@@ -1144,6 +1239,8 @@ class TemplateTARGET(Template):
         elif self.settings["targetType"] == "vertex":
             if self.settings["targetObject"] not in bpy.context.scene.objects:
                 return False
+            if bpy.context.scene.objects[self.settings["targetObject"]].type != 'MESH':
+                return False
         return True
 
 
@@ -1213,6 +1310,8 @@ class TemplateGROUND(Template):
 
     def check(self):
         if self.settings["groundMesh"] not in bpy.context.scene.objects:
+            return False
+        if bpy.context.scene.objects[self.settings["groundMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
             return False

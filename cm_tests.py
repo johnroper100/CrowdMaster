@@ -20,6 +20,7 @@
 import unittest
 
 import bpy
+from bpy.types import Operator
 
 from .cm_syncManager import SyncManagerTestCase
 
@@ -48,8 +49,8 @@ class AddonRegisterTestCase(unittest.TestCase):
 
         opsProps = ["cm_actions_populate", "cm_actions_remove", "cm_agent_add",
                     "cm_agent_add_selected", "cm_agent_nodes_generate",
-                    "cm_agents_move", "cm_convert_to_bound_box",
-                    "cm_events_move", "cm_events_populate", "cm_events_remove",
+                    "cm_agents_move", "cm_events_move",
+                    "cm_events_populate", "cm_events_remove",
                     "cm_gennodes_pos_formation_simple",
                     "cm_gennodes_pos_random_simple",
                     "cm_gennodes_pos_target_simple", "cm_groups_reset",
@@ -76,7 +77,7 @@ def createLongTestSuite():
     return test_suite
 
 
-class CrowdMaster_run_short_tests(bpy.types.Operator):
+class CrowdMaster_run_short_tests(Operator):
     """For tests cases that will run quickly.
     ie. that don't involve running simulations"""
     bl_idname = "scene.cm_run_short_tests"
@@ -91,7 +92,7 @@ class CrowdMaster_run_short_tests(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class CrowdMaster_run_long_tests(bpy.types.Operator):
+class CrowdMaster_run_long_tests(Operator):
     """For tests cases that will take a long time.
     ie. that involve simulation"""
     bl_idname = "scene.cm_run_long_tests"

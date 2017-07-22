@@ -20,14 +20,14 @@
 import os
 
 import bpy
-from bpy.props import *
-from bpy.types import AddonPreferences
+from bpy.props import BoolProperty, IntProperty, EnumProperty
+from bpy.types import AddonPreferences, Operator
 
 from . import addon_updater_ops
 from .cm_iconLoad import cicon
 
 
-class CMSavePrefs(bpy.types.Operator):
+class CMSavePrefs(Operator):
     """Save the CrowdMaster preferences """
     bl_idname = "scene.cm_save_prefs"
     bl_label = "Save Settings"
@@ -58,7 +58,7 @@ class CMPreferences(AddonPreferences):
     updater_intrval_days = IntProperty(
         name='Days',
         description="Number of days between checking for updates",
-        default=7,
+        default=5,
         min=0,
     )
     updater_intrval_hours = IntProperty(
@@ -89,7 +89,7 @@ class CMPreferences(AddonPreferences):
     )
 
     show_debug_timings = BoolProperty(
-        name="Show debug timings",
+        name="Show Debug Timings",
         description="Time and print to console the times taken by elements of the system.",
         default=False,
     )
