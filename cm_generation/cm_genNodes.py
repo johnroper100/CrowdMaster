@@ -44,7 +44,7 @@ class CrowdMasterAGenTree(NodeTree):
 class GeoSocket(NodeSocket):
     """Geo node socket type"""
     bl_idname = 'GeoSocketType'
-    bl_label = 'Geo Node Socket'
+    bl_label = 'Geometry Node Socket'
 
     def draw(self, context, layout, node, text):
         layout.label(text)
@@ -56,7 +56,7 @@ class GeoSocket(NodeSocket):
 class ObjSocket(NodeSocket):
     """Geo node socket type"""
     bl_idname = 'ObjSocketType'
-    bl_label = 'Obj Node Socket'
+    bl_label = 'Object Node Socket'
 
     def draw(self, context, layout, node, text):
         layout.label(text)
