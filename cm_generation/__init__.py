@@ -25,6 +25,7 @@ from bpy.types import Operator
 
 from . import cm_genNodes
 from .cm_templates import TemplateRequest, templates, tmpPathChannel, GeoRequest
+from .. import cm_timings
 
 
 def getInput(inp):
@@ -120,6 +121,8 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+
         for agentGroup in bpy.context.scene.cm_groups:
             if agentGroup.groupType != "auto":
                 continue
@@ -134,36 +137,47 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
                         suc, temp = construct(buildRequest.bpyNode, cache)
                         if suc:
                             gr = temp.build(buildRequest)
-                            for o in bpy.context.selected_objects:
-                                o.select = False
-                            gr.obj.select = True
-                            bpy.context.scene.objects.active = obj
-                            bpy.ops.object.make_links_data(type="ANIMATION")
-                            gr.obj.select = False
 
-                            if gr.overwriteRig.proxy is None:
-                                gr.overwriteRig.select = True
-                                bpy.context.scene.objects.active = rig
-                                bpy.ops.object.make_links_data(
-                                    type="ANIMATION")
-                            else:
-                                bpy.context.scene.objects.active = rig
-                                if rig.animation_data is None:
-                                    rig.animation_data_create()
-                                if rig.animation_data.action is None:
-                                    action = bpy.data.actions.new(
-                                        name=rig.name + ".Action")
-                                    rig.animation_data.action = action
+                            if preferences.show_debug_options and preferences.show_debug_timings:
+                                t = time.time()
+
+                            if obj != gr.obj:
+                                for o in bpy.context.selected_objects:
+                                    o.select = False
+                                gr.obj.select = True
+                                bpy.context.scene.objects.active = obj
+                                bpy.ops.object.make_links_data(type="ANIMATION")
+                                gr.obj.select = False
+
+                            if rig != gr.overwriteRig:
+                                if gr.overwriteRig.proxy is None:
+                                    gr.overwriteRig.select = True
+                                    bpy.context.scene.objects.active = rig
+                                    bpy.ops.object.make_links_data(type="ANIMATION")
                                 else:
-                                    action = rig.animation_data.action
-                                if gr.overwriteRig.animation_data is None:
-                                    gr.overwriteRig.animation_data_create()
+                                    if rig.animation_data is None:
+                                        rig.animation_data_create()
+                                    if rig.animation_data.action is None:
+                                        acNm = rig.name + ".Action"
+                                        action = bpy.data.actions.new(name=acNm)
+                                        rig.animation_data.action = action
+                                    else:
+                                        action = rig.animation_data.action
+                                    if gr.overwriteRig.animation_data is None:
+                                        gr.overwriteRig.animation_data_create()
 
-                                gr.overwriteRig.animation_data.action = action
+                                    gr.overwriteRig.animation_data.action = action
+
+                            if preferences.show_debug_options and preferences.show_debug_timings:
+                                cm_timings.placement["deferGeoB"] += time.time() - t
                         else:
                             return {'CANCELLED'}
         # For rig update
         bpy.context.scene.frame_current = bpy.context.scene.frame_current
+
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.printPlacementTimings()
+
         return {'FINISHED'}
 
 

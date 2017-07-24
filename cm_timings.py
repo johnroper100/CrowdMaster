@@ -21,7 +21,17 @@ from collections import OrderedDict
 
 from .cm_channels import channelTimes
 
-placement = OrderedDict([])
+placement = OrderedDict([
+    ("GROUP", 0),
+    ("GROUPA", 0),
+    ("GROUPB", 0),
+    ("deferGeoB", 0)
+])
+
+def printPlacementTimings():
+    print("Placement")
+    for k, v in placement.items():
+        print("     ", k, v)
 
 agent = OrderedDict([
     ("init", 0),
@@ -89,9 +99,6 @@ coreNumber = OrderedDict([
 
 
 def printTimings():
-    print("Placement")
-    for k, v in placement.items():
-        print("     ", k, v)
     print("Agent")
     for k, v in agent.items():
         print("     ", k, v)

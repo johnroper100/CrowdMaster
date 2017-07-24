@@ -23,6 +23,7 @@ import random
 import re
 from collections import OrderedDict
 from math import radians
+import time
 
 import bmesh
 import bpy
@@ -32,6 +33,7 @@ from mathutils import Euler
 from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
+from .. import cm_timings
 
 BVHTree = mathutils.bvhtree.BVHTree
 KDTree = mathutils.kdtree.KDTree
@@ -263,6 +265,10 @@ class GeoTemplateGROUP(GeoTemplate):
     """For placing groups into the scene"""
 
     def build(self, buildRequest):
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            t = time.time()
+
         dat = bpy.data
 
         pos = buildRequest.pos
@@ -343,12 +349,21 @@ class GeoTemplateGROUP(GeoTemplate):
                         if mod.type == "ARMATURE":
                             obj.modifiers[mod.name].object = dat.objects[arm.name]
 
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            tb = time.time()
+            cm_timings.placement["GROUPA"] += time.time() - t
+
         bb["cm_deferOriginal"] = self.settings["boundingObj"]
         arm["cm_deferOriginal"] = self.settings["armatureObj"]
         arm.parent = bb
         bb.rotation_euler = rot
         bb.scale = Vector((scale, scale, scale))
         bb.location = pos
+
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.placement["GROUP"] += time.time() - t
+            cm_timings.placement["GROUPB"] += time.time() - tb
+
         return GeoReturn(bb, arm)
 
     def check(self):
