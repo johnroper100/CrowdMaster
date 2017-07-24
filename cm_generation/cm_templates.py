@@ -303,15 +303,15 @@ class GeoTemplateGROUP(GeoTemplate):
                 if o.name == bbOriginal:
                     if bb is None:
                         bb = o.copy()
+                        group.objects.link(bb)
+                        bpy.context.scene.objects.link(bb)
                     group_objects.append(bb)
-                    group.objects.link(bb)
-                    bpy.context.scene.objects.link(bb)
                 elif o.name == armOriginal:
                     if arm is None:
                         arm = o.copy()
+                        group.objects.link(arm)
+                        bpy.context.scene.objects.link(arm)
                     group_objects.append(arm)
-                    group.objects.link(arm)
-                    bpy.context.scene.objects.link(arm)
                 else:
                     obj = o.copy()
                     group_objects.append(obj)
@@ -760,6 +760,7 @@ class TemplateAGENT(Template):
             rot = buildRequest.rot
             scale = buildRequest.scale
             seed = random.random()
+            random.seed(seed)
             geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp, seed)
             gret = self.inputs["Objects"].build(geoBuildRequest)
             topObj = gret.obj
