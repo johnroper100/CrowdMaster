@@ -115,7 +115,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
 
 class SCENE_OT_agent_nodes_place_defer_geo(Operator):
     bl_idname = "scene.cm_agent_nodes_place_defer_geo"
-    bl_label = "Place defer geo"
+    bl_label = "Place Defer Geo"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
@@ -166,7 +166,7 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
 
 class SCENE_OT_agent_nodes_remove_defer_geo(Operator):
     bl_idname = "scene.cm_agent_nodes_remove_defer_geo"
-    bl_label = "Remove defer geo"
+    bl_label = "Remove Defer Geo"
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
