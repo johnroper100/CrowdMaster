@@ -73,8 +73,8 @@ class SCENE_OT_agent_nodes_generate(Operator):
     bl_label = "Generate Agents"
     bl_options = {'REGISTER', 'UNDO'}
 
-    nodeName = StringProperty(name="node name")
-    nodeTreeName = StringProperty(name="node tree")
+    nodeName = StringProperty(name="Node Name")
+    nodeTreeName = StringProperty(name="Node Tree")
 
     def execute(self, context):
         if bpy.context.active_object is not None:
