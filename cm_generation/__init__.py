@@ -34,6 +34,7 @@ def getInput(inp):
     else:
         return fr
 
+
 def construct(current, cache):
     """returns: bool - successfully built, Template"""
     tmpPathChannel.newframe()
@@ -143,13 +144,15 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
                             if gr.overwriteRig.proxy is None:
                                 gr.overwriteRig.select = True
                                 bpy.context.scene.objects.active = rig
-                                bpy.ops.object.make_links_data(type="ANIMATION")
+                                bpy.ops.object.make_links_data(
+                                    type="ANIMATION")
                             else:
                                 bpy.context.scene.objects.active = rig
                                 if rig.animation_data is None:
                                     rig.animation_data_create()
                                 if rig.animation_data.action is None:
-                                    action = bpy.data.actions.new(name=rig.name+".Action")
+                                    action = bpy.data.actions.new(
+                                        name=rig.name + ".Action")
                                     rig.animation_data.action = action
                                 else:
                                     action = rig.animation_data.action

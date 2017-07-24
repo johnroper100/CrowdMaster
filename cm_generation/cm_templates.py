@@ -171,6 +171,7 @@ class GeoRequest(TemplateRequest):
         t.bpyNode = bpy.data.node_groups[graph].nodes[node]
         return t
 
+
 class GeoReturn:
     """Object that is passed back by geo template nodes"""
 
@@ -188,6 +189,7 @@ class ObjTemplate(Template):
     def build(self, buildRequest):
         """Called when this GeoTemplate is being used to modify the scene"""
         pass
+
 
 class ObjRequest(TemplateRequest):
     """Passed between the children of ObjTemplate"""
@@ -379,7 +381,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             newObj["cm_deferOriginal"] = self.settings["boundingBox"]
             buildRequest.group.objects.link(newObj)
             bpy.context.scene.objects.link(newObj)
-            bpy.ops.object.armature_add(location=(0,0,0))
+            bpy.ops.object.armature_add(location=(0, 0, 0))
             newRig = bpy.context.active_object
             newRig.data.bones[0].name = self.settings["constrainBone"]
             buildRequest.group.objects.link(newRig)
@@ -419,8 +421,10 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         bpy.ops.pose.constraint_add(type="COPY_LOCATION")
         bpy.ops.pose.constraint_add(type="COPY_ROTATION")
 
-        Cloc = newRig.pose.bones[self.settings["constrainBone"]].constraints[-2]
-        Crot = newRig.pose.bones[self.settings["constrainBone"]].constraints[-1]
+        Cloc = newRig.pose.bones[self.settings["constrainBone"]
+                                 ].constraints[-2]
+        Crot = newRig.pose.bones[self.settings["constrainBone"]
+                                 ].constraints[-1]
 
         Cloc.target = newObj
         Cloc.use_z = False
@@ -481,10 +485,12 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
             if targetBlendName in dupFiles:
                 targetPath = os.path.join(dupDir, targetBlendName)
                 with bpy.data.libraries.load(targetPath, link=True) as (data_src, data_dst):
-                    data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
+                    data_dst.groups = [
+                        "{0}.{1:0>3}".format(sourceGroup, count)]
                     for adGrp in additionalGroup.split(","):
                         if adGrp.split() != "":
-                            adGrpNm = "{0}.{1:0>3}".format(adGrp.strip(), count)
+                            adGrpNm = "{0}.{1:0>3}".format(
+                                adGrp.strip(), count)
                             data_dst.groups.append(adGrpNm)
                 dupliGroup = data_dst.groups[0]
 
@@ -557,7 +563,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
         # add the group instance to the scene
         scene = bpy.context.scene
-        ob = bpy.data.objects.new("cm_{0}.{1:0>3}".format(assetName, count), None)
+        ob = bpy.data.objects.new(
+            "cm_{0}.{1:0>3}".format(assetName, count), None)
         ob.dupli_group = dupliGroup
         ob.dupli_type = 'GROUP'
         scene.objects.link(ob)
@@ -565,7 +572,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         activeStore = bpy.context.scene.objects.active
         bpy.context.scene.objects.active = ob
 
-        bpy.ops.object.proxy_make(object="{0}.{1:0>3}".format(sourceRig, count))
+        bpy.ops.object.proxy_make(
+            object="{0}.{1:0>3}".format(sourceRig, count))
         rigObj = bpy.context.scene.objects.active
 
         bpy.context.scene.objects.active = activeStore
@@ -757,7 +765,8 @@ class TemplateAGENT(Template):
             topObj = gret.obj
             arm = gret.overwriteRig
 
-            geoBuildRequest.storeWithObject(topObj, self.inputs["Objects"].bpyNode)
+            geoBuildRequest.storeWithObject(
+                topObj, self.inputs["Objects"].bpyNode)
             topObj["cm_deferGeo"] = defG
 
             topObj.location = pos
@@ -1223,7 +1232,7 @@ class TemplateVCOLPOSITIONING(Template):
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
-            
+
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
             poly = mesh.polygons[ind]
