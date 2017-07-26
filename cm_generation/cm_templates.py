@@ -429,27 +429,14 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 if "cm_deferOriginal" in placedObj:
                     newObj = placedObj
 
-        lastActive = bpy.context.scene.objects.active
-        bpy.context.scene.objects.active = newRig
-        bpy.ops.object.posemode_toggle()
-        armature = newRig.data.bones
-        armature.active = armature[self.settings["constrainBone"]]
-        bpy.ops.pose.constraint_add(type="COPY_LOCATION")
-        bpy.ops.pose.constraint_add(type="COPY_ROTATION")
-
-        Cloc = newRig.pose.bones[self.settings["constrainBone"]
-                                 ].constraints[-2]
-        Crot = newRig.pose.bones[self.settings["constrainBone"]
-                                 ].constraints[-1]
+        cons = newRig.pose.bones[self.settings["constrainBone"]].constraints
+        Cloc = cons.new("COPY_LOCATION")
+        Crot = cons.new("COPY_ROTATION")
 
         Cloc.target = newObj
         Cloc.use_z = False
 
         Crot.target = newObj
-        # Crot.use_offset = True
-
-        bpy.ops.object.posemode_toggle()
-        bpy.context.scene.objects.active = lastActive
 
         return GeoReturn(newObj, newRig)
 
