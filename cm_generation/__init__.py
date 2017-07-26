@@ -79,6 +79,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
     nodeTreeName = StringProperty(name="Node Tree")
 
     def execute(self, context):
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
         if bpy.context.active_object is not None:
             bpy.ops.object.mode_set(mode='OBJECT')
         ntree = bpy.data.node_groups[self.nodeTreeName]
@@ -100,8 +101,15 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 allSuccess = False
 
         if allSuccess:
+            if preferences.show_debug_options and preferences.show_debug_timings:
+                t = time.time()
+
             for gpName in [g.name for g in context.scene.cm_groups]:
                 bpy.ops.scene.cm_groups_reset(groupName=gpName)
+
+            if preferences.show_debug_options and preferences.show_debug_timings:
+                cm_timings.placement["GenOpReset"] += time.time() - t
+                t = time.time()
 
             for space in generateNode.inputs[0].links:
                 tipNode = space.from_node
@@ -109,9 +117,15 @@ class SCENE_OT_agent_nodes_generate(Operator):
                     tipNode = getInput(tipNode.inputs[0])
                 buildRequest = TemplateRequest()
                 genSpaces[tipNode].build(buildRequest)
+
+            if preferences.show_debug_options and preferences.show_debug_timings:
+                cm_timings.placement["GenOpBuild"] += time.time() - t
         else:
             return {'CANCELLED'}
 
+
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.printPlacementTimings()
         return {'FINISHED'}
 
 

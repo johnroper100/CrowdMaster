@@ -25,7 +25,12 @@ placement = OrderedDict([
     ("GROUP", 0),
     ("GROUPA", 0),
     ("GROUPB", 0),
-    ("deferGeoB", 0)
+    ("deferGeoB", 0),
+    ("GenOpReset", 0),
+    ("GenOpBuild", 0),
+    ("TemplateAgent", 0),
+    ("TemplateAgentGeo", 0),
+    ("TemplateLinkGroupConstrain", 0)
 ])
 
 def printPlacementTimings():

@@ -390,6 +390,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         self.additional = {}  # {"original name": <group>}
 
     def build(self, buildRequest):
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
         if buildRequest.deferGeo:
             obj = bpy.context.scene.objects[self.settings["boundingBox"]]
             newObj = obj.copy()
@@ -758,6 +759,11 @@ class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
 
     def build(self, buildRequest):
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            t = time.time()
+            tGeo = t
+
         cm_groups = bpy.context.scene.cm_groups
         gpName = buildRequest.cm_group
         if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
@@ -777,7 +783,13 @@ class TemplateAGENT(Template):
             seed = random.random()
             random.seed(seed)
             geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp, seed)
-            gret = self.inputs["Objects"].build(geoBuildRequest)
+
+            if preferences.show_debug_options and preferences.show_debug_timings:
+                tmpt = time.time()
+                gret = self.inputs["Objects"].build(geoBuildRequest)
+                t += time.time() - tmpt
+            else:
+                gret = self.inputs["Objects"].build(geoBuildRequest)
             topObj = gret.obj
             arm = gret.overwriteRig
 
@@ -853,6 +865,11 @@ class TemplateAGENT(Template):
                                        initialTags=packTags,
                                        rigOverwrite=rigOverwrite,
                                        modifyBones=packModifyBones)
+
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            tm = time.time() - t
+            cm_timings.placement["TemplateAgent"] += tm
+            cm_timings.placement["TemplateAgentGeo"] += time.time() - tGeo - tm
 
     def check(self):
         if "Objects" not in self.inputs:
