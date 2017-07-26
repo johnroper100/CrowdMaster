@@ -103,7 +103,7 @@ class Channel:
             self.store["index"] = ind
             self.store["distance"] = dist * direc  # direc is +/-1
         else:
-            self.store["distance"] = 0
+            self.store["distance"] = None
         self.calcd = True
 
     @timeChannel("Ground")

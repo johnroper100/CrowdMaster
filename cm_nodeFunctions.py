@@ -115,7 +115,8 @@ class LogicNEWINPUT(Neuron):
         elif settings["InputSource"] == "GROUND":
             if settings["GroundOptions"] == "DH":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
-                return {"None": gChan.dh()}
+                dh = gChan.dh()
+                return {"None": dh} if dh is not None else {}
             elif settings["GroundOptions"] == "ARZ":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
                 return {"None": gChan.aheadRz(self.settings["GroundAheadOffset"])}
