@@ -88,7 +88,7 @@ def compileNodeGroup(nodeGroup, prefix, brain):
     for node in nodeGroup.nodes:
         nodeKey = (prefix, nodeGroup.name, node.name)
         if node.bl_idname in logictypes:
-            item = logictypes[node.bl_idname](brain, node)
+            item = logictypes[node.bl_idname](brain, node, nodeKey)
             node.getSettings(item)
             if node.bl_idname == "PriorityNode":
                 item.inputs = getMultiInputs(node.inputs, nodeKey)
@@ -102,7 +102,7 @@ def compileNodeGroup(nodeGroup, prefix, brain):
             compileNodeGroup(bpy.data.node_groups[node.groupName], nodeKey,
                              brain)
         elif node.bl_idname in statetypes:
-            item = statetypes[node.bl_idname](brain, node, node.name)
+            item = statetypes[node.bl_idname](brain, node, node.name, nodeKey)
             node.getSettings(item)
             item.outputs = getOutputs(node.outputs["To"], nodeKey)
             if node.bl_idname == "StartState":
