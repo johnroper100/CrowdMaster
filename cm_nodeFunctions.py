@@ -690,7 +690,8 @@ class StateAction(State):
             action = actionobj.action  # bpy action
             if action:
                 currentFrame = bpy.context.scene.frame_current
-                self.strip = tr.strips.new("", currentFrame, action)
+                startTime = currentFrame - self.settings["Overlap"]
+                self.strip = tr.strips.new("", startTime, action)
                 self.strip.extrapolation = 'NOTHING'
                 self.strip.use_auto_blend = True
                 self.strip.mute = self.brain.freeze

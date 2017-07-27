@@ -754,11 +754,11 @@ class ActionState(StateNode):
     stateLength = IntProperty(name="State Length", default=1)
     cycleState = BoolProperty(name="Cycle State", default=False)
     actionName = StringProperty(name="Action Name", default="")
+    overlap = IntProperty(name="Overlap", min=0, default=0)
     useValueOfSpeed = BoolProperty(name="Use Value of Speed", default=True)
     interuptState = BoolProperty(name="Interupt State", default=False)
     syncState = BoolProperty(name="Sync State", default=False)
-    randomActionFromGroup = BoolProperty(
-        name="Rand Group Action", default=True)
+    randomActionFromGroup = BoolProperty(name="Rand Group Action", default=True)
 
     def init(self, context):
         StateNode.init(self, context)
@@ -768,6 +768,7 @@ class ActionState(StateNode):
         item.settings["ValueFilter"] = val.filterProperty
         item.settings["ValueDefault"] = val.defaultValueProperty
         item.settings["RandomInput"] = val.randomInputValue
+        item.settings["Overlap"] = self.overlap
         item.length = self.stateLength
         item.cycleState = self.cycleState
         item.actionName = self.actionName
@@ -793,6 +794,7 @@ class ActionState(StateNode):
             else:
                 row.prop(self, "randomActionFromGroup", icon="FILE_REFRESH",
                          icon_only=True)
+        layout.prop(self, "overlap")
         layout.prop(self, "interuptState")
         if self.interuptState:
             layout.prop(self, "syncState")
