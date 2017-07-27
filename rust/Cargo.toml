@@ -1,8 +1,7 @@
-[package]
-name = "libcm"
-version = "0.1.0"
-authors = ["Peter Noble"]
-
-[lib]
-name = "libcm"
+[workspace]
 crate-type = ["cdylib"]
+members = [
+     "channel_world",
+     "channel_sound"
+]
+

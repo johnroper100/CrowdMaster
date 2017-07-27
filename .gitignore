@@ -102,3 +102,5 @@ sources/cm_compileBrain\.html
 \.idea/
 
 rust/cmake-build-debug/
+
+rust/Cargo\.lock

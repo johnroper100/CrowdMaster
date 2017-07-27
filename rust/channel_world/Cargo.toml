@@ -1,0 +1,13 @@
+[package]
+name = "channel_world"
+version = "0.1.0"
+authors = ["Peter-Noble <peter@noblesque.org.uk>"]
+
+[lib]
+name = "channel_world"
+crate-type = ["cdylib"]
+
+[dependencies.cpython]
+version = "0.1"
+features = ["extension-module"]
+
