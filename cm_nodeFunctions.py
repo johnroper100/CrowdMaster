@@ -695,7 +695,7 @@ class StateAction(State):
                 self.strip.extrapolation = 'NOTHING'
                 self.strip.use_auto_blend = True
                 self.strip.mute = self.brain.freeze
-            self.length = actionobj.length
+            self.length = actionobj.length - self.settings["Overlap"]
 
         self.currentAction = self.action
 
@@ -758,17 +758,15 @@ class StateAction(State):
         self.currentFrame += 1
 
         """Check to see if the current state is still playing an animation"""
-        # print("currentFrame", self.currentFrame, "length", self.length)
-        # print("Value compared", self.length - 2 - self.settings["Fade out"])
 
         # The proportion of the way through the state
-        if self.length == 0:
+        if self.length <= 0:
             complete = 1
         else:
             complete = self.currentFrame / self.length
             complete = 0.5 + complete / 2
         currentFrame = bpy.context.scene.frame_current
-        self.resultLog[currentFrame] = ((0.15, 0.4, complete))
+        self.resultLog[currentFrame] = (0.15, 0.4, complete)
 
         if self.currentAction in self.brain.sim.actions:
             actionobj = self.brain.sim.actions[self.currentAction]

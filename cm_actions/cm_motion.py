@@ -42,7 +42,7 @@ class Action:
             alen = arange[1] - arange[0] + 1
         else:
             self.action = None  # So that other code can do \- if action.action
-            alen = float("inf")
+            alen = 0
 
         self.motiondata = {}
 
