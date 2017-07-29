@@ -198,7 +198,7 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("SINWAVE", "Sine Wave", "", 3)])
 
-    SineWaveAmplitude = FloatProperty(name="Amplitude", default=5.0)
+    SineWaveFrequency = FloatProperty(name="Frequency", default=5.0)
     SineWaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
 
     PathName = StringProperty(name="Path Name")
@@ -287,7 +287,7 @@ class NewInputNode(LogicNode):
             layout.prop(self, "NoiseOptions")
             if self.NoiseOptions == "SINWAVE":
                 row = layout.row(align=True)
-                row.prop(self, "SineWaveAmplitude")
+                row.prop(self, "SineWaveFrequency")
                 row.prop(self, "SineWaveTimeMul")
         elif self.InputSource == "PATH":
             layout.prop_search(
@@ -345,7 +345,7 @@ class NewInputNode(LogicNode):
             node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
-            node.settings["SineWaveAmplitude"] = self.SineWaveAmplitude
+            node.settings["SineWaveFrequency"] = self.SineWaveFrequency
             node.settings["SineWaveTimeMul"] = self.SineWaveTimeMul
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
