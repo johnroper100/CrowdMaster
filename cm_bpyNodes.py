@@ -616,7 +616,7 @@ class MapNode(LogicNode):
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
-    bl_width_default = 310.0
+    bl_width_default = 320.0
 
     Output = EnumProperty(name="Output",
                           items=[("rz", "rz", "", 3),
