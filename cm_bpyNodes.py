@@ -198,7 +198,7 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("SINWAVE", "Sine Wave", "", 3)])
     
-    SineWaveSpeed = IntProperty(name="Sine Wave Speed")
+    SineWaveSpeed = IntProperty(name="Sine Wave Speed", default=5)
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
