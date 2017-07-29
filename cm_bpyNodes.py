@@ -196,10 +196,13 @@ class NewInputNode(LogicNode):
     NoiseOptions = EnumProperty(name="Noise Options",
                                 items=[("RANDOM", "Random", "", 1),
                                        ("AGENTRANDOM", "Agent Random", "", 2),
-                                       ("SINWAVE", "Sine Wave", "", 3)])
+                                       ("WAVE", "Wave", "", 3)])
 
-    SineWaveFrequency = FloatProperty(name="Frequency", default=5.0)
-    SineWaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
+    WaveFrequency = FloatProperty(name="Frequency", default=5.0)
+    WaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
+    WaveMode = EnumProperty(name="Wave Mode",
+                                items=[("SIN", "Sine", "", 1),
+                                       ("COS", "Cosine", "", 2)])
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -285,10 +288,11 @@ class NewInputNode(LogicNode):
                 layout.prop(self, "GroundAheadOffset")
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
-            if self.NoiseOptions == "SINWAVE":
+            if self.NoiseOptions == "WAVE":
+                layout.prop(self, "WaveMode")
                 row = layout.row(align=True)
-                row.prop(self, "SineWaveFrequency")
-                row.prop(self, "SineWaveTimeMul")
+                row.prop(self, "WaveFrequency")
+                row.prop(self, "WaveTimeMul")
         elif self.InputSource == "PATH":
             layout.prop_search(
                 self, "PathName", context.scene.cm_paths, "coll")
@@ -345,8 +349,9 @@ class NewInputNode(LogicNode):
             node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
-            node.settings["SineWaveFrequency"] = self.SineWaveFrequency
-            node.settings["SineWaveTimeMul"] = self.SineWaveTimeMul
+            node.settings["WaveFrequency"] = self.WaveFrequency
+            node.settings["WaveTimeMul"] = self.WaveTimeMul
+            node.settings["WaveMode"] = self.WaveMode
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
