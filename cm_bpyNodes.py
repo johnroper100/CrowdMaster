@@ -201,8 +201,8 @@ class NewInputNode(LogicNode):
     WaveFrequency = FloatProperty(name="Frequency", default=5.0)
     WaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
     WaveMode = EnumProperty(name="Wave Mode",
-                                items=[("SIN", "Sine", "", 1),
-                                       ("COS", "Cosine", "", 2)])
+                            items=[("SIN", "Sine", "", 1),
+                                   ("COS", "Cosine", "", 2)])
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -625,9 +625,11 @@ class OutputNode(LogicNode):
                                  ("px", "px", "", 4),
                                  ("py", "py", "", 5),
                                  ("pz", "pz", "", 6),
-                                 ("sk", "Shape Key", "", 7)
+                                 ("sk", "Shape Key",
+                                  "Assign the value of a shapekey", 7)
                                  ])
-    SKName = StringProperty(name="Shape Key Name")
+    SKName = StringProperty(name="Shape Key Name",
+                            description="The name of the shape key that you would like affect")
     MultiInputType = EnumProperty(name="Multi Input Type",
                                   items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
