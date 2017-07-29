@@ -199,8 +199,10 @@ class Agent:
 
         """Set objects shape key value, rotation and location"""
 
-        obj.data.shape_keys.key_blocks[self.brain.outvars["SKName"]].value = self.sk
-        obj.data.shape_keys.key_blocks[self.brain.outvars["SKName"]].keyframe_insert(data_path="value")
+        obj.data.shape_keys.key_blocks[self.brain.outvars["SKName"]
+                                       ].value = self.sk
+        obj.data.shape_keys.key_blocks[self.brain.outvars["SKName"]].keyframe_insert(
+            data_path="value", index=0, frame=bpy.context.scene.frame_current - 1)
 
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:
