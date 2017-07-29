@@ -286,7 +286,7 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
             if self.NoiseOptions == "SINWAVE":
-                row = layout.row(expand=True)
+                row = layout.row(align=True)
                 row.prop(self, "SineWaveAmplitude")
                 row.prop(self, "SineWaveTimeMul")
         elif self.InputSource == "PATH":
