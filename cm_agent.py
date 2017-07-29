@@ -103,7 +103,8 @@ class Agent:
 
             objs[blenderid].animation_data_clear()
             objs[blenderid].keyframe_insert(data_path="location", frame=1)
-            objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
+            objs[blenderid].keyframe_insert(
+                data_path="rotation_euler", frame=1)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t

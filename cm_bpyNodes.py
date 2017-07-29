@@ -145,14 +145,22 @@ class NewInputNode(LogicNode):
 
     InputSource = EnumProperty(name="Input Channel",
                                items=[("AGENTINFO", "Agent Info", "Get information about other agents in the scene", 10),
-                                      ("CONSTANT", "Constant", "Get a single value that does not change per frame", 1),
-                                      ("FLOCK", "Flock", "Get information relating to flocking agents", 2),
-                                      ("FORMATION", "Formation", "Get information relating to formation agents", 3),
-                                      ("GROUND", "Ground", "Get information about ground objects", 4),
-                                      ("NOISE", "Noise", "Get random values that change over time", 5),
-                                      ("PATH", "Path", "Get information relating to path following", 6),
-                                      ("SOUND", "Sound", "Get sound information from each agent", 7),
-                                      ("STATE", "State", "Get state information from each agent", 8),
+                                      ("CONSTANT", "Constant",
+                                       "Get a single value that does not change per frame", 1),
+                                      ("FLOCK", "Flock",
+                                       "Get information relating to flocking agents", 2),
+                                      ("FORMATION", "Formation",
+                                       "Get information relating to formation agents", 3),
+                                      ("GROUND", "Ground",
+                                       "Get information about ground objects", 4),
+                                      ("NOISE", "Noise",
+                                       "Get random values that change over time", 5),
+                                      ("PATH", "Path",
+                                       "Get information relating to path following", 6),
+                                      ("SOUND", "Sound",
+                                       "Get sound information from each agent", 7),
+                                      ("STATE", "State",
+                                       "Get state information from each agent", 8),
                                       ("WORLD", "World", "Get world information from the scene", 9)],
                                description="Which channel the input data should be pulled from",
                                default="CONSTANT")
@@ -758,7 +766,8 @@ class ActionState(StateNode):
     useValueOfSpeed = BoolProperty(name="Use Value of Speed", default=True)
     interuptState = BoolProperty(name="Interupt State", default=False)
     syncState = BoolProperty(name="Sync State", default=False)
-    randomActionFromGroup = BoolProperty(name="Rand Group Action", default=True)
+    randomActionFromGroup = BoolProperty(
+        name="Rand Group Action", default=True)
 
     def init(self, context):
         StateNode.init(self, context)

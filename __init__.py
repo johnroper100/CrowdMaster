@@ -47,7 +47,7 @@ class SCENE_UL_group(UIList):
 
     def draw_item(self, context, layout, data, item, icon, active_data,
                   active_propname):
-        #layout.label(item.name)
+        # layout.label(item.name)
         op = layout.operator(SCENE_OT_CrowdMasterSelectGroup.bl_idname,
                              text=item.name)
         op.groupName = item.name
@@ -197,9 +197,9 @@ class SCENE_OT_cm_agent_add_selected(Operator):
         if not self.groupName in bpy.data.groups:
             bpy.ops.group.create(name=self.groupName)
         for obj in context.selected_objects:
-            bpy.context.scene.objects[obj.name].select=True
+            bpy.context.scene.objects[obj.name].select = True
             bpy.ops.object.group_link(group=self.groupName)
-            bpy.context.scene.objects[obj.name].select=False
+            bpy.context.scene.objects[obj.name].select = False
 
             inGroup = agentType.agents.find(obj.name)
             if inGroup == -1:
@@ -609,7 +609,7 @@ def unregister():
     cm_channels.unregister()
 
     cm_tests.unregister()
-    
+
     cm_pieMenus.unregister()
 
     if "sim" in globals():

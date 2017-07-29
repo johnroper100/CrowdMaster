@@ -22,9 +22,8 @@ import math
 import bmesh
 import bpy
 import mathutils
-from bpy.props import (CollectionProperty, EnumProperty,
-                       FloatProperty, IntProperty, PointerProperty,
-                       StringProperty)
+from bpy.props import (CollectionProperty, EnumProperty, FloatProperty,
+                       IntProperty, PointerProperty, StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 from ..libs import cm_draw

@@ -21,8 +21,8 @@ import random
 import time
 
 import bpy
-from bpy.props import BoolProperty
 import mathutils
+from bpy.props import BoolProperty
 
 from . import cm_timings
 

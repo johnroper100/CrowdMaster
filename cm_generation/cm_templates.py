@@ -327,8 +327,9 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                 if targetBlendName in dupFiles:
                     targetPath = os.path.join(dupDir, targetBlendName)
                     with bpy.data.libraries.load(targetPath, link=True) as (data_src, data_dst):
-                        data_dst.groups = ["{0}.{1:0>3}".format(sourceGroup, count)]
-                        #if additionalGroup != "":
+                        data_dst.groups = [
+                            "{0}.{1:0>3}".format(sourceGroup, count)]
+                        # if additionalGroup != "":
                         #    data_dst.groups.append(additionalGroup)
                     dupliGroup = data_dst.groups[0]
 
@@ -340,11 +341,12 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
                         self.linkedGroup = bpy.data.groups[sourceGroup]
                     else:
                         # TODO handle this properly
-                        raise Exception("CrowdMaster - Duplicate groups in file")
+                        raise Exception(
+                            "CrowdMaster - Duplicate groups in file")
                 else:
                     with bpy.data.libraries.load(sourceBlend, link=False) as (data_src, data_dst):
                         data_dst.groups = [sourceGroup]
-                        #if additionalGroup != "":
+                        # if additionalGroup != "":
                         #    data_dst.groups.append(additionalGroup)
 
                     self.linkedGroup = data_dst.groups[0]
@@ -370,7 +372,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
         # add the group instance to the scene
         scene = bpy.context.scene
-        ob = bpy.data.objects.new("cm_{0}.{1:0>3}".format(assetName, count), None)
+        ob = bpy.data.objects.new(
+            "cm_{0}.{1:0>3}".format(assetName, count), None)
         ob.dupli_group = dupliGroup
         ob.dupli_type = 'GROUP'
         scene.objects.link(ob)
@@ -378,7 +381,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         activeStore = bpy.context.scene.objects.active
         bpy.context.scene.objects.active = ob
 
-        bpy.ops.object.proxy_make(object="{0}.{1:0>3}".format(sourceRig, count))
+        bpy.ops.object.proxy_make(
+            object="{0}.{1:0>3}".format(sourceRig, count))
         rigObj = bpy.context.scene.objects.active
 
         bpy.context.scene.objects.active = activeStore
@@ -1021,7 +1025,7 @@ class TemplateVCOLPOSITIONING(Template):
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
-            
+
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
             poly = mesh.polygons[ind]
