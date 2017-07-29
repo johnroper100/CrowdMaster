@@ -463,7 +463,7 @@ class Path(Mc):
 
 class draw_path_directions_operator(Operator):
     bl_idname = "view3d.draw_path_operator"
-    bl_label = "Draw The Directions Of A Path"
+    bl_label = "Draw Directions"
 
     pathName = StringProperty(name="Name Of Path")
 
