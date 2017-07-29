@@ -197,6 +197,8 @@ class NewInputNode(LogicNode):
                                 items=[("RANDOM", "Random", "", 1),
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("SINWAVE", "Sine Wave", "", 3)])
+    
+    SineWaveSpeed = IntProperty(name="Sine Wave Speed")
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -282,6 +284,8 @@ class NewInputNode(LogicNode):
                 layout.prop(self, "GroundAheadOffset")
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
+            if self.NoiseOptions == "SINWAVE":
+                layout.prop(self, "SineWaveSpeed")
         elif self.InputSource == "PATH":
             layout.prop_search(
                 self, "PathName", context.scene.cm_paths, "coll")
@@ -338,6 +342,7 @@ class NewInputNode(LogicNode):
             node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
+            node.settings["SineWaveSpeed"] = self.SineWaveSpeed
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
