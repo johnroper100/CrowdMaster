@@ -578,8 +578,9 @@ class SCENE_UL_cm_path(UIList):
         if item.mode == "road":
             layout.prop(item, "laneSeparation")
         if item.mode == "directional":
-            oper = layout.operator("view3d.draw_path_operator")
-            oper.pathName = item.name
+            if bpy.context.scene.objects.active == bpy.data.objects[item.objectName]:
+                oper = layout.operator("view3d.draw_path_operator")
+                oper.pathName = item.name
 
 
 class SCENE_PT_path(Panel):
