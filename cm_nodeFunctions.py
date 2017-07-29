@@ -130,6 +130,8 @@ class LogicNEWINPUT(Neuron):
                 return {"None": noise.random()}
             elif settings["NoiseOptions"] == "AGENTRANDOM":
                 return {"None": noise.agentRandom(offset=hash(self))}
+             elif settings["NoiseOptions"] == "SINWAVE":
+                return {"None": noise.sinWave()}
 
         elif settings["InputSource"] == "PATH":
             if settings["PathOptions"] == "RZ":
