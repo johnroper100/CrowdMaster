@@ -19,6 +19,10 @@
 
 import random
 
+import numpy as np
+
+import bpy
+
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
@@ -45,3 +49,8 @@ class Noise(Mc):
         result = random.random()
         random.setstate(state)
         return result
+
+    @timeChannel("Noise")
+    def sinWave(self):
+        """Returns a sine wave section in range -1 - 1 based on the current frame"""
+        return np.cos(bpy.context.scene.frame_current * 3.14 / 5)

@@ -196,7 +196,8 @@ class NewInputNode(LogicNode):
 
     NoiseOptions = EnumProperty(name="Noise Options",
                                 items=[("RANDOM", "Random", "", 1),
-                                       ("AGENTRANDOM", "Agent Random", "", 2)])
+                                       ("AGENTRANDOM", "Agent Random", "", 2)
+                                       ("SINWAVE", "Sine Wave", "", 3)])
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
