@@ -1,4 +1,4 @@
-![CrowdMaster logo](http://crowdmaster.org/media/logo.gif)
+![CrowdMaster logo](https://github.com/johnroper100/CrowdMaster/raw/master/CrowdMaster-logo.gif)
 # CrowdMaster
 
 CrowdMaster is the only complete workflow for crowd simulation in Blender.
