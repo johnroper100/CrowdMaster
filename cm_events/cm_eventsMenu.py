@@ -43,7 +43,7 @@ class events_collection(PropertyGroup):
 
 class SCENE_OT_cm_events_populate(Operator):
     bl_idname = "scene.cm_events_populate"
-    bl_label = "Populate cm events list"
+    bl_label = "Populate CM events list"
 
     def execute(self, context):
         context.scene.cm_events.coll.add()

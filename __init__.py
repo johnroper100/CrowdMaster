@@ -121,7 +121,7 @@ class SCENE_OT_cm_groups_reset(Operator):
 class SCENE_OT_cm_agent_add(Operator):
     """Add a single agent to the list of agents in the current group."""
     bl_idname = "scene.cm_agent_add"
-    bl_label = "Add single agent to cm agents list"
+    bl_label = "Add single agent to CM agents list"
 
     agentName = StringProperty()
     brainType = StringProperty()
