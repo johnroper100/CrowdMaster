@@ -199,6 +199,7 @@ class NewInputNode(LogicNode):
                                        ("SINWAVE", "Sine Wave", "", 3)])
     
     SineWaveAmplitude = FloatProperty(name="Amplitude", default=5.0)
+    SineWaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -285,7 +286,9 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
             if self.NoiseOptions == "SINWAVE":
-                layout.prop(self, "SineWaveAmplitude")
+                row = layout.row(expand=True)
+                row.prop(self, "SineWaveAmplitude")
+                row.prop(self, "SineWaveTimeMul")
         elif self.InputSource == "PATH":
             layout.prop_search(
                 self, "PathName", context.scene.cm_paths, "coll")
@@ -343,6 +346,7 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
             node.settings["SineWaveAmplitude"] = self.SineWaveAmplitude
+            node.settings["SineWaveTimeMul"] = self.SineWaveTimeMul
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
