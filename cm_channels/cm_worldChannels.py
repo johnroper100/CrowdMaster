@@ -60,7 +60,7 @@ class World(Mc):
                 match = True
                 result = 1
                 if e.category == "Time" or e.category == "Time+Volume":
-                    if e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
+                    if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
                         result = 0
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
