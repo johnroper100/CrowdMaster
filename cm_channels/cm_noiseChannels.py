@@ -52,5 +52,5 @@ class Noise(Mc):
 
     @timeChannel("Noise")
     def sinWave(self, swtm=1.0, swa=5):
-        """Returns a sine wave section in range -1 - 1 based on the current frame"""
+        """Returns a sine wave based on the current frame"""
         return np.cos((bpy.context.scene.frame_current * swtm) * 3.14 / swa)

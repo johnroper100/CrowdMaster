@@ -197,7 +197,7 @@ class NewInputNode(LogicNode):
                                 items=[("RANDOM", "Random", "", 1),
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("SINWAVE", "Sine Wave", "", 3)])
-    
+
     SineWaveAmplitude = FloatProperty(name="Amplitude", default=5.0)
     SineWaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
 
