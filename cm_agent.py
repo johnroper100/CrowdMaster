@@ -152,6 +152,8 @@ class Agent:
         self.py = self.brain.outvars["py"] if self.brain.outvars["py"] else 0
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
 
+        self.sk = self.brain.outvars["sk"] if self.brain.outvars["sk"] else 0
+
         self.external["tags"] = self.brain.tags
 
         move = mathutils.Vector((self.px + self.sx,
@@ -195,7 +197,10 @@ class Agent:
             for track in obj.animation_data.nla_tracks:
                 track.mute = False
 
-        """Set objects rotation and location"""
+        """Set objects shape key value, rotation and location"""
+
+        obj.data.shape_keys.key_blocks[self.brain.outvars["SKName"]].value = self.sk
+        obj.data.shape_keys.key_blocks[self.brain.outvars["SKName"]].keyframe_insert(data_path="value")
 
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:

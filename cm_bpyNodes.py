@@ -624,8 +624,10 @@ class OutputNode(LogicNode):
                                  ("ry", "ry", "", 2),
                                  ("px", "px", "", 4),
                                  ("py", "py", "", 5),
-                                 ("pz", "pz", "", 6)
+                                 ("pz", "pz", "", 6),
+                                 ("sk", "Shape Key", "", 6)
                                  ])
+    SKName = StringProperty(name="Shape Key Name")
     MultiInputType = EnumProperty(name="Multi Input Type",
                                   items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
@@ -635,10 +637,13 @@ class OutputNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Output")
+        if self.Output == "sk":
+            layout.prop(self, "SKName")
         layout.prop(self, "MultiInputType")
 
     def getSettings(self, node):
         node.settings["Output"] = self.Output
+        node.settings["SKName"] = self.SKName
         node.settings["MultiInputType"] = self.MultiInputType
 
 
