@@ -46,8 +46,7 @@ class DefaultSocket(NodeSocket):
 
     filterProperty = EnumProperty(items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
-                                         ("MIN", "Min", "", 3)
-                                         ])
+                                         ("MIN", "Min", "", 3)])
     defaultValueProperty = FloatProperty(default=1.0)
     randomInputValue = BoolProperty(default=False)
 
