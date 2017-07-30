@@ -26,8 +26,8 @@ from bpy.types import Operator, Panel, PropertyGroup, UIList
 class event_entry(PropertyGroup):
     """The data structure for the event entries"""
     eventname = StringProperty()
-    timeMin = IntProperty()
-    timeMax = IntProperty()
+    timeMin = IntProperty(name="Time Min")
+    timeMax = IntProperty(name="Time Max")
     index = IntProperty(min=0)
     category = EnumProperty(items=(
         ("Time", "Time", "Time"),
@@ -99,8 +99,8 @@ class SCENE_UL_event(UIList):
             layout.prop(item, "eventname", text="")
             layout.prop(item, "category", text="")
             if item.category == "Time" or item.category == "Time+Volume":
-                layout.prop(item, "timeMin", text="")
-                layout.prop(item, "timeMax", text="")
+                layout.prop(item, "timeMin", text="Min")
+                layout.prop(item, "timeMax", text="Max")
             if item.category == "Volume" or item.category == "Time+Volume":
                 layout.prop_search(item, "volume", bpy.data, "objects")
             # this draws each row in the list. Each line is a widget
