@@ -99,8 +99,8 @@ class SCENE_UL_event(UIList):
             layout.prop(item, "eventname", text="")
             layout.prop(item, "category", text="")
             if item.category == "Time" or item.category == "Time+Volume":
-                layout.prop(item, "timeMin", text="Min")
-                layout.prop(item, "timeMax", text="Max")
+                layout.prop(item, "timeMin", text="Start")
+                layout.prop(item, "timeMax", text="End")
             if item.category == "Volume" or item.category == "Time+Volume":
                 layout.prop_search(item, "volume", bpy.data, "objects")
             # this draws each row in the list. Each line is a widget
