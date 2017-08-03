@@ -238,7 +238,7 @@ class NewInputNode(LogicNode):
                                           ("CERT", "cert", "", 6),
                                           ("ACC", "acc", "", 7),
                                           ("OVER", "over", "", 8)])
-    MinusRadius = BoolProperty(name="Minus radius", default=True)
+    MinusRadius = BoolProperty(name="Minus Radius", default=True)
 
     StateOptions = EnumProperty(name="State Options",
                                 items=[("RADIUS", "Radius", "", 1),

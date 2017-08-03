@@ -116,7 +116,7 @@ translations = {
         ("*", "Agent Random"): "Agentes de manera Aleatoria",
         ("*", "Path Name"): "Nombre de Ruta",
         ("*", "Prediction"): "Predicción",
-        ("*", "Minus radius"): "Radio Menor",
+        ("*", "Minus Radius"): "Radio Menor",
         ("*", "State Options"): "Opciones de Estado",
         ("*", "Query tag"): "Etiqueta de Consulta",
         ("*", "World Options"): "Opciones Generales",
