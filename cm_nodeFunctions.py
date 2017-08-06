@@ -787,6 +787,8 @@ class StateAction(State):
                     self.brain.outvars["rx"] += x * scale.x
                     self.brain.outvars["ry"] += y * scale.y
                     self.brain.outvars["rz"] += z * scale.z
+                elif data_path == "value":
+                    self.brain.outvars["sk"] += x
 
         # Check to see if there is a valid sync state to move to
 
