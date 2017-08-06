@@ -644,8 +644,8 @@ class OutputNode(LogicNode):
         layout.prop(self, "MultiInputType")
 
     def getSettings(self, node):
-        node.settings["Output"] = self.Output
         node.settings["SKName"] = self.SKName
+        node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
 
 

@@ -573,8 +573,8 @@ class LogicOUTPUT(Neuron):
             for into in inps:
                 for i in into:
                     out += into[i]
-        self.brain.outvars[settings["Output"]] = out
         self.brain.outvars["SKName"] = settings["SKName"]
+        self.brain.outvars[settings["Output"]] = out
         return out
 
 
