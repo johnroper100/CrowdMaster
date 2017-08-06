@@ -152,7 +152,7 @@ class Agent:
         self.py = self.brain.outvars["py"] if self.brain.outvars["py"] else 0
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
 
-        self.sk = self.brain.outvars["sk"] if self.brain.outvars["sk"] else 0
+        self.sk = self.brain.outvars["SKName"] if self.brain.outvars["SKName"] else 0
 
         self.external["tags"] = self.brain.tags
 
