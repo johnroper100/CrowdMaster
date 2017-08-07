@@ -573,8 +573,11 @@ class LogicOUTPUT(Neuron):
             for into in inps:
                 for i in into:
                     out += into[i]
-        self.brain.outvars["SKName"] = settings["SKName"]
-        self.brain.outvars[settings["Output"]] = out
+        outNm = settings["Output"]
+        if outNm == "sk":
+            self.brain.outvars["sk"][settings["SKName"]] = out
+        else:
+            self.brain.outvars[settings["Output"]] = out
         return out
 
 
@@ -787,8 +790,6 @@ class StateAction(State):
                     self.brain.outvars["rx"] += x * scale.x
                     self.brain.outvars["ry"] += y * scale.y
                     self.brain.outvars["rz"] += z * scale.z
-                elif data_path == "value":
-                    self.brain.outvars["sk"] += x
 
         # Check to see if there is a valid sync state to move to
 
