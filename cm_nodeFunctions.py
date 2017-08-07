@@ -787,9 +787,9 @@ class StateAction(State):
                     self.brain.outvars["py"] += y * scale.y
                     self.brain.outvars["pz"] += z * scale.z
                 elif data_path == "rotation_euler":
-                    self.brain.outvars["rx"] += x * scale.x
-                    self.brain.outvars["ry"] += y * scale.y
-                    self.brain.outvars["rz"] += z * scale.z
+                    self.brain.outvars["rx"] += x
+                    self.brain.outvars["ry"] += y
+                    self.brain.outvars["rz"] += z
 
         # Check to see if there is a valid sync state to move to
 
