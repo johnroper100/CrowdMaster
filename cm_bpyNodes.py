@@ -259,6 +259,11 @@ class NewInputNode(LogicNode):
                                         ("RX", "rx", "", 2),
                                         ("ARRIVED", "Arrived", "", 3)])
     EventName = StringProperty(name="Event Name")
+    EventOptions = EnumProperty(name="Event Options",
+                                items=[("duration", "Duration", "", 1),
+                                       ("elapsed", "Elapsed", "", 2),
+                                       ("control", "Control", "", 3)],
+                                default="control")
 
     AgentInfoOptions = EnumProperty(name="Agent Info Options",
                                     items=[("GETTAG", "Get Tag", "", 1),
@@ -323,6 +328,7 @@ class NewInputNode(LogicNode):
                     layout.prop(self, "TargetOptions")
             if self.WorldOptions == "EVENT":
                 layout.prop(self, "EventName")
+                layout.prop(self, "EventOptions")
         elif self.InputSource == "AGENTINFO":
             layout.prop(self, "AgentInfoOptions")
             if self.AgentInfoOptions == "GETTAG":
@@ -375,6 +381,7 @@ class NewInputNode(LogicNode):
                     node.settings["TargetOptions"] = self.TargetOptions
             if self.WorldOptions == "EVENT":
                 node.settings["EventName"] = self.EventName
+                node.settings["EventOptions"] = self.EventOptions
         elif self.InputSource == "AGENTINFO":
             node.settings["AgentInfoOptions"] = self.AgentInfoOptions
             node.settings["GetTagName"] = self.GetTagName
