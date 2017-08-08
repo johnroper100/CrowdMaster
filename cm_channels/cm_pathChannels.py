@@ -776,21 +776,24 @@ class cm_path_dfs(Operator):
             return False
         return True
 
-    def dfs(self, v):
-        for e in v.link_edges:
-            if e not in self.seen:
-                other = e.other_vert(v)
-                indexStr = str(e.index)
-                if v.index == e.verts[0].index:
-                    if indexStr in self.pathEntry.revDirec:
-                        toRm = self.pathEntry.revDirec.find(indexStr)
-                        self.pathEntry.revDirec.remove(toRm)
-                else:
-                    if indexStr not in self.pathEntry.revDirec:
-                        revEdge = self.pathEntry.revDirec.add()
-                        revEdge.name = indexStr
-                self.seen.add(e)
-                self.dfs(other)
+    def dfs(self, startVert):
+        stack = [startVert]
+        while len(stack) > 0:
+            v = stack.pop()
+            for e in v.link_edges:
+                if e not in self.seen:
+                    other = e.other_vert(v)
+                    indexStr = str(e.index)
+                    if v.index == e.verts[0].index:
+                        if indexStr in self.pathEntry.revDirec:
+                            toRm = self.pathEntry.revDirec.find(indexStr)
+                            self.pathEntry.revDirec.remove(toRm)
+                    else:
+                        if indexStr not in self.pathEntry.revDirec:
+                            revEdge = self.pathEntry.revDirec.add()
+                            revEdge.name = indexStr
+                    self.seen.add(e)
+                    stack.append(other)
 
     def execute(self, context):
         global activePath
