@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import time
+import random
 
 import bpy
 from bpy.props import StringProperty
@@ -137,6 +138,18 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
     def execute(self, context):
         preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
 
+        wm = bpy.context.window_manager
+        tot = 0
+        for agentGroup in bpy.context.scene.cm_groups:
+            if agentGroup.groupType != "auto":
+                continue
+            for agentType in agentGroup.agentTypes:
+                for agent in agentType.agents:
+                    if bpy.context.scene.objects[agent.name]["cm_deferGeo"]:
+                        tot += 1
+
+        progress = 0
+        wm.progress_begin(0, tot)
         for agentGroup in bpy.context.scene.cm_groups:
             if agentGroup.groupType != "auto":
                 continue
@@ -150,6 +163,7 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
                         cache = {}
                         suc, temp = construct(buildRequest.bpyNode, cache)
                         if suc:
+                            random.seed(buildRequest.seed)
                             gr = temp.build(buildRequest)
 
                             if preferences.show_debug_options and preferences.show_debug_timings:
@@ -182,12 +196,18 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
 
                                     gr.overwriteRig.animation_data.action = action
 
+                            progress += 1
+                            wm.progress_update(progress)
+
                             if preferences.show_debug_options and preferences.show_debug_timings:
                                 cm_timings.placement["deferGeoB"] += time.time() - t
                         else:
+                            wm.progress_end()
                             return {'CANCELLED'}
         # For rig update
         bpy.context.scene.frame_current = bpy.context.scene.frame_current
+
+        wm.progress_end()
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.printPlacementTimings()
