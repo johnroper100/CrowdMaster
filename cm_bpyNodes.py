@@ -851,7 +851,7 @@ class NoteNode(CrowdMasterNode):
                 if l:
                     col.label(text=l)
             col = layout.column()
-            col.operator("node.sim_note_clear", icon="X_VEC")
+            col.operator("node.sim_note_clear", icon="X")
 
         else:
             col = layout.column()
@@ -859,12 +859,12 @@ class NoteNode(CrowdMasterNode):
 
             col = layout.column(align=True)
             col.operator("node.sim_note_from_clipboard", icon="TEXT")
-            col.operator("node.sim_note_clear", icon="X_VEC")
+            col.operator("node.sim_note_clear", icon="X")
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "text", text="Text")
         layout.operator("node.sim_note_from_clipboard", icon="TEXT")
-        layout.operator("node.sim_note_clear", icon="X_VEC")
+        layout.operator("node.sim_note_clear", icon="X")
 
     def clear(self):
         self.text = ""
