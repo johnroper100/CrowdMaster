@@ -212,7 +212,7 @@ class LogicNEWINPUT(Neuron):
             elif settings["WorldOptions"] == "TIME":
                 return {"None": channels["World"].time}
             elif settings["WorldOptions"] == "EVENT":
-                return world.event(settings["EventName"])
+                return world.event(settings["EventName"], settings["EventOptions"])
 
         elif settings["InputSource"] == "AGENTINFO":
             agent = channels["AgentInfo"]
