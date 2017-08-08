@@ -826,7 +826,8 @@ class StateAction(State):
                 moveToInterupt = False
 
             if moveToInterupt:
-                self.strip.action_frame_end = self.currentFrame + 1
+                if self.strip is not None:
+                    self.strip.action_frame_end = self.currentFrame + 1
                 return True, nextState
 
         # ==== Will stop here if there is a valid sync or interupt state ====
