@@ -82,26 +82,33 @@ class Channel:
         s = bpy.context.scene.objects[self.userid]
         for gnd in self.groupObjects:
             if gnd.name not in self.groundTrees:
-                r = gnd.rotation_euler
-                if r[0] or r[1] or r[2]:
-                    print(gnd.name, "rotation must be applied")
-                    # TODO make ray_cast work with rotation
                 sce = bpy.context.scene
                 self.groundTrees[gnd.name] = BVHTree.FromObject(gnd, sce)
-            point = s.location - gnd.location
-            calcd = self.groundTrees[gnd.name].ray_cast(point, (0, 0, -1))
+            inverseTransform = gnd.matrix_world.inverted()
+            point = s.location * inverseTransform
+            direc = Vector((0, 0, 1)) * inverseTransform
+            calcd = self.groundTrees[gnd.name].ray_cast(point,
+                                                        tuple(-x for x in direc))
             if calcd[0]:
-                results.append(calcd + (1,))
-            calcd = self.groundTrees[gnd.name].ray_cast(point, (0, 0, 1))
+                loc, norm, ind, dist = calcd
+                loc = loc * gnd.matrix_world
+                norm = norm * gnd.matrix_world
+                dist = (s.location - loc).length
+                results.append((loc, norm, ind, dist))
+            calcd = self.groundTrees[gnd.name].ray_cast(point, tuple(x for x in direc))
             if calcd[0]:
-                results.append(calcd + (-1,))
+                loc, norm, ind, dist = calcd
+                loc = loc * gnd.matrix_world
+                norm = norm * gnd.matrix_world
+                dist = (s.location - loc).length
+                results.append((loc, norm, ind, -dist))
 
         if len(results) > 0:
-            loc, norm, ind, dist, direc = min(results, key=lambda x: x[3])
+            loc, norm, ind, dist = min(results, key=lambda x: x[3])
             self.store["location"] = loc
             self.store["normal"] = norm
             self.store["index"] = ind
-            self.store["distance"] = dist * direc  # direc is +/-1
+            self.store["distance"] = dist
         else:
             self.store["distance"] = None
         self.calcd = True
