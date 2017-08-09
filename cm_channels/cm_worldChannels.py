@@ -60,32 +60,29 @@ class World(Mc):
                 match = True
                 result = 1
                 if e.category == "Time" or e.category == "Time+Volume":
-                    if eventType == "control":
-                        if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
-                            result = 0
-                        elif eventType == "duration":
-                            duration = e.timeMax - e.timeMin
-                            return {"None": duration}
+                    if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
+                        result = 0
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
-                        if eventType == "control":
-                            volObj = bpy.data.objects[e.volume]
-                            pt = bpy.data.objects[self.userid].location
-                            localPt = volObj.matrix_world.inverted() * pt
-                            d = mathutils.Vector()
-                            d.x = volObj.dimensions.x / volObj.scale.x
-                            d.y = volObj.dimensions.y / volObj.scale.y
-                            d.z = volObj.dimensions.z / volObj.scale.z
+                        volObj = bpy.data.objects[e.volume]
+                        pt = bpy.data.objects[self.userid].location
+                        localPt = volObj.matrix_world.inverted() * pt
+                        d = mathutils.Vector()
+                        d.x = volObj.dimensions.x / volObj.scale.x
+                        d.y = volObj.dimensions.y / volObj.scale.y
+                        d.z = volObj.dimensions.z / volObj.scale.z
 
-                            if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
-                                    -(d.y / 2) <= localPt.y <= (d.y / 2) and
-                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
-                                result = 0
-                        else:
-                            return {"None": 0}
-
+                        if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                                -(d.y / 2) <= localPt.y <= (d.y / 2) and
+                                -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                            result = 0
                 if result:
-                    return {"None": 1}
+                    if eventType == "control":
+                        return {"None": 1}
+                    elif eventType == "duration":
+                        duration = e.timeMax - e.timeMin
+                        return {"None": duration}
+
         return {"None": 0}
 
 
