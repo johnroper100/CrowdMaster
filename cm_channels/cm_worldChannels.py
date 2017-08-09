@@ -82,6 +82,9 @@ class World(Mc):
                     elif eventType == "duration":
                         duration = e.timeMax - e.timeMin
                         return {"None": duration}
+                    elif eventType == "elapsed":
+                        elapsed = e.timeMax - bpy.context.scene.frame_current
+                        return {"None": elapsed}
 
         return {"None": 0}
 
