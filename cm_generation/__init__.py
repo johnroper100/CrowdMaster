@@ -145,7 +145,8 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
                 continue
             for agentType in agentGroup.agentTypes:
                 for agent in agentType.agents:
-                    if bpy.context.scene.objects[agent.name]["cm_deferGeo"]:
+                    obj = bpy.context.scene.objects[agent.name]
+                    if obj["cm_deferGeo"] and obj.select:
                         tot += 1
 
         progress = 0
@@ -157,7 +158,7 @@ class SCENE_OT_agent_nodes_place_defer_geo(Operator):
                 for agent in agentType.agents:
                     obj = bpy.context.scene.objects[agent.name]
                     rig = bpy.context.scene.objects[agent.rigOverwrite]
-                    if obj["cm_deferGeo"]:
+                    if obj["cm_deferGeo"] and obj.select:
                         obj["cm_deferGeo"] = False
                         buildRequest = GeoRequest.fromObject(obj)
                         cache = {}
