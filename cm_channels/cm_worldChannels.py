@@ -56,10 +56,10 @@ class World(Mc):
         en = eventName
         for e in events:
             if e.eventname == en:
-                result = 1
+                result = True
                 if e.category == "Time" or e.category == "Time+Volume":
                     if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
-                        result = 0
+                        result = False
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
                         volObj = bpy.data.objects[e.volume]
@@ -73,7 +73,7 @@ class World(Mc):
                         if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
                                 -(d.y / 2) <= localPt.y <= (d.y / 2) and
                                 -(d.z / 2) <= localPt.z <= (d.z / 2)):
-                            result = 0
+                            result = False
                 if result:
                     return {"None": 1}
         return {"None": 0}
