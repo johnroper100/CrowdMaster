@@ -54,10 +54,8 @@ class World(Mc):
     def event(self, eventName):
         events = bpy.context.scene.cm_events.coll
         en = eventName
-        match = False
         for e in events:
             if e.eventname == en:
-                match = True
                 result = 1
                 if e.category == "Time" or e.category == "Time+Volume":
                     if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
