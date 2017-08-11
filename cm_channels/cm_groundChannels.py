@@ -85,26 +85,27 @@ class Channel:
                 sce = bpy.context.scene
                 self.groundTrees[gnd.name] = BVHTree.FromObject(gnd, sce)
             inverseTransform = gnd.matrix_world.inverted()
-            point = s.location * inverseTransform
-            direc = Vector((0, 0, 1)) * inverseTransform
+            point = (inverseTransform * s.location.to_4d()).to_3d()
+            direc = Vector((0, 0, 1))
+            direc.rotate(inverseTransform.to_euler())
             calcd = self.groundTrees[gnd.name].ray_cast(point,
                                                         tuple(-x for x in direc))
             if calcd[0]:
                 loc, norm, ind, dist = calcd
-                loc = loc * gnd.matrix_world
-                norm = norm * gnd.matrix_world
+                loc = gnd.matrix_world * loc
+                norm = gnd.matrix_world * norm
                 dist = (s.location - loc).length
                 results.append((loc, norm, ind, dist))
             calcd = self.groundTrees[gnd.name].ray_cast(point, tuple(x for x in direc))
             if calcd[0]:
                 loc, norm, ind, dist = calcd
-                loc = loc * gnd.matrix_world
-                norm = norm * gnd.matrix_world
+                loc = gnd.matrix_world * loc
+                norm = gnd.matrix_world * norm
                 dist = (s.location - loc).length
                 results.append((loc, norm, ind, -dist))
 
         if len(results) > 0:
-            loc, norm, ind, dist = min(results, key=lambda x: x[3])
+            loc, norm, ind, dist = min(results, key=lambda x: abs(x[3]))
             self.store["location"] = loc
             self.store["normal"] = norm
             self.store["index"] = ind

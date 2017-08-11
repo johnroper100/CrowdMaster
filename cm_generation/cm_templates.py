@@ -1291,24 +1291,37 @@ class TemplateGROUND(Template):
         gnd = sce.objects[self.settings["groundMesh"]]
         if self.bvhtree is None:
             self.bvhtree = BVHTree.FromObject(gnd, sce)
-        point = buildRequest.pos - gnd.location
-        hitA, normA, indA, distA = self.bvhtree.ray_cast(point, (0, 0, -1))
-        hitB, normB, indB, distB = self.bvhtree.ray_cast(point, (0, 0, 1))
+
+        inverseTransform = gnd.matrix_world.inverted()
+        point = (inverseTransform * buildRequest.pos.to_4d()).to_3d()
+        direc = Vector((0, 0, 1))
+        direc.rotate(inverseTransform.to_euler())
+
+        hitA, normA, indA, distA = self.bvhtree.ray_cast(point,
+                                                         tuple(-x for x in direc))
+        if hitA is not None:
+            hitA = gnd.matrix_world * hitA
+            normA = gnd.matrix_world * normA
+            distA = (buildRequest.pos - hitA).length
+        
+        hitB, normB, indB, distB = self.bvhtree.ray_cast(point,
+                                                         tuple(x for x in direc))
+        if hitB is not None:
+            hitB = gnd.matrix_world * hitB
+            normB = gnd.matrix_world * normB
+            distB = (buildRequest.pos - hitB).length
+        
         if hitA and hitB:
             if distA <= distB:
-                hitA += gnd.location
                 buildRequest.pos = hitA
                 self.inputs["Template"].build(buildRequest)
             else:
-                hitB += gnd.location
                 buildRequest.pos = hitB
                 self.inputs["Template"].build(buildRequest)
         elif hitA:
-            hitA += gnd.location
             buildRequest.pos = hitA
             self.inputs["Template"].build(buildRequest)
         elif hitB:
-            hitB += gnd.location
             buildRequest.pos = hitB
             self.inputs["Template"].build(buildRequest)
 
