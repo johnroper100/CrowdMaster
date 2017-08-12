@@ -30,6 +30,8 @@ bl_info = {
     "category": "Simulation"
 }
 
+import logging
+
 import bpy
 from bpy.props import CollectionProperty, StringProperty
 from bpy.types import Operator, Panel, UIList
@@ -38,9 +40,9 @@ from . import addon_updater_ops, cm_prefs
 from .cm_blenderData import initialTagProperty, modifyBoneProperty
 from .cm_iconLoad import cicon, register_icons, unregister_icons
 
-
 # =============== GROUPS LIST START ===============#
 
+logger = logging.getLogger("CrowdMaster")
 
 class SCENE_UL_group(UIList):
     """for drawing each row"""
@@ -581,6 +583,12 @@ def register():
 
     if nodeTreeSetFakeUser not in bpy.app.handlers.save_pre:
         bpy.app.handlers.save_pre.append(nodeTreeSetFakeUser)
+
+    preferences = bpy.context.user_preferences.addons[__package__].preferences
+    if preferences.show_debug_options:
+        logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 def unregister():

@@ -17,6 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import time
 
 import bpy
@@ -26,6 +27,8 @@ from . import cm_timings
 from .cm_actions import getmotions
 from .cm_agent import Agent
 from .cm_syncManager import syncManager
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Simulation:
@@ -94,8 +97,7 @@ class Simulation:
                        freezeAnimation=freezeAnimation)
             self.agents[name] = ag
         else:
-            if preferences.show_debug_options:
-                print("No such brain type:" + brain)
+            logger.debug("No such brain type:" + brain)
 
     def createAgents(self, group):
         """Set up all the agents at the beginning of the simulation"""
@@ -110,7 +112,7 @@ class Simulation:
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
-            print("NEWFRAME", bpy.context.scene.frame_current)
+            logger.debug("NEWFRAME", bpy.context.scene.frame_current)
             if preferences.show_debug_timings:
                 if self.lastFrameTime is not None:
                     between = time.time() - self.lastFrameTime
@@ -135,13 +137,13 @@ class Simulation:
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.printTimings()
             newT = time.time()
-            print("Frame time", newT - t)
+            logger.debug("Frame time", newT - t)
             cm_timings.simulation["total"] += newT - t
-            print("Total time", cm_timings.simulation["total"])
+            logger.debug("Total time", cm_timings.simulation["total"])
             cm_timings.simulation["totalFrames"] += 1
             tf = cm_timings.simulation["totalFrames"]
             tt = cm_timings.simulation["total"]
-            print("spf", tt / tf)  # seconds per frame
+            logger.debug("spf", tt / tf)  # seconds per frame
             self.lastFrameTime = time.time()
 
     def frameChangeHandler(self, scene):
@@ -166,7 +168,7 @@ class Simulation:
         if preferences.show_debug_options:
             self.totalTime = 0
             self.totalFrames = 0
-            print("Registering frame change handler")
+        logger.debug("Registering frame change handler")
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
@@ -178,6 +180,5 @@ class Simulation:
         """Remove self.frameChangeHandler from Blenders event handlers"""
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
-            if preferences.show_debug_options:
-                print("Unregistering frame change handler")
+            logger.debug("Unregistering frame change handler")
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)

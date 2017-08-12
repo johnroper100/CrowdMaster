@@ -17,6 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import math
 
 import bmesh
@@ -33,6 +34,8 @@ from .cm_masterChannels import timeChannel
 Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
 Vector = mathutils.Vector
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Path(Mc):
@@ -285,7 +288,7 @@ class Path(Mc):
 
             index = nextIndex
             if nextVert is None:
-                print("no next", index)
+                logger.info("no next", index)
             nextIndex = nextVert.index
 
     def alignToPath(self, pathEntry, point, nDirec):

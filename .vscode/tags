@@ -1800,7 +1800,6 @@ show_debug_options	../cm_prefs.py	/^    show_debug_options = BoolProperty($/;"	k
 show_debug_timings	../cm_prefs.py	/^    show_debug_timings = BoolProperty($/;"	kind:variable	line:91
 shutil	../addon_updater.py	/^import shutil$/;"	kind:namespace	line:31
 simulation	../cm_timings.py	/^simulation = OrderedDict([$/;"	kind:variable	line:41
-sinWave	../cm_channels\cm_noiseChannels.py	/^    def sinWave(self, wm="COS", wtm=1.0, wf=5):$/;"	kind:member	line:54
 skip_tag_function	../addon_updater_ops.py	/^def skip_tag_function(tag):$/;"	kind:function	line:844
 slotIndex	../cm_generation\cm_genNodes.py	/^    slotIndex = IntProperty(name="Slot Index",$/;"	kind:variable	line:533
 sortAlongLine	../libs\ins_clustering.py	/^    from .ins_vector import Vector, sortAlongLine$/;"	kind:namespace	line:25
@@ -1968,6 +1967,7 @@ version_min_update	../addon_updater.py	/^	def version_min_update(self):$/;"	kind
 version_min_update	../addon_updater.py	/^	def version_min_update(self, value):$/;"	kind:member	line:372
 version_tuple_from_text	../addon_updater.py	/^	def version_tuple_from_text(self,text):$/;"	kind:member	line:725
 volume	../cm_events\cm_eventsMenu.py	/^    volume = StringProperty(name="Volume")$/;"	kind:variable	line:37
+wave	../cm_channels\cm_noiseChannels.py	/^    def wave(self, wm="COS", wtm=1.0, wf=5):$/;"	kind:member	line:54
 website	../addon_updater.py	/^	def website(self):$/;"	kind:member	line:240
 website	../addon_updater.py	/^	def website(self, value):$/;"	kind:member	line:243
 weight	../cm_generation\cm_genNodes.py	/^    weight = FloatProperty(name="Weight", default=1.0, min=0.0,$/;"	kind:variable	line:343

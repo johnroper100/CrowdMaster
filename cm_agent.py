@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import copy
+import logging
 import time
 
 import bpy
@@ -25,6 +26,8 @@ import mathutils
 
 from . import cm_timings
 from .cm_compileBrain import compileBrain
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Agent:
@@ -134,7 +137,7 @@ class Agent:
             if preferences.show_debug_timings:
                 cm_timings.agent["brainExecute"] += time.time() - t
             if objs[self.id].select:
-                print("ID: ", self.id, "Tags: ", self.brain.tags,
+                logger.debug("ID: ", self.id, "Tags: ", self.brain.tags,
                       "outvars: ", self.brain.outvars)
             # TODO show this in the UI
         if preferences.show_debug_options:

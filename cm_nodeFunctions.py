@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import copy
+import logging
 import math
 import os
 import random
@@ -36,6 +37,8 @@ class Logic{NAME}(Neuron):
         :param settings: dict of form {str: str | int | float, }
         :rtype: int | dict of form {str: float | int}
 """
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class LogicNEWINPUT(Neuron):
@@ -259,9 +262,8 @@ class LogicGRAPH(Neuron):
         for into in inps:
             for i in into:
                 if i in output:
-                    if preferences.show_debug_options:
-                        print(
-                            """LogicGRAPH data lost due to multiple inputs with the same key""")
+                    logger.debug(
+                        """LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
                         output[i] = (RBF(into[i]) * settings["Multiply"])
@@ -559,11 +561,9 @@ class LogicOUTPUT(Neuron):
             SmSquared = 0
             for into in inps:
                 for i in into:
-                    if preferences.show_debug_options:
-                        print("Val:", into[i])
+                    logger.debug("Val:", into[i])
                     Sm += into[i]
                     SmSquared += into[i] * abs(into[i])  # To retain sign
-            # print(Sm, SmSquared)
             if Sm == 0:
                 out = 0
             else:
@@ -589,14 +589,12 @@ class LogicPRIORITY(Neuron):
         remaining = {}
         for v in range((len(inps) + 1) // 2):
             into = inps[2 * v]
-            # print("into", into)
             if 2 * v + 1 < len(inps):
                 priority = inps[2 * v + 1]
                 usesPriority = True
             else:
                 priority = []
                 usesPriority = False
-            # print("priority", priority)
             for i in into:
                 if i in priority:
                     # TODO what if priority[i] < 0?
@@ -615,7 +613,6 @@ class LogicPRIORITY(Neuron):
                     else:
                         result[i] = into[i]
                         remaining[i] = 0
-            # print("resultPartial", result)
         for key, rem in remaining.items():
             if rem != 0:
                 result[key] += settings["defaultValue"] * rem
@@ -636,7 +633,7 @@ class LogicPRINT(Neuron):
                                 str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
-                        print(settings["Label"], ">>", i, into[i])
+                        logger.info(settings["Label"], ">>", i, into[i])
         return 0
 
 
@@ -845,7 +842,6 @@ class StateAction(State):
         options = []
         for con in self.outputs:
             val = self.neurons[con].query()
-            # print(con, val)
             if val is not None and val > 0:
                 options.append((con, val))
 

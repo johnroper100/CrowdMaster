@@ -17,7 +17,11 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 from random import choice, randrange
+
+logger = logging.getLogger("CrowdMaster")
+
 
 try:
     from ins_vector import Vector, sortAlongLine
@@ -41,7 +45,7 @@ def clusterMatch(sources, targets, srcAccessFunc, trgAccessFunc):
     fst = [x[0] for x in check]
     scd = [x[1] for x in check]
     if len(set(fst)) != len(fst) or len(set(scd)) != len(scd):
-        print("Match produced duplicates")
+        logger.info("Match produced duplicates")
     return result
 
 
@@ -296,7 +300,7 @@ if __name__ == "__main__":
             t = time.time()
             success, pairings = clusterMatch(self.agents, self.targets,
                                              accessFunc, accessFunc)
-            print(time.time() - t)
+            logger.debug(time.time() - t)
             assert success, "There was a problem executing clusterMatch"
 
             for p in pairings:
