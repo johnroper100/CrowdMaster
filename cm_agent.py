@@ -58,20 +58,13 @@ class Agent:
                 if m.name not in self.modifyBones:
                     self.modifyBones[m.name] = {}
                 self.modifyBones[m.name][m.attribute] = m.tag
-        for bone in bpy.context.scene.objects[self.rigOverwrite].pose.bones:
-            bone.keyframe_insert("location")
-            if bone.rotation_mode == "QUATERNION":
-                bone.keyframe_insert("rotation_quaternion")
-            elif bone.rotation_mode == "AXIS_ANGLE":
-                bone.keyframe_insert("rotation_axis_angle")
-            else:
-                bone.keyframe_insert("rotation_euler")
 
         objs = bpy.data.objects
 
         """Set the dimensions of this object"""
         self.dimensions = objs[blenderid].dimensions
         self.radius = max(self.dimensions) / 2
+        # TODO allow the user to specify a bounding geometry
 
         """ar - absolute rot, r - change rot by, rs - rot speed"""
         self.arx = objs[blenderid].rotation_euler[0]
