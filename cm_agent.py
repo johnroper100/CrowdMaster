@@ -207,19 +207,20 @@ class Agent:
         lastFrame = bpy.context.scene.frame_current - 1
         thisFrame = bpy.context.scene.frame_current - 1
 
-        for skNm in self.shapeKeys if obj.data.shape_keys is not None:
-            sk = obj.data.shape_keys.key_blocks.get(skNm)
-            if sk is not None:
-                skVal = self.shapeKeys[skNm]
-                if abs(sk.value - skVal) > 0.000001:
-                    if skNm not in self.lastShapeKeys:
-                        sk.keyframe_insert(data_path="value", frame=lastFrame)
-                        self.lastShapeKeys.add(skNm)
-                    sk.value = skVal
-                    sk.keyframe_insert(data_path="value", frame=thisFrame)
-                else:
-                    if skNm in self.lastShapeKeys:
-                        self.lastShapeKeys.remove(skNm)
+        if obj.data.shape_keys is not None:
+            for skNm in self.shapeKeys:
+                sk = obj.data.shape_keys.key_blocks.get(skNm)
+                if sk is not None:
+                    skVal = self.shapeKeys[skNm]
+                    if abs(sk.value - skVal) > 0.000001:
+                        if skNm not in self.lastShapeKeys:
+                            sk.keyframe_insert(data_path="value", frame=lastFrame)
+                            self.lastShapeKeys.add(skNm)
+                        sk.value = skVal
+                        sk.keyframe_insert(data_path="value", frame=thisFrame)
+                    else:
+                        if skNm in self.lastShapeKeys:
+                            self.lastShapeKeys.remove(skNm)
 
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:
