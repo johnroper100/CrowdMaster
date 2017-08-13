@@ -104,8 +104,6 @@ class Agent:
 
         """Clear out the nla"""
         if not freezeAnimation:
-            objs = bpy.data.objects
-
             objs[blenderid].animation_data_clear()
             objs[blenderid].keyframe_insert(data_path="location", frame=1)
             objs[blenderid].keyframe_insert(
