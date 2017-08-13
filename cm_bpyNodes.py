@@ -616,16 +616,16 @@ class MapNode(LogicNode):
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
-    bl_width_default = 320.0
+    bl_width_default = 325.0
 
     Output = EnumProperty(name="Output",
-                          items=[("rz", "rz", "", 3),
-                                 ("rx", "rx", "", 1),
-                                 ("ry", "ry", "", 2),
-                                 ("px", "px", "", 4),
-                                 ("py", "py", "", 5),
-                                 ("pz", "pz", "", 6),
-                                 ("sk", "sk", "", 7)
+                          items=[("rx", "Rotation X", "", 1),
+                                 ("ry", "Rotation Y", "", 2),
+                                 ("rz", "Rotation Z", "", 3),
+                                 ("px", "Position X", "", 4),
+                                 ("py", "Position Y", "", 5),
+                                 ("pz", "Position Z", "", 6),
+                                 ("sk", "Shape Key", "", 7)
                                  ])
     SKName = StringProperty(name="Shape Key Name",
                             description="The name of the shape key")
