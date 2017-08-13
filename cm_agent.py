@@ -207,7 +207,7 @@ class Agent:
         lastFrame = bpy.context.scene.frame_current - 1
         thisFrame = bpy.context.scene.frame_current - 1
 
-        for skNm in self.shapeKeys:
+        for skNm in self.shapeKeys if obj.data.shape_keys is not None:
             sk = obj.data.shape_keys.key_blocks.get(skNm)
             if sk is not None:
                 skVal = self.shapeKeys[skNm]
