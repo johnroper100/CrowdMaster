@@ -41,12 +41,14 @@ class CMSavePrefs(Operator):
 
         return {'FINISHED'}
 
+
 def updateLogger(self, context):
     preferences = context.user_preferences.addons[__package__].preferences
     if preferences.show_debug_options:
         logging.basicConfig(level=logging.DEBUG, format='%(message)s')
     else:
         logging.basicConfig(level=logging.INFO, format='%(message)s')
+
 
 class CMPreferences(AddonPreferences):
     bl_idname = __package__

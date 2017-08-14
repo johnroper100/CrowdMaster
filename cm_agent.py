@@ -130,7 +130,7 @@ class Agent:
                 cm_timings.agent["brainExecute"] += time.time() - t
             if objs[self.id].select:
                 logger.debug("ID: ", self.id, "Tags: ", self.brain.tags,
-                      "outvars: ", self.brain.outvars)
+                             "outvars: ", self.brain.outvars)
             # TODO show this in the UI
         if preferences.show_debug_options:
             t = time.time()
@@ -216,10 +216,12 @@ class Agent:
                             skVal = self.shapeKeys[skNm]
                             if abs(sk.value - skVal) > 0.000001:
                                 if skNm not in self.lastShapeKeys:
-                                    sk.keyframe_insert(data_path="value", frame=lastFrame)
+                                    sk.keyframe_insert(
+                                        data_path="value", frame=lastFrame)
                                     self.lastShapeKeys.add(skNm)
                                 sk.value = skVal
-                                sk.keyframe_insert(data_path="value", frame=thisFrame)
+                                sk.keyframe_insert(
+                                    data_path="value", frame=thisFrame)
                             else:
                                 if skNm in self.lastShapeKeys:
                                     self.lastShapeKeys.remove(skNm)

@@ -16,9 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+import os
+
 import bpy
 from bpy.app.handlers import persistent
-import os
 
 # updater import, import safely
 try:

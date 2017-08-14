@@ -96,7 +96,8 @@ class Channel:
                 norm = gnd.matrix_world * norm
                 dist = (s.location - loc).length
                 results.append((loc, norm, ind, dist))
-            calcd = self.groundTrees[gnd.name].ray_cast(point, tuple(x for x in direc))
+            calcd = self.groundTrees[gnd.name].ray_cast(
+                point, tuple(x for x in direc))
             if calcd[0]:
                 loc, norm, ind, dist = calcd
                 loc = gnd.matrix_world * loc

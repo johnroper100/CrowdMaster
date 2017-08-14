@@ -1303,14 +1303,14 @@ class TemplateGROUND(Template):
             hitA = gnd.matrix_world * hitA
             normA = gnd.matrix_world * normA
             distA = (buildRequest.pos - hitA).length
-        
+
         hitB, normB, indB, distB = self.bvhtree.ray_cast(point,
                                                          tuple(x for x in direc))
         if hitB is not None:
             hitB = gnd.matrix_world * hitB
             normB = gnd.matrix_world * normB
             distB = (buildRequest.pos - hitB).length
-        
+
         if hitA and hitB:
             if distA <= distB:
                 buildRequest.pos = hitA

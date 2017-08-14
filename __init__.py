@@ -44,6 +44,7 @@ from .cm_iconLoad import cicon, register_icons, unregister_icons
 
 logger = logging.getLogger("CrowdMaster")
 
+
 class SCENE_UL_group(UIList):
     """for drawing each row"""
 

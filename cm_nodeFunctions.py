@@ -28,7 +28,6 @@ import bpy
 
 from .cm_brainClasses import Neuron, State
 
-
 """
 class Logic{NAME}(Neuron):
     def core(self, inps, settings):
