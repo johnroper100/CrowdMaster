@@ -207,8 +207,7 @@ class Agent:
         lastFrame = bpy.context.scene.frame_current - 1
         thisFrame = bpy.context.scene.frame_current - 1
 
-        for objname in self.geoGroup:
-            cobj = bpy.data.objects[objname]
+        for cname in bpy.data.groups[self.geoGroup]:
             if cobj.data.shape_keys is not None:
                 for skNm in self.shapeKeys:
                     sk = cobj.data.shape_keys.key_blocks.get(skNm)
