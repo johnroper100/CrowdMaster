@@ -626,7 +626,8 @@ class OutputNode(LogicNode):
                                  ("py", "Position Y", "", 5),
                                  ("pz", "Position Z", "", 6),
                                  ("sk", "Shape Key", "", 7)
-                                 ])
+                                 ],
+                            default="py")
     SKName = StringProperty(name="Shape Key Name",
                             description="The name of the shape key")
     MultiInputType = EnumProperty(name="Multi Input Type",
