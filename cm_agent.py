@@ -224,7 +224,7 @@ class Agent:
         """Set objects shape key value, rotation and location"""
 
         lastFrame = bpy.context.scene.frame_current - 1
-        thisFrame = bpy.context.scene.frame_current - 1
+        thisFrame = bpy.context.scene.frame_current
 
         for cobj in bpy.data.groups[self.geoGroup].objects:
             if cobj.type == 'MESH':
