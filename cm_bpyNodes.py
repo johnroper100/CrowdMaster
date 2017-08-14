@@ -198,11 +198,8 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("WAVE", "Wave", "", 3)])
 
-    WaveFrequency = FloatProperty(name="Frequency", default=5.0)
-    WaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
-    WaveMode = EnumProperty(name="Wave Mode",
-                            items=[("SIN", "Sine", "", 1),
-                                   ("COS", "Cosine", "", 2)])
+    WaveLength = FloatProperty(name="Wavelength", default=24.0, min=0.0)
+    WaveOffset = FloatProperty(name="Offset", default=0.0, min=0.0, max=1.0)
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -289,10 +286,9 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
             if self.NoiseOptions == "WAVE":
-                layout.prop(self, "WaveMode")
                 row = layout.row(align=True)
-                row.prop(self, "WaveFrequency")
-                row.prop(self, "WaveTimeMul")
+                row.prop(self, "WaveLength")
+                row.prop(self, "WaveOffset")
         elif self.InputSource == "PATH":
             layout.prop_search(
                 self, "PathName", context.scene.cm_paths, "coll")
@@ -349,9 +345,8 @@ class NewInputNode(LogicNode):
             node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
-            node.settings["WaveFrequency"] = self.WaveFrequency
-            node.settings["WaveTimeMul"] = self.WaveTimeMul
-            node.settings["WaveMode"] = self.WaveMode
+            node.settings["WaveOffset"] = self.WaveOffset
+            node.settings["WaveLength"] = self.WaveLength
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
