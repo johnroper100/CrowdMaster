@@ -111,6 +111,25 @@ class Agent:
             objs[blenderid].keyframe_insert(
                 data_path="rotation_euler", frame=1)
 
+        # Keyframe everything so agent return to the same position.
+        for obj in bpy.data.groups[self.geoGroup].objects:
+            if obj.type == "ARMATURE":
+                for bone in obj.pose.bones:
+                    bone.keyframe_insert("location")
+                    if bone.rotation_mode == "QUATERNION":
+                        bone.keyframe_insert("rotation_quaternion")
+                    elif bone.rotation_mode == "AXIS_ANGLE":
+                        bone.keyframe_insert("rotation_axis_angle")
+                    else:
+                        bone.keyframe_insert("rotation_euler")
+            obj.keyframe_insert("location")
+            if obj.rotation_mode == "QUATERNION":
+                obj.keyframe_insert("rotation_quaternion")
+            elif obj.rotation_mode == "AXIS_ANGLE":
+                obj.keyframe_insert("rotation_axis_angle")
+            else:
+                obj.keyframe_insert("rotation_euler")
+
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
 
