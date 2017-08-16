@@ -25,7 +25,7 @@ translations = {
         ("Operator", "Start Simulation"): "Empezar Simulación",
         ("Operator", "Stop Simulation"): "Detener Simulación",
         ("*", "Simulation Start Frame"): "Empezar Simulación por Frame",
-        ("*", "Simulation Etart Frame"): "Detener Simulación por Frame",
+        ("*", "Simulation End Frame"): "Detener Simulación por Frame",
         ("*", "Utilities"): "Utilitarios",
         ("Operator", "Place Deferred Geometry"): "Lugar sin Geometría",
         ("Operator", "Switch Dupli Groups"): "Cambiar Grupos Duplicados",
