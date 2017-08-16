@@ -34,6 +34,7 @@ from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
 from .. import cm_timings
+from .. import SCENE_OT_cm_agent_add
 
 BVHTree = mathutils.bvhtree.BVHTree
 KDTree = mathutils.kdtree.KDTree
@@ -662,14 +663,18 @@ class TemplateAGENT(Template):
                                             "attribute": attribute,
                                             "tag": tag})
 
-            bpy.ops.scene.cm_agent_add(agentName=topObj.name,
-                                       brainType=self.settings["brainType"],
-                                       groupName=buildRequest.cm_group,
-                                       geoGroupName=newGp.name,
-                                       initialTags=packTags,
-                                       rigOverwrite=rigOverwrite,
-                                       constrainBone=constrainBone,
-                                       modifyBones=packModifyBones)
+            t = time.time()
+            SCENE_OT_cm_agent_add._execute(bpy.context,
+                                           topObj.name,
+                                           self.settings["brainType"],
+                                           buildRequest.cm_group,
+                                           newGp.name,
+                                           packTags,
+                                           rigOverwrite,
+                                           constrainBone,
+                                           packModifyBones)
+            cm_timings.placement["TemplateAGENT-cm_agent_add"] += time.time() -t
+            cm_timings.placementNum["TemplateAGENT-cm_agent_add"] += 1
 
         cm_timings.placement["TemplateAGENT"] += time.time() - t
         cm_timings.placementNum["TemplateAGENT"] += 1

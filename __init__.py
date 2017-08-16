@@ -140,33 +140,35 @@ class SCENE_OT_cm_agent_add(Operator):
     constrainBone = StringProperty()
     modifyBones = CollectionProperty(type=modifyBoneProperty)
 
-    def execute(self, context):
+    @staticmethod
+    def _execute(context, agentName, brainType, groupName, geoGroupName,
+                 initialTags, rigOverwrite, constrainBone, modifyBones):
         t = time.time()
         scene = context.scene
 
-        if scene.cm_groups.find(self.groupName) == -1:
+        if scene.cm_groups.find(groupName) == -1:
             newGroup = scene.cm_groups.add()
-            newGroup.name = self.groupName
+            newGroup.name = groupName
             newGroup.groupType = "auto"
-        group = scene.cm_groups.get(self.groupName)
+        group = scene.cm_groups.get(groupName)
         if group.groupType == "manual" or group.freezePlacement:
             return {'CANCELLED'}
-        ty = group.agentTypes.find(self.brainType)
+        ty = group.agentTypes.find(brainType)
         if ty == -1:
             at = group.agentTypes.add()
-            at.name = self.brainType
+            at.name = brainType
             ty = group.agentTypes.find(at.name)
         agentType = group.agentTypes[ty]
         newAgent = agentType.agents.add()
-        newAgent.name = self.agentName
-        newAgent.geoGroup = self.geoGroupName
-        newAgent.rigOverwrite = self.rigOverwrite
-        newAgent.constrainBone = self.constrainBone
-        for x in self.initialTags:
+        newAgent.name = agentName
+        newAgent.geoGroup = geoGroupName
+        newAgent.rigOverwrite = rigOverwrite
+        newAgent.constrainBone = constrainBone
+        for x in initialTags:
             tag = newAgent.initialTags.add()
             tag.name = x.name
             tag.value = x.value
-        for x in self.modifyBones:
+        for x in modifyBones:
             modify = newAgent.modifyBones.add()
             modify.name = x.name
             modify.tag = x.tag
@@ -176,6 +178,12 @@ class SCENE_OT_cm_agent_add(Operator):
         cm_timings.placement["cm_agent_add"] += time.time() - t
         cm_timings.placementNum["cm_agent_add"] += 1
         return {'FINISHED'}
+
+    def execute(self, context):
+        return self._execute(context, self.agentName, self.brainType,
+                             self.groupName, self.geoGroupName,
+                             self.initialTags, self.rigOverwrite,
+                             self.constrainBone, self.modifyBones)
 
 
 class SCENE_OT_cm_agent_add_selected(Operator):
