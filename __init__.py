@@ -31,6 +31,8 @@ bl_info = {
 }
 
 import logging
+import time
+from . import cm_timings
 
 import bpy
 from bpy.props import CollectionProperty, StringProperty
@@ -139,6 +141,7 @@ class SCENE_OT_cm_agent_add(Operator):
     modifyBones = CollectionProperty(type=modifyBoneProperty)
 
     def execute(self, context):
+        t = time.time()
         scene = context.scene
 
         if scene.cm_groups.find(self.groupName) == -1:
@@ -169,6 +172,9 @@ class SCENE_OT_cm_agent_add(Operator):
             modify.tag = x.tag
             modify.attribute = x.attribute
         group.totalAgents += 1
+
+        cm_timings.placement["cm_agent_add"] += time.time() - t
+        cm_timings.placementNum["cm_agent_add"] += 1
         return {'FINISHED'}
 
 

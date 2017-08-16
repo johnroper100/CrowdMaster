@@ -26,6 +26,7 @@ from bpy.types import Operator
 from . import cm_genNodes
 from ..libs.ins_vector import Vector
 from .cm_templates import TemplateRequest, templates, tmpPathChannel
+from .. import cm_timings
 
 
 class SCENE_OT_agent_nodes_generate(Operator):
@@ -86,6 +87,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
         genSpaces = {}
         allSuccess = True
 
+        t = time.time()
         for space in generateNode.inputs[0].links:
             tipNode = space.from_node
             if tipNode.bl_idname == "NodeReroute":
@@ -95,7 +97,10 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 genSpaces[tipNode] = temp
             else:
                 allSuccess = False
+        cm_timings.placement["Construct"] += time.time() - t
+        cm_timings.placementNum["Construct"] += 1
 
+        t = time.time()
         if allSuccess:
             for gpName in [g.name for g in context.scene.cm_groups]:
                 bpy.ops.scene.cm_groups_reset(groupName=gpName)
@@ -108,7 +113,11 @@ class SCENE_OT_agent_nodes_generate(Operator):
                 genSpaces[tipNode].build(buildRequest)
         else:
             return {'CANCELLED'}
+        cm_timings.placement["Build"] += time.time() - t
+        cm_timings.placementNum["Build"] += 1
 
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.printTimings()
         return {'FINISHED'}
 
 
