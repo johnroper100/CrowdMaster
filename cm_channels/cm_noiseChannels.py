@@ -53,5 +53,7 @@ class Noise(Mc):
     def wave(self, offset, wavelength):
         """Returns a sine wave based on the current frame
         https://www.desmos.com/calculator/gwpmwylgg0"""
-        x = (bpy.context.scene.frame_current + offset * wavelength)
+        scene = bpy.context.scene
+        t = scene.frame_current - scene.cm_sim_start_frame
+        x = (t + offset * wavelength)
         return math.sin((2 * math.pi * x) / wavelength)
