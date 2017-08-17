@@ -300,7 +300,7 @@ if __name__ == "__main__":
             t = time.time()
             success, pairings = clusterMatch(self.agents, self.targets,
                                              accessFunc, accessFunc)
-            logger.debug(time.time() - t)
+            logger.debug(str(time.time() - t))
             assert success, "There was a problem executing clusterMatch"
 
             for p in pairings:

@@ -97,7 +97,7 @@ class Simulation:
                        freezeAnimation=freezeAnimation, geoGroup=geoGroup)
             self.agents[name] = ag
         else:
-            logger.debug("No such brain type:" + brain)
+            logger.debug("No such brain type: {}".format(brain))
 
     def createAgents(self, group):
         """Set up all the agents at the beginning of the simulation"""
@@ -112,7 +112,7 @@ class Simulation:
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
-            logger.debug("NEWFRAME", bpy.context.scene.frame_current)
+            logger.debug("NEWFRAME {}".format(bpy.context.scene.frame_current))
             if preferences.show_debug_timings:
                 if self.lastFrameTime is not None:
                     between = time.time() - self.lastFrameTime
@@ -137,13 +137,13 @@ class Simulation:
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.printTimings()
             newT = time.time()
-            logger.debug("Frame time", newT - t)
+            logger.debug("Frame time {}".format(newT - t))
             cm_timings.simulation["total"] += newT - t
-            logger.debug("Total time", cm_timings.simulation["total"])
+            logger.debug("Total time {}".format(cm_timings.simulation["total"]))
             cm_timings.simulation["totalFrames"] += 1
             tf = cm_timings.simulation["totalFrames"]
             tt = cm_timings.simulation["total"]
-            logger.debug("spf", tt / tf)  # seconds per frame
+            logger.debug("spf {}".format(tt / tf))  # seconds per frame
             self.lastFrameTime = time.time()
 
     def frameChangeHandler(self, scene):

@@ -148,8 +148,7 @@ class Agent:
             if preferences.show_debug_timings:
                 cm_timings.agent["brainExecute"] += time.time() - t
             if objs[self.id].select:
-                logger.debug("ID: ", self.id, "Tags: ", self.brain.tags,
-                             "outvars: ", self.brain.outvars)
+                logger.debug("ID: {} Tags: {} outvars: {}".format(self.id, self.brain.tags, self.brain.outvars))
             # TODO show this in the UI
         if preferences.show_debug_options:
             t = time.time()

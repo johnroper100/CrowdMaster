@@ -561,7 +561,7 @@ class LogicOUTPUT(Neuron):
             SmSquared = 0
             for into in inps:
                 for i in into:
-                    logger.debug("Val:", into[i])
+                    logger.debug("Val: {}".format(into[i]))
                     Sm += into[i]
                     SmSquared += into[i] * abs(into[i])  # To retain sign
             if Sm == 0:
