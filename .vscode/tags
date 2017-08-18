@@ -36,7 +36,7 @@ CMSavePrefs	../cm_prefs.py	/^class CMSavePrefs(Operator):$/;"	kind:class	line:30
 Channel	../cm_channels\cm_formationChannels.py	/^class Channel:$/;"	kind:class	line:67
 Channel	../cm_channels\cm_groundChannels.py	/^class Channel:$/;"	kind:class	line:55
 Channel	../cm_channels\cm_soundChannels.py	/^class Channel:$/;"	kind:class	line:63
-Channel	../cm_channels\cm_worldChannels.py	/^class Channel:$/;"	kind:class	line:92
+Channel	../cm_channels\cm_worldChannels.py	/^class Channel:$/;"	kind:class	line:90
 CollectionProperty	../__init__.py	/^from bpy.props import CollectionProperty, StringProperty$/;"	kind:namespace	line:34
 CollectionProperty	../cm_actions\cm_actionsMenu.py	/^from bpy.props import (CollectionProperty, EnumProperty, IntProperty,$/;"	kind:namespace	line:21
 CollectionProperty	../cm_blenderData.py	/^from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,$/;"	kind:namespace	line:21
@@ -400,7 +400,7 @@ __init__	../cm_channels\cm_soundChannels.py	/^    def __init__(self, frequency, 
 __init__	../cm_channels\cm_soundChannels.py	/^    def __init__(self, sim):$/;"	kind:member	line:35
 __init__	../cm_channels\cm_stateChannels.py	/^    def __init__(self, sim):$/;"	kind:member	line:29
 __init__	../cm_channels\cm_worldChannels.py	/^    def __init__(self, sim):$/;"	kind:member	line:32
-__init__	../cm_channels\cm_worldChannels.py	/^    def __init__(self, target, user, sim):$/;"	kind:member	line:93
+__init__	../cm_channels\cm_worldChannels.py	/^    def __init__(self, target, user, sim):$/;"	kind:member	line:91
 __init__	../cm_generation\cm_templates.py	/^    def __init__(self):$/;"	kind:member	line:116
 __init__	../cm_generation\cm_templates.py	/^    def __init__(self):$/;"	kind:member	line:70
 __init__	../cm_generation\cm_templates.py	/^    def __init__(self, *args):$/;"	kind:member	line:260
@@ -497,7 +497,7 @@ api_url	../addon_updater.py	/^	def api_url(self):$/;"	kind:member	line:253
 api_url	../addon_updater.py	/^	def api_url(self, value):$/;"	kind:member	line:256
 app	../libs\ins_clustering.py	/^    app = QtGui.QApplication(sys.argv)$/;"	kind:variable	line:319
 apply	../cm_agent.py	/^    def apply(self):$/;"	kind:member	line:184
-arrived	../cm_channels\cm_worldChannels.py	/^    def arrived(self):$/;"	kind:member	line:150
+arrived	../cm_channels\cm_worldChannels.py	/^    def arrived(self):$/;"	kind:member	line:148
 ask_to_save	../cm_prefs.py	/^    ask_to_save = BoolProperty($/;"	kind:variable	line:103
 assignConnectedToIsland	../cm_generation\cm_templates.py	/^def assignConnectedToIsland(vert, islandID, islandNo):$/;"	kind:function	line:1055
 async	../addon_updater.py	/^import asyncio # for async processing$/;"	kind:namespace	line:32
@@ -888,7 +888,7 @@ calcSeparate	../cm_channels\cm_flockChannels.py	/^    def calcSeparate(self, loc
 calcground	../cm_channels\cm_groundChannels.py	/^    def calcground(self):$/;"	kind:member	line:79
 calculate	../cm_channels\cm_formationChannels.py	/^    def calculate(self):$/;"	kind:member	line:110
 calculate	../cm_channels\cm_soundChannels.py	/^    def calculate(self, minusRadius):$/;"	kind:member	line:102
-calculate	../cm_channels\cm_worldChannels.py	/^    def calculate(self):$/;"	kind:member	line:102
+calculate	../cm_channels\cm_worldChannels.py	/^    def calculate(self):$/;"	kind:member	line:100
 calculatePrediction	../cm_channels\cm_soundChannels.py	/^    def calculatePrediction(self):$/;"	kind:member	line:147
 calculateSteering	../cm_channels\cm_soundChannels.py	/^    def calculateSteering(self):$/;"	kind:member	line:213
 category	../cm_events\cm_eventsMenu.py	/^    category = EnumProperty(items=($/;"	kind:variable	line:32
@@ -1772,11 +1772,11 @@ run_update	../addon_updater.py	/^	def run_update(self,force=False,revert_tag=Non
 rx	../cm_channels\cm_formationChannels.py	/^    def rx(self):$/;"	kind:member	line:256
 rx	../cm_channels\cm_pathChannels.py	/^    def rx(self, pathName):$/;"	kind:member	line:356
 rx	../cm_channels\cm_soundChannels.py	/^    def rx(self, minusRadius):$/;"	kind:member	line:384
-rx	../cm_channels\cm_worldChannels.py	/^    def rx(self):$/;"	kind:member	line:143
+rx	../cm_channels\cm_worldChannels.py	/^    def rx(self):$/;"	kind:member	line:141
 rz	../cm_channels\cm_formationChannels.py	/^    def rz(self):$/;"	kind:member	line:209
 rz	../cm_channels\cm_pathChannels.py	/^    def rz(self, pathName):$/;"	kind:member	line:345
 rz	../cm_channels\cm_soundChannels.py	/^    def rz(self, minusRadius):$/;"	kind:member	line:377
-rz	../cm_channels\cm_worldChannels.py	/^    def rz(self):$/;"	kind:member	line:136
+rz	../cm_channels\cm_worldChannels.py	/^    def rz(self):$/;"	kind:member	line:134
 save_to_file	../cm_bpyNodes.py	/^    save_to_file = BoolProperty($/;"	kind:variable	line:665
 save_updater_json	../addon_updater.py	/^	def save_updater_json(self):$/;"	kind:member	line:1033
 savedOnce	../cm_bpyNodes.py	/^    savedOnce = BoolProperty(default=False)$/;"	kind:variable	line:39
