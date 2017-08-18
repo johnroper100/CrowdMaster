@@ -23,6 +23,7 @@ import random
 import re
 from collections import OrderedDict
 from math import radians
+import time
 
 import bmesh
 import bpy
@@ -32,6 +33,8 @@ from mathutils import Euler
 from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
+from .. import cm_timings
+from .. import SCENE_OT_cm_agent_add
 
 BVHTree = mathutils.bvhtree.BVHTree
 KDTree = mathutils.kdtree.KDTree
@@ -148,6 +151,7 @@ class GeoTemplateOBJECT(GeoTemplate):
     """For placing objects into the scene"""
 
     def build(self, buildRequest):
+        t = time.time()
         obj = bpy.context.scene.objects[self.settings["inputObject"]]
         if buildRequest.deferGeo:
             cp = bpy.data.objects.new("Empty", None)
@@ -162,6 +166,8 @@ class GeoTemplateOBJECT(GeoTemplate):
                     m.material = bpy.data.materials[replacement]
         buildRequest.group.objects.link(cp)
         bpy.context.scene.objects.link(cp)
+        cm_timings.placement["GeoTemplateOBJECT"] += time.time() - t
+        cm_timings.placementNum["GeoTemplateOBJECT"] += 1
         return GeoReturn(cp)
 
     def check(self):
@@ -176,6 +182,7 @@ class GeoTemplateGROUP(GeoTemplate):
     """For placing groups into the scene"""
 
     def build(self, buildRequest):
+        t = time.time()
         dat = bpy.data
 
         pos = buildRequest.pos
@@ -208,6 +215,8 @@ class GeoTemplateGROUP(GeoTemplate):
             group.objects.link(e)
             e["cm_deferGroup"] = {"group": self.settings["inputGroup"]}
             e["cm_materials"] = buildRequest.materials
+            cm_timings.placement["GeoTemplateGROUP"] += time.time() - t
+            cm_timings.placementNum["GeoTemplateGROUP"] += 1
             return GeoReturn(e)
 
         topObj = None
@@ -250,6 +259,8 @@ class GeoTemplateGROUP(GeoTemplate):
                     obj.location -= pos
                     obj.parent = e
             topObj = e
+        cm_timings.placement["GeoTemplateGROUP"] += time.time() - t
+        cm_timings.placementNum["GeoTemplateGROUP"] += 1
         return GeoReturn(topObj)
 
     def check(self):
@@ -262,6 +273,7 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         self.linkedGroup = None
 
     def build(self, buildRequest):
+        t = time.time()
         blendfile = os.path.split(bpy.data.filepath)[0]
         for d in self.settings["groupFile"][2:].split("/"):
             if d == "..":
@@ -290,6 +302,8 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
         gret.overwriteRig = newRig
         gret.constrainBone = newRig.pose.bones[self.settings["constrainBone"]]
 
+        cm_timings.placement["GeoTemplateLINKGROUPNODE"] += time.time() - t
+        cm_timings.placementNum["GeoTemplateLINKGROUPNODE"] += 1
         return gret
 
     def check(self):
@@ -395,6 +409,8 @@ class GeoTemplateCONSTRAINBONE(GeoTemplate):
         gretp = self.inputs["Parent Group"].build(buildRequest.copy())
         gret = self.inputs["Child Object"].build(buildRequest.copy())
 
+        t = time.time()
+
         boneName = gret.constrainBone.name
 
         newRig = gret.overwriteRig
@@ -423,6 +439,8 @@ class GeoTemplateCONSTRAINBONE(GeoTemplate):
         gretp.overwriteRig = newRig
         gretp.constrainBone = newRig.pose.bones[boneName]
 
+        cm_timings.placement["GeoTemplateCONSTRAINBONE"] += time.time() - t
+        cm_timings.placementNum["GeoTemplateCONSTRAINBONE"] += 1
         return gretp
 
     def check(self):
@@ -441,11 +459,15 @@ class GeoTemplateCONSTRAINBONE(GeoTemplate):
 class GeoTemplateMODIFYBONE(GeoTemplate):
     def build(self, buildRequest):
         gret = self.inputs["Objects"].build(buildRequest)
+        t = time.time()
         bn = self.settings["boneName"]
         if bn not in gret.modifyBones:
             gret.modifyBones[bn] = {}
         attrib = self.settings["attribute"]
         gret.modifyBones[bn][attrib] = self.settings["tagName"]
+
+        cm_timings.placement["GeoTemplateMODIFYBONE"] += time.time() - t
+        cm_timings.placementNum["GeoTemplateMODIFYBONE"] += 1
         return gret
 
     def check(self):
@@ -486,6 +508,8 @@ class GeoTemplatePARENT(GeoTemplate):
         gret = self.inputs["Child Object"].build(buildRequest.copy())
         child = gret.obj
 
+        t = time.time()
+
         if self.settings["parentMode"] == "bone":
             con = child.constraints.new("CHILD_OF")
             con.target = parent
@@ -502,6 +526,8 @@ class GeoTemplatePARENT(GeoTemplate):
             mod.object = parent
             mod.use_vertex_groups = self.settings["bindToVGroups"]
             mod.use_bone_envelopes = self.settings["bindToBEnvelops"]
+        cm_timings.placement["GeoTemplatePARENT"] += time.time() - t
+        cm_timings.placementNum["GeoTemplatePARENT"] += 1
         return gretp
         # TODO check if the object has an armature modifier
 
@@ -522,6 +548,7 @@ class TemplateADDTOGROUP(Template):
     """Change the group that agents are added to"""
 
     def build(self, buildRequest):
+        t = time.time()
         scene = bpy.context.scene
         isFrozen = False
         if scene.cm_groups.find(self.settings["groupName"]) != -1:
@@ -531,13 +558,19 @@ class TemplateADDTOGROUP(Template):
                 bpy.ops.scene.cm_groups_reset(
                     groupName=self.settings["groupName"])
             else:
+                cm_timings.placement["TemplateADDTOGROUP"] += time.time() - t
+                cm_timings.placementNum["TemplateADDTOGROUP"] += 1
                 return
         if isFrozen:
+            cm_timings.placement["TemplateADDTOGROUP"] += time.time() - t
+            cm_timings.placementNum["TemplateADDTOGROUP"] += 1
             return
         newGroup = scene.cm_groups.add()
         newGroup.name = self.settings["groupName"]
         newBuildRequest = buildRequest.copy()
         newBuildRequest.cm_group = self.settings["groupName"]
+        cm_timings.placement["TemplateADDTOGROUP"] += time.time() - t
+        cm_timings.placementNum["TemplateADDTOGROUP"] += 1
         self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
@@ -556,6 +589,7 @@ class TemplateRANDOMMATERIAL(Template):
     """Assign random materials"""
 
     def build(self, buildRequest):
+        t = time.time()
         s = random.random() * self.settings["totalWeight"]
         index = 0
         mat = None
@@ -565,6 +599,8 @@ class TemplateRANDOMMATERIAL(Template):
                 mat = self.settings["materialList"][index][0]
             index += 1
         buildRequest.materials[self.settings["targetMaterial"]] = mat
+        cm_timings.placement["TemplateRANDOMMATERIAL"] += time.time() - t
+        cm_timings.placementNum["TemplateRANDOMMATERIAL"] += 1
         self.inputs["Template"].build(buildRequest)
 
     def check(self):
@@ -581,6 +617,7 @@ class TemplateAGENT(Template):
     """Create a CrowdMaster agent"""
 
     def build(self, buildRequest):
+        t = time.time()
         cm_groups = bpy.context.scene.cm_groups
         gpName = buildRequest.cm_group
         if gpName not in cm_groups or not cm_groups[gpName].freezePlacement:
@@ -599,7 +636,11 @@ class TemplateAGENT(Template):
             rot = buildRequest.rot
             scale = buildRequest.scale
             geoBuildRequest = buildRequest.toGeoTemplate(defG, newGp)
+
+            t = time.time()
             gret = self.inputs["Objects"].build(geoBuildRequest)
+            cm_timings.placement["TemplateAGENT-Build"] += time.time() -t
+            cm_timings.placementNum["TemplateAGENT-Build"] += 1
             topObj = gret.obj
 
             topObj.location = pos
@@ -622,14 +663,21 @@ class TemplateAGENT(Template):
                                             "attribute": attribute,
                                             "tag": tag})
 
-            bpy.ops.scene.cm_agent_add(agentName=topObj.name,
-                                       brainType=self.settings["brainType"],
-                                       groupName=buildRequest.cm_group,
-                                       geoGroupName=newGp.name,
-                                       initialTags=packTags,
-                                       rigOverwrite=rigOverwrite,
-                                       constrainBone=constrainBone,
-                                       modifyBones=packModifyBones)
+            t = time.time()
+            SCENE_OT_cm_agent_add._execute(bpy.context,
+                                           topObj.name,
+                                           self.settings["brainType"],
+                                           buildRequest.cm_group,
+                                           newGp.name,
+                                           packTags,
+                                           rigOverwrite,
+                                           constrainBone,
+                                           packModifyBones)
+            cm_timings.placement["TemplateAGENT-cm_agent_add"] += time.time() -t
+            cm_timings.placementNum["TemplateAGENT-cm_agent_add"] += 1
+
+        cm_timings.placement["TemplateAGENT"] += time.time() - t
+        cm_timings.placementNum["TemplateAGENT"] += 1
 
     def check(self):
         if "Objects" not in self.inputs:
@@ -668,6 +716,7 @@ class TemplateOFFSET(Template):
     """Modify the postion and/or the rotation of the request made"""
 
     def build(self, buildRequest):
+        t = time.time()
         nPos = Vector()
         nRot = Vector()
         if not self.settings["overwrite"]:
@@ -683,6 +732,10 @@ class TemplateOFFSET(Template):
                         radians(tmpRot.y), radians(tmpRot.z)))
         buildRequest.pos = nPos
         buildRequest.rot = nRot
+
+        cm_timings.placement["TemplateOFFSET"] += time.time() - t
+        cm_timings.placementNum["TemplateOFFSET"] += 1
+
         self.inputs["Template"].build(buildRequest)
 
     def check(self):
@@ -702,6 +755,7 @@ class TemplateRANDOM(Template):
     """Randomly modify rotation and scale of the request made"""
 
     def build(self, buildRequest):
+        t = time.time()
         rotDiff = random.uniform(self.settings["minRandRot"],
                                  self.settings["maxRandRot"])
         eul = mathutils.Euler(buildRequest.rot, 'XYZ')
@@ -713,6 +767,8 @@ class TemplateRANDOM(Template):
 
         buildRequest.rot = Vector(eul)
         buildRequest.scale = newScale
+        cm_timings.placement["TemplateRANDOM"] += time.time() - t
+        cm_timings.placementNum["TemplateRANDOM"] += 1
         self.inputs["Template"].build(buildRequest)
 
     def check(self):
@@ -733,6 +789,7 @@ class TemplatePOINTTOWARDS(Template):
         self.kdtree = None
 
     def build(self, buildRequest):
+        t = time.time()
         ob = bpy.context.scene.objects[self.settings["PointObject"]]
         pos = buildRequest.pos
         if self.settings["PointType"] == "OBJECT":
@@ -749,6 +806,8 @@ class TemplatePOINTTOWARDS(Template):
         direc = point - pos
         rotQuat = direc.to_track_quat('Y', 'Z')
         buildRequest.rot = rotQuat.to_euler()
+        cm_timings.placement["TemplatePOINTTOWARDS"] += time.time() - t
+        cm_timings.placementNum["TemplatePOINTTOWARDS"] += 1
         self.inputs["Template"].build(buildRequest)
 
     def check(self):
@@ -779,6 +838,7 @@ class TemplateRANDOMPOSITIONING(Template):
     """Place randomly"""
 
     def build(self, buildRequest):
+        t = time.time()
         positions = []
         for a in range(self.settings["noToPlace"]):
             if self.settings["locationType"] == "radius":
@@ -837,6 +897,8 @@ class TemplateRANDOMPOSITIONING(Template):
                                     ((2 * radius - v.length) / v.length)
                     if len(localPoints) > 0:
                         positions[n] += adjust / len(localPoints)
+        cm_timings.placement["TemplateRANDOMPOSITIONING"] += time.time() - t
+        cm_timings.placementNum["TemplateRANDOMPOSITIONING"] += 1
         for newPos in positions:
             newBuildRequest = buildRequest.copy()
             newBuildRequest.pos = newPos
@@ -861,6 +923,7 @@ class TemplateMESHPOSITIONING(Template):
         self.totalArea = None
 
     def build(self, buildRequest):
+        t = time.time()
         guide = bpy.data.objects[self.settings["guideMesh"]]
         data = guide.data
 
@@ -913,6 +976,9 @@ class TemplateMESHPOSITIONING(Template):
                         adjPos = positions[n] + adjust / len(localPoints)
                         positions[n] = self.bvhtree.find_nearest(adjPos)[0]
 
+        cm_timings.placement["TemplateMESHPOSITIONING"] += time.time() - t
+        cm_timings.placementNum["TemplateMESHPOSITIONING"] += 1
+
         for newPos in positions:
             newBuildRequest = buildRequest.copy()
             newBuildRequest.pos = newPos
@@ -941,6 +1007,7 @@ class TemplateVCOLPOSITIONING(Template):
         self.totalArea = None
 
     def build(self, buildRequest):
+        t = time.time()
         paintMode = self.settings["paintMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
         invert = self.settings["invert"]
@@ -1015,6 +1082,9 @@ class TemplateVCOLPOSITIONING(Template):
                             adjPos = positions[n] + adjust / len(localPoints)
                             positions[n] = self.bvhtree.find_nearest(adjPos)[0]
 
+            cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
+            cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
+
             for newPos in positions:
                 newBuildRequest = buildRequest.copy()
                 newBuildRequest.pos = newPos
@@ -1029,6 +1099,10 @@ class TemplateVCOLPOSITIONING(Template):
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
             poly = mesh.polygons[ind]
+
+            cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
+            cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
+
             for loop_index in poly.loop_indices:
                 loop_vert_index = mesh.loops[loop_index].vertex_index
                 if not invert:
@@ -1063,6 +1137,8 @@ class TemplatePATH(Template):
     """Place along a path"""
 
     def build(self, buildRequest):
+        t = time.time()
+
         pathEntry = bpy.context.scene.cm_paths.coll.get(
             self.settings["pathName"])
         obj = bpy.context.scene.objects[pathEntry.objectName]
@@ -1144,6 +1220,9 @@ class TemplatePATH(Template):
                             island = 0
                         positions[n] = (pos, rot, island)
 
+        cm_timings.placement["TemplatePATH"] += time.time() - t
+        cm_timings.placementNum["TemplatePATH"] += 1
+
         for newPos, newRot, island in positions:
             newBuildRequest = buildRequest.copy()
             newBuildRequest.pos = newPos + buildRequest.pos
@@ -1158,6 +1237,8 @@ class TemplateFORMATION(Template):
     """Place in a row"""
 
     def build(self, buildRequest):
+        t = time.time()
+
         placePos = Vector(buildRequest.pos)
         diffRow = Vector((self.settings["ArrayRowMargin"], 0, 0))
         diffCol = Vector((0, self.settings["ArrayColumnMargin"], 0))
@@ -1167,11 +1248,16 @@ class TemplateFORMATION(Template):
         diffCol *= buildRequest.scale
         number = self.settings["noToPlace"]
         rows = self.settings["ArrayRows"]
+
+        cm_timings.placement["TemplateFORMATION"] += time.time() - t
+        cm_timings.placementNum["TemplateFORMATION"] += 1
+
         for fullcols in range(number // rows):
             for row in range(rows):
                 newBuildRequest = buildRequest.copy()
                 newBuildRequest.pos = placePos + fullcols * diffCol + row * diffRow
                 self.inputs["Template"].build(newBuildRequest)
+
         for leftOver in range(number % rows):
             newBuild = buildRequest.copy()
             newBuild.pos = placePos + \
@@ -1192,6 +1278,7 @@ class TemplateTARGET(Template):
     """Place based on the positions of vertices"""
 
     def build(self, buildRequest):
+        t = time.time()
         if self.settings["targetType"] == "object":
             objs = bpy.data.groups[self.settings["targetGroups"]].objects
             if self.settings["overwritePosition"]:
@@ -1199,7 +1286,13 @@ class TemplateTARGET(Template):
                     newBuildRequest = buildRequest.copy()
                     newBuildRequest.pos = obj.location
                     newBuildRequest.rot = Vector(obj.rotation_euler)
+
+                    cm_timings.placement[
+                        "TemplateTARGET"] += time.time() - t
+
                     self.inputs["Template"].build(newBuildRequest)
+
+                    t = time.time()
             else:
                 for obj in objs:
                     loc = obj.location
@@ -1209,7 +1302,13 @@ class TemplateTARGET(Template):
                     newBuildRequest = buildRequest.copy()
                     newBuildRequest.pos = loc + buildRequest.pos
                     newBuildRequest.rot = buildRequest.rot + oRot
+
+                    cm_timings.placement[
+                        "TemplateTARGET"] += time.time() - t
+
                     self.inputs["Template"].build(newBuildRequest)
+
+                    t = time.time()
         else:  # targetType == "vertex"
             obj = bpy.data.objects[self.settings["targetObject"]]
             if self.settings["overwritePosition"]:
@@ -1220,7 +1319,13 @@ class TemplateTARGET(Template):
                     newBuildRequest = buildRequest.copy()
                     newBuildRequest.pos = vert
                     newBuildRequest.rot = newRot
+
+                    cm_timings.placement[
+                        "TemplateTARGET"] += time.time() - t
+
                     self.inputs["Template"].build(newBuildRequest)
+
+                    t = time.time()
             else:
                 targets = [Vector(v.co) for v in obj.data.vertices]
                 for loc in targets:
@@ -1228,7 +1333,14 @@ class TemplateTARGET(Template):
                     loc *= buildRequest.scale
                     newBuildRequest = buildRequest.copy()
                     newBuildRequest.pos = loc + buildRequest.pos
+
+                    cm_timings.placement[
+                        "TemplateTARGET"] += time.time() - t
+
                     self.inputs["Template"].build(newBuildRequest)
+
+                    t = time.time()
+        cm_timings.placementNum["TemplateTARGET"] += 1
 
     def check(self):
         if "Template" not in self.inputs:
@@ -1256,6 +1368,7 @@ class TemplateOBSTACLE(Template):
         self.octree = None
 
     def build(self, buildRequest):
+        t = time.time()
         if self.octree is None:
             objs = bpy.data.groups[self.settings["obstacleGroup"]].objects
             margin = self.settings["margin"]
@@ -1264,6 +1377,10 @@ class TemplateOBSTACLE(Template):
             self.octree = createOctreeFromBPYObjs(objs, allSpheres=False,
                                                   radii=radii)
         intersections = self.octree.checkPoint(buildRequest.pos)
+
+        cm_timings.placement["TemplateOBSTACLE"] += time.time() - t
+        cm_timings.placementNum["TemplateOBSTACLE"] += 1
+
         if len(intersections) == 0:
             self.inputs["Template"].build(buildRequest)
 
@@ -1287,28 +1404,45 @@ class TemplateGROUND(Template):
         self.bvhtree = None
 
     def build(self, buildRequest):
+        t = time.time()
         sce = bpy.context.scene
         gnd = sce.objects[self.settings["groundMesh"]]
         if self.bvhtree is None:
             self.bvhtree = BVHTree.FromObject(gnd, sce)
-        point = buildRequest.pos - gnd.location
-        hitA, normA, indA, distA = self.bvhtree.ray_cast(point, (0, 0, -1))
-        hitB, normB, indB, distB = self.bvhtree.ray_cast(point, (0, 0, 1))
+
+        inverseTransform = gnd.matrix_world.inverted()
+        point = (inverseTransform * buildRequest.pos.to_4d()).to_3d()
+        direc = Vector((0, 0, 1))
+        direc.rotate(inverseTransform.to_euler())
+
+        hitA, normA, indA, distA = self.bvhtree.ray_cast(point,
+                                                         tuple(-x for x in direc))
+        if hitA is not None:
+            hitA = gnd.matrix_world * hitA
+            normA = gnd.matrix_world * normA
+            distA = (buildRequest.pos - hitA).length
+
+        hitB, normB, indB, distB = self.bvhtree.ray_cast(point,
+                                                         tuple(x for x in direc))
+        if hitB is not None:
+            hitB = gnd.matrix_world * hitB
+            normB = gnd.matrix_world * normB
+            distB = (buildRequest.pos - hitB).length
+
+        cm_timings.placement["TemplateGROUND"] += time.time() - t
+        cm_timings.placementNum["TemplateGROUND"] += 1
+
         if hitA and hitB:
             if distA <= distB:
-                hitA += gnd.location
                 buildRequest.pos = hitA
                 self.inputs["Template"].build(buildRequest)
             else:
-                hitB += gnd.location
                 buildRequest.pos = hitB
                 self.inputs["Template"].build(buildRequest)
         elif hitA:
-            hitA += gnd.location
             buildRequest.pos = hitA
             self.inputs["Template"].build(buildRequest)
         elif hitB:
-            hitB += gnd.location
             buildRequest.pos = hitB
             self.inputs["Template"].build(buildRequest)
 

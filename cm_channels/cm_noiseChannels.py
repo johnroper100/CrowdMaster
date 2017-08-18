@@ -18,8 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import random
-
-import numpy as np
+import math
 
 import bpy
 
@@ -51,9 +50,10 @@ class Noise(Mc):
         return result
 
     @timeChannel("Noise")
-    def sinWave(self, wm="COS", wtm=1.0, wf=5):
-        """Returns a sine/cosine wave based on the current frame"""
-        if wm == "SIN":
-            return np.sin((bpy.context.scene.frame_current * wtm) * 3.14 / wf)
-        else:
-            return np.cos((bpy.context.scene.frame_current * wtm) * 3.14 / wf)
+    def wave(self, offset, wavelength):
+        """Returns a sine wave based on the current frame
+        https://www.desmos.com/calculator/gwpmwylgg0"""
+        scene = bpy.context.scene
+        t = scene.frame_current - scene.cm_sim_start_frame
+        x = (t + offset * wavelength)
+        return math.sin((2 * math.pi * x) / wavelength)

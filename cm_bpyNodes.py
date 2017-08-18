@@ -198,11 +198,8 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("WAVE", "Wave", "", 3)])
 
-    WaveFrequency = FloatProperty(name="Frequency", default=5.0)
-    WaveTimeMul = FloatProperty(name="Time Multiplier", default=1.0)
-    WaveMode = EnumProperty(name="Wave Mode",
-                            items=[("SIN", "Sine", "", 1),
-                                   ("COS", "Cosine", "", 2)])
+    WaveLength = FloatProperty(name="Wavelength", default=24.0, min=0.0)
+    WaveOffset = FloatProperty(name="Offset", default=0.0, min=0.0, max=1.0)
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -294,10 +291,9 @@ class NewInputNode(LogicNode):
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
             if self.NoiseOptions == "WAVE":
-                layout.prop(self, "WaveMode")
                 row = layout.row(align=True)
-                row.prop(self, "WaveFrequency")
-                row.prop(self, "WaveTimeMul")
+                row.prop(self, "WaveLength")
+                row.prop(self, "WaveOffset")
         elif self.InputSource == "PATH":
             layout.prop_search(
                 self, "PathName", context.scene.cm_paths, "coll")
@@ -355,9 +351,8 @@ class NewInputNode(LogicNode):
             node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
-            node.settings["WaveFrequency"] = self.WaveFrequency
-            node.settings["WaveTimeMul"] = self.WaveTimeMul
-            node.settings["WaveMode"] = self.WaveMode
+            node.settings["WaveOffset"] = self.WaveOffset
+            node.settings["WaveLength"] = self.WaveLength
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
@@ -623,17 +618,18 @@ class MapNode(LogicNode):
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
-    bl_width_default = 320.0
+    bl_width_default = 350.0
 
     Output = EnumProperty(name="Output",
-                          items=[("rz", "rz", "", 3),
-                                 ("rx", "rx", "", 1),
-                                 ("ry", "ry", "", 2),
-                                 ("px", "px", "", 4),
-                                 ("py", "py", "", 5),
-                                 ("pz", "pz", "", 6),
-                                 ("sk", "sk", "", 7)
-                                 ])
+                          items=[("rx", "Rotation X", "", 1),
+                                 ("ry", "Rotation Y", "", 2),
+                                 ("rz", "Rotation Z", "", 3),
+                                 ("px", "Position X", "", 4),
+                                 ("py", "Position Y", "", 5),
+                                 ("pz", "Position Z", "", 6),
+                                 ("sk", "Shape Key", "", 7)
+                                 ],
+                          default="py")
     SKName = StringProperty(name="Shape Key Name",
                             description="The name of the shape key")
     MultiInputType = EnumProperty(name="Multi Input Type",
@@ -830,7 +826,8 @@ class ActionState(StateNode):
             else:
                 row.prop(self, "randomActionFromGroup", icon="FILE_REFRESH",
                          icon_only=True)
-        layout.prop(self, "overlap")
+        if self.actionName != "":
+            layout.prop(self, "overlap")
         layout.prop(self, "interuptState")
         if self.interuptState:
             layout.prop(self, "syncState")

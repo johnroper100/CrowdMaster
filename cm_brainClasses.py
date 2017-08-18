@@ -17,6 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import random
 import time
 
@@ -25,6 +26,8 @@ import mathutils
 from bpy.props import BoolProperty
 
 from . import cm_timings
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Neuron():
@@ -233,7 +236,6 @@ class State:
         options = []
         for con in self.outputs:
             val = self.neurons[con].query()
-            # print(con, val)
             if val is not None:
                 options.append((con, val))
 
@@ -241,7 +243,6 @@ class State:
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
             val = self.neurons[self.name].query()
-            # print(con, val)
             if val is not None:
                 options.append((self.name, val))
 

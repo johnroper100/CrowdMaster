@@ -17,19 +17,23 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
+
+logger = logging.getLogger("CrowdMaster")
+
 try:
     from . import ins_vector
 except Exception:
-    print("ERROR importing ins_vector.py")
+    logger.error("ERROR importing ins_vector.py")
 
 try:
     from . import ins_clustering
 except Exception:
-    print("ERROR importing ins_clustering")
+    logger.error("ERROR importing ins_clustering")
 
 try:
     from . import ins_octree
 except Exception:
-    print("ERROR importing ins_octree")
+    logger.error("ERROR importing ins_octree")
 
 from . import cm_draw
