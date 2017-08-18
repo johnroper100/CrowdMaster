@@ -177,7 +177,7 @@ def printTimings():
     logger.debug("Channel times")
     for k in sorted(channelTimes):
         v = channelTimes[k]
-        logger.debug("     ", k, sum(v.values()))
+        logger.debug("     {} {}".format(k, sum(v.values())))
         for k1 in sorted(v):
             v1 = v[k1]
             logger.debug("          {} {}".format(k1, v1))
