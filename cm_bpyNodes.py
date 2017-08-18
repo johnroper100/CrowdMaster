@@ -819,7 +819,8 @@ class ActionState(StateNode):
             else:
                 row.prop(self, "randomActionFromGroup", icon="FILE_REFRESH",
                          icon_only=True)
-        layout.prop(self, "overlap")
+        if self.actionName != "":
+            layout.prop(self, "overlap")
         layout.prop(self, "interuptState")
         if self.interuptState:
             layout.prop(self, "syncState")
