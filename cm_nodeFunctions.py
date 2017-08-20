@@ -629,8 +629,12 @@ class LogicPRINT(Neuron):
                 for i in into:
                     if settings["save_to_file"]:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            message = settings["Label"] + " >> " + \
-                                str(i) + " " + str(into[i]) + "\n"
+                            if settings["show_current_frame"]:
+                                message = settings["Label"] + " >> " + \
+                                    str(i) + " " + str(into[i]) + "\n"
+                            else:
+                                message = settings["Label"] + " >> " + \
+                                    str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
                         if settings["show_current_frame"]:
