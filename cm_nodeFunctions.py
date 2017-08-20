@@ -633,7 +633,10 @@ class LogicPRINT(Neuron):
                                 str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
-                        logger.info("{} >> {} {}".format(settings["Label"], i, into[i]))
+                        if settings["show_current_frame"]:
+                            logger.info("NEWFRAME {}\n{} >> {} {}".format(bpy.context.scene.frame_current, settings["Label"], i, into[i]))
+                        else:
+                            logger.info("{} >> {} {}".format(settings["Label"], i, into[i]))
         return 0
 
 
