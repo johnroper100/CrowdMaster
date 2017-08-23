@@ -86,15 +86,15 @@ class Simulation:
                     self.syncManager.actionPair(s, t)
                     self.syncManager.actionPair(t, s)
 
-    def newagent(self, ag, brain, freezeAnimation):
+    def newagent(self, agent, brain, freezeAnimation):
         """Set up an agent"""
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
-            ag = Agent(name, nGps[brain], self, ag.rigOverwrite, constrainBone,
-                       tags=initialTags, modifyBones=modifyBones,
-                       freezeAnimation=freezeAnimation, geoGroup=geoGroup)
-            self.agents[name] = ag
+            ag = Agent(agent.name, nGps[brain], self, agent.rigOverwrite, agent.constrainBone,
+                       tags=agent.initialTags, modifyBones=agent.modifyBones,
+                       freezeAnimation=freezeAnimation, geoGroup=agent.geoGroup)
+            self.agents[agent.name] = ag
         else:
             logger.debug("No such brain type: {}".format(brain))
 
