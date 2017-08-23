@@ -33,7 +33,7 @@ logger = logging.getLogger("CrowdMaster")
 class Agent:
     """Represents each of the agents in the scene."""
 
-    def __init__(self, ag, nodeGroup, sim, tags=None, modifyBones=None, freezeAnimation=False):
+    def __init__(self, ag, nodeGroup, sim, freezeAnimation=False):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
@@ -41,7 +41,7 @@ class Agent:
         self.brain = compileBrain(nodeGroup, sim, self.id, freezeAnimation)
         self.sim = sim
         self.external = {"id": self.id, "tags": {
-            t.name: t.value for t in tags}}
+            t.name: t.value for t in aginitialTags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
@@ -54,8 +54,8 @@ class Agent:
         self.rigOverwrite = ag.rigOverwrite
         self.constrainBone = ag.constrainBone
         self.modifyBones = {}
-        if modifyBones is not None:
-            for m in modifyBones:
+        if ag.modifyBones is not None:
+            for m in ag.modifyBones:
                 if m.name not in self.modifyBones:
                     self.modifyBones[m.name] = {}
                 self.modifyBones[m.name][m.attribute] = m.tag
