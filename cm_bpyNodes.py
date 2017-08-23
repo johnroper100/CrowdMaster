@@ -664,6 +664,12 @@ class PrintNode(LogicNode):
         default=False,
     )
 
+    show_current_frame = BoolProperty(
+        name="Show Current Frame",
+        description="Show the curent frame when printing.",
+        default=True,
+    )
+
     output_filepath = StringProperty(
         name="Output Filepath",
         default="",
@@ -674,13 +680,17 @@ class PrintNode(LogicNode):
     # implemented
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "Label")
+        row = layout.row()
+        row.prop(self, "Label")
+        row.prop(self, "show_current_frame")
+
         layout.prop(self, "save_to_file")
         if self.save_to_file:
             layout.prop(self, "output_filepath")
 
     def getSettings(self, node):
         node.settings["Label"] = self.Label
+        node.settings["show_current_frame"] = self.show_current_frame
         node.settings["save_to_file"] = self.save_to_file
         node.settings["output_filepath"] = self.output_filepath
 
