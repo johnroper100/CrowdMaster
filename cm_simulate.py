@@ -139,7 +139,8 @@ class Simulation:
             newT = time.time()
             logger.debug("Frame time {}".format(newT - t))
             cm_timings.simulation["total"] += newT - t
-            logger.debug("Total time {}".format(cm_timings.simulation["total"]))
+            logger.debug("Total time {}".format(
+                cm_timings.simulation["total"]))
             cm_timings.simulation["totalFrames"] += 1
             tf = cm_timings.simulation["totalFrames"]
             tt = cm_timings.simulation["total"]
