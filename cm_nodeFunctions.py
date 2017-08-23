@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import copy
+import logging
 import math
 import os
 import random
@@ -27,7 +28,6 @@ import bpy
 
 from .cm_brainClasses import Neuron, State
 
-
 """
 class Logic{NAME}(Neuron):
     def core(self, inps, settings):
@@ -36,6 +36,8 @@ class Logic{NAME}(Neuron):
         :param settings: dict of form {str: str | int | float, }
         :rtype: int | dict of form {str: float | int}
 """
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class LogicNEWINPUT(Neuron):
@@ -115,7 +117,8 @@ class LogicNEWINPUT(Neuron):
         elif settings["InputSource"] == "GROUND":
             if settings["GroundOptions"] == "DH":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
-                return {"None": gChan.dh()}
+                dh = gChan.dh()
+                return {"None": dh} if dh is not None else {}
             elif settings["GroundOptions"] == "ARZ":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
                 return {"None": gChan.aheadRz(self.settings["GroundAheadOffset"])}
@@ -129,6 +132,9 @@ class LogicNEWINPUT(Neuron):
                 return {"None": noise.random()}
             elif settings["NoiseOptions"] == "AGENTRANDOM":
                 return {"None": noise.agentRandom(offset=hash(self))}
+            elif settings["NoiseOptions"] == "WAVE":
+                return {"None": noise.wave(self.settings["WaveOffset"],
+                                           self.settings["WaveLength"])}
 
         elif settings["InputSource"] == "PATH":
             if settings["PathOptions"] == "RZ":
@@ -209,7 +215,7 @@ class LogicNEWINPUT(Neuron):
             elif settings["WorldOptions"] == "TIME":
                 return {"None": channels["World"].time}
             elif settings["WorldOptions"] == "EVENT":
-                return world.event(settings["EventName"])
+                return world.event(settings["EventName"], settings["EventOptions"])
 
         elif settings["InputSource"] == "AGENTINFO":
             agent = channels["AgentInfo"]
@@ -256,9 +262,8 @@ class LogicGRAPH(Neuron):
         for into in inps:
             for i in into:
                 if i in output:
-                    if preferences.show_debug_options:
-                        print(
-                            """LogicGRAPH data lost due to multiple inputs with the same key""")
+                    logger.debug(
+                        """LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
                         output[i] = (RBF(into[i]) * settings["Multiply"])
@@ -556,11 +561,9 @@ class LogicOUTPUT(Neuron):
             SmSquared = 0
             for into in inps:
                 for i in into:
-                    if preferences.show_debug_options:
-                        print("Val:", into[i])
+                    logger.debug("Val: {}".format(into[i]))
                     Sm += into[i]
                     SmSquared += into[i] * abs(into[i])  # To retain sign
-            # print(Sm, SmSquared)
             if Sm == 0:
                 out = 0
             else:
@@ -570,7 +573,11 @@ class LogicOUTPUT(Neuron):
             for into in inps:
                 for i in into:
                     out += into[i]
-        self.brain.outvars[settings["Output"]] = out
+        outNm = settings["Output"]
+        if outNm == "sk":
+            self.brain.outvars["sk"][settings["SKName"]] = out
+        else:
+            self.brain.outvars[settings["Output"]] = out
         return out
 
 
@@ -582,14 +589,12 @@ class LogicPRIORITY(Neuron):
         remaining = {}
         for v in range((len(inps) + 1) // 2):
             into = inps[2 * v]
-            # print("into", into)
             if 2 * v + 1 < len(inps):
                 priority = inps[2 * v + 1]
                 usesPriority = True
             else:
                 priority = []
                 usesPriority = False
-            # print("priority", priority)
             for i in into:
                 if i in priority:
                     # TODO what if priority[i] < 0?
@@ -608,7 +613,6 @@ class LogicPRIORITY(Neuron):
                     else:
                         result[i] = into[i]
                         remaining[i] = 0
-            # print("resultPartial", result)
         for key, rem in remaining.items():
             if rem != 0:
                 result[key] += settings["defaultValue"] * rem
@@ -629,7 +633,7 @@ class LogicPRINT(Neuron):
                                 str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
-                        print(settings["Label"], ">>", i, into[i])
+                        logger.info("{} >> {} {}".format(settings["Label"], i, into[i]))
         return 0
 
 
@@ -689,11 +693,12 @@ class StateAction(State):
             action = actionobj.action  # bpy action
             if action:
                 currentFrame = bpy.context.scene.frame_current
-                self.strip = tr.strips.new("", currentFrame, action)
+                startTime = currentFrame - self.settings["Overlap"]
+                self.strip = tr.strips.new("", startTime, action)
                 self.strip.extrapolation = 'NOTHING'
                 self.strip.use_auto_blend = True
                 self.strip.mute = self.brain.freeze
-            self.length = actionobj.length
+            self.length = actionobj.length - self.settings["Overlap"]
 
         self.currentAction = self.action
 
@@ -756,17 +761,15 @@ class StateAction(State):
         self.currentFrame += 1
 
         """Check to see if the current state is still playing an animation"""
-        # print("currentFrame", self.currentFrame, "length", self.length)
-        # print("Value compared", self.length - 2 - self.settings["Fade out"])
 
         # The proportion of the way through the state
-        if self.length == 0:
+        if self.length <= 0:
             complete = 1
         else:
             complete = self.currentFrame / self.length
             complete = 0.5 + complete / 2
         currentFrame = bpy.context.scene.frame_current
-        self.resultLog[currentFrame] = ((0.15, 0.4, complete))
+        self.resultLog[currentFrame] = (0.15, 0.4, complete)
 
         if self.currentAction in self.brain.sim.actions:
             actionobj = self.brain.sim.actions[self.currentAction]
@@ -781,9 +784,9 @@ class StateAction(State):
                     self.brain.outvars["py"] += y * scale.y
                     self.brain.outvars["pz"] += z * scale.z
                 elif data_path == "rotation_euler":
-                    self.brain.outvars["rx"] += x * scale.x
-                    self.brain.outvars["ry"] += y * scale.y
-                    self.brain.outvars["rz"] += z * scale.z
+                    self.brain.outvars["rx"] += x
+                    self.brain.outvars["ry"] += y
+                    self.brain.outvars["rz"] += z
 
         # Check to see if there is a valid sync state to move to
 
@@ -839,7 +842,6 @@ class StateAction(State):
         options = []
         for con in self.outputs:
             val = self.neurons[con].query()
-            # print(con, val)
             if val is not None and val > 0:
                 options.append((con, val))
 

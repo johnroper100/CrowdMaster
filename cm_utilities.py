@@ -20,8 +20,8 @@
 import time
 
 import bpy
-from bpy.types import Operator
 from bpy.props import BoolProperty
+from bpy.types import Operator
 
 from .cm_iconLoad import cicon
 

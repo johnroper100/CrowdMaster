@@ -17,9 +17,8 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import textwrap
-
 import os
+import textwrap
 
 import bpy
 import nodeitems_utils
@@ -310,7 +309,7 @@ class ParentNode(CrowdMasterAGenTreeNode):
 
     parentTo = StringProperty(name="Bone Name",
                               description="The bone you want to parent to")
-    
+
     bindToVGroups = BoolProperty(name="Vertex Groups", default=True)
     bindToBEnvelopes = BoolProperty(name="Bone Envelopes")
 
@@ -791,10 +790,10 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
                                  default=[1.0, 1.0, 1.0],
                                  min=0.0,
                                  max=1.0)
-    
+
     invert = BoolProperty(name="Invert",
-                         description="Place agents outside of the painted area",
-                         default=False)
+                          description="Place agents outside of the painted area",
+                          default=False)
 
     noToPlace = IntProperty(name="Number of Agents",
                             description="The number of agents to place",

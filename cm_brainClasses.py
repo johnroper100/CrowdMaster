@@ -17,14 +17,17 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import random
 import time
 
 import bpy
-from bpy.props import BoolProperty
 import mathutils
+from bpy.props import BoolProperty
 
 from . import cm_timings
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Neuron():
@@ -233,7 +236,6 @@ class State:
         options = []
         for con in self.outputs:
             val = self.neurons[con].query()
-            # print(con, val)
             if val is not None:
                 options.append((con, val))
 
@@ -241,7 +243,6 @@ class State:
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
             val = self.neurons[self.name].query()
-            # print(con, val)
             if val is not None:
                 options.append((self.name, val))
 
@@ -299,7 +300,7 @@ class Brain():
 
     def reset(self):
         self.outvars = {"rx": 0, "ry": 0, "rz": 0,
-                        "px": 0, "py": 0, "pz": 0}
+                        "px": 0, "py": 0, "pz": 0, "sk": {}}
         self.tags = self.sim.agents[self.userid].access["tags"]
 
     def execute(self):

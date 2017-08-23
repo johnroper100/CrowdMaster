@@ -23,20 +23,20 @@ https://github.com/CGCookie/blender-addon-updater
 
 """
 
-import urllib.request
-import urllib
-import os
+import asyncio  # for async processing
 import json
-import zipfile
+import os
 import shutil
-import asyncio # for async processing
 import threading
 import time
-from datetime import datetime,timedelta
+import urllib
+import urllib.request
+import zipfile
+from datetime import datetime, timedelta
 
+import addon_utils
 # blender imports, used in limited cases
 import bpy
-import addon_utils
 
 # -----------------------------------------------------------------------------
 # Define error messages/notices & hard coded globals
@@ -1130,4 +1130,3 @@ class Singleton_updater(object):
 # -----------------------------------------------------------------------------
 
 Updater = Singleton_updater()
-

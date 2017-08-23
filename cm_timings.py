@@ -17,11 +17,76 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 from collections import OrderedDict
 
 from .cm_channels import channelTimes
 
-placement = OrderedDict([])
+logger = logging.getLogger("CrowdMaster")
+
+placement = OrderedDict([
+    ("Construct", 0),
+    ("Build", 0),
+    ("GeoTemplateOBJECT", 0),
+    ("GeoTemplateGROUP", 0),
+    ("GeoTemplateLINKGROUPNODE", 0),
+    ("GeoTemplateCONSTRAINBONE", 0),
+    ("GeoTemplateMODIFYBONE", 0),
+    ("GeoTemplatePARENT", 0),
+    ("TemplateADDTOGROUP", 0),
+    ("TemplateRANDOMMATERIAL", 0),
+    ("TemplateAGENT", 0),
+    ("TemplateAGENT-Build", 0),
+    ("TemplateAGENT-cm_agent_add", 0),
+    ("TemplateOFFSET", 0),
+    ("TemplateRANDOM", 0),
+    ("TemplatePOINTTOWARDS", 0),
+    ("TemplateRANDOMPOSITIONING", 0),
+    ("TemplateMESHPOSITIONING", 0),
+    ("TemplateVCOLPOSITIONING", 0),
+    ("TemplatePATH", 0),
+    ("TemplateFORMATION", 0),
+    ("TemplateTARGET", 0),
+    ("TemplateOBSTACLE", 0),
+    ("TemplateGROUND", 0),
+    ("cm_agent_add", 0),
+    ("cm_agent_add-find_category", 0),
+    ("cm_agent_add-create_entry", 0),
+    ("cm_agent_add-initial_tags", 0),
+    ("cm_agent_add-modify_bones", 0)
+])
+
+placementNum = OrderedDict([
+    ("Construct", 0),
+    ("Build", 0),
+    ("GeoTemplateOBJECT", 0),
+    ("GeoTemplateGROUP", 0),
+    ("GeoTemplateLINKGROUPNODE", 0),
+    ("GeoTemplateCONSTRAINBONE", 0),
+    ("GeoTemplateMODIFYBONE", 0),
+    ("GeoTemplatePARENT", 0),
+    ("TemplateADDTOGROUP", 0),
+    ("TemplateRANDOMMATERIAL", 0),
+    ("TemplateAGENT", 0),
+    ("TemplateAGENT-Build", 0),
+    ("TemplateAGENT-cm_agent_add", 0),
+    ("TemplateOFFSET", 0),
+    ("TemplateRANDOM", 0),
+    ("TemplatePOINTTOWARDS", 0),
+    ("TemplateRANDOMPOSITIONING", 0),
+    ("TemplateMESHPOSITIONING", 0),
+    ("TemplateVCOLPOSITIONING", 0),
+    ("TemplatePATH", 0),
+    ("TemplateFORMATION", 0),
+    ("TemplateTARGET", 0),
+    ("TemplateOBSTACLE", 0),
+    ("TemplateGROUND", 0),
+    ("cm_agent_add", 0),
+    ("cm_agent_add-find_category", 0),
+    ("cm_agent_add-create_entry", 0),
+    ("cm_agent_add-initial_tags", 0),
+    ("cm_agent_add-modify_bones", 0)
+])
 
 agent = OrderedDict([
     ("init", 0),
@@ -89,29 +154,30 @@ coreNumber = OrderedDict([
 
 
 def printTimings():
-    print("Placement")
+    logger.debug("Placement")
     for k, v in placement.items():
-        print("     ", k, v)
-    print("Agent")
+        n = placementNum[k]
+        logger.debug("     {} {} {} {}".format(k, v, n, v / max(n, 1)))
+    logger.debug("Agent")
     for k, v in agent.items():
-        print("     ", k, v)
-    print("Brain")
+        logger.debug("     {} {}".format(k, v))
+    logger.debug("Brain")
     for k, v in brain.items():
-        print("     ", k, v)
-    print("Simulation")
+        logger.debug("     {} {}".format(k, v))
+    logger.debug("Simulation")
     for k, v in simulation.items():
-        print("     ", k, v)
-    print("Neuron")
+        logger.debug("     {} {}".format(k, v))
+    logger.debug("Neuron")
     for k, v in neuron.items():
-        print("     ", k, v)
-    print("Cores")
+        logger.debug("     {} {}".format(k, v))
+    logger.debug("Cores")
     for k, v in coreTimes.items():
         n = coreNumber[k]
-        print("     ", k, v, n, v / max(n, 1))
-    print("Channel times")
+        logger.debug("     {} {} {} {}".format(k, v, n, v / max(n, 1)))
+    logger.debug("Channel times")
     for k in sorted(channelTimes):
         v = channelTimes[k]
-        print("     ", k, sum(v.values()))
+        logger.debug("     {} {}".format(k, sum(v.values())))
         for k1 in sorted(v):
             v1 = v[k1]
-            print("          ", k1, v1)
+            logger.debug("          {} {}".format(k1, v1))

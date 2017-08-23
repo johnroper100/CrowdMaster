@@ -18,15 +18,16 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import (CollectionProperty, EnumProperty,
-                       IntProperty, PointerProperty, StringProperty)
+from bpy.props import (CollectionProperty, EnumProperty, IntProperty,
+                       PointerProperty, StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
 class event_entry(PropertyGroup):
     """The data structure for the event entries"""
     eventname = StringProperty()
-    time = IntProperty()
+    timeMin = IntProperty(name="Time Min")
+    timeMax = IntProperty(name="Time Max")
     index = IntProperty(min=0)
     category = EnumProperty(items=(
         ("Time", "Time", "Time"),
@@ -43,7 +44,7 @@ class events_collection(PropertyGroup):
 
 class SCENE_OT_cm_events_populate(Operator):
     bl_idname = "scene.cm_events_populate"
-    bl_label = "Populate cm events list"
+    bl_label = "Populate CM events list"
 
     def execute(self, context):
         context.scene.cm_events.coll.add()
@@ -98,7 +99,8 @@ class SCENE_UL_event(UIList):
             layout.prop(item, "eventname", text="")
             layout.prop(item, "category", text="")
             if item.category == "Time" or item.category == "Time+Volume":
-                layout.prop(item, "time", text="")
+                layout.prop(item, "timeMin", text="Start")
+                layout.prop(item, "timeMax", text="End")
             if item.category == "Volume" or item.category == "Time+Volume":
                 layout.prop_search(item, "volume", bpy.data, "objects")
             # this draws each row in the list. Each line is a widget

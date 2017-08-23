@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import copy
+import logging
 import time
 
 import bpy
@@ -26,12 +27,14 @@ import mathutils
 from . import cm_timings
 from .cm_compileBrain import compileBrain
 
+logger = logging.getLogger("CrowdMaster")
+
 
 class Agent:
     """Represents each of the agents in the scene."""
 
     def __init__(self, blenderid, nodeGroup, sim, rigOverwrite, constrainBone,
-                 tags=None, modifyBones=None, freezeAnimation=False):
+                 tags=None, modifyBones=None, freezeAnimation=False, geoGroup=None):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
@@ -47,6 +50,8 @@ class Agent:
 
         self.freezeAnimation = freezeAnimation
 
+        self.geoGroup = geoGroup
+
         self.rigOverwrite = rigOverwrite
         self.constrainBone = constrainBone
         self.modifyBones = {}
@@ -61,7 +66,6 @@ class Agent:
         """Set the dimensions of this object"""
         self.dimensions = objs[blenderid].dimensions
         self.radius = max(self.dimensions) / 2
-        # TODO allow the user to specify a bounding geometry
 
         """ar - absolute rot, r - change rot by, rs - rot speed"""
         self.arx = objs[blenderid].rotation_euler[0]
@@ -97,13 +101,56 @@ class Agent:
 
         self.globalVelocity = mathutils.Vector([0, 0, 0])
 
+        self.shapeKeys = {}
+        self.lastShapeKeys = set()
+
         """Clear out the nla"""
         if not freezeAnimation:
-            objs = bpy.data.objects
-
             objs[blenderid].animation_data_clear()
             objs[blenderid].keyframe_insert(data_path="location", frame=1)
-            objs[blenderid].keyframe_insert(data_path="rotation_euler", frame=1)
+            objs[blenderid].keyframe_insert(
+                data_path="rotation_euler", frame=1)
+
+        # Keyframe everything so agent return to the same position.
+        if self.geoGroup is None or self.geoGroup == "":
+            # ie. manual agent
+            if self.rigOverwrite != "":
+                obj = objs[self.id]
+                if obj.type == "ARMATURE":
+                    for bone in obj.pose.bones:
+                        bone.keyframe_insert("location")
+                        if bone.rotation_mode == "QUATERNION":
+                            bone.keyframe_insert("rotation_quaternion")
+                        elif bone.rotation_mode == "AXIS_ANGLE":
+                            bone.keyframe_insert("rotation_axis_angle")
+                        else:
+                            bone.keyframe_insert("rotation_euler")
+                obj.keyframe_insert("location")
+                if obj.rotation_mode == "QUATERNION":
+                    obj.keyframe_insert("rotation_quaternion")
+                elif obj.rotation_mode == "AXIS_ANGLE":
+                    obj.keyframe_insert("rotation_axis_angle")
+                else:
+                    obj.keyframe_insert("rotation_euler")
+        else:
+            # ie. auto generated agent
+            for obj in bpy.data.groups[self.geoGroup].objects:
+                if obj.type == "ARMATURE":
+                    for bone in obj.pose.bones:
+                        bone.keyframe_insert("location")
+                        if bone.rotation_mode == "QUATERNION":
+                            bone.keyframe_insert("rotation_quaternion")
+                        elif bone.rotation_mode == "AXIS_ANGLE":
+                            bone.keyframe_insert("rotation_axis_angle")
+                        else:
+                            bone.keyframe_insert("rotation_euler")
+                obj.keyframe_insert("location")
+                if obj.rotation_mode == "QUATERNION":
+                    obj.keyframe_insert("rotation_quaternion")
+                elif obj.rotation_mode == "AXIS_ANGLE":
+                    obj.keyframe_insert("rotation_axis_angle")
+                else:
+                    obj.keyframe_insert("rotation_euler")
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
@@ -123,8 +170,7 @@ class Agent:
             if preferences.show_debug_timings:
                 cm_timings.agent["brainExecute"] += time.time() - t
             if objs[self.id].select:
-                print("ID: ", self.id, "Tags: ", self.brain.tags,
-                      "outvars: ", self.brain.outvars)
+                logger.debug("ID: {} Tags: {} outvars: {}".format(self.id, self.brain.tags, self.brain.outvars))
             # TODO show this in the UI
         if preferences.show_debug_options:
             t = time.time()
@@ -150,6 +196,8 @@ class Agent:
         self.px = self.brain.outvars["px"] if self.brain.outvars["px"] else 0
         self.py = self.brain.outvars["py"] if self.brain.outvars["py"] else 0
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
+
+        self.shapeKeys = self.brain.outvars["sk"]
 
         self.external["tags"] = self.brain.tags
 
@@ -194,18 +242,45 @@ class Agent:
             for track in obj.animation_data.nla_tracks:
                 track.mute = False
 
-        """Set objects rotation and location"""
+        """Set objects shape key value, rotation and location"""
+
+        lastFrame = bpy.context.scene.frame_current - 1
+        thisFrame = bpy.context.scene.frame_current
+
+        if self.geoGroup is None or self.geoGroup == "":
+            grpObjs = [obj]
+        else:
+            grpObjs = bpy.data.groups[self.geoGroup].objects
+
+        for cobj in grpObjs:
+            if cobj.type == 'MESH':
+                if cobj.data.shape_keys is not None:
+                    for skNm in self.shapeKeys:
+                        sk = cobj.data.shape_keys.key_blocks.get(skNm)
+                        if sk is not None:
+                            skVal = self.shapeKeys[skNm]
+                            if abs(sk.value - skVal) > 0.000001:
+                                if skNm not in self.lastShapeKeys:
+                                    sk.keyframe_insert(
+                                        data_path="value", frame=lastFrame)
+                                    self.lastShapeKeys.add(skNm)
+                                sk.value = skVal
+                                sk.keyframe_insert(
+                                    data_path="value", frame=thisFrame)
+                            else:
+                                if skNm in self.lastShapeKeys:
+                                    self.lastShapeKeys.remove(skNm)
 
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=0,
-                                    frame=bpy.context.scene.frame_current - 1)
+                                    frame=lastFrame)
                 self.arxKey = True
             obj.rotation_euler[0] = self.arx
             obj.keyframe_insert(data_path="rotation_euler",
                                 index=0,
-                                frame=bpy.context.scene.frame_current)
+                                frame=thisFrame)
         else:
             self.arxKey = False
 
@@ -213,12 +288,12 @@ class Agent:
             if not self.aryKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=1,
-                                    frame=bpy.context.scene.frame_current - 1)
+                                    frame=lastFrame)
                 self.aryKey = True
             obj.rotation_euler[1] = self.ary
             obj.keyframe_insert(data_path="rotation_euler",
                                 index=1,
-                                frame=bpy.context.scene.frame_current)
+                                frame=thisFrame)
         else:
             self.aryKey = False
 
@@ -226,12 +301,12 @@ class Agent:
             if not self.arzKey:
                 obj.keyframe_insert(data_path="rotation_euler",
                                     index=2,
-                                    frame=bpy.context.scene.frame_current - 1)
+                                    frame=lastFrame)
                 self.arzKey = True
             obj.rotation_euler[2] = self.arz
             obj.keyframe_insert(data_path="rotation_euler",
                                 index=2,
-                                frame=bpy.context.scene.frame_current)
+                                frame=thisFrame)
         else:
             self.arzKey = False
 
@@ -239,12 +314,12 @@ class Agent:
             if not self.apxKey:
                 obj.keyframe_insert(data_path="location",
                                     index=0,
-                                    frame=bpy.context.scene.frame_current - 1)
+                                    frame=lastFrame)
                 self.apxKey = True
             obj.location[0] = self.apx
             obj.keyframe_insert(data_path="location",
                                 index=0,
-                                frame=bpy.context.scene.frame_current)
+                                frame=thisFrame)
         else:
             self.apxKey = False
 
@@ -252,12 +327,12 @@ class Agent:
             if not self.apyKey:
                 obj.keyframe_insert(data_path="location",
                                     index=1,
-                                    frame=bpy.context.scene.frame_current - 1)
+                                    frame=lastFrame)
                 self.apyKey = True
             obj.location[1] = self.apy
             obj.keyframe_insert(data_path="location",
                                 index=1,
-                                frame=bpy.context.scene.frame_current)
+                                frame=thisFrame)
         else:
             self.apyKey = False
 
@@ -265,12 +340,12 @@ class Agent:
             if not self.apzKey:
                 obj.keyframe_insert(data_path="location",
                                     index=2,
-                                    frame=bpy.context.scene.frame_current - 1)
+                                    frame=lastFrame)
                 self.apzKey = True
             obj.location[2] = self.apz
             obj.keyframe_insert(data_path="location",
                                 index=2,
-                                frame=bpy.context.scene.frame_current)
+                                frame=thisFrame)
         else:
             self.apzKey = False
 
@@ -295,17 +370,17 @@ class Agent:
                                 boneObj.rotation_euler[0] = tagVal
                                 boneObj.keyframe_insert(data_path="rotation_euler",
                                                         index=0,
-                                                        frame=bpy.context.scene.frame_current)
+                                                        frame=thisFrame)
                             if attribute == "RY":
                                 boneObj.rotation_euler[1] = tagVal
                                 boneObj.keyframe_insert(data_path="rotation_euler",
                                                         index=1,
-                                                        frame=bpy.context.scene.frame_current)
+                                                        frame=thisFrame)
                             if attribute == "RZ":
                                 boneObj.rotation_euler[2] = tagVal
                                 boneObj.keyframe_insert(data_path="rotation_euler",
                                                         index=2,
-                                                        frame=bpy.context.scene.frame_current)
+                                                        frame=thisFrame)
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["applyOutput"] += time.time() - t
