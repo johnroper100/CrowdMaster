@@ -91,7 +91,7 @@ class Simulation:
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
-            ag = Agent(agent, nGps[brain], self, freezeAnimation=freezeAnimation)
+            ag = Agent(agent, nGps[brain], self, tags=agent.initialTags, modifyBones=agent.modifyBones, freezeAnimation=freezeAnimation)
             self.agents[agent.name] = ag
         else:
             logger.debug("No such brain type: {}".format(brain))
