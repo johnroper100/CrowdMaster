@@ -92,9 +92,8 @@ class Simulation:
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
-            agent_entry = {"blenderid": name, "nodeGroup": nGps[brain], "sim": self,
-                           "rigOverwrite": rigOverwrite, "constrainBone": constrainBone}
-            ag = Agent(agent_entry, tags=initialTags, modifyBones=modifyBones,
+            ag = Agent(name, nGps[brain], self, rigOverwrite, constrainBone,
+                       tags=initialTags, modifyBones=modifyBones,
                        freezeAnimation=freezeAnimation, geoGroup=geoGroup)
             self.agents[name] = ag
         else:
@@ -140,8 +139,7 @@ class Simulation:
             newT = time.time()
             logger.debug("Frame time {}".format(newT - t))
             cm_timings.simulation["total"] += newT - t
-            logger.debug("Total time {}".format(
-                cm_timings.simulation["total"]))
+            logger.debug("Total time {}".format(cm_timings.simulation["total"]))
             cm_timings.simulation["totalFrames"] += 1
             tf = cm_timings.simulation["totalFrames"]
             tt = cm_timings.simulation["total"]
