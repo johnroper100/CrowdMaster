@@ -23,7 +23,7 @@ bl_info = {
     "version": (1, 3, 2),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
-    "description": "Crowd generation and simulation for Blender 3D",
+    "description": "Crowd Simulation for the Masses",
     "warning": "",
     "wiki_url": "http://crowdmaster.org/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
