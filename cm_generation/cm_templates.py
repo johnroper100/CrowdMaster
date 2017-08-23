@@ -639,7 +639,7 @@ class TemplateAGENT(Template):
 
             t = time.time()
             gret = self.inputs["Objects"].build(geoBuildRequest)
-            cm_timings.placement["TemplateAGENT-Build"] += time.time() -t
+            cm_timings.placement["TemplateAGENT-Build"] += time.time() - t
             cm_timings.placementNum["TemplateAGENT-Build"] += 1
             topObj = gret.obj
 
@@ -673,7 +673,7 @@ class TemplateAGENT(Template):
                                            rigOverwrite,
                                            constrainBone,
                                            packModifyBones)
-            cm_timings.placement["TemplateAGENT-cm_agent_add"] += time.time() -t
+            cm_timings.placement["TemplateAGENT-cm_agent_add"] += time.time() - t
             cm_timings.placementNum["TemplateAGENT-cm_agent_add"] += 1
 
         cm_timings.placement["TemplateAGENT"] += time.time() - t

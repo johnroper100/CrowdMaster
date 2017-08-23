@@ -633,7 +633,8 @@ class LogicPRINT(Neuron):
                                 str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
-                        logger.info("{} >> {} {}".format(settings["Label"], i, into[i]))
+                        logger.info("{} >> {} {}".format(
+                            settings["Label"], i, into[i]))
         return 0
 
 
