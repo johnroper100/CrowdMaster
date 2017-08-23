@@ -627,20 +627,17 @@ class LogicPRINT(Neuron):
         if self.brain.userid in selected:
             for into in inps:
                 for i in into:
+                    if settings["show_current_frame"]:
+                        newframe = "NEWFRAME " + str(bpy.context.scene.frame_current) + "\n"
+                    else:
+                        newframe = ""
                     if settings["save_to_file"]:
                         with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            if settings["show_current_frame"]:
-                                message = "NEWFRAME " + str(bpy.context.scene.frame_current) + "\n" + \
-                                    settings["Label"] + " >> " + str(i) + " " + str(into[i]) + "\n"
-                            else:
-                                message = settings["Label"] + " >> " + \
-                                    str(i) + " " + str(into[i]) + "\n"
+                            message = newframe + settings["Label"] + " >> " + \
+                                str(i) + " " + str(into[i]) + "\n"
                             output.write(message)
                     else:
-                        if settings["show_current_frame"]:
-                            logger.info("NEWFRAME {}\n{} >> {} {}".format(str(bpy.context.scene.frame_current), settings["Label"], i, into[i]))
-                        else:
-                            logger.info("{} >> {} {}".format(settings["Label"], i, into[i]))
+                        logger.info("{}{} >> {} {}".format(newframe, settings["Label"], i, into[i]))
         return 0
 
 
