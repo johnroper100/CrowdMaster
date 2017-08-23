@@ -166,13 +166,13 @@ class SCENE_OT_cm_agent_add(Operator):
         newAgent.constrainBone = constrainBone
         for x in initialTags:
             tag = newAgent.initialTags.add()
-            tag.name = x.name
-            tag.value = x.value
+            tag.name = x["name"]
+            tag.value = x["value"]
         for x in modifyBones:
             modify = newAgent.modifyBones.add()
-            modify.name = x.name
-            modify.tag = x.tag
-            modify.attribute = x.attribute
+            modify.name = x["name"]
+            modify.tag = x["tag"]
+            modify.attribute = x["attribute"]
         group.totalAgents += 1
 
         cm_timings.placement["cm_agent_add"] += time.time() - t
