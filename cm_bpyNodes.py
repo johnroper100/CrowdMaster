@@ -680,10 +680,8 @@ class PrintNode(LogicNode):
     # implemented
 
     def draw_buttons(self, context, layout):
-        row = layout.row()
-        row.prop(self, "Label")
-        row.prop(self, "show_current_frame")
-
+        layout.prop(self, "Label")
+        layout.prop(self, "show_current_frame")
         layout.prop(self, "save_to_file")
         if self.save_to_file:
             layout.prop(self, "output_filepath")
