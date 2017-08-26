@@ -514,6 +514,12 @@ class LogicFILTER(Neuron):
                     count += 1
             if count != 0:
                 result = {"None": total / count}
+        elif self.settings["Operation"] == "SUM":
+            total = 0
+            for into in inps:
+                for i in into:
+                    total += into[i]
+            result = {"None": total}
         return result
 
 

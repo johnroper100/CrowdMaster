@@ -571,7 +571,8 @@ class FilterNode(LogicNode):
                                     ("GREATER", "Greater than", "", 4),
                                     ("LEAST", "Least only", "", 5),
                                     ("MOST", "Most only", "", 6),
-                                    ("AVERAGE", "Average", "", 7)])
+                                    ("AVERAGE", "Average", "", 7),
+                                    ("SUM", "Sum", "", 8)])
     Tag = BoolProperty(name="Tag", default=False)
     TagName = StringProperty(name="Tag Name", default="")
     Value = FloatProperty(name="Value", default=0.0)
