@@ -128,15 +128,9 @@ class SCENE_PT_event(Panel):
 
     def draw(self, context):
         layout = self.layout
-
-        row = layout.row()
-
-        row.label("Events")
-
-        row = layout.row()
-
         sce = bpy.context.scene
 
+        row = layout.row()
         row.template_list("SCENE_UL_event", "", sce.cm_events,
                           "coll", sce.cm_events, "index")
 
