@@ -36,7 +36,8 @@ class event_entry(PropertyGroup):
     )
     volumeType = EnumProperty(items=(
         ("Object", "Object", "Object"),
-        ("Group", "Group", "Group"))
+        ("Group", "Group", "Group"),
+        default="Object")
     )
     volume = StringProperty(name="Volume")
 
