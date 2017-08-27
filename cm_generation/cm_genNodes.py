@@ -911,14 +911,13 @@ class VGroupPositionNode(CrowdMasterAGenTreeNode):
         row = layout.row()
         row.prop(self, "vgroup")
 
-        if self.paintMode == 'place':
-            layout.prop(self, "noToPlace")
-            layout.prop(self, "overwritePosition")
+        layout.prop(self, "noToPlace")
+        layout.prop(self, "overwritePosition")
 
-            layout.prop(self, "relax")
-            if self.relax:
-                layout.prop(self, "relaxIterations")
-                layout.prop(self, "relaxRadius")
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
 
     def getSettings(self):
         return {"affectMode": self.affectMode,
