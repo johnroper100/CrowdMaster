@@ -44,6 +44,7 @@ placement = OrderedDict([
     ("TemplateRANDOMPOSITIONING", 0),
     ("TemplateMESHPOSITIONING", 0),
     ("TemplateVCOLPOSITIONING", 0),
+    ("TemplateVGROUPPOSITIONING", 0),
     ("TemplatePATH", 0),
     ("TemplateFORMATION", 0),
     ("TemplateTARGET", 0),

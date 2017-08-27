@@ -1141,7 +1141,6 @@ class TemplateVGROUPPOSITIONING(Template):
 
     def build(self, buildRequest):
         t = time.time()
-        affectMode = self.settings["affectMode"]
         guide = bpy.data.objects[self.settings["guideMesh"]]
         invert = self.settings["invert"]
         data = guide.data
@@ -1162,86 +1161,63 @@ class TemplateVGROUPPOSITIONING(Template):
         if self.totalArea is None:
             self.totalArea = sum(p.area for p in polys)
 
-        if affectMode == 'place':
-            positions = []
-            for n in range(self.settings["noToPlace"]):
-                remaining = random.random() * self.totalArea
-                index = 0
-                while remaining > 0:
-                    remaining -= polys[index].area
-                    if remaining <= 0:
-                        a = data.vertices[polys[index].vertices[0]].co
-                        b = data.vertices[polys[index].vertices[1]].co
-                        c = data.vertices[polys[index].vertices[2]].co
-                        r1 = math.sqrt(random.random())
-                        r2 = random.random()
-                        pos = (1 - r1) * a + (r1 * (1 - r2)) * \
-                            b + (r1 * r2) * c
-                        if self.settings["overwritePosition"]:
-                            pos = wrld * pos
-                        else:
-                            pos.rotate(mathutils.Euler(buildRequest.rot))
-                            pos *= buildRequest.scale
-                            pos = buildRequest.pos + pos
-                        positions.append(pos)
-                    index += 1
+        positions = []
+        for n in range(self.settings["noToPlace"]):
+            remaining = random.random() * self.totalArea
+            index = 0
+            while remaining > 0:
+                remaining -= polys[index].area
+                if remaining <= 0:
+                    a = data.vertices[polys[index].vertices[0]].co
+                    b = data.vertices[polys[index].vertices[1]].co
+                    c = data.vertices[polys[index].vertices[2]].co
+                    r1 = math.sqrt(random.random())
+                    r2 = random.random()
+                    pos = (1 - r1) * a + (r1 * (1 - r2)) * \
+                        b + (r1 * r2) * c
+                    if self.settings["overwritePosition"]:
+                        pos = wrld * pos
+                    else:
+                        pos.rotate(mathutils.Euler(buildRequest.rot))
+                        pos *= buildRequest.scale
+                        pos = buildRequest.pos + pos
+                    positions.append(pos)
+                index += 1
 
-            if self.settings["relax"]:
-                sce = bpy.context.scene
-                gnd = sce.objects[self.settings["guideMesh"]]
-                if self.bvhtree is None:
-                    self.bvhtree = BVHTree.FromObject(gnd, sce)
-                radius = self.settings["relaxRadius"]
-                for n, p in enumerate(positions):
-                    rvec = random.random() * mathutils.noise.random_unit_vector()
-                    positions[n] = p + rvec * radius
-                for i in range(self.settings["relaxIterations"]):
-                    kd = KDTree(len(positions))
-                    for n, p in enumerate(positions):
-                        kd.insert(p, n)
-                    kd.balance()
-                    for n, p in enumerate(positions):
-                        adjust = Vector()
-                        localPoints = kd.find_range(p, radius * 2)
-                        for (co, ind, dist) in localPoints:
-                            if ind != n:
-                                v = p - co
-                                if v.length > 0:
-                                    adjust += v * \
-                                        ((2 * radius - v.length) / v.length)
-                        if len(localPoints) > 0:
-                            adjPos = positions[n] + adjust / len(localPoints)
-                            positions[n] = self.bvhtree.find_nearest(adjPos)[0]
-
-            cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
-            cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
-
-            for newPos in positions:
-                newBuildRequest = buildRequest.copy()
-                newBuildRequest.pos = newPos
-                self.inputs["Template"].build(newBuildRequest)
-
-        elif affectMode == 'edit':
+        if self.settings["relax"]:
             sce = bpy.context.scene
             gnd = sce.objects[self.settings["guideMesh"]]
             if self.bvhtree is None:
                 self.bvhtree = BVHTree.FromObject(gnd, sce)
+            radius = self.settings["relaxRadius"]
+            for n, p in enumerate(positions):
+                rvec = random.random() * mathutils.noise.random_unit_vector()
+                positions[n] = p + rvec * radius
+            for i in range(self.settings["relaxIterations"]):
+                kd = KDTree(len(positions))
+                for n, p in enumerate(positions):
+                    kd.insert(p, n)
+                kd.balance()
+                for n, p in enumerate(positions):
+                    adjust = Vector()
+                    localPoints = kd.find_range(p, radius * 2)
+                    for (co, ind, dist) in localPoints:
+                        if ind != n:
+                            v = p - co
+                            if v.length > 0:
+                                adjust += v * \
+                                    ((2 * radius - v.length) / v.length)
+                    if len(localPoints) > 0:
+                        adjPos = positions[n] + adjust / len(localPoints)
+                        positions[n] = self.bvhtree.find_nearest(adjPos)[0]
 
-            point = buildRequest.pos
-            loc, norm, ind, dist = self.bvhtree.find_nearest(point)
-            poly = data.polygons[ind]
+        cm_timings.placement["TemplateVGROUPPOSITIONING"] += time.time() - t
+        cm_timings.placementNum["TemplateVGROUPPOSITIONING"] += 1
 
-            cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
-            cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
-
-            for loop_index in poly.loop_indices:
-                loop_vert_index = data.loops[loop_index].vertex_index
-                if not invert:
-                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        self.inputs["Template"].build(buildRequest)
-                else:
-                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        self.inputs["Template"].build(buildRequest)
+        for newPos in positions:
+            newBuildRequest = buildRequest.copy()
+            newBuildRequest.pos = newPos
+            self.inputs["Template"].build(newBuildRequest)
 
     def check(self):
         if "Template" not in self.inputs:

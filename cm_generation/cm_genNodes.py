@@ -864,10 +864,6 @@ class VGroupPositionNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
     bl_width_default = 260.0
 
-    affectMode = EnumProperty(name="Affect Mode", description="Decide how the node acts", items=[
-        ('place', "Place", 'Place agents based on the vertex group'),
-        ('edit', "Edit", 'Edit the positions inputted from other nodes')])
-
     guideMesh = StringProperty(name="Guide Mesh",
                                description="The mesh to scatter points over")
 
@@ -905,8 +901,6 @@ class VGroupPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "affectMode", expand=True)
-
         row = layout.row(align=True)
         row.prop_search(self, "guideMesh", bpy.context.scene, "objects")
         if self.invert:
