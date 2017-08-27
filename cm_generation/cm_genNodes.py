@@ -920,8 +920,7 @@ class VGroupPositionNode(CrowdMasterAGenTreeNode):
             layout.prop(self, "relaxRadius")
 
     def getSettings(self):
-        return {"affectMode": self.affectMode,
-                "vgroup": self.vgroup,
+        return {"vgroup": self.vgroup,
                 "guideMesh": self.guideMesh,
                 "invert": self.invert,
                 "noToPlace": self.noToPlace,
