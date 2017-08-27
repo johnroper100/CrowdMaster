@@ -1154,8 +1154,12 @@ class TemplateVGROUPPOSITIONING(Template):
             mode = verts_vertexGroups[modeIndex]
             groupName = guide.vertex_groups[mode].name
 
-            if groupName == vgroup:
-                polys.append(p)
+            if invert:
+                if not groupName == vgroup:
+                    polys.append(p)
+            else:
+                if groupName == vgroup:
+                    polys.append(p)
 
         wrld = guide.matrix_world
         if self.totalArea is None:
