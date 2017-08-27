@@ -1019,13 +1019,12 @@ class TemplateVCOLPOSITIONING(Template):
         invert = self.settings["invert"]
         data = guide.data
         polys = []
-        mesh = data
 
-        vcol_layer = mesh.vertex_colors[self.settings["vcols"]]
+        vcol_layer = data.vertex_colors[self.settings["vcols"]]
 
-        for poly in mesh.polygons:
+        for poly in data.polygons:
             for loop_index in poly.loop_indices:
-                loop_vert_index = mesh.loops[loop_index].vertex_index
+                loop_vert_index = data.loops[loop_index].vertex_index
                 if not invert:
                     if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         polys.append(poly)
@@ -1104,13 +1103,13 @@ class TemplateVCOLPOSITIONING(Template):
 
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
-            poly = mesh.polygons[ind]
+            poly = data.polygons[ind]
 
             cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
             cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
 
             for loop_index in poly.loop_indices:
-                loop_vert_index = mesh.loops[loop_index].vertex_index
+                loop_vert_index = data.loops[loop_index].vertex_index
                 if not invert:
                     if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         self.inputs["Template"].build(buildRequest)
@@ -1146,14 +1145,12 @@ class TemplateVGROUPPOSITIONING(Template):
         guide = bpy.data.objects[self.settings["guideMesh"]]
         invert = self.settings["invert"]
         data = guide.data
-        polys = []
-        mesh = data
 
-        vgroup_layer = mesh.vertex_colors[self.settings["vgroup"]]
+        vgroup_layer = data.vertex_colors[self.settings["vgroup"]]
 
-        for poly in mesh.polygons:
+        for poly in data.polygons:
             for loop_index in poly.loop_indices:
-                loop_vert_index = mesh.loops[loop_index].vertex_index
+                loop_vert_index = data.loops[loop_index].vertex_index
                 if not invert:
                     if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         polys.append(poly)
@@ -1232,13 +1229,13 @@ class TemplateVGROUPPOSITIONING(Template):
 
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
-            poly = mesh.polygons[ind]
+            poly = data.polygons[ind]
 
             cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
             cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
 
             for loop_index in poly.loop_indices:
-                loop_vert_index = mesh.loops[loop_index].vertex_index
+                loop_vert_index = data.loops[loop_index].vertex_index
                 if not invert:
                     if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         self.inputs["Template"].build(buildRequest)
