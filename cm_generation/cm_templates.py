@@ -17,24 +17,26 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import math
 import os
 import random
 import re
+import time
 from collections import OrderedDict
 from math import radians
-import time
 
 import bmesh
 import bpy
 import mathutils
 from mathutils import Euler
 
+from .. import SCENE_OT_cm_agent_add, cm_timings
 from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
-from .. import cm_timings
-from .. import SCENE_OT_cm_agent_add
+
+logger = logging.getLogger("CrowdMaster")
 
 BVHTree = mathutils.bvhtree.BVHTree
 KDTree = mathutils.kdtree.KDTree
@@ -513,11 +515,15 @@ class GeoTemplatePARENT(GeoTemplate):
         if self.settings["parentMode"] == "bone":
             con = child.constraints.new("CHILD_OF")
             con.target = parent
-            con.subtarget = self.settings["parentTo"]
-            bone = parent.pose.bones[self.settings["parentTo"]]
-            con.inverse_matrix = bone.matrix.inverted()
-            if child.data:
-                child.data.update()
+            try:
+                con.subtarget = self.settings["parentTo"]
+                bone = parent.pose.bones[self.settings["parentTo"]]
+                con.inverse_matrix = bone.matrix.inverted()
+                if child.data:
+                    child.data.update()
+            except:
+                logger.info(
+                    "The chosed bone was not found in the parent armature!")
         else:
             child.parent = parent
             mod = child.modifiers.get("Armature")
