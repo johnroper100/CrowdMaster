@@ -11,3 +11,7 @@ crate-type = ["cdylib"]
 version = "0.1"
 features = ["extension-module"]
 
+[dependencies]
+nalgebra = "0.13.0"
+ncollide = "0.13.0"
+lazy_static = "0.2"
