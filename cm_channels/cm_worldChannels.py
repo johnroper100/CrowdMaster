@@ -62,18 +62,34 @@ class World(Mc):
                         result = False
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
-                        volObj = bpy.data.objects[e.volume]
-                        pt = bpy.data.objects[self.userid].location
-                        localPt = volObj.matrix_world.inverted() * pt
-                        d = mathutils.Vector()
-                        d.x = volObj.dimensions.x / volObj.scale.x
-                        d.y = volObj.dimensions.y / volObj.scale.y
-                        d.z = volObj.dimensions.z / volObj.scale.z
+                        result = False
+                        if e.volumeType == "Object":
+                            volObj = bpy.data.objects[e.volume]
+                            pt = bpy.data.objects[self.userid].location
+                            localPt = volObj.matrix_world.inverted() * pt
+                            d = mathutils.Vector()
+                            d.x = volObj.dimensions.x / volObj.scale.x
+                            d.y = volObj.dimensions.y / volObj.scale.y
+                            d.z = volObj.dimensions.z / volObj.scale.z
 
-                        if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                            if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
                                 -(d.y / 2) <= localPt.y <= (d.y / 2) and
                                 -(d.z / 2) <= localPt.z <= (d.z / 2)):
-                            result = False
+                                result = True
+                        elif e.volumeType == "Group":
+                            for obj in bpy.data.groups[e.volumeType]:
+                                volObj = bpy.data.objects[obj]
+                                pt = bpy.data.objects[self.userid].location
+                                localPt = volObj.matrix_world.inverted() * pt
+                                d = mathutils.Vector()
+                                d.x = volObj.dimensions.x / volObj.scale.x
+                                d.y = volObj.dimensions.y / volObj.scale.y
+                                d.z = volObj.dimensions.z / volObj.scale.z
+
+                                if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                                    -(d.y / 2) <= localPt.y <= (d.y / 2) and
+                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                                    result = True
                 if result:
                     if eventType == "control":
                         return {"None": 1}

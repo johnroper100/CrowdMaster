@@ -571,7 +571,8 @@ class FilterNode(LogicNode):
                                     ("GREATER", "Greater than", "", 4),
                                     ("LEAST", "Least only", "", 5),
                                     ("MOST", "Most only", "", 6),
-                                    ("AVERAGE", "Average", "", 7)])
+                                    ("AVERAGE", "Average", "", 7),
+                                    ("SUM", "Sum", "", 8)])
     Tag = BoolProperty(name="Tag", default=False)
     TagName = StringProperty(name="Tag Name", default="")
     Value = FloatProperty(name="Value", default=0.0)
@@ -664,6 +665,12 @@ class PrintNode(LogicNode):
         default=False,
     )
 
+    show_current_frame = BoolProperty(
+        name="Show Current Frame",
+        description="Show the curent frame when printing.",
+        default=True,
+    )
+
     output_filepath = StringProperty(
         name="Output Filepath",
         default="",
@@ -675,12 +682,14 @@ class PrintNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Label")
+        layout.prop(self, "show_current_frame")
         layout.prop(self, "save_to_file")
         if self.save_to_file:
             layout.prop(self, "output_filepath")
 
     def getSettings(self, node):
         node.settings["Label"] = self.Label
+        node.settings["show_current_frame"] = self.show_current_frame
         node.settings["save_to_file"] = self.save_to_file
         node.settings["output_filepath"] = self.output_filepath
 
