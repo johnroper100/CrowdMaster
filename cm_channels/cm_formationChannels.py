@@ -17,6 +17,7 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import math
 
 import bpy
@@ -25,6 +26,8 @@ import mathutils
 from ..libs.ins_clustering import clusterMatch
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Formation(Mc):
@@ -46,7 +49,7 @@ class Formation(Mc):
     def registerOld(self, agent, formID, val):
         """Adds an object that is a formation target"""
         if formID in dir(self):
-            print("""Formation ID must not be an attribute of this
+            logger.info("""Formation ID must not be an attribute of this
                   python object""")
         else:
             if formID not in self.formations:

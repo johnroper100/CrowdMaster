@@ -53,8 +53,7 @@ class DefaultSocket(NodeSocket):
 
     filterProperty = EnumProperty(items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
-                                         ("MIN", "Min", "", 3)
-                                         ])
+                                         ("MIN", "Min", "", 3)])
     defaultValueProperty = FloatProperty(default=1.0)
     randomInputValue = BoolProperty(default=False)
 
@@ -151,32 +150,40 @@ class NewInputNode(LogicNode):
     bl_width_default = 350.0
 
     InputSource = EnumProperty(name="Input Channel",
-                               items=[("AGENTINFO", "Agent Info", "", 10),
-                                      ("CONSTANT", "Constant", "", 1),
-                                      ("FLOCK", "Flock", "", 2),
-                                      ("FORMATION", "Formation", "", 3),
-                                      ("GROUND", "Ground", "", 4),
-                                      ("NOISE", "Noise", "", 5),
-                                      ("PATH", "Path", "", 6),
-                                      ("SOUND", "Sound", "", 7),
-                                      ("STATE", "State", "", 8),
-                                      ("WORLD", "World", "", 9)],
+                               items=[("AGENTINFO", "Agent Info", "Get information about other agents in the scene", 10),
+                                      ("CONSTANT", "Constant",
+                                       "Get a single value that does not change per frame", 1),
+                                      ("FLOCK", "Flock",
+                                       "Get information relating to flocking agents", 2),
+                                      ("FORMATION", "Formation",
+                                       "Get information relating to formation agents", 3),
+                                      ("GROUND", "Ground",
+                                       "Get information about ground objects", 4),
+                                      ("NOISE", "Noise",
+                                       "Get random values that change over time", 5),
+                                      ("PATH", "Path",
+                                       "Get information relating to path following", 6),
+                                      ("SOUND", "Sound",
+                                       "Get sound information from each agent", 7),
+                                      ("STATE", "State",
+                                       "Get state information from each agent", 8),
+                                      ("WORLD", "World", "Get world information from the scene", 9)],
                                description="Which channel the input data should be pulled from",
                                default="CONSTANT")
 
     Constant = FloatProperty(name="Constant", precision=5)
 
     Flocking = EnumProperty(name="Flocking Input",
-                            items=[("SEPARATE", "Separate", "", 1),
-                                   ("ALIGN", "Align", "", 2),
-                                   ("COHERE", "Cohere", "", 3)])
+                            items=[("SEPARATE", "Separate", "The direction the agent needs to move to move away from other nearby agent", 1),
+                                   ("ALIGN", "Align", "The rotation about the X and Z axes needed to align to the average heading of nearby agents", 2),
+                                   ("COHERE", "Cohere", "The direction the agent needs to move to move towards the average position of neighbours", 3)])
     RotationAxis = EnumProperty(name="Rotation Axis",
-                                items=[("RZ", "rz", "", 1),
-                                       ("RX", "rx", "", 2)])
+                                items=[("RZ", "rz", "Rotate on the z axis", 1),
+                                       ("RX", "rx", "Rotate on the x axis", 2)])
     TranslationAxis = EnumProperty(name="Translation Axis",
-                                   items=[("TX", "tx", "", 1),
-                                          ("TY", "ty", "", 2),
-                                          ("TZ", "tz", "", 3)])
+                                   items=[("TX", "tx", "Translate on the x axis", 1),
+                                          ("TY", "ty", "Translate on the y axis", 2),
+                                          ("TZ", "tz", "Translate on the z axis", 3)])
 
     FormationGroup = StringProperty(name="Formation Group")
     FormationOptions = EnumProperty(name="Formation Options",
@@ -195,7 +202,11 @@ class NewInputNode(LogicNode):
 
     NoiseOptions = EnumProperty(name="Noise Options",
                                 items=[("RANDOM", "Random", "", 1),
-                                       ("AGENTRANDOM", "Agent Random", "", 2)])
+                                       ("AGENTRANDOM", "Agent Random", "", 2),
+                                       ("WAVE", "Wave", "", 3)])
+
+    WaveLength = FloatProperty(name="Wavelength", default=24.0, min=0.0)
+    WaveOffset = FloatProperty(name="Offset", default=0.0, min=0.0, max=1.0)
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
@@ -231,7 +242,7 @@ class NewInputNode(LogicNode):
                                           ("CERT", "cert", "", 6),
                                           ("ACC", "acc", "", 7),
                                           ("OVER", "over", "", 8)])
-    MinusRadius = BoolProperty(name="Minus radius", default=True)
+    MinusRadius = BoolProperty(name="Minus Radius", default=True)
 
     StateOptions = EnumProperty(name="State Options",
                                 items=[("RADIUS", "Radius", "", 1),
@@ -240,7 +251,7 @@ class NewInputNode(LogicNode):
                                        ("GLOBALVELY", "Global Vel Y", "", 4),
                                        ("GLOBALVELZ", "Global Vel Z", "", 5),
                                        ("QUERYTAG", "Query tag", "", 6)])
-    StateTagName = StringProperty(name="Tag name")
+    StateTagName = StringProperty(name="Tag Name")
 
     WorldOptions = EnumProperty(name="World Options",
                                 items=[("TIME", "Time", "", 1),
@@ -251,10 +262,15 @@ class NewInputNode(LogicNode):
                                  items=[("RZ", "rz", "", 1),
                                         ("RX", "rx", "", 2),
                                         ("ARRIVED", "Arrived", "", 3)])
-    EventName = StringProperty(name="Event name")
+    EventName = StringProperty(name="Event Name")
+    EventOptions = EnumProperty(name="Event Options",
+                                items=[("duration", "Duration", "", 1),
+                                       ("elapsed", "Elapsed", "", 2),
+                                       ("control", "Control", "", 3)],
+                                default="control")
 
     AgentInfoOptions = EnumProperty(name="Agent Info Options",
-                                    items=[("GETTAG", "Get tag", "", 1),
+                                    items=[("GETTAG", "Get Tag", "", 1),
                                            ("HEADRZ", "Heading rz", "", 2),
                                            ("HEADRX", "Heading rx", "", 3)])
     GetTagName = StringProperty(name="Get Tag Name")
@@ -281,6 +297,10 @@ class NewInputNode(LogicNode):
                 layout.prop(self, "GroundAheadOffset")
         elif self.InputSource == "NOISE":
             layout.prop(self, "NoiseOptions")
+            if self.NoiseOptions == "WAVE":
+                row = layout.row(align=True)
+                row.prop(self, "WaveLength")
+                row.prop(self, "WaveOffset")
         elif self.InputSource == "PATH":
             layout.prop_search(
                 self, "PathName", context.scene.cm_paths, "coll")
@@ -311,6 +331,7 @@ class NewInputNode(LogicNode):
                     layout.prop(self, "TargetOptions")
             if self.WorldOptions == "EVENT":
                 layout.prop(self, "EventName")
+                layout.prop(self, "EventOptions")
         elif self.InputSource == "AGENTINFO":
             layout.prop(self, "AgentInfoOptions")
             if self.AgentInfoOptions == "GETTAG":
@@ -337,6 +358,8 @@ class NewInputNode(LogicNode):
             node.settings["GroundAheadOffset"] = self.GroundAheadOffset
         elif self.InputSource == "NOISE":
             node.settings["NoiseOptions"] = self.NoiseOptions
+            node.settings["WaveOffset"] = self.WaveOffset
+            node.settings["WaveLength"] = self.WaveLength
         elif self.InputSource == "PATH":
             node.settings["PathName"] = self.PathName
             node.settings["PathOptions"] = self.PathOptions
@@ -360,6 +383,7 @@ class NewInputNode(LogicNode):
                     node.settings["TargetOptions"] = self.TargetOptions
             if self.WorldOptions == "EVENT":
                 node.settings["EventName"] = self.EventName
+                node.settings["EventOptions"] = self.EventOptions
         elif self.InputSource == "AGENTINFO":
             node.settings["AgentInfoOptions"] = self.AgentInfoOptions
             node.settings["GetTagName"] = self.GetTagName
@@ -554,7 +578,8 @@ class FilterNode(LogicNode):
                                     ("GREATER", "Greater than", "", 4),
                                     ("LEAST", "Least only", "", 5),
                                     ("MOST", "Most only", "", 6),
-                                    ("AVERAGE", "Average", "", 7)])
+                                    ("AVERAGE", "Average", "", 7),
+                                    ("SUM", "Sum", "", 8)])
     Tag = BoolProperty(name="Tag", default=False)
     TagName = StringProperty(name="Tag Name", default="")
     Value = FloatProperty(name="Value", default=0.0)
@@ -601,16 +626,20 @@ class MapNode(LogicNode):
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
-    bl_width_default = 310.0
+    bl_width_default = 350.0
 
     Output = EnumProperty(name="Output",
-                          items=[("rz", "rz", "", 3),
-                                 ("rx", "rx", "", 1),
-                                 ("ry", "ry", "", 2),
-                                 ("px", "px", "", 4),
-                                 ("py", "py", "", 5),
-                                 ("pz", "pz", "", 6)
-                                 ])
+                          items=[("rx", "Rotation X", "", 1),
+                                 ("ry", "Rotation Y", "", 2),
+                                 ("rz", "Rotation Z", "", 3),
+                                 ("px", "Position X", "", 4),
+                                 ("py", "Position Y", "", 5),
+                                 ("pz", "Position Z", "", 6),
+                                 ("sk", "Shape Key", "", 7)
+                                 ],
+                          default="py")
+    SKName = StringProperty(name="Shape Key Name",
+                            description="The name of the shape key")
     MultiInputType = EnumProperty(name="Multi Input Type",
                                   items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
@@ -620,9 +649,12 @@ class OutputNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Output")
+        if self.Output == "sk":
+            layout.prop(self, "SKName")
         layout.prop(self, "MultiInputType")
 
     def getSettings(self, node):
+        node.settings["SKName"] = self.SKName
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
 
@@ -640,6 +672,12 @@ class PrintNode(LogicNode):
         default=False,
     )
 
+    show_current_frame = BoolProperty(
+        name="Show Current Frame",
+        description="Show the curent frame when printing.",
+        default=True,
+    )
+
     output_filepath = StringProperty(
         name="Output Filepath",
         default="",
@@ -651,12 +689,14 @@ class PrintNode(LogicNode):
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Label")
+        layout.prop(self, "show_current_frame")
         layout.prop(self, "save_to_file")
         if self.save_to_file:
             layout.prop(self, "output_filepath")
 
     def getSettings(self, node):
         node.settings["Label"] = self.Label
+        node.settings["show_current_frame"] = self.show_current_frame
         node.settings["save_to_file"] = self.save_to_file
         node.settings["output_filepath"] = self.output_filepath
 
@@ -761,6 +801,7 @@ class ActionState(StateNode):
     stateLength = IntProperty(name="State Length", default=1)
     cycleState = BoolProperty(name="Cycle State", default=False)
     actionName = StringProperty(name="Action Name", default="")
+    overlap = IntProperty(name="Overlap", min=0, default=0)
     useValueOfSpeed = BoolProperty(name="Use Value of Speed", default=True)
     interuptState = BoolProperty(name="Interupt State", default=False)
     syncState = BoolProperty(name="Sync State", default=False)
@@ -775,6 +816,7 @@ class ActionState(StateNode):
         item.settings["ValueFilter"] = val.filterProperty
         item.settings["ValueDefault"] = val.defaultValueProperty
         item.settings["RandomInput"] = val.randomInputValue
+        item.settings["Overlap"] = self.overlap
         item.length = self.stateLength
         item.cycleState = self.cycleState
         item.actionName = self.actionName
@@ -800,6 +842,8 @@ class ActionState(StateNode):
             else:
                 row.prop(self, "randomActionFromGroup", icon="FILE_REFRESH",
                          icon_only=True)
+        if self.actionName != "":
+            layout.prop(self, "overlap")
         layout.prop(self, "interuptState")
         if self.interuptState:
             layout.prop(self, "syncState")

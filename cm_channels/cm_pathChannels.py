@@ -17,14 +17,14 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import math
 
 import bmesh
 import bpy
 import mathutils
-from bpy.props import (CollectionProperty, EnumProperty,
-                       FloatProperty, IntProperty, PointerProperty,
-                       StringProperty)
+from bpy.props import (CollectionProperty, EnumProperty, FloatProperty,
+                       IntProperty, PointerProperty, StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 from ..libs import cm_draw
@@ -34,6 +34,8 @@ from .cm_masterChannels import timeChannel
 Rotation = mathutils.Matrix.Rotation
 Euler = mathutils.Euler
 Vector = mathutils.Vector
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class Path(Mc):
@@ -222,6 +224,8 @@ class Path(Mc):
 
             if laneSeparation is not None:
                 zaxis = Vector((0, 0, 1))
+                if isDirectional:
+                    laneSeparation = 0.0
                 sepVec = direc.cross(zaxis).normalized() * laneSeparation
 
             length = direc.length
@@ -284,7 +288,7 @@ class Path(Mc):
 
             index = nextIndex
             if nextVert is None:
-                print("no next", index)
+                logger.info("no next {}".format(index))
             nextIndex = nextVert.index
 
     def alignToPath(self, pathEntry, point, nDirec):
@@ -461,7 +465,7 @@ class Path(Mc):
 
 class draw_path_directions_operator(Operator):
     bl_idname = "view3d.draw_path_operator"
-    bl_label = "Draw The Directions Of A Path"
+    bl_label = "Draw Directions"
 
     pathName = StringProperty(name="Name Of Path")
 
@@ -576,8 +580,9 @@ class SCENE_UL_cm_path(UIList):
         if item.mode == "road":
             layout.prop(item, "laneSeparation")
         if item.mode == "directional":
-            oper = layout.operator("view3d.draw_path_operator")
-            oper.pathName = item.name
+            if bpy.context.scene.objects.active == bpy.data.objects[item.objectName]:
+                oper = layout.operator("view3d.draw_path_operator")
+                oper.pathName = item.name
 
 
 class SCENE_PT_path(Panel):
@@ -774,21 +779,24 @@ class cm_path_dfs(Operator):
             return False
         return True
 
-    def dfs(self, v):
-        for e in v.link_edges:
-            if e not in self.seen:
-                other = e.other_vert(v)
-                indexStr = str(e.index)
-                if v.index == e.verts[0].index:
-                    if indexStr in self.pathEntry.revDirec:
-                        toRm = self.pathEntry.revDirec.find(indexStr)
-                        self.pathEntry.revDirec.remove(toRm)
-                else:
-                    if indexStr not in self.pathEntry.revDirec:
-                        revEdge = self.pathEntry.revDirec.add()
-                        revEdge.name = indexStr
-                self.seen.add(e)
-                self.dfs(other)
+    def dfs(self, startVert):
+        stack = [startVert]
+        while len(stack) > 0:
+            v = stack.pop()
+            for e in v.link_edges:
+                if e not in self.seen:
+                    other = e.other_vert(v)
+                    indexStr = str(e.index)
+                    if v.index == e.verts[0].index:
+                        if indexStr in self.pathEntry.revDirec:
+                            toRm = self.pathEntry.revDirec.find(indexStr)
+                            self.pathEntry.revDirec.remove(toRm)
+                    else:
+                        if indexStr not in self.pathEntry.revDirec:
+                            revEdge = self.pathEntry.revDirec.add()
+                            revEdge.name = indexStr
+                    self.seen.add(e)
+                    stack.append(other)
 
     def execute(self, context):
         global activePath

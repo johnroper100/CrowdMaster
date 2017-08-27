@@ -18,8 +18,8 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-from bpy.props import (CollectionProperty, EnumProperty,
-                       IntProperty, PointerProperty, StringProperty)
+from bpy.props import (CollectionProperty, EnumProperty, IntProperty,
+                       PointerProperty, StringProperty)
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
@@ -56,7 +56,7 @@ class actions_collection(PropertyGroup):
 
 class SCENE_OT_cm_actions_populate(Operator):
     bl_idname = "scene.cm_actions_populate"
-    bl_label = "Populate cm actions list"
+    bl_label = "Populate CM actions list"
 
     def execute(self, context):
         item = context.scene.cm_actions.coll.add()
@@ -141,7 +141,7 @@ class action_pair_collection(PropertyGroup):
 
 class SCENE_OT_cm_action_pair_populate(Operator):
     bl_idname = "scene.cm_action_pair_populate"
-    bl_label = "Populate cm action pairs list"
+    bl_label = "Populate CM action pairs list"
 
     def execute(self, context):
         item = context.scene.cm_action_pairs.coll.add()
@@ -220,8 +220,8 @@ class SCENE_PT_action(Panel):
 
         row = layout.row()
         row.label("Name")
-        row.label("Armature action")
-        row.label("Motion action")
+        row.label("Armature Action")
+        row.label("Motion Action")
         row.label("Groups")
 
         row = layout.row()

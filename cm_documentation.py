@@ -28,8 +28,6 @@ documentation_mapping = (
     ("bpy.ops.scene.cm_stop", "simulation/toolbars/main/index.html#stop-simulation"),
     ("bpy.ops.scene.cm_place_deferred_geo",
      "simulation/toolbars/main/utilities/place_deferred_geo.html"),
-    ("bpy.ops.scene.cm_convert_to_bound_box",
-     "simulation/toolbars/main/utilities/conv_to_bound_box.html"),
     ("bpy.ops.scene.cm_switch_dupli_groups",
      "simulation/toolbars/main/utilities/switch_dupli_groups.html"),
     ("bpy.ops.scene.cm_groups_reset", "simulation/toolbars/agents.html#reset-group"),
@@ -52,11 +50,15 @@ documentation_mapping = (
     ("bpy.ops.view3d.cm_switch_selected_path",
      "simulation/toolbars/paths.html#switch-the-direction-of-the-selected-edges"),
     ("bpy.ops.view3d.draw_path_operator",
-     "simulation/toolbars/paths.html#draw-the-directions-of-a-path"),
+     "simulation/toolbars/paths.html#draw-directions"),
     # TODO - nodes
 
     # PROPS
     # toolbar
+    ("bpy.types.Scene.cm_sim_start_frame",
+     "simulation/toolbars/main/index.html#simulation-start-frame"),
+    ("bpy.types.Scene.cm_sim_end_frame",
+     "simulation/toolbars/main/index.html#simulation-end-frame"),
     ("bpy.types.Scene.cm_manual.groupName",
      "simulation/toolbars/manual_agents.html"),
     ("bpy.types.Scene.cm_manual.brainType",

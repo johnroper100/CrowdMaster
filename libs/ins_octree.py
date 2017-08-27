@@ -27,7 +27,11 @@ try:
 except:
     from mathutils import Vector
 
+import logging
+
 import bpy
+
+logger = logging.getLogger("CrowdMaster")
 
 
 #  TODO use Vector for locations and dimensions
@@ -282,7 +286,7 @@ class Octree:
         return collided
 
     def printTree(self, depth=0):
-        print(depth * "--" + "tree")
+        logger.debug(depth * "--" + "tree")
         for cell in self.cells:
             cell.printTree(depth=depth + 1)
 
@@ -340,7 +344,7 @@ class Leaf:
                             failed.add(key)
 
     def printTree(self, depth=0):
-        print(depth * "--", [c.original for c in self.contents])
+        logger.debug(depth * "--", [c.original for c in self.contents])
 
 
 if __name__ == "__main__":
@@ -427,27 +431,27 @@ if __name__ == "__main__":
                     result[a.original] = b.original
         bruteCheckAllCollisions.append(time.time() - t)"""
 
-    print("Construct time:")
+    logger.debug("Construct time:")
     for f in constructTime:
-        print(f)
-    print("Check 10000 time:")
+        logger.debug(f)
+    logger.debug("Check 10000 time:")
     for f in check100Time:
-        print(f)
-    print("Check N time")
+        logger.debug(f)
+    logger.debug("Check N time")
     for f in checkNTime:
-        print(f)
-    print("Check all collisions time:")
+        logger.debug(f)
+    logger.debug("Check all collisions time:")
     for f in checkAllCollisions:
-        print(f)
-    print("Brute construction time:")
+        logger.debug(f)
+    logger.debug("Brute construction time:")
     for f in bruteContructTime:
-        print(f)
-    print("Brute check 10000 time:")
+        logger.debug(f)
+    logger.debug("Brute check 10000 time:")
     for f in bruteCheck100Time:
-        print(f)
-    print("Brute check N time:")
+        logger.debug(f)
+    logger.debug("Brute check N time:")
     for f in bruteCheckNTime:
-        print(f)
-    print("Brute check all collisions:")
+        logger.debug(f)
+    logger.debug("Brute check all collisions:")
     for f in bruteCheckAllCollisions:
-        print(f)
+        logger.debug(f)
