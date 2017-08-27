@@ -51,33 +51,55 @@ class World(Mc):
         return bpy.context.scene.frame_current
 
     @timeChannel("World")
-    def event(self, eventName):
+    def event(self, eventName, eventType):
         events = bpy.context.scene.cm_events.coll
         en = eventName
-        match = False
         for e in events:
             if e.eventname == en:
-                match = True
-                result = 1
+                result = True
                 if e.category == "Time" or e.category == "Time+Volume":
-                    if e.time != bpy.context.scene.frame_current:
-                        result = 0
+                    if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
+                        result = False
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
-                        volObj = bpy.data.objects[e.volume]
-                        pt = bpy.data.objects[self.userid].location
-                        localPt = volObj.matrix_world.inverted() * pt
-                        d = mathutils.Vector()
-                        d.x = volObj.dimensions.x / volObj.scale.x
-                        d.y = volObj.dimensions.y / volObj.scale.y
-                        d.z = volObj.dimensions.z / volObj.scale.z
+                        result = False
+                        if e.volumeType == "Object":
+                            volObj = bpy.data.objects[e.volume]
+                            pt = bpy.data.objects[self.userid].location
+                            localPt = volObj.matrix_world.inverted() * pt
+                            d = mathutils.Vector()
+                            d.x = volObj.dimensions.x / volObj.scale.x
+                            d.y = volObj.dimensions.y / volObj.scale.y
+                            d.z = volObj.dimensions.z / volObj.scale.z
 
-                        if not (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                            if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
                                 -(d.y / 2) <= localPt.y <= (d.y / 2) and
                                 -(d.z / 2) <= localPt.z <= (d.z / 2)):
-                            result = 0
+                                result = True
+                        elif e.volumeType == "Group":
+                            for obj in bpy.data.groups[e.volumeType]:
+                                volObj = bpy.data.objects[obj]
+                                pt = bpy.data.objects[self.userid].location
+                                localPt = volObj.matrix_world.inverted() * pt
+                                d = mathutils.Vector()
+                                d.x = volObj.dimensions.x / volObj.scale.x
+                                d.y = volObj.dimensions.y / volObj.scale.y
+                                d.z = volObj.dimensions.z / volObj.scale.z
+
+                                if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
+                                    -(d.y / 2) <= localPt.y <= (d.y / 2) and
+                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                                    result = True
                 if result:
-                    return {"None": 1}
+                    if eventType == "control":
+                        return {"None": 1}
+                    elif eventType == "duration":
+                        duration = e.timeMax - e.timeMin
+                        return {"None": duration}
+                    elif eventType == "elapsed":
+                        elapsed = bpy.context.scene.frame_current - e.timeMin
+                        return {"None": elapsed}
+
         return {"None": 0}
 
 

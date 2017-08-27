@@ -10,4 +10,4 @@ Its main features include:
 
 You can find the menus in the Node Editor inside the CrowdMaster node trees. Documentation can be found [here](http://crowdmaster.org/docs/).
 
-__If you are a python coder and want to help, take a look at [the goals page](https://github.com/johnroper100/CrowdMaster/wiki/Goals) or send us an email [here](mailto:crowdmaster@jmroper.com) and tell us what you can do. We would be glad to have your help.__
+__If you are a python coder and want to help, send us an email [here](mailto:crowdmaster@jmroper.com) and tell us what you can do. We would be glad to have your help.__

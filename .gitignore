@@ -104,3 +104,4 @@ sources/cm_compileBrain\.html
 rust/cmake-build-debug/
 
 rust/Cargo\.lock
+.vscode/*

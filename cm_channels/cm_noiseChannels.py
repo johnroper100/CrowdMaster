@@ -18,6 +18,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import random
+import math
+
+import bpy
 
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
@@ -45,3 +48,12 @@ class Noise(Mc):
         result = random.random()
         random.setstate(state)
         return result
+
+    @timeChannel("Noise")
+    def wave(self, offset, wavelength):
+        """Returns a sine wave based on the current frame
+        https://www.desmos.com/calculator/gwpmwylgg0"""
+        scene = bpy.context.scene
+        t = scene.frame_current - scene.cm_sim_start_frame
+        x = (t + offset * wavelength)
+        return math.sin((2 * math.pi * x) / wavelength)

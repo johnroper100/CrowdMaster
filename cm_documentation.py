@@ -50,11 +50,15 @@ documentation_mapping = (
     ("bpy.ops.view3d.cm_switch_selected_path",
      "simulation/toolbars/paths.html#switch-the-direction-of-the-selected-edges"),
     ("bpy.ops.view3d.draw_path_operator",
-     "simulation/toolbars/paths.html#draw-the-directions-of-a-path"),
+     "simulation/toolbars/paths.html#draw-directions"),
     # TODO - nodes
 
     # PROPS
     # toolbar
+    ("bpy.types.Scene.cm_sim_start_frame",
+     "simulation/toolbars/main/index.html#simulation-start-frame"),
+    ("bpy.types.Scene.cm_sim_end_frame",
+     "simulation/toolbars/main/index.html#simulation-end-frame"),
     ("bpy.types.Scene.cm_manual.groupName",
      "simulation/toolbars/manual_agents.html"),
     ("bpy.types.Scene.cm_manual.brainType",

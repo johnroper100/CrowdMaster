@@ -17,14 +17,17 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
+import logging
 import os
 
 import bpy
-from bpy.props import BoolProperty, IntProperty, EnumProperty
+from bpy.props import BoolProperty, EnumProperty, IntProperty
 from bpy.types import AddonPreferences, Operator
 
 from . import addon_updater_ops
 from .cm_iconLoad import cicon
+
+logger = logging.getLogger("CrowdMaster")
 
 
 class CMSavePrefs(Operator):
@@ -37,6 +40,14 @@ class CMSavePrefs(Operator):
         bpy.ops.wm.save_userpref()
 
         return {'FINISHED'}
+
+
+def updateLogger(self, context):
+    preferences = context.user_preferences.addons[__package__].preferences
+    if preferences.show_debug_options:
+        logging.basicConfig(level=logging.DEBUG, format='%(message)s')
+    else:
+        logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 class CMPreferences(AddonPreferences):
@@ -86,6 +97,7 @@ class CMPreferences(AddonPreferences):
         name="Show Debug Options",
         description="Chose whether to show the debug options in the interface. This also enables debug mode.",
         default=False,
+        update=updateLogger,
     )
 
     show_debug_timings = BoolProperty(
