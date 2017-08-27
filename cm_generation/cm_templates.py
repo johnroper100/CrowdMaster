@@ -1142,20 +1142,20 @@ class TemplateVGROUPPOSITIONING(Template):
     def build(self, buildRequest):
         t = time.time()
         guide = bpy.data.objects[self.settings["guideMesh"]]
+        vgroup = self.settings["vgroup"]
         invert = self.settings["invert"]
         data = guide.data
+        polys = []
 
-        vgroup_layer = data.vertex_colors[self.settings["vgroup"]]
+        for p in guide.data.polygons:
+            verts_vertexGroups = [g.group for v in p.vertices for g in guide.data.vertices[ v ].groups]
+            counts = [verts_vertexGroups.count( idx ) for idx in verts_vertexGroups]
+            modeIndex = counts.index(max(counts))
+            mode = verts_vertexGroups[modeIndex]
+            groupName = guide.vertex_groups[mode].name
 
-        for poly in data.polygons:
-            for loop_index in poly.loop_indices:
-                loop_vert_index = data.loops[loop_index].vertex_index
-                if not invert:
-                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        polys.append(poly)
-                else:
-                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        polys.append(poly)
+            if groupName == vgroup:
+                polys.append(p)
 
         wrld = guide.matrix_world
         if self.totalArea is None:
