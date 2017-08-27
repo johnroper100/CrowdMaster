@@ -856,6 +856,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
                 "relaxIterations": self.relaxIterations,
                 "relaxRadius": self.relaxRadius}
 
+
 class VGroupPositionNode(CrowdMasterAGenTreeNode):
     """The vertex group positioning node"""
     bl_idname = 'VGroupPositionNodeType'
@@ -871,7 +872,7 @@ class VGroupPositionNode(CrowdMasterAGenTreeNode):
                                description="The mesh to scatter points over")
 
     vgroup = StringProperty(name="Vertex Group",
-                        description="The name of the vertex group to use.")
+                            description="The name of the vertex group to use.")
 
     invert = BoolProperty(name="Invert",
                           description="Place agents outside of the painted area",
