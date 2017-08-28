@@ -404,29 +404,35 @@ class LogicSETTAG(Neuron):
     Tag from the agents tags"""
 
     def core(self, inps, settings):
+        empty = True
         condition = False
         total = 0
         count = 0
         for into in inps:
             for i in into:
+                empty = False
                 if into[i] > settings["Threshold"]:
                     condition = True
                 total += into[i]
                 count += 1
-        if settings["UseThreshold"]:
-            if condition:
+        if not empty:
+            if settings["UseThreshold"]:
+                if condition:
+                    if settings["Action"] == "ADD":
+                        self.brain.tags[settings["Tag"]] = 1
+                    else:
+                        if settings["Tag"] in self.brain.tags:
+                            del self.brain.tags[settings["Tag"]]
+            else:
                 if settings["Action"] == "ADD":
-                    self.brain.tags[settings["Tag"]] = 1
+                    self.brain.tags[settings["Tag"]] = total
                 else:
                     if settings["Tag"] in self.brain.tags:
                         del self.brain.tags[settings["Tag"]]
+        if settings["Tag"] in self.brain.tags:
+            return self.brain.tags[settings["Tag"]]
         else:
-            if settings["Action"] == "ADD":
-                self.brain.tags[settings["Tag"]] = total
-            else:
-                if settings["Tag"] in self.brain.tags:
-                    del self.brain.tags[settings["Tag"]]
-        return settings["Threshold"]
+            return {}
 
 
 class LogicFILTER(Neuron):
