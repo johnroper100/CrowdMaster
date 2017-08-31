@@ -1149,8 +1149,9 @@ class TemplateVGROUPPOSITIONING(Template):
 
         for p in guide.data.polygons:
             here = True
-            for v in p.vertices:
-                for g in v.groups:
+            for idx in p.vertices:
+                vert = guide.data.vertices[idx]
+                for g in vert.groups:
                      if not g.group == vgroup:
                          here = False
             if invert:
