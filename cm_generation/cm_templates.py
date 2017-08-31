@@ -1152,8 +1152,8 @@ class TemplateVGROUPPOSITIONING(Template):
             for idx in p.vertices:
                 vert = guide.data.vertices[idx]
                 for g in vert.groups:
-                     if not g.group == vgroup:
-                         here = False
+                    if not g.group == vgroup:
+                        here = False
             if invert:
                 if not here:
                     polys.append(p)
