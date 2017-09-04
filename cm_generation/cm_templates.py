@@ -1141,19 +1141,21 @@ class TemplateVGROUPPOSITIONING(Template):
 
     def build(self, buildRequest):
         t = time.time()
-        guide = bpy.data.objects[self.settings["guideMesh"]]
-        vgroup = guide.vertex_groups[self.settings["vgroup"]].index
+        guideMesh = bpy.data.objects[self.settings["guideMesh"]]
+        vgroup = guideMesh.vertex_groups[self.settings["vgroup"]].index
         invert = self.settings["invert"]
-        data = guide.data
         polys = []
 
-        for p in data.polygons:
+        for p in guideMesh.data.polygons:
             here = True
             for idx in p.vertices:
-                vert = data.vertices[idx]
-                for g in vert.groups:
-                    if not g.group == vgroup:
-                        here = False
+                vert = guideMesh.data.vertices[idx]
+                if len(vert.groups) == 0:
+                    here = False
+                else:
+                    for g in vert.groups:
+                        if not g.group == vgroup:
+                            here = False
             if invert:
                 if not here:
                     polys.append(p)
@@ -1161,7 +1163,7 @@ class TemplateVGROUPPOSITIONING(Template):
                 if here:
                     polys.append(p)
 
-        wrld = guide.matrix_world
+        wrld = guideMesh.matrix_world
         if self.totalArea is None:
             self.totalArea = sum(p.area for p in polys)
 
@@ -1172,9 +1174,9 @@ class TemplateVGROUPPOSITIONING(Template):
             while remaining > 0:
                 remaining -= polys[index].area
                 if remaining <= 0:
-                    a = data.vertices[polys[index].vertices[0]].co
-                    b = data.vertices[polys[index].vertices[1]].co
-                    c = data.vertices[polys[index].vertices[2]].co
+                    a = guideMesh.data.vertices[polys[index].vertices[0]].co
+                    b = guideMesh.data.vertices[polys[index].vertices[1]].co
+                    c = guideMesh.data.vertices[polys[index].vertices[2]].co
                     r1 = math.sqrt(random.random())
                     r2 = random.random()
                     pos = (1 - r1) * a + (r1 * (1 - r2)) * \
