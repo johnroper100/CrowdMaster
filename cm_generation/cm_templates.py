@@ -1145,8 +1145,11 @@ class TemplateVGROUPPOSITIONING(Template):
         vgroup = guideMesh.vertex_groups[self.settings["vgroup"]].index
         invert = self.settings["invert"]
         polys = []
-
-        for p in guideMesh.data.polygons:
+        
+        me = guideMesh.data
+        bm = bmesh.new()
+        bm.from_mesh(me)
+        for p in bm.faces:
             here = True
             for idx in p.vertices:
                 vert = guideMesh.data.vertices[idx]
@@ -1162,10 +1165,6 @@ class TemplateVGROUPPOSITIONING(Template):
             else:
                 if here:
                     polys.append(p)
-        
-        me = guideMesh.data
-        bm = bmesh.new()
-        bm.from_mesh(me)
         bmesh.ops.triangulate(bm, faces=polys[:], quad_method=0, ngon_method=0)
         bm.free()
 
