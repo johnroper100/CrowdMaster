@@ -1162,6 +1162,17 @@ class TemplateVGROUPPOSITIONING(Template):
             else:
                 if here:
                     polys.append(p)
+        
+        me = guideMesh.data
+        # Get a BMesh representation
+        bm = bmesh.new()
+        bm.from_mesh(me)
+
+        bmesh.ops.triangulate(bm, faces=polys[:], quad_method=0, ngon_method=0)
+
+        # Finish up, write the bmesh back to the mesh
+        bm.to_mesh(me)
+        bm.free()
 
         wrld = guideMesh.matrix_world
         if self.totalArea is None:
