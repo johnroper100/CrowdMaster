@@ -1149,7 +1149,7 @@ class TemplateVGROUPPOSITIONING(Template):
         me = guideMesh.data
         bm = bmesh.new()
         bm.from_mesh(me)
-        bmesh.ops.triangulate(bm, faces=polys[:], quad_method=0, ngon_method=0)
+        bmesh.ops.triangulate(bm, faces=bm.faces[:], quad_method=0, ngon_method=0)
         for p in bm.faces:
             here = True
             for idx in p.vertices:
