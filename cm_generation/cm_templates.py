@@ -1170,14 +1170,14 @@ class TemplateVGROUPPOSITIONING(Template):
 
         wrld = guideMesh.matrix_world
         if self.totalArea is None:
-            self.totalArea = sum(p.area for p in polys)
+            self.totalArea = sum(p.calc_area() for p in polys)
 
         positions = []
         for n in range(self.settings["noToPlace"]):
             remaining = random.random() * self.totalArea
             index = 0
             while remaining > 0:
-                remaining -= polys[index].area
+                remaining -= polys[index].calc_area()
                 if remaining <= 0:
                     a = guideMesh.data.vertices[polys[index].vertices[0]].co
                     b = guideMesh.data.vertices[polys[index].vertices[1]].co
