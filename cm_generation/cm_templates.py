@@ -1166,7 +1166,6 @@ class TemplateVGROUPPOSITIONING(Template):
             else:
                 if here:
                     polys.append(p)
-        bm.free()
 
         wrld = guideMesh.matrix_world
         if self.totalArea is None:
@@ -1224,6 +1223,8 @@ class TemplateVGROUPPOSITIONING(Template):
 
         cm_timings.placement["TemplateVGROUPPOSITIONING"] += time.time() - t
         cm_timings.placementNum["TemplateVGROUPPOSITIONING"] += 1
+
+        bm.free()
 
         for newPos in positions:
             newBuildRequest = buildRequest.copy()
