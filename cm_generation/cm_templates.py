@@ -1153,11 +1153,11 @@ class TemplateVGROUPPOSITIONING(Template):
         for p in bm.faces:
             here = True
             for vert in p.verts:
-
-                if len(vert.groups) == 0:
+                v = guideMesh.data.vertices[vert.index]
+                if len(v.groups) == 0:
                     here = False
                 else:
-                    for g in vert.groups:
+                    for g in v.groups:
                         if not g.group == vgroup:
                             here = False
             if invert:
