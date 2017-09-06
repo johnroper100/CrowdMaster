@@ -2,6 +2,3 @@ language: rust
 script:
   - cd rust
   - ./build-linux.sh
-os:
-  - linux
-  - osx
