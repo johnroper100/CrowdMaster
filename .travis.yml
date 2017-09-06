@@ -5,3 +5,5 @@ script:
 notifications:
   slack: crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
   email: false
+  on_success: change
+  on_failure: always
