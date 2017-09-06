@@ -2,6 +2,6 @@ language: rust
 script:
   - cd rust
   - ./build-linux.sh
- notifications:
-    slack: crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
-    email: false
+notifications:
+  slack: crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
+  email: false
