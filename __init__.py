@@ -18,7 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 bl_info = {
-    "name": "CrowdMaster",
+    "name": "CrowdMaster Rust",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
     "version": (1, 3, 2),
     "blender": (2, 78, 0),
