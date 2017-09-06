@@ -1,7 +1,14 @@
 language: rust
-script:
-  - cd rust
-  - ./build-linux.sh
+jobs:
+  include:
+    - stage: test
+      script:
+        - cd rust
+        - cargo test --all
+    - stage: build
+      script:
+        - cd rust
+        - ./build-linux.sh
 notifications:
   slack:
     rooms:
