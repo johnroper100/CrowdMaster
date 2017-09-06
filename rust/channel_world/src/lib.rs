@@ -13,7 +13,6 @@ use ncollide::shape::{Cuboid3, Shape3};
 use ncollide::bounding_volume;
 use ncollide::query::{PointInterferencesCollector, PointQuery};
 
-use std::f64::consts::PI;
 use std::sync::Mutex;
 use std::collections::HashMap;
 
@@ -39,32 +38,39 @@ lazy_static! {
 }
 
 // add bindings to the generated python module
-// N.B: names: "channel_world" must be the name of the `.so` or `.pyd` file
 py_module_initializer!(channel_world, initchannel_world, PyInit_channel_world, |py, m| {
     try!(m.add(py, "__doc__", "This module is implemented in Rust."));
-    try!(m.add(py, "event_new", py_fn!(py, event_new_py(name: String,
-                                                        loc_x: f64, loc_y: f64, loc_z: f64,
-                                                        rot_x: f64, rot_y: f64, rot_z: f64,
-                                                        scale_x: f64, scale_y: f64, scale_z: f64))));
+    try!(m.add(py, "event_update", py_fn!(py, event_update_py(name: String, py_loc: PyObject,
+                                                              py_rot: PyObject, py_scale: PyObject))));
     try!(m.add(py, "event_construct_bvt", py_fn!(py, event_construct_bvt_py())));
     try!(m.add(py, "event_query_point", py_fn!(py, event_query_point_py(vector: PyObject))));
+    try!(m.add(py, "event_clear", py_fn!(py, event_clear_py())));
     Ok(())
 });
 
-fn event_new(name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
+fn event_update(name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
     let e = Event { shape: Box::new(Cuboid3::new(scale)),
-                    isometry: Isometry3::new(loc, rot.scaled_axis())};
+                    isometry: Isometry3::new(loc, rot.scaled_axis()) };
     EVENTSTATE.lock().unwrap().as_mut().unwrap().volumes.insert(name, e);
 }
 
-fn event_new_py(py: Python, name: String, loc_x: f64, loc_y: f64, loc_z: f64,
-                rot_x: f64, rot_y: f64, rot_z: f64, scale_x: f64, scale_y: f64, scale_z: f64) -> PyResult<PyObject> {
+fn event_update_py(py: Python, name: String, py_loc: PyObject, py_rot: PyObject, py_scale: PyObject) -> PyResult<PyObject> {
+    let loc_x: f64 = py_loc.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let loc_y: f64 = py_loc.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let loc_z: f64 = py_loc.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+
+    let rot_x: f64 = py_rot.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let rot_y: f64 = py_rot.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let rot_z: f64 = py_rot.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+
+    let scale_x: f64 = py_scale.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let scale_y: f64 = py_scale.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let scale_z: f64 = py_scale.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+
     let loc = Vector3::new(loc_x, loc_y, loc_z);
-    let rot = Rotation3::from_euler_angles(PI * rot_x / 180.0,
-                                           PI * rot_y / 180.0,
-                                           PI * rot_z / 180.0);
+    let rot = Rotation3::from_euler_angles(rot_x, rot_y, rot_z);
     let scale = Vector3::new(scale_x, scale_y, scale_z);
-    event_new(name, loc, rot, scale);
+    event_update(name, loc, rot, scale);
     Ok(py.None())
 }
 
@@ -111,6 +117,17 @@ fn event_query_point_py(py: Python, vector: PyObject) -> PyResult<Vec<String>> {
     Ok(event_query_point(Point3::new(x, y, z)))
 }
 
+fn event_clear() {
+    let mut opt = EVENTSTATE.lock().unwrap();
+    let mut event_state = opt.as_mut().unwrap();
+    event_state.volumes.clear();
+}
+
+fn event_clear_py(py: Python) -> PyResult<PyObject> {
+    event_clear();
+    Ok(py.None())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -120,17 +137,17 @@ mod tests {
         let rot1 = Rotation3::from_euler_angles(PI * 75.222 / 180.0,
                                                 PI * -3.574 / 180.0,
                                                 PI * -69.214 / 180.0);
-        event_new(String::from("1"), Vector3::new(0.0, 0.0, -0.3), rot1, Vector3::new(0.5, 0.25, 0.25));
+        event_update(String::from("1"), Vector3::new(0.0, 0.0, -0.3), rot1, Vector3::new(0.5, 0.25, 0.25));
 
         let rot2 = Rotation3::from_euler_angles(PI * -40.903 / 180.0,
                                                 PI * 32.16 / 180.0,
                                                 PI * 50.156 / 180.0);
-        event_new(String::from("2"), Vector3::new(0.0, 0.66454, 0.0), rot2, Vector3::new(0.5, 0.25, 0.5));
+        event_update(String::from("2"), Vector3::new(0.0, 0.66454, 0.0), rot2, Vector3::new(0.5, 0.25, 0.5));
 
         let rot3 = Rotation3::from_euler_angles(PI * 0.0 / 180.0,
                                                 PI * 0.0 / 180.0,
                                                 PI * 0.0 / 180.0);
-        event_new(String::from("3"), Vector3::new(0.0, 0.0, 0.0), rot3, Vector3::new(0.5, 0.25, 0.5));
+        event_update(String::from("3"), Vector3::new(0.0, 0.0, 0.0), rot3, Vector3::new(0.5, 0.25, 0.5));
         event_construct_bvt();
         let mut r = event_query_point(Point3::new(0.0, 0.0, 0.0));
         r.sort();
@@ -138,7 +155,7 @@ mod tests {
         let mut r = event_query_point(Point3::new(0.04573, 0.53356, -0.19536));
         r.sort();
         assert_eq!(r, ["1", "2"]);
-        event_new(String::from("4"), Vector3::new(0.0, 0.0, 0.0), Rotation3::from_euler_angles(0.0, 0.0, 0.0), Vector3::new(0.5, 0.5, 0.5));
+        event_update(String::from("4"), Vector3::new(0.0, 0.0, 0.0), Rotation3::from_euler_angles(0.0, 0.0, 0.0), Vector3::new(0.5, 0.5, 0.5));
         event_construct_bvt();
         let mut r = event_query_point(Point3::new(0.0, 0.0, 0.0));
         r.sort();

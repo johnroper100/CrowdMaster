@@ -25,6 +25,7 @@ import mathutils
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel
 
+from . import channel_world
 
 class World(Mc):
     """Used to access other data from the scene"""
@@ -32,6 +33,9 @@ class World(Mc):
     def __init__(self, sim):
         Mc.__init__(self, sim)
         self.store = {}
+        self.eventVolStore = []
+        self.eventQueried = False
+        channel_world.event_clear()
 
     def target(self, target):
         """Dynamic properties"""
@@ -41,9 +45,26 @@ class World(Mc):
 
     def newframe(self):
         self.store = {}
+        self.eventVolStore = []
+        self.eventQueried = False
+
+        events = bpy.context.scene.cm_events.coll
+        for e in events:
+            if e.category == "Volume" or e.category == "Time+Volume":
+                if e.volumeType == "Object":
+                    objs = [bpy.data.objects[e.volume]]
+                else:
+                    objs = bpy.data.groups[e.volumeType].objects
+                for obj in objs:
+                    mw = obj.matrix_world
+                    channel_world.event_update(obj.name, mw.to_translation(),
+                                               mw.to_euler(), mw.to_scale())
+        channel_world.event_construct_bvt()
 
     def setuser(self, userid):
         self.store = {}
+        self.eventVolStore = []
+        self.eventQueried = False
         Mc.setuser(self, userid)
 
     @property
@@ -62,34 +83,21 @@ class World(Mc):
                         result = False
                 if e.category == "Volume" or e.category == "Time+Volume":
                     if result:
-                        result = False
-                        if e.volumeType == "Object":
-                            volObj = bpy.data.objects[e.volume]
+                        if not self.eventQueried:
                             pt = bpy.data.objects[self.userid].location
-                            localPt = volObj.matrix_world.inverted() * pt
-                            d = mathutils.Vector()
-                            d.x = volObj.dimensions.x / volObj.scale.x
-                            d.y = volObj.dimensions.y / volObj.scale.y
-                            d.z = volObj.dimensions.z / volObj.scale.z
-
-                            if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
-                                -(d.y / 2) <= localPt.y <= (d.y / 2) and
-                                -(d.z / 2) <= localPt.z <= (d.z / 2)):
-                                result = True
-                        elif e.volumeType == "Group":
-                            for obj in bpy.data.groups[e.volumeType]:
-                                volObj = bpy.data.objects[obj]
-                                pt = bpy.data.objects[self.userid].location
-                                localPt = volObj.matrix_world.inverted() * pt
-                                d = mathutils.Vector()
-                                d.x = volObj.dimensions.x / volObj.scale.x
-                                d.y = volObj.dimensions.y / volObj.scale.y
-                                d.z = volObj.dimensions.z / volObj.scale.z
-
-                                if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
-                                    -(d.y / 2) <= localPt.y <= (d.y / 2) and
-                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
-                                    result = True
+                            self.eventVolStore = channel_world.event_query_point(pt)
+                            self.eventQueried = True
+                        if len(self.eventVolStore) == 0:
+                            result = False
+                        else:
+                            if e.volumeType == "Object":
+                                result = e.volume in self.eventVolStore
+                            elif e.volumeType == "Group":
+                                result = False
+                                for obj in bpy.data.groups[e.volume].objects:
+                                    if obj.name in self.eventVolStore:
+                                        result = True
+                                        break
                 if result:
                     if eventType == "control":
                         return {"None": 1}

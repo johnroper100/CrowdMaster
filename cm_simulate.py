@@ -128,12 +128,12 @@ class Simulation:
 
         self.syncManager.newFrame()
 
+        for chan in self.lvars.values():
+            chan.newframe()
         for a in self.agents.values():
             a.step()
         for a in self.agents.values():
             a.apply()
-        for chan in self.lvars.values():
-            chan.newframe()
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.printTimings()
             newT = time.time()
