@@ -1,4 +1,7 @@
 language: rust
 script:
-- cd rust
-- ./build-linux.sh
+  - cd rust
+  - ./build-linux.sh
+branches:
+  only:
+  - rust-core
