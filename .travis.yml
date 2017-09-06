@@ -3,7 +3,9 @@ script:
   - cd rust
   - ./build-linux.sh
 notifications:
-  slack: crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
+  slack:
+    rooms:
+      - crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
+    on_success: change
+    on_failure: always
   email: false
-  on_success: change
-  on_failure: always
