@@ -228,9 +228,9 @@ fn event_query_py(py: Python, event_name: String, point_py: PyObject, output: St
     let z: f64 = point_py.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
     let mut output_type = EventOption::Control;
     match output.as_ref() {
-        "Control" => output_type = EventOption::Control,
-        "Duration" => output_type = EventOption::Duration,
-        "Elapsed" => output_type = EventOption::Elapsed,
+        "control" => output_type = EventOption::Control,
+        "duration" => output_type = EventOption::Duration,
+        "elapsed" => output_type = EventOption::Elapsed,
         _ => ()
     }
     Ok(event_query(event_name, Point3::new(x, y, z), output_type))
