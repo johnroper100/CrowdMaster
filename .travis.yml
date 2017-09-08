@@ -4,7 +4,7 @@ jobs:
     - stage: test
       script:
         - cd rust
-        - cargo test --all
+        - cargo test --all -- --test-threads=1
     - stage: build
       script:
         - cd rust
