@@ -59,7 +59,7 @@ lazy_static! {
 
 // add bindings to the generated python module
 py_module_initializer!(channel_world, initchannel_world, PyInit_channel_world, |py, m| {
-    try!(m.add(py, "__doc__", "This module is implemented in Rust."));
+    try!(m.add(py, "__doc__", "This is the CrowdMaster channel_world module (implemented in Rust)."));
     try!(m.add(py, "event_set_time", py_fn!(py, event_set_time_py(time: i32))));
     try!(m.add(py, "event_time_update", py_fn!(py, event_time_update_py(event_name: String, lower: i32, upper: i32))));
     try!(m.add(py, "event_volume_update", py_fn!(py, event_volume_update_py(event_name: String, object_name: String,

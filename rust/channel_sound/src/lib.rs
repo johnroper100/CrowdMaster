@@ -5,7 +5,7 @@ use cpython::{PyResult, Python};
 // add bindings to the generated python module
 // N.B: names: "libcpython_lib" must be the name of the `.so` or `.pyd` file
 py_module_initializer!(channel_sound, initchannel_sound, PyInit_channel_sound, |py, m| {
-    try!(m.add(py, "__doc__", "This module is implemented in Rust."));
+    try!(m.add(py, "__doc__", "This is the CrowdMaster channel_sound module (implemented in Rust)."));
     try!(m.add(py, "sum_as_string", py_fn!(py, sum_as_string_py(a: i64, b:i64))));
     Ok(())
 });
