@@ -50,7 +50,7 @@ class World(Mc):
                                                       mw.to_euler(),
                                                       mw.to_scale())
             elif e.category == "Time":
-                channel_world.event_time_create(e.name, e.timeMin, e.timeMax)
+                channel_world.event_time_create(e.eventname, e.timeMin, e.timeMax)
 
     def target(self, target):
         """Dynamic properties"""
