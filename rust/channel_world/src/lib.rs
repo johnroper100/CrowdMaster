@@ -61,9 +61,11 @@ lazy_static! {
 py_module_initializer!(channel_world, initchannel_world, PyInit_channel_world, |py, m| {
     try!(m.add(py, "__doc__", "This is the CrowdMaster channel_world module (implemented in Rust)."));
     try!(m.add(py, "event_set_time", py_fn!(py, event_set_time_py(time: i32))));
-    try!(m.add(py, "event_time_update", py_fn!(py, event_time_update_py(event_name: String, lower: i32, upper: i32))));
-    try!(m.add(py, "event_volume_update", py_fn!(py, event_volume_update_py(event_name: String, object_name: String,
+    try!(m.add(py, "event_time_create", py_fn!(py, event_time_create_py(event_name: String, lower: i32, upper: i32))));
+    try!(m.add(py, "event_volume_create", py_fn!(py, event_volume_create_py(event_name: String, object_name: String,
                                                                             py_loc: PyObject, py_rot: PyObject, py_scale: PyObject))));
+    try!(m.add(py, "event_volume_update", py_fn!(py, event_volume_update_py(event_name: String, object_name: String, py_loc: PyObject,
+                                                                            py_rot: PyObject, py_scale: PyObject))));
     try!(m.add(py, "event_construct_bvt", py_fn!(py, event_construct_bvt_py())));
     try!(m.add(py, "event_query", py_fn!(py, event_query_py(event_name: String, point_py: PyObject, output: String))));
     try!(m.add(py, "event_clear", py_fn!(py, event_clear_py())));
@@ -82,7 +84,7 @@ fn event_set_time_py(py: Python, time: i32) -> PyResult<PyObject> {
     Ok(py.None())
 }
 
-fn event_time_update(event_name: String, lower: i32, upper: i32) {
+fn event_time_create(event_name: String, lower: i32, upper: i32) {
     let mut opt = EVENTSTATE.lock().unwrap();
     let mut event_state = opt.as_mut().unwrap();
 
@@ -96,12 +98,12 @@ fn event_time_update(event_name: String, lower: i32, upper: i32) {
     event_state.event_groups.get_mut(&event_name).unwrap().events.push(e);
 }
 
-fn event_time_update_py(py: Python, event_name: String, lower: i32, upper: i32) -> PyResult<PyObject> {
-    event_time_update(event_name, lower, upper);
+fn event_time_create_py(py: Python, event_name: String, lower: i32, upper: i32) -> PyResult<PyObject> {
+    event_time_create(event_name, lower, upper);
     Ok(py.None())
 }
 
-fn event_volume_update(event_name: String, object_name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
+fn event_volume_create(event_name: String, object_name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
     let mut opt = EVENTSTATE.lock().unwrap();
     let mut event_state = opt.as_mut().unwrap();
 
@@ -118,6 +120,37 @@ fn event_volume_update(event_name: String, object_name: String, loc: Vector3<f64
     }
 
     event_state.event_groups.get_mut(&event_name).unwrap().events.push(e);
+}
+
+fn event_volume_create_py(py: Python, event_name: String, object_name: String, py_loc: PyObject, py_rot: PyObject, py_scale: PyObject) -> PyResult<PyObject> {
+    let loc_x: f64 = py_loc.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let loc_y: f64 = py_loc.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let loc_z: f64 = py_loc.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+
+    let rot_x: f64 = py_rot.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let rot_y: f64 = py_rot.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let rot_z: f64 = py_rot.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+
+    let scale_x: f64 = py_scale.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let scale_y: f64 = py_scale.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let scale_z: f64 = py_scale.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+
+    let loc = Vector3::new(loc_x, loc_y, loc_z);
+    let rot = Rotation3::from_euler_angles(rot_x, rot_y, rot_z);
+    let scale = Vector3::new(scale_x, scale_y, scale_z);
+    event_volume_create(event_name, object_name, loc, rot, scale);
+    Ok(py.None())
+}
+
+fn event_volume_update(event_name: String, object_name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
+    let mut opt = EVENTSTATE.lock().unwrap();
+    let mut event_state = opt.as_mut().unwrap();
+
+    if let Some(event_group) = event_state.event_groups.get_mut(&event_name) {
+        if let Some(x) = event_group.volume_map.get_mut(&object_name) {
+            *x = (Box::new(Cuboid3::new(scale)), Isometry3::new(loc, rot.scaled_axis()));
+        }
+    }
 }
 
 fn event_volume_update_py(py: Python, event_name: String, object_name: String, py_loc: PyObject, py_rot: PyObject, py_scale: PyObject) -> PyResult<PyObject> {
@@ -257,17 +290,17 @@ mod tests {
         let rot1 = Rotation3::from_euler_angles(PI * 75.222 / 180.0,
                                                 PI * -3.574 / 180.0,
                                                 PI * -69.214 / 180.0);
-        event_volume_update(String::from("1"), String::from("Obj1"), Vector3::new(0.0, 0.0, -0.3), rot1, Vector3::new(0.5, 0.25, 0.25));
+        event_volume_create(String::from("1"), String::from("Obj1"), Vector3::new(0.0, 0.0, -0.3), rot1, Vector3::new(0.5, 0.25, 0.25));
 
         let rot2 = Rotation3::from_euler_angles(PI * -40.903 / 180.0,
                                                 PI * 32.16 / 180.0,
                                                 PI * 50.156 / 180.0);
-        event_volume_update(String::from("1"), String::from("Obj2"), Vector3::new(0.0, 0.66454, 0.0), rot2, Vector3::new(0.5, 0.25, 0.5));
+        event_volume_create(String::from("1"), String::from("Obj2"), Vector3::new(0.0, 0.66454, 0.0), rot2, Vector3::new(0.5, 0.25, 0.5));
 
         let rot3 = Rotation3::from_euler_angles(PI * 0.0 / 180.0,
                                                 PI * 0.0 / 180.0,
                                                 PI * 0.0 / 180.0);
-        event_volume_update(String::from("2"), String::from("Obj3"), Vector3::new(0.0, 0.0, 0.0), rot3, Vector3::new(0.5, 0.25, 0.5));
+        event_volume_create(String::from("2"), String::from("Obj3"), Vector3::new(0.0, 0.0, 0.0), rot3, Vector3::new(0.5, 0.25, 0.5));
         event_construct_bvt();
         let ev1 = event_query(String::from("1"), Point3::new(0.0, 0.0, 0.0), EventOption::Control);
         let ev2 = event_query(String::from("2"), Point3::new(0.0, 0.0, 0.0), EventOption::Control);
@@ -285,20 +318,25 @@ mod tests {
         let ev2 = event_query(String::from("2"), Point3::new(1.0, 0.0, 0.0), EventOption::Control);
         assert_eq!(ev1, 0.0);
         assert_eq!(ev2, 0.0);
-        event_volume_update(String::from("2"), String::from("Obj4"), Vector3::new(1.0, 0.0, 0.0), Rotation3::from_euler_angles(0.0, 0.0, 0.0), Vector3::new(0.5, 0.5, 0.5));
+        event_volume_update(String::from("2"), String::from("Obj3"), Vector3::new(1.0, 0.0, 0.0), Rotation3::from_euler_angles(0.0, 0.0, 0.0), Vector3::new(0.5, 0.5, 0.5));
         event_construct_bvt();
         let ev1 = event_query(String::from("1"), Point3::new(1.0, 0.0, 0.0), EventOption::Control);
         let ev2 = event_query(String::from("2"), Point3::new(1.0, 0.0, 0.0), EventOption::Control);
         assert_eq!(ev1, 0.0);
         assert_eq!(ev2, 1.0);
+        event_construct_bvt();
+        let ev1 = event_query(String::from("1"), Point3::new(0.0, 0.0, 0.0), EventOption::Control);
+        let ev2 = event_query(String::from("2"), Point3::new(0.0, 0.0, 0.0), EventOption::Control);
+        assert_eq!(ev1, 1.0);
+        assert_eq!(ev2, 0.0);
 
         event_clear();
     }
 
     #[test]
     fn test_event_time() {
-        event_time_update(String::from("1"), 0, 10);
-        event_time_update(String::from("1"), 15, 20);
+        event_time_create(String::from("1"), 0, 10);
+        event_time_create(String::from("1"), 15, 20);
         event_construct_bvt();
 
         event_set_time(1);
@@ -351,14 +389,14 @@ mod tests {
 
     #[test]
     fn test_event_mixed() {
-        event_time_update(String::from("1"), 0, 10);
+        event_time_create(String::from("1"), 0, 10);
 
         let rot = Rotation3::from_euler_angles(PI * 0.0 / 180.0,
                                                PI * 0.0 / 180.0,
                                                PI * 0.0 / 180.0);
-        event_volume_update(String::from("1"), String::from("Obj1"), Vector3::new(0.0, 0.0, 0.0), rot, Vector3::new(0.5, 0.25, 0.5));
+        event_volume_create(String::from("1"), String::from("Obj1"), Vector3::new(0.0, 0.0, 0.0), rot, Vector3::new(0.5, 0.25, 0.5));
 
-        event_time_update(String::from("1"), 15, 20);
+        event_time_create(String::from("1"), 15, 20);
 
         event_construct_bvt();
         event_set_time(1);

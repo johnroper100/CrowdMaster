@@ -36,6 +36,21 @@ class World(Mc):
         self.eventVolStore = []
         self.eventQueried = False
         channel_world.event_clear()
+        events = bpy.context.scene.cm_events.coll
+        for e in events:
+            if e.category == "Volume":
+                if e.volumeType == "Object":
+                    objs = [bpy.data.objects[e.volume]]
+                else:
+                    objs = bpy.data.groups[e.volumeType].objects
+                for obj in objs:
+                    mw = obj.matrix_world
+                    channel_world.event_volume_create(e.eventname, obj.name,
+                                                      mw.to_translation(),
+                                                      mw.to_euler(),
+                                                      mw.to_scale())
+            elif e.category == "Time":
+                channel_world.event_time_create(e.name, e.timeMin, e.timeMax)
 
     def target(self, target):
         """Dynamic properties"""
@@ -50,16 +65,19 @@ class World(Mc):
 
         events = bpy.context.scene.cm_events.coll
         for e in events:
-            if e.category == "Volume" or e.category == "Time+Volume":
+            if e.category == "Volume":
                 if e.volumeType == "Object":
                     objs = [bpy.data.objects[e.volume]]
                 else:
                     objs = bpy.data.groups[e.volumeType].objects
                 for obj in objs:
                     mw = obj.matrix_world
-                    channel_world.event_update(obj.name, mw.to_translation(),
-                                               mw.to_euler(), mw.to_scale())
+                    channel_world.event_volume_update(e.name, obj.name,
+                                                      mw.to_translation(),
+                                                      mw.to_euler(),
+                                                      mw.to_scale())
         channel_world.event_construct_bvt()
+        channel_world.event_set_time(bpy.context.scene.frame_current)
 
     def setuser(self, userid):
         self.store = {}
@@ -73,42 +91,8 @@ class World(Mc):
 
     @timeChannel("World")
     def event(self, eventName, eventType):
-        events = bpy.context.scene.cm_events.coll
-        en = eventName
-        for e in events:
-            if e.eventname == en:
-                result = True
-                if e.category == "Time" or e.category == "Time+Volume":
-                    if not e.timeMin <= bpy.context.scene.frame_current < e.timeMax:
-                        result = False
-                if e.category == "Volume" or e.category == "Time+Volume":
-                    if result:
-                        if not self.eventQueried:
-                            pt = bpy.data.objects[self.userid].location
-                            self.eventVolStore = channel_world.event_query_point(pt)
-                            self.eventQueried = True
-                        if len(self.eventVolStore) == 0:
-                            result = False
-                        else:
-                            if e.volumeType == "Object":
-                                result = e.volume in self.eventVolStore
-                            elif e.volumeType == "Group":
-                                result = False
-                                for obj in bpy.data.groups[e.volume].objects:
-                                    if obj.name in self.eventVolStore:
-                                        result = True
-                                        break
-                if result:
-                    if eventType == "control":
-                        return {"None": 1}
-                    elif eventType == "duration":
-                        duration = e.timeMax - e.timeMin
-                        return {"None": duration}
-                    elif eventType == "elapsed":
-                        elapsed = bpy.context.scene.frame_current - e.timeMin
-                        return {"None": elapsed}
-
-        return {"None": 0}
+        pt = bpy.data.objects[self.userid].location
+        return {"None": channel_world.event_query(eventName, pt, eventType)}
 
 
 class Channel:

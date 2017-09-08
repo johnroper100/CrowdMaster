@@ -31,8 +31,7 @@ class event_entry(PropertyGroup):
     index = IntProperty(min=0)
     category = EnumProperty(items=(
         ("Time", "Time", "Time"),
-        ("Volume", "Volume", "Volume"),
-        ("Time+Volume", "Time+Volume", "Time+Volume"))
+        ("Volume", "Volume", "Volume"))
     )
     volumeType = EnumProperty(name="Volume Type",
                               items=(("Object", "Object", "Object"), ("Group", "Group", "Group")),
@@ -101,10 +100,10 @@ class SCENE_UL_event(UIList):
         if self.layout_type in {'DEFAULT', 'COMPACT'}:
             layout.prop(item, "eventname", text="")
             layout.prop(item, "category", text="")
-            if item.category == "Time" or item.category == "Time+Volume":
+            if item.category == "Time":
                 layout.prop(item, "timeMin", text="Start")
                 layout.prop(item, "timeMax", text="End")
-            if item.category == "Volume" or item.category == "Time+Volume":
+            if item.category == "Volume":
                 layout.prop(item, "volumeType")
                 if item.volumeType == "Object":
                     layout.prop_search(item, "volume", bpy.data, "objects")
