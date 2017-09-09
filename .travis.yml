@@ -1,5 +1,8 @@
 language: rust
 cache: cargo
+os:
+  - linux
+  - osx
 env:
   global:
   - secure: QzWQmaau+ToaUaIDT1Tz4BLKHkmnN7ZudpgTh24sCprN5fNMhG3poAV2K5vltokGijG8DNiabaDD7Guy0xxS4ducPOv1GNxWC8kw3iqkyDe6lfYKsTdtrM3oirrTK6P1s8cp1idrCMxhso3if9217XKx6XDRqadj5lgEoOtAkjf5vpJgXjIm72KFXnRblg2R/tKLtXucH/ShR4IQ0AWSiHSV6+86Ei7Cu1B5Z52kMKTFP+yoRHfauTLhB2pfFf+7hiMTLLriQ+4JGvi7tyoAu422l5M9C/VMVLqjy1PM1/gCWZ88QDTErosbV8O7OgRMNuESv5A2TbwwaHREExdhFN3SJF3f1Kqc/hzMQqY59KvbzzKwppryEEE8xU/5jNXeJWZxwcmGSv9KkjDD/WyHz8CoHzIIWLcpJygELMNUikXpxL+Vnf4sz9PsyriUnAvXvLUURUtNSognIEbqz9JkxFBOIj474DnbHc5LtjT4YHvsWH9lOAYdVY8YbBGcGLe9g4Zkj9vURMC1482AYlp4FxUCUdetFA5PiIN84ZGPQPrpS0rpAtnv+G+GVS/E3g92SgQIFYkOI9umTUsqEFEMsYgfKIKNnLOTQR7I2SyjPIBV8Mvh4Fn9lci5DTmmP7jmz+/8uVJFYGP44/H7rdnK8bDJ/3vu0sbx5XEKTOTduxY=
@@ -13,7 +16,8 @@ jobs:
   - stage: build
     script:
     - cd rust
-    - "./build-linux-release.sh"
+    - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-macos-release.sh          ; fi
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-linux-release.sh          ; fi
     after_success:
       - "cd ../"
       - "rm -rf rust"
@@ -21,8 +25,10 @@ jobs:
       - "rm -rf .git"
       - "rm CrowdMaster-logo.gif"
       - "cd ../"
-      - "zip -r CrowdMaster_Linux_Auto.zip CrowdMaster"
-      - "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/public_html/crowdmaster-builds/"
+      - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then zip -r CrowdMaster_macOS_Auto.zip CrowdMaster          ; fi
+      - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then zip -r CrowdMaster_Linux_Auto.zip CrowdMaster          ; fi
+      - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then curl --ftp-create-dirs -T CrowdMaster_macOS_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/public_html/crowdmaster-builds/          ; fi
+      - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/public_html/crowdmaster-builds/          ; fi
 notifications:
   slack:
     rooms:
