@@ -9,7 +9,7 @@ jobs:
     - stage: build
       script:
         - cd rust
-        - ./build-linux.sh
+        - ./build-linux-release.sh
 notifications:
   slack:
     rooms:
