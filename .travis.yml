@@ -24,10 +24,9 @@ jobs:
       script:
         - cd rust
         - ./build-linux-release.sh
-before_deploy:
-  "zip CrowdMaster_Linux_Auto.zip"
-deploy:
-  "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/crowdmaster/builds"
+after_success:
+  - "zip CrowdMaster_Linux_Auto.zip"
+  - "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/crowdmaster/builds"
 notifications:
   slack:
     rooms:
