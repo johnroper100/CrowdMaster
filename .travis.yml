@@ -1,5 +1,19 @@
 language: rust
 cache: cargo
+env:
+  global:
+    - "FTP_USER=sFtZjrqYDSgzc7O//4R26TzOU9nyfIyiViEPD7/JMYlZGHAu5YEgGd+a+TUvtMgVh/Q+mTcjidgY2U+FoxlFXjCyyrXIZdPOJQgGA8sUa6
+eKUtfsELw4/912OnQPr7d3tB1ho30Pw1UAZXWD9d9Ck644/6MhkXK0BpbdgrkgIllc5EzRCHYS6XUDUKe3gVyAzDaU0R2NrexnTj4meSHlP2GTky8CqSK
+ostbrtMyRgikjbVeo8YyXU2fjZ/MBCxWpwAJTJEFyXCnzoowLfWgjO7iCmKjXjnAKAm73h+KTN/2hnThQk/ko61mMuJ0AFGQJcHtSQ9Y+lF6zTJ247Q8R
+3PpE/ZgDCZwJ7mwfkf8bGnDeGkDkoUEnRo7RbEDgYY6uCZ+RuceEiVDR2i+w9EtwfAbwBzW8VxfkAb+hchz1jactp69mtcK7wJcawa0Pp300EPDCC+8AV
+FtYHcbFMvtqd3PSVhVzvMP/23cqRwLNDGk9Ke6qkrkDz924iILMlwhSwV5DWJMXBT0sXitzP5ZJNGSIUtLVwdliOc64t1aADAkjOMlNZzIMW3pXF9YAei
+k3QEMISpZbchJmILUPhqI+leATAng33g2RCuYqQE94Y1D1gk+BVBMR9xWf6tXi7WCxInhK7TAvhCf0IjhoFDp5ZcnlELpx1AEbW1Sb1ZyunVw="
+    - "FTP_PASSWORD=xlnSVKTkqy44OeeAN1vr4S0RjvJ5X2Q62ALFlFPNM6U81hyssyoaDxhVLVNikAcnLVujOZkUuC3oMkJtMvw8FvofwCdPEnqzdpAyCkM6no
+nZOTmr65KvjwLzVu36QIH/ttVIofkW6gstzuMvYI2KMKML2tRIfygZFx1SFiGF0bDDdoBffhfJ9zcV907x+CnltYAbGxhoUDvVx3+Ue5UHN/GMqRaYEpr
+LdAOmft40550OWgl45Sz0KL+CsEj7s8+HrD176gGfdiSgHUhzzM7Kd5CzNmdA5E+QnR8LjmEl2Deae2/CprIXb+Boj3xy/08l+2IzJM5OQNOgpb1rNBg4
+GgHzCgtese9tp30aJ1xXeneHxzqIxqSMUCPpMxK8Xh8zskQQFRUhhVC+ws5ANOhxUbfNG/ZB+vi95I9PePyuIBVQRE/FU4l2dxGMQzWOnhUv6TEiT2+4J
+97J2O+DbtMPHujyYW9DHQCyrkucUfw7SZHN6M7Jj9F++pKw7PZexKO19DgLsWilgHXpgN+IjN4TTy/QCLcsCLpzFXFnQc0kDqFrLOo15Oq6ChULT7CqdQ
+HVjO1jV2vHvDT4+t0xXANfzFw23qdrnVmJis6S5E7r1RUp7R+tYtq3xnos4niKkAhHkNtnaw6f1K686M/ReUZjyHc6GWNHhXVBOOLTCQw1ndE="
 jobs:
   include:
     - stage: test
@@ -10,6 +24,10 @@ jobs:
       script:
         - cd rust
         - ./build-linux.sh
+before_deploy:
+  "zip CrowdMaster_Linux_Auto.zip"
+deploy:
+  "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/crowdmaster/builds"
 notifications:
   slack:
     rooms:
