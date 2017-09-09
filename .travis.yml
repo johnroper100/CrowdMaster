@@ -23,7 +23,7 @@ jobs:
     - stage: build
       script:
         - cd rust
-        - ./build-linux.sh
+        - ./build-linux-release.sh
 before_deploy:
   "zip CrowdMaster_Linux_Auto.zip"
 deploy:
