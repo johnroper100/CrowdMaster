@@ -29,7 +29,7 @@ jobs:
 notifications:
   slack:
     rooms:
-    - crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
+      - crowdmasterdevelopers:fDilAv0776bDAcSBGEJHGKyd
     on_success: change
     on_failure: always
   email: false
