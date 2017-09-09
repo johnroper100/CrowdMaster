@@ -15,8 +15,10 @@ jobs:
     - cd rust
     - "./build-linux-release.sh"
     after_success:
-      - "ls"
-      - "cd ../../"
+      - "cd ../"
+      - "rm -rf rust"
+      - "rm -rf target"
+      - "cd ../"
       - "zip -r CrowdMaster_Linux_Auto.zip CrowdMaster"
       - "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/public_html/crowdmaster-builds/"
 notifications:
