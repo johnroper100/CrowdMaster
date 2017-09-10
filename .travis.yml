@@ -12,7 +12,7 @@ script:
   - cd rust
   - cargo test --all -- --test-threads=1
   - "./build-linux-release.sh"
-deploy:
+after_success:
   - "cd ../"
   - "rm -rf rust"
   - "rm -rf target"
