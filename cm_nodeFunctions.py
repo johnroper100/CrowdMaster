@@ -266,12 +266,13 @@ class LogicGRAPH(Neuron):
                         """LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
-                        output[i] = (RBF(into[i]) * settings["Multiply"])
+                        output[i] = RBF(into[i])
                     elif settings["CurveType"] == "RANGE":
-                        output[i] = (linear(into[i]) * settings["Multiply"])
+                        output[i] = linear(into[i])
                     # cubic bezier could also be an option here (1/2 sided)
                     if settings["Invert"]:
                         output[i] = -output[i] + 1
+                    output[i] *= settings["Multiply"]
         return output
 
 
