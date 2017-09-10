@@ -24,7 +24,7 @@ script:
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then ./build-osx-release.sh          ; fi
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then ./build-linux-release.sh          ; fi
 after_success:
-  - "if [[ "$TRAVIS_RUST_VERSION" == "stable" ]]; then ./deploy_travis.sh          ; fi"
+  - if [[ $TRAVIS_RUST_VERSION" == "stable" ]]; then ./deploy_travis.sh          ; fi
 notifications:
   slack:
     rooms:
