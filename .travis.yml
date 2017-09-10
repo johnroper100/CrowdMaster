@@ -1,34 +1,26 @@
 language: rust
 language: python
-matrix:
-  include:
-    - os: linux
-      python: 3.5
-    - os: osx
-      python: 3.5
+os:
+  - linux
+  - osx
 env:
   global:
   - secure: QzWQmaau+ToaUaIDT1Tz4BLKHkmnN7ZudpgTh24sCprN5fNMhG3poAV2K5vltokGijG8DNiabaDD7Guy0xxS4ducPOv1GNxWC8kw3iqkyDe6lfYKsTdtrM3oirrTK6P1s8cp1idrCMxhso3if9217XKx6XDRqadj5lgEoOtAkjf5vpJgXjIm72KFXnRblg2R/tKLtXucH/ShR4IQ0AWSiHSV6+86Ei7Cu1B5Z52kMKTFP+yoRHfauTLhB2pfFf+7hiMTLLriQ+4JGvi7tyoAu422l5M9C/VMVLqjy1PM1/gCWZ88QDTErosbV8O7OgRMNuESv5A2TbwwaHREExdhFN3SJF3f1Kqc/hzMQqY59KvbzzKwppryEEE8xU/5jNXeJWZxwcmGSv9KkjDD/WyHz8CoHzIIWLcpJygELMNUikXpxL+Vnf4sz9PsyriUnAvXvLUURUtNSognIEbqz9JkxFBOIj474DnbHc5LtjT4YHvsWH9lOAYdVY8YbBGcGLe9g4Zkj9vURMC1482AYlp4FxUCUdetFA5PiIN84ZGPQPrpS0rpAtnv+G+GVS/E3g92SgQIFYkOI9umTUsqEFEMsYgfKIKNnLOTQR7I2SyjPIBV8Mvh4Fn9lci5DTmmP7jmz+/8uVJFYGP44/H7rdnK8bDJ/3vu0sbx5XEKTOTduxY=
   - secure: A53oKa1EjtFqRSokKvHszF15ektwnjdR+hcFwzpk2yDDzMiNwtADwuhB2cgWM1q6xR9M3d75H1FpZkdolXB26IC/cPhq8MeObl+cL0QjzLovAEdYqmpCYgmVvIlNULNPCPZOTxwx07qBJUF3pDjH2btAV/5egovLrCx4nRxTMJ7aNcoIZj06eEgoVVyLxUMLZ0P5YYNhqtRVGVwU5bLqe9lWRNs6iYKyCh73tLZqcBNY3WQ714p4AWgYyDHb9JuldmrMmhJtarJKDeAA27kK/3a+9cOjw3VegrAlJMDI7JXU2C9jeQYb66FduF0equzFNc5YI1Y9ghZU7oYTg4+3U0ETgTZ6QAJuJpsFtxUjYPDfVTeAS6xAzYK5vvwiuzAgeaepX6w/wJnkcmt2NxkF6m7yW2DPHkHS863g4uLPXcfbsdHCq1MeJpWksfIbGC+oIMbfEW1gbmx/Ogp05KoIiEwCngg/YVvMHiyCmUwAOiDjbOt9qodYmAn2j5aHfUGPvFSjKVNEeKlZ+xZ0A9yTDMG9nN5XeL5B6etQ4whzBWvL3DBEJE3BZ+pu5dn6ZP2rMCnq3kVHb9lly0K8mFDQ6IKnmbKbvob5Lgqg2UWAiz+Oz9wZPDjtjaPjosL8Mq+BzYdqJ8qW+vkCMGr1DGRYRyceAQKcX/wx1nR2FzWCg9Y=
-jobs:
-  include:
-  - stage: test
-    script:
-    - cd rust
-    - cargo test --all -- --test-threads=1
-  - stage: build
-    script:
-    - cd rust
-    - "./build-linux-release.sh"
-    after_success:
-      - "cd ../"
-      - "rm -rf rust"
-      - "rm -rf target"
-      - "rm -rf .git"
-      - "rm CrowdMaster-logo.gif"
-      - "cd ../"
-      - "zip -r CrowdMaster_Linux_Auto.zip CrowdMaster"
-      - "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/public_html/crowdmaster-builds/"
+
+script:
+  - cd rust
+  - cargo test --all -- --test-threads=1
+  - "./build-linux-release.sh"
+deploy:
+  - "cd ../"
+  - "rm -rf rust"
+  - "rm -rf target"
+  - "rm -rf .git"
+  - "rm CrowdMaster-logo.gif"
+  - "cd ../"
+  - "zip -r CrowdMaster_Linux_Auto.zip CrowdMaster"
+  - "curl --ftp-create-dirs -T CrowdMaster_Linux_Auto.zip -u $FTP_USER:$FTP_PASSWORD ftp://jmroper.com/public_html/crowdmaster-builds/"
 notifications:
   slack:
     rooms:
