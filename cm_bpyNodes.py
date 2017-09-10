@@ -31,10 +31,6 @@ from nodeitems_utils import NodeCategory, NodeItem
 from .cm_iconLoad import cicon
 
 
-class GroupIOListing(PropertyGroup):
-    name = StringProperty(name="Name")
-
-
 class CrowdMasterTree(NodeTree):
     """The node tree that contains the CrowdMaster nodes."""
     bl_idname = 'CrowdMasterTreeType'
@@ -42,8 +38,9 @@ class CrowdMasterTree(NodeTree):
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
     savedOnce = BoolProperty(default=False)
-    groupIn = CollectionProperty(type=GroupIOListing)
-    groupOut = CollectionProperty(type=GroupIOListing)
+
+    def update(self):
+        pass
 
 
 class DefaultSocket(NodeSocket):
@@ -124,7 +121,8 @@ class CrowdMasterNode(Node):
 
     @classmethod
     def poll(cls, ntree):
-        return ntree.bl_idname == 'CrowdMasterTreeType'
+        if ntree.bl_idname in {'CrowdMasterTreeType', 'CrowdMasterGroupTreeType'}:
+            return True
 
 
 class LogicNode(CrowdMasterNode):
@@ -848,139 +846,6 @@ class ActionState(StateNode):
         if self.interuptState:
             layout.prop(self, "syncState")
 
-def updateGroups():
-    node_trees = bpy.data.node_groups
- 
-    for tree in node_trees:
-        if tree.bl_idname == "CrowdMasterTreeType":
-            for node in tree.nodes:
-                if node.bl_idname == "GroupNode":
-                    node.update()
-
-class GroupInputs(CrowdMasterNode):
-    """CrowdMaster Inputs Group Node"""
-    bl_label = "Group Inputs"
-
-    def init(self, context):
-        # Input and self.outputs not a typo! Think about what this node is!
-        self.outputs.new('DefaultSocketType', "Input 0")
-
-    def getSettings(self, item):
-        pass
-
-    def draw_buttons(self, context, layout):
-        pass
-
-    def update(self):
-        # TODO multiple group input nodes
-        changedConnected = False
-        if self.outputs[-1].is_linked:
-            n = len(self.outputs)
-            self.outputs.new("DefaultSocketType", "Input {}".format(n))
-            changedConnected = True
-        elif len(self.outputs) > 1 and not self.outputs[-1].is_linked:
-            while len(self.outputs) > 1 and not self.outputs[-2].is_linked:
-                self.outputs.remove(self.outputs[-1])
-                changedConnected = True
-
-        if changedConnected:
-            self.id_data.groupIn.clear()
-            # inp and self.outputs not a typo! Think about what this node is!
-            for inp in self.outputs[:-1]:
-                i = self.id_data.groupIn.add()
-                i.name = inp.name
-            updateGroups()
-
-
-class GroupOutputs(CrowdMasterNode):
-    """CrowdMaster Output Group Node"""
-    bl_label = "Group Outputs"
-
-    def init(self, context):
-        # Output and self.inputs not a typo! Think about what this node is!
-        self.inputs.new('DefaultSocketType', "Output 0")
-
-    def getSettings(self, item):
-        pass
-
-    def draw_buttons(self, context, layout):
-        pass
-
-    def update(self):
-        # TODO multiple group output nodes
-        changedConnected = False
-        if self.inputs[-1].is_linked:
-            n = len(self.inputs)
-            self.inputs.new("DefaultSocketType", "Output {}".format(n))
-            changedConnected = True
-        elif len(self.inputs) > 1 and not self.inputs[-1].is_linked:
-            while len(self.inputs) > 1 and not self.inputs[-2].is_linked:
-                self.inputs.remove(self.inputs[-1])
-                changedConnected = True
-
-        if changedConnected:
-            self.id_data.groupOut.clear()
-            # out and self.inputs not a typo! Think about what this node is!
-            for out in self.inputs[:-1]:
-                i = self.id_data.groupOut.add()
-                i.name = out.name
-            updateGroups()
-
-
-def updateGroupNodeName(self, context):
-    correctTree = False
-    if self.groupName in bpy.data.node_groups:
-        tree = bpy.data.node_groups[self.groupName]
-        if tree.bl_idname == 'CrowdMasterTreeType':
-            correctTree = True
-
-            # set input sockets
-            i = 0
-            while i < len(self.inputs) and i < len(tree.groupIn):
-                i += 1
-            while i < len(tree.groupIn):
-                self.inputs.new("DefaultSocketType", tree.groupIn[i].name)
-                i += 1
-            while i < len(self.inputs):
-                self.inputs.remove(self.inputs[-1])
-                i += 1
-
-            # set output sockets
-            i = 0
-            while i < len(self.outputs) and i < len(tree.groupOut):
-                i += 1
-            while i < len(tree.groupOut):
-                self.outputs.new("DefaultSocketType", tree.groupOut[i].name)
-                i += 1
-            while i < len(self.outputs):
-                self.outputs.remove(self.outputs[-1])
-                i += 1
-
-    if not correctTree:
-        self.inputs.clear()
-        self.outputs.clear()
-
-class GroupNode(CrowdMasterNode):
-    """CrowdMaster Group Node"""
-    bl_label = "Group"
-    bl_width_default = 275.0
-
-    groupName = StringProperty(name="Group Name",
-                               update=updateGroupNodeName)
-
-    def init(self, context):
-        # TODO get from group
-        pass
-
-    def getSettings(self, item):
-        pass
-    
-    def update(self):
-        self.groupName = self.groupName
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "groupName")
-
 
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
@@ -1096,6 +961,31 @@ class MyNodeCategory(NodeCategory):
     def poll(cls, context):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
+def groupCategory(context):
+    if context is None:
+        return
+    space = context.space_data
+    if not space:
+        return
+    ntree = space.edit_tree
+    if not ntree:
+        return
+
+    if ntree.bl_idname == "CrowdMasterGroupTreeType":
+        yield NodeItem("GroupInputs")
+        yield NodeItem("GroupOutpts")
+
+    for group in context.blend_data.node_groups:
+        if group.bl_idname != "CrowdMasterGroupTreeType":
+            continue
+
+        grp_cls = getattr(bpy.types, group.cm_groupUID, None)
+
+        if grp_cls and grp_cls.cm_groupUID:
+            yield NodeItem(grp_cls.cm_groupUID, grp_cls.name)
+        elif group.cm_groupUID:
+            print("ERROR WITH GROUP LISTINGS")
+
 
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
@@ -1134,15 +1024,13 @@ node_categories = [
         NodeItem("NodeReroute"),
     ]),
     MyNodeCategory("GROUP", "Group", items=[
-        NodeItem("GroupNode"),
         NodeItem("GroupInputs"),
-        NodeItem("GroupOutputs"),
+        NodeItem("GroupOutputs")
     ])
 ]
 
 
 def register():
-    bpy.utils.register_class(GroupIOListing)
     bpy.utils.register_class(CrowdMasterTree)
     bpy.utils.register_class(DefaultSocket)
     bpy.utils.register_class(StateSocket)
@@ -1172,10 +1060,6 @@ def register():
     bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
-    bpy.utils.register_class(GroupInputs)
-    bpy.utils.register_class(GroupOutputs)
-    bpy.utils.register_class(GroupNode)
-
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
 
@@ -1183,7 +1067,6 @@ def register():
 def unregister():
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
 
-    bpy.utils.unregister_class(GroupIOListing)
     bpy.utils.unregister_class(CrowdMasterTree)
     bpy.utils.unregister_class(DefaultSocket)
     bpy.utils.unregister_class(StateSocket)
@@ -1212,10 +1095,6 @@ def unregister():
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
-
-    bpy.utils.unregister_class(GroupInputs)
-    bpy.utils.unregister_class(GroupOutputs)
-    bpy.utils.unregister_class(GroupNode)
 
 
 if __name__ == "__main__":

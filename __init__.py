@@ -573,6 +573,10 @@ def register():
     from . import cm_bpyNodes
     cm_bpyNodes.register()
 
+    global cm_nodeGroups
+    from . import cm_nodeGroups
+    cm_nodeGroups.register()
+
     global cm_generation
     from . import cm_generation
     cm_generation.register()
@@ -628,6 +632,7 @@ def unregister():
 
     addon_updater_ops.unregister()
     cm_bpyNodes.unregister()
+    cm_nodeGroups.unregister()
     cm_generation.unregister()
     cm_utilities.unregister()
     cm_prefs.unregister()
