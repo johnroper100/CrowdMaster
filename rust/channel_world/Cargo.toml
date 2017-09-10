@@ -8,10 +8,10 @@ name = "channel_world"
 crate-type = ["cdylib"]
 
 [dependencies.cpython]
-version = "0.1"
+version = "*"
 features = ["extension-module"]
 
 [dependencies]
-nalgebra = "0.13.0"
-ncollide = "0.13.0"
-lazy_static = "0.2"
+nalgebra = "*"
+ncollide = "*"
+lazy_static = "*"

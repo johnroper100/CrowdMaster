@@ -8,6 +8,6 @@ name = "channel_sound"
 crate-type = ["cdylib"]
 
 [dependencies.cpython]
-version = "0.1"
+version = "*"
 features = ["extension-module"]
 
