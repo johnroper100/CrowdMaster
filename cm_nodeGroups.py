@@ -404,7 +404,7 @@ class CrowdMasterGroupToggle(Operator):
     def execute(self, context):
         node = context.active_node
 
-        if node and node.bl_idname == "GroupNode":
+        if node and node.select and node.bl_idname == "GroupNode":
             if node.groupName != "":
                 parentTree = node.id_data
                 group = bpy.data.node_groups[node.groupName]
@@ -573,6 +573,9 @@ class GroupOutputs(cm_bpyNodes.CrowdMasterNode):
         pass
 
 
+keyMap = None
+keyMapItems = []
+
 def register():
     bpy.utils.register_class(GroupInListing)
     bpy.utils.register_class(GroupOutListing)
@@ -590,7 +593,30 @@ def register():
     bpy.utils.register_class(SOCKET_UL_CrowdMaster_GroupIO)
     bpy.utils.register_class(GroupIOPanel)
 
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        global keyMap
+        keyMap = kc.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
+
+        # ctrl+G
+        kmi = keyMap.keymap_items.new('node.cm_node_group_from_selected', 'G', 'PRESS', ctrl=True)
+        keyMapItems.append(kmi)
+
+        # TAB
+        kmi = keyMap.keymap_items.new('node.cm_group_enter_exit', 'TAB', 'PRESS')
+        keyMapItems.append(kmi)
+
 def unregister():
+    global keyMap
+    if keyMap:
+        for kmi in keyMapItems:
+            try:
+                keyMap.keymap_items.remove(kmi)
+            except Exception:
+                pass
+    keyMapItems.clear()
+
     bpy.utils.unregister_class(GroupInListing)
     bpy.utils.unregister_class(GroupOutListing)
     bpy.utils.unregister_class(CrowdMasterGroupTree)
