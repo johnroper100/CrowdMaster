@@ -27,6 +27,7 @@ from . import cm_bpyNodes
 
 updatingGroupInSocket = False
 
+
 def groupInSocketUpdate(self, context):
     global updatingGroupInSocket
     if updatingGroupInSocket:
@@ -36,6 +37,7 @@ def groupInSocketUpdate(self, context):
     for n, gi in enumerate(group.groupIn):
         if gi == self:
             index = n
+
     def dup(coll, name):
         one = False
         for i in coll:
@@ -54,7 +56,9 @@ def groupInSocketUpdate(self, context):
     group.updateInstances()
     updatingGroupInSocket = False
 
+
 updatingGroupOutSocket = False
+
 
 def groupOutSocketUpdate(self, context):
     global updatingGroupOutSocket
@@ -65,6 +69,7 @@ def groupOutSocketUpdate(self, context):
     for n, gi in enumerate(group.groupOut):
         if gi == self:
             index = n
+
     def dup(coll, name):
         one = False
         for i in coll:
@@ -87,17 +92,21 @@ def groupOutSocketUpdate(self, context):
 class GroupInListing(PropertyGroup):
     name = StringProperty(name="Name", update=groupInSocketUpdate)
     socketType = EnumProperty(items=[("DefaultSocketType", "DefaultSocketType", "DefaultSocketType"),
-                                     ("StateSocketType", "StateSocketType", "StateSocketType"),
+                                     ("StateSocketType", "StateSocketType",
+                                      "StateSocketType"),
                                      ("DependanceSocketType", "DependanceSocketType", "DependanceSocketType")])
 
 
 class GroupOutListing(PropertyGroup):
     name = StringProperty(name="Name", update=groupOutSocketUpdate)
     socketType = EnumProperty(items=[("DefaultSocketType", "DefaultSocketType", "DefaultSocketType"),
-                                     ("StateSocketType", "StateSocketType", "StateSocketType"),
+                                     ("StateSocketType", "StateSocketType",
+                                      "StateSocketType"),
                                      ("DependanceSocketType", "DependanceSocketType", "DependanceSocketType")])
 
+
 updatingGroup = False
+
 
 class CrowdMasterGroupTree(NodeTree):
     bl_idname = 'CrowdMasterGroupTreeType'
@@ -123,14 +132,16 @@ class CrowdMasterGroupTree(NodeTree):
                     continue
                 inConnections[inputSocket.name] = []
                 for inputLink in inputSocket.links:
-                    inConnections[inputSocket.name].append(inputLink.from_socket)
+                    inConnections[inputSocket.name].append(
+                        inputLink.from_socket)
             outConnections = {}
             for outputSocket in node.outputs:
                 if outputSocket.name == "":
                     continue
                 outConnections[outputSocket.name] = []
                 for outputLink in outputSocket.links:
-                    outConnections[outputSocket.name].append(outputLink.to_socket)
+                    outConnections[outputSocket.name].append(
+                        outputLink.to_socket)
 
             changedConnected = False
             groupIONode = False
@@ -144,7 +155,8 @@ class CrowdMasterGroupTree(NodeTree):
                         n = len(node.outputs) + 1
                         while node.outputs.get("Input {}".format(n)) is not None:
                             n += 1
-                        newSocket = node.outputs.new(socketType, "Input {}".format(n))
+                        newSocket = node.outputs.new(
+                            socketType, "Input {}".format(n))
                         self.links.new(newSocket, toSocket)
                         node.outputs.new("EmptySocketType", "")
                         changedConnected = True
@@ -193,7 +205,8 @@ class CrowdMasterGroupTree(NodeTree):
                         n = len(node.inputs) + 1
                         while node.inputs.get("Input {}".format(n)) is not None:
                             n += 1
-                        newSocket = node.inputs.new(socketType, "Output {}".format(n))
+                        newSocket = node.inputs.new(
+                            socketType, "Output {}".format(n))
                         self.links.new(fromSocket, newSocket)
                         node.inputs.new("EmptySocketType", "")
                         changedConnected = True
@@ -289,7 +302,6 @@ class remove_group_input_socket(Operator):
                 if 0 <= group.groupInIndex < len(group.groupIn):
                     return True
 
-
     def invoke(self, context, event):
         group = bpy.data.node_groups[self.groupName]
 
@@ -313,7 +325,6 @@ class remove_group_output_socket(Operator):
             if group.bl_idname == "CrowdMasterGroupTreeType":
                 if 0 <= group.groupOutIndex < len(group.groupOut):
                     return True
-
 
     def invoke(self, context, event):
         group = bpy.data.node_groups[self.groupName]
@@ -357,8 +368,10 @@ class GroupIOPanel(Panel):
         o.groupName = group.name
 
         row = layout.row()
-        row.template_list("SOCKET_UL_CrowdMaster_GroupIO", "", group, "groupIn", group, "groupInIndex")
-        row.template_list("SOCKET_UL_CrowdMaster_GroupIO", "", group, "groupOut", group, "groupOutIndex")
+        row.template_list("SOCKET_UL_CrowdMaster_GroupIO", "",
+                          group, "groupIn", group, "groupInIndex")
+        row.template_list("SOCKET_UL_CrowdMaster_GroupIO", "",
+                          group, "groupOut", group, "groupOutIndex")
 
 
 class EmptySocket(NodeSocket):
@@ -397,7 +410,8 @@ class CrowdMasterCreateFromSelected(Operator):
         bpy.ops.node.clipboard_copy()
 
         # TODO Use proper group name
-        newGroup = bpy.data.node_groups.new("New group name", "CrowdMasterGroupTreeType")
+        newGroup = bpy.data.node_groups.new(
+            "New group name", "CrowdMasterGroupTreeType")
         newGroup.use_fake_user = True
 
         # TODO create group input and output nodes here
@@ -477,13 +491,15 @@ def getCMGroups(self, context):
     res = []
     for group in context.blend_data.node_groups:
         if group.bl_idname == "CrowdMasterGroupTreeType":
-            res.append((group.name,)*3)
+            res.append((group.name,) * 3)
     return res
+
 
 def updateGroupName(self, context):
     if self.editGroupName != self.groupName:
         self.editGroupName = self.groupName
     self.update()
+
 
 def updateEditGroupName(self, context):
     if self.groupName != self.editGroupName:
@@ -598,7 +614,6 @@ class GroupInputs(cm_bpyNodes.CrowdMasterNode):
     bl_idname = "GroupInputs"
     bl_label = "Group Inputs"
 
-
     @classmethod
     def poll(cls, ntree):
         if ntree.bl_idname in {'CrowdMasterGroupTreeType'}:
@@ -641,6 +656,7 @@ class GroupOutputs(cm_bpyNodes.CrowdMasterNode):
 keyMap = None
 keyMapItems = []
 
+
 def register():
     bpy.utils.register_class(GroupInListing)
     bpy.utils.register_class(GroupOutListing)
@@ -665,12 +681,15 @@ def register():
         keyMap = kc.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
 
         # ctrl+G
-        kmi = keyMap.keymap_items.new('node.cm_node_group_from_selected', 'G', 'PRESS', ctrl=True)
+        kmi = keyMap.keymap_items.new(
+            'node.cm_node_group_from_selected', 'G', 'PRESS', ctrl=True)
         keyMapItems.append(kmi)
 
         # TAB
-        kmi = keyMap.keymap_items.new('node.cm_group_enter_exit', 'TAB', 'PRESS')
+        kmi = keyMap.keymap_items.new(
+            'node.cm_group_enter_exit', 'TAB', 'PRESS')
         keyMapItems.append(kmi)
+
 
 def unregister():
     global keyMap

@@ -961,6 +961,7 @@ class MyNodeCategory(NodeCategory):
     def poll(cls, context):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
+
 def groupCategory(context):
     if context is None:
         return
