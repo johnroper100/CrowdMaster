@@ -25,7 +25,13 @@ from bpy.props import IntProperty, BoolProperty
 import random
 from . import cm_bpyNodes
 
+updatingGroupInSocket = False
+
 def groupInSocketUpdate(self, context):
+    global updatingGroupInSocket
+    if updatingGroupInSocket:
+        return
+    updatingGroupInSocket = True
     group = context.space_data.path[-1].node_tree
     for n, gi in enumerate(group.groupIn):
         if gi == self:
@@ -46,8 +52,15 @@ def groupInSocketUpdate(self, context):
             if node.outputs[index].name != self.name:
                 node.outputs[index].name = self.name
     group.updateInstances()
+    updatingGroupInSocket = False
+
+updatingGroupOutSocket = False
 
 def groupOutSocketUpdate(self, context):
+    global updatingGroupOutSocket
+    if updatingGroupOutSocket:
+        return
+    updatingGroupOutSocket = True
     group = context.space_data.path[-1].node_tree
     for n, gi in enumerate(group.groupOut):
         if gi == self:
@@ -68,20 +81,23 @@ def groupOutSocketUpdate(self, context):
             if node.inputs[index].name != self.name:
                 node.inputs[index].name = self.name
     group.updateInstances()
+    updatingGroupOutSocket = False
 
 
 class GroupInListing(PropertyGroup):
     name = StringProperty(name="Name", update=groupInSocketUpdate)
-    # TODO socket type
+    socketType = EnumProperty(items=[("DefaultSocketType", "DefaultSocketType", "DefaultSocketType"),
+                                     ("StateSocketType", "StateSocketType", "StateSocketType"),
+                                     ("DependanceSocketType", "DependanceSocketType", "DependanceSocketType")])
 
 
 class GroupOutListing(PropertyGroup):
     name = StringProperty(name="Name", update=groupOutSocketUpdate)
-    # TODO socket type
-
+    socketType = EnumProperty(items=[("DefaultSocketType", "DefaultSocketType", "DefaultSocketType"),
+                                     ("StateSocketType", "StateSocketType", "StateSocketType"),
+                                     ("DependanceSocketType", "DependanceSocketType", "DependanceSocketType")])
 
 updatingGroup = False
-
 
 class CrowdMasterGroupTree(NodeTree):
     bl_idname = 'CrowdMasterGroupTreeType'
@@ -94,6 +110,8 @@ class CrowdMasterGroupTree(NodeTree):
     groupOutIndex = IntProperty()
 
     def update(self):
+        global updatingGroupInSocket
+        global updatingGroupOutSocket
         global updatingGroup
         if updatingGroup:
             return
@@ -120,19 +138,28 @@ class CrowdMasterGroupTree(NodeTree):
                 groupIONode = True
                 if len(node.outputs) > 0:
                     if node.outputs[-1].is_linked:
+                        toSocket = node.outputs[-1].links[0].to_socket
+                        socketType = toSocket.bl_idname
+                        node.outputs.remove(node.outputs[-1])
                         n = len(node.outputs)
-                        node.outputs[-1].name = "Input {}".format(n)
+                        newSocket = node.outputs.new(socketType, "Input {}".format(n))
+                        self.links.new(newSocket, toSocket)
                         node.outputs.new("EmptySocketType", "")
                         changedConnected = True
 
                 if changedConnected:
+                    updatingGroupInSocket = True
                     for inp in node.outputs[len(self.groupIn):-1]:
                         i = self.groupIn.add()
                         i.name = inp.name
+                        i.socketType = inp.bl_idname
+                    updatingGroupInSocket = False
 
                 count = 0
                 while count < len(self.groupIn) and count < len(node.outputs):
-                    if self.groupIn[count].name != node.outputs[count].name:
+                    grp = self.groupIn[count]
+                    out = node.outputs[count]
+                    if grp.name != out.name or grp.socketType != out.bl_idname:
                         break
                     count += 1
 
@@ -148,38 +175,57 @@ class CrowdMasterGroupTree(NodeTree):
                 if newInputs:
                     while count < len(self.groupIn):
                         socketName = self.groupIn[count].name
-                        node.outputs.new("EmptySocketType", socketName)
+                        socketType = self.groupIn[count].socketType
+                        node.outputs.new(socketType, socketName)
                         count += 1
 
                     node.outputs.new("EmptySocketType", "")
 
             elif node.bl_idname == "GroupOutputs":
                 groupIONode = True
-                if node.inputs[-1].is_linked:
-                    n = len(node.inputs)
-                    node.inputs[-1].name = "Output {}".format(n)
-                    node.inputs.new("EmptySocketType", "")
-                    changedConnected = True
+                if len(node.inputs) > 0:
+                    if node.inputs[-1].is_linked:
+                        fromSocket = node.inputs[-1].links[0].from_socket
+                        socketType = fromSocket.bl_idname
+                        node.inputs.remove(node.inputs[-1])
+                        n = len(node.inputs)
+                        newSocket = node.inputs.new(socketType, "Output {}".format(n))
+                        self.links.new(fromSocket, newSocket)
+                        node.inputs.new("EmptySocketType", "")
+                        changedConnected = True
 
                 if changedConnected:
-                    self.groupOut.clear()
-                    for out in node.inputs[:-1]:
-                        i = node.id_data.groupOut.add()
+                    updatingGroupOutSocket = True
+                    for out in node.inputs[len(self.groupOut):-1]:
+                        i = self.groupOut.add()
                         i.name = out.name
+                        i.socketType = out.bl_idname
+                    updatingGroupInSocket = False
 
                 count = 0
                 while count < len(self.groupOut) and count < len(node.inputs):
-                    if self.groupOut[count].name != node.inputs[count].name:
+                    grp = self.groupOut[count]
+                    inp = node.inputs[count]
+                    if grp.name != inp.name or grp.socketType != inp.bl_idname:
                         break
                     count += 1
-                while count < len(node.inputs):
-                    node.inputs.remove(node.inputs[count])
 
-                while count < len(self.groupOut):
-                    socketName = self.groupOut[count].name
-                    node.inputs.new("EmptySocketType", socketName)
-                    count += 1
-                node.inputs.new("EmptySocketType", "")
+                newOutputs = count != len(self.groupOut)
+                while count < len(node.inputs):
+                    if newOutputs:
+                        node.inputs.remove(node.inputs[count])
+                    elif len(node.inputs) - 1 <= count:
+                        break
+                    else:
+                        node.inputs.remove(node.inputs[count])
+
+                if newOutputs:
+                    while count < len(self.groupOut):
+                        socketName = self.groupOut[count].name
+                        socketType = self.groupOut[count].socketType
+                        node.inputs.new(socketType, socketName)
+                        count += 1
+                    node.inputs.new("EmptySocketType", "")
 
             if groupIONode:
                 for inputSocketName in inConnections:
@@ -494,9 +540,12 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
             self.inputs.clear()
             self.outputs.clear()
         else:
+            # Inputs
             count = 0
             while count < len(group.groupIn) and count < len(self.inputs):
-                if group.groupIn[count].name != self.inputs[count].name:
+                grp = group.groupIn[count]
+                inp = self.inputs[count]
+                if grp.name != inp.name or grp.socketType != inp.bl_idname:
                     break
                 count += 1
             while count < len(self.inputs):
@@ -511,12 +560,16 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
 
             while count < len(group.groupIn):
                 socketName = group.groupIn[count].name
-                self.inputs.new("EmptySocketType", socketName)
+                socketType = group.groupIn[count].socketType
+                self.inputs.new(socketType, socketName)
                 count += 1
 
+            # Outputs
             count = 0
             while count < len(group.groupOut) and count < len(self.outputs):
-                if group.groupOut[count].name != self.outputs[count].name:
+                grp = group.groupOut[count]
+                out = self.outputs[count]
+                if grp.name != out.name or grp.socketType != out.bl_idname:
                     break
                 count += 1
             while count < len(self.outputs):
@@ -531,7 +584,8 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
 
             while count < len(group.groupOut):
                 socketName = group.groupOut[count].name
-                self.outputs.new("EmptySocketType", socketName)
+                socketType = group.groupOut[count].socketType
+                self.outputs.new(socketType, socketName)
                 count += 1
 
 
