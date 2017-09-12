@@ -77,8 +77,7 @@ class World(Mc):
                                 -(d.z / 2) <= localPt.z <= (d.z / 2)):
                                 result = True
                         elif e.volumeType == "Group":
-                            for obj in bpy.data.groups[e.volumeType]:
-                                volObj = bpy.data.objects[obj]
+                            for volObj in bpy.data.groups[e.volume].objects:
                                 pt = bpy.data.objects[self.userid].location
                                 localPt = volObj.matrix_world.inverted() * pt
                                 d = mathutils.Vector()

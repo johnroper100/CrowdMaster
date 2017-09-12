@@ -266,12 +266,13 @@ class LogicGRAPH(Neuron):
                         """LogicGRAPH data lost due to multiple inputs with the same key""")
                 else:
                     if settings["CurveType"] == "RBF":
-                        output[i] = (RBF(into[i]) * settings["Multiply"])
+                        output[i] = RBF(into[i])
                     elif settings["CurveType"] == "RANGE":
-                        output[i] = (linear(into[i]) * settings["Multiply"])
+                        output[i] = linear(into[i])
                     # cubic bezier could also be an option here (1/2 sided)
                     if settings["Invert"]:
                         output[i] = -output[i] + 1
+                    output[i] *= settings["Multiply"]
         return output
 
 
@@ -404,29 +405,35 @@ class LogicSETTAG(Neuron):
     Tag from the agents tags"""
 
     def core(self, inps, settings):
+        empty = True
         condition = False
         total = 0
         count = 0
         for into in inps:
             for i in into:
+                empty = False
                 if into[i] > settings["Threshold"]:
                     condition = True
                 total += into[i]
                 count += 1
-        if settings["UseThreshold"]:
-            if condition:
+        if not empty:
+            if settings["UseThreshold"]:
+                if condition:
+                    if settings["Action"] == "ADD":
+                        self.brain.tags[settings["Tag"]] = 1
+                    else:
+                        if settings["Tag"] in self.brain.tags:
+                            del self.brain.tags[settings["Tag"]]
+            else:
                 if settings["Action"] == "ADD":
-                    self.brain.tags[settings["Tag"]] = 1
+                    self.brain.tags[settings["Tag"]] = total
                 else:
                     if settings["Tag"] in self.brain.tags:
                         del self.brain.tags[settings["Tag"]]
+        if settings["Tag"] in self.brain.tags:
+            return self.brain.tags[settings["Tag"]]
         else:
-            if settings["Action"] == "ADD":
-                self.brain.tags[settings["Tag"]] = total
-            else:
-                if settings["Tag"] in self.brain.tags:
-                    del self.brain.tags[settings["Tag"]]
-        return settings["Threshold"]
+            return {}
 
 
 class LogicFILTER(Neuron):

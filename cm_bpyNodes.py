@@ -406,7 +406,7 @@ class GraphNode(LogicNode):
     bl_width_default = 200.0
 
     Multiply = FloatProperty(
-        name="Multiply", description="Multiply the outputted value by this number", default=1.0)
+        name="Multiply", description="Multiply the outputted value by this number (post invert)", default=1.0)
     Invert = BoolProperty(
         name="Invert", description="Invert the output of the graph", default=False)
 
