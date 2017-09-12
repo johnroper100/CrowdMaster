@@ -438,10 +438,17 @@ def updateGroupName(self, context):
 def updateEditGroupName(self, context):
     if self.groupName != self.editGroupName:
         group = bpy.data.node_groups[self.groupName]
-        group.name = self.editGroupName
-        if group.name != self.editGroupName:
-            self.editGroupName = group.name
+        instances = group.instances()
+        oldGroupName = group.name
+        newGroupName = self.editGroupName
+        while bpy.data.node_groups.get(newGroupName) is not None:
+            newGroupName += "*"
+        group.name = newGroupName
         self.groupName = group.name
+        for instance in instances:
+            if instance.editGroupName == oldGroupName:
+                instance.groupName = group.name
+        group.updateInstances()
 
 
 class GroupNode(cm_bpyNodes.CrowdMasterNode):
