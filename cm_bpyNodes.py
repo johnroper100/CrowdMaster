@@ -973,18 +973,13 @@ def groupCategory(context):
 
     if ntree.bl_idname == "CrowdMasterGroupTreeType":
         yield NodeItem("GroupInputs")
-        yield NodeItem("GroupOutpts")
+        yield NodeItem("GroupOutputs")
+
+    yield NodeItem("GroupNode")
 
     for group in context.blend_data.node_groups:
-        if group.bl_idname != "CrowdMasterGroupTreeType":
+        if group.bl_idname == "CrowdMasterGroupTreeType":
             continue
-
-        grp_cls = getattr(bpy.types, group.cm_groupUID, None)
-
-        if grp_cls and grp_cls.cm_groupUID:
-            yield NodeItem(grp_cls.cm_groupUID, grp_cls.name)
-        elif group.cm_groupUID:
-            print("ERROR WITH GROUP LISTINGS")
 
 
 node_categories = [
@@ -1023,10 +1018,7 @@ node_categories = [
         NodeItem("LogicNoteNode"),
         NodeItem("NodeReroute"),
     ]),
-    MyNodeCategory("GROUP", "Group", items=[
-        NodeItem("GroupInputs"),
-        NodeItem("GroupOutputs")
-    ])
+    MyNodeCategory("GROUP", "Group", items=groupCategory)
 ]
 
 
