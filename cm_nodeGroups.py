@@ -141,7 +141,9 @@ class CrowdMasterGroupTree(NodeTree):
                         toSocket = node.outputs[-1].links[0].to_socket
                         socketType = toSocket.bl_idname
                         node.outputs.remove(node.outputs[-1])
-                        n = len(node.outputs)
+                        n = len(node.outputs) + 1
+                        while node.outputs.get("Input {}".format(n)) is not None:
+                            n += 1
                         newSocket = node.outputs.new(socketType, "Input {}".format(n))
                         self.links.new(newSocket, toSocket)
                         node.outputs.new("EmptySocketType", "")
@@ -188,7 +190,9 @@ class CrowdMasterGroupTree(NodeTree):
                         fromSocket = node.inputs[-1].links[0].from_socket
                         socketType = fromSocket.bl_idname
                         node.inputs.remove(node.inputs[-1])
-                        n = len(node.inputs)
+                        n = len(node.inputs) + 1
+                        while node.inputs.get("Input {}".format(n)) is not None:
+                            n += 1
                         newSocket = node.inputs.new(socketType, "Output {}".format(n))
                         self.links.new(fromSocket, newSocket)
                         node.inputs.new("EmptySocketType", "")
