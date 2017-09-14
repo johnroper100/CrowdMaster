@@ -601,8 +601,8 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
     bl_idname = "GroupNode"
     bl_label = "Group"
 
-    groupName = EnumProperty(items=getCMGroups, update=updateGroupName)
-    editGroupName = StringProperty(update=updateEditGroupName)
+    groupName = EnumProperty(name="Group Name", items=getCMGroups, update=updateGroupName)
+    editGroupName = StringProperty(name="Edit Group Name", update=updateEditGroupName)
 
     @classmethod
     def poll(cls, ntree):
