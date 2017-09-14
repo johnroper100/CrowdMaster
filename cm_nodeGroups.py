@@ -24,6 +24,7 @@ from bpy.props import StringProperty, CollectionProperty, EnumProperty
 from bpy.props import IntProperty, BoolProperty
 import random
 from . import cm_bpyNodes
+from mathutils import Vector
 
 updatingGroupInSocket = False
 
@@ -406,15 +407,54 @@ class CrowdMasterCreateFromSelected(Operator):
             self.report({"ERROR_INVALID_INPUT"}, "No nodes selected")
             return {'CANCELLED'}
 
+        inConnections = {}
+        outConnections = {}
+
+        loc = Vector((0, 0))
+        minLoc = float("inf")
+        maxLoc = -float("inf")
+        num = 0
+        for node in nodes:
+            for inp in node.inputs:
+                for link in inp.links:
+                    if not link.from_node.select:
+                        if link.from_socket not in inConnections:
+                            inConnections[link.from_socket] = []
+                        inConnections[link.from_socket].append((node.name,
+                                                                inp.name))
+            for out in node.outputs:
+                for link in out.links:
+                    if not link.to_node.select:
+                        if link.to_socket not in outConnections:
+                            outConnections[link.to_socket] = []
+                        outConnections[link.to_socket].append((node.name,
+                                                               out.name))
+            loc += node.location
+            if node.location.x + node.width > maxLoc:
+                maxLoc = node.location.x + node.width
+            if node.location.x < minLoc:
+                minLoc = node.location.x
+            num += 1
+
+        av = loc / num
+
+        for node in nodes:
+            node.location -= av
+
+        minLoc -= av.x
+        maxLoc -= av.x
+
         # TODO achieve this without using the clipboard
         bpy.ops.node.clipboard_copy()
 
-        # TODO Use proper group name
-        newGroup = bpy.data.node_groups.new(
-            "New group name", "CrowdMasterGroupTreeType")
+        newGroup = bpy.data.node_groups.new("NodeGroup",
+                                            "CrowdMasterGroupTreeType")
         newGroup.use_fake_user = True
 
-        # TODO create group input and output nodes here
+        groupInputs = newGroup.nodes.new("GroupInputs")
+        groupInputs.location = Vector((minLoc - groupInputs.width - 50, 0))
+        groupOutputs = newGroup.nodes.new("GroupOutputs")
+        groupOutputs.location = Vector((maxLoc + 50, 0))
 
         # by appending, space_data is now different
         path = context.space_data.path
@@ -424,10 +464,49 @@ class CrowdMasterCreateFromSelected(Operator):
 
         # TODO set positions of group input and output nodes and link sockets
 
-        parent_node = ng.nodes.new("GroupNode")
-        parent_node.select = False
-        parent_node.groupName = newGroup.name
-        # parent_node.location = average_of_selected(nodes)
+        parentNode = ng.nodes.new("GroupNode")
+
+        parentNode.location = av
+        parentNode.select = False
+        parentNode.groupName = newGroup.name
+        # parentNode.location = average_of_selected(nodes)
+
+        global updatingGroupInSocket
+        global updatingGroupOutSocket
+        global updatingGroup
+
+        n = 1
+        for fromNode in inConnections:
+            updatingGroupInSocket = True
+            updatingGroup = True
+            i = newGroup.groupIn.add()
+            i.name = "Input {}".format(n)
+            n += 1
+            i.socketType = fromNode.bl_idname
+            updatingGroupInSocket = False
+            updatingGroup = False
+            ng.update()
+            newGroup.update()
+            ng.links.new(fromNode, parentNode.inputs[-1])
+            for nodeName, inpName in inConnections[fromNode]:
+                inp = newGroup.nodes[nodeName].inputs[inpName]
+                newGroup.links.new(groupInputs.outputs[-2], inp)
+        n = 1
+        for toSocket in outConnections:
+            updatingGroupOutSocket = True
+            updatingGroup = True
+            i = newGroup.groupOut.add()
+            i.name = "Output {}".format(n)
+            n += 1
+            i.socketType = toSocket.bl_idname
+            updatingGroupOutSocket = False
+            updatingGroup = False
+            ng.update()
+            newGroup.update()
+            ng.links.new(parentNode.outputs[-1], toSocket)
+            for nodeName, outName in outConnections[toSocket]:
+                out = newGroup.nodes[nodeName].outputs[outName]
+                newGroup.links.new(out, groupOutputs.inputs[-2])
 
         # remove nodes from parent_tree
         for n in nodes:
@@ -437,7 +516,7 @@ class CrowdMasterCreateFromSelected(Operator):
 
         # to make it pretty we pop and then append with the node
         path.pop()
-        path.append(newGroup, node=parent_node)
+        path.append(newGroup, node=parentNode)
 
         bpy.ops.node.view_all()
 
