@@ -219,12 +219,10 @@ translations = {
 
 
 def register():
-    # Register translations
     bpy.app.translations.register(__name__, translations)
 
 
 def unregister():
-    # Unregister translations
     bpy.app.translations.unregister(__name__)
 
 
