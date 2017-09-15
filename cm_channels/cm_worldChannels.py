@@ -74,11 +74,10 @@ class World(Mc):
 
                             if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
                                 -(d.y / 2) <= localPt.y <= (d.y / 2) and
-                                -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
                                 result = True
                         elif e.volumeType == "Group":
-                            for obj in bpy.data.groups[e.volumeType]:
-                                volObj = bpy.data.objects[obj]
+                            for volObj in bpy.data.groups[e.volume].objects:
                                 pt = bpy.data.objects[self.userid].location
                                 localPt = volObj.matrix_world.inverted() * pt
                                 d = mathutils.Vector()
@@ -88,7 +87,7 @@ class World(Mc):
 
                                 if (-(d.x / 2) <= localPt.x <= (d.x / 2) and
                                     -(d.y / 2) <= localPt.y <= (d.y / 2) and
-                                    -(d.z / 2) <= localPt.z <= (d.z / 2)):
+                                        -(d.z / 2) <= localPt.z <= (d.z / 2)):
                                     result = True
                 if result:
                     if eventType == "control":

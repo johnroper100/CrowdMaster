@@ -131,6 +131,15 @@ class Agent:
                     obj.keyframe_insert("rotation_axis_angle")
                 else:
                     obj.keyframe_insert("rotation_euler")
+
+                action = obj.animation_data.action
+                if action is not None:
+                    track = obj.animation_data.nla_tracks.new()
+                    st = track.strips.new(action.name,
+                                          action.frame_range[0], action)
+                    obj.animation_data.action = None
+                    st.extrapolation = 'NOTHING'
+                    st.blend_out = 1
         else:
             # ie. auto generated agent
             for obj in bpy.data.groups[self.geoGroup].objects:
@@ -150,6 +159,15 @@ class Agent:
                     obj.keyframe_insert("rotation_axis_angle")
                 else:
                     obj.keyframe_insert("rotation_euler")
+
+                action = obj.animation_data.action
+                if action is not None:
+                    track = obj.animation_data.nla_tracks.new()
+                    st = track.strips.new(action.name,
+                                          action.frame_range[0], action)
+                    obj.animation_data.action = None
+                    st.extrapolation = 'NOTHING'
+                    st.blend_out = 1
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
