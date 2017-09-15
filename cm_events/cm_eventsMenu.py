@@ -26,8 +26,8 @@ from bpy.types import Operator, Panel, PropertyGroup, UIList
 class event_entry(PropertyGroup):
     """The data structure for the event entries"""
     eventname = StringProperty()
-    timeMin = IntProperty(name="Time Min")
-    timeMax = IntProperty(name="Time Max")
+    timeMin = IntProperty(name="Time Min", min=0)
+    timeMax = IntProperty(name="Time Max", min=0)
     index = IntProperty(min=0)
     category = EnumProperty(items=(
         ("Time", "Time", "Time"),
