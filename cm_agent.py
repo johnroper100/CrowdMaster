@@ -170,7 +170,6 @@ class Agent:
                     st.extrapolation = 'NOTHING'
                     st.blend_out = 1
 
-
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
 

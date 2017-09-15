@@ -35,7 +35,8 @@ class event_entry(PropertyGroup):
         ("Time+Volume", "Time+Volume", "Time+Volume"))
     )
     volumeType = EnumProperty(name="Volume Type",
-                              items=(("Object", "Object", "Object"), ("Group", "Group", "Group")),
+                              items=(("Object", "Object", "Object"),
+                                     ("Group", "Group", "Group")),
                               default="Object")
     volume = StringProperty(name="Volume")
 
@@ -109,7 +110,8 @@ class SCENE_UL_event(UIList):
                 if item.volumeType == "Object":
                     layout.prop_search(item, "volume", bpy.data, "objects")
                 elif item.volumeType == "Group":
-                    layout.prop_search(item, "volume", bpy.data, "groups", text="Volumes")
+                    layout.prop_search(
+                        item, "volume", bpy.data, "groups", text="Volumes")
             # this draws each row in the list. Each line is a widget
         elif self.layout_type in {'GRID'}:
             layout.alignment = 'CENTER'
