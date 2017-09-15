@@ -41,7 +41,7 @@ class Agent:
         self.brain = compileBrain(nodeGroup, sim, self.id, freezeAnimation)
         self.sim = sim
         self.external = {"id": self.id, "tags": {
-            t.name: t.value for t in aginitialTags}}
+            t.name: t.value for t in ag.initialTags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
