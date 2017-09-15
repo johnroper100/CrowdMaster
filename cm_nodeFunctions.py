@@ -463,37 +463,69 @@ class LogicFILTER(Neuron):
                 for i in into:
                     if useTag:
                         if into[i] == tagValue:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
                     else:
                         if into[i] == self.settings["Value"]:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
         elif self.settings["Operation"] == "NOT EQUAL":
             for into in inps:
                 for i in into:
                     if useTag:
                         if into[i] != tagValue:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
                     else:
                         if into[i] != self.settings["Value"]:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
         elif self.settings["Operation"] == "LESS":
             for into in inps:
                 for i in into:
                     if useTag:
                         if into[i] <= tagValue:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
                     else:
                         if into[i] <= self.settings["Value"]:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
         elif self.settings["Operation"] == "GREATER":
             for into in inps:
                 for i in into:
                     if useTag:
                         if into[i] > tagValue:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
                     else:
                         if into[i] > self.settings["Value"]:
-                            result[i] = into[i]
+                            if self.settings["Clamp"]:
+                                total = max(self.settings["ClampMin"], min(into[i], self.settings["ClampMax"]))
+                            else:
+                                total = into[i]
+                            result[i] = total
         elif self.settings["Operation"] == "LEAST":
             leastVal = float("inf")
             leastName = "None"
@@ -502,6 +534,8 @@ class LogicFILTER(Neuron):
                     if into[i] < leastVal:
                         leastVal = into[i]
                         leastName = i
+            if self.settings["Clamp"]:
+                leastVal = max(self.settings["ClampMin"], min(leastVal, self.settings["ClampMax"]))
             result = {leastName: leastVal}
         elif self.settings["Operation"] == "MOST":
             mostVal = -float("inf")
@@ -511,6 +545,8 @@ class LogicFILTER(Neuron):
                     if into[i] > mostVal:
                         mostVal = into[i]
                         mostName = i
+            if self.settings["Clamp"]:
+                mostVal = max(self.settings["ClampMin"], min(mostVal, self.settings["ClampMax"]))
             result = {mostName: mostVal}
         elif self.settings["Operation"] == "AVERAGE":
             total = 0
@@ -520,12 +556,18 @@ class LogicFILTER(Neuron):
                     total += into[i]
                     count += 1
             if count != 0:
-                result = {"None": total / count}
+                if self.settings["Clamp"]:
+                    total = max(self.settings["ClampMin"], min(total/count, self.settings["ClampMax"]))
+                else:
+                    total = total/count
+                result = {"None": total}
         elif self.settings["Operation"] == "SUM":
             total = 0
             for into in inps:
                 for i in into:
                     total += into[i]
+            if self.settings["Clamp"]:
+                total = max(self.settings["ClampMin"], min(total, self.settings["ClampMax"]))
             result = {"None": total}
         return result
 

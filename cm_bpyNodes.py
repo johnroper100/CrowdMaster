@@ -576,9 +576,18 @@ class FilterNode(LogicNode):
     Tag = BoolProperty(name="Tag", default=False)
     TagName = StringProperty(name="Tag Name", default="")
     Value = FloatProperty(name="Value", default=0.0)
+    Clamp = BoolProperty(name="Clamp", default=False)
+    ClampMin = FloatProperty(name="Min", default=0.0)
+    ClampMax = FloatProperty(name="Max", default=1.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Operation")
+        row = layout.row(align=True)
+        row.prop(self, "Clamp")
+        if self.Clamp:
+            row.prop(self, "ClampMin")
+            row.prop(self, "ClampMax")
+
         if self.Operation in {"EQUAL", "NOT EQUAL", "LESS", "GREATER"}:
             layout.prop(self, "Tag")
             if self.Tag:
@@ -591,6 +600,9 @@ class FilterNode(LogicNode):
         node.settings["Tag"] = self.Tag
         node.settings["TagName"] = self.TagName
         node.settings["Value"] = self.Value
+        node.settings["Clamp"] = self.Clamp
+        node.settings["ClampMin"] = self.ClampMin
+        node.settings["ClampMax"] = self.ClampMax
 
 
 class MapNode(LogicNode):
