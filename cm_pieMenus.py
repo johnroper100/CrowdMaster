@@ -54,7 +54,6 @@ def register():
         km = wm.keyconfigs.addon.keymaps.new(name='Window')
         kmi = km.keymap_items.new("wm.call_menu_pie", "M", "PRESS", shift=True,
                                   alt=True).properties.name = "SCENE_PT_CrowdMaster_SimTools_Pie"
-        kmi.properties.total = 4
         addon_keymaps.append((km, kmi))
 
 
