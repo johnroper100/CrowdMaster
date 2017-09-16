@@ -968,6 +968,32 @@ class SimNoteClear(Operator):
         return {'FINISHED'}
 
 
+class CrowdMasterMuteSimNodes(Operator):
+    """Mutes the selected simulation nodes"""
+    bl_idname = "node.cm_sim_mute"
+    bl_label = "Mute the Selected Simulation Nodes"
+
+    @classmethod
+    def poll(cls, context):
+        tree_type = context.space_data.tree_type
+        if tree_type == 'CrowdMasterTreeType':
+            return True
+
+    def execute(self, context):
+
+        ng = context.space_data.edit_tree
+        nodes = [n for n in ng.nodes if n.select]
+
+        if not nodes:
+            self.report({"ERROR_INVALID_INPUT"}, "No nodes selected")
+            return {'CANCELLED'}
+
+        for node in nodes:
+            node.mute = not node.mute
+            
+        return {'FINISHED'}
+
+
 class MyNodeCategory(NodeCategory):
     @classmethod
     def poll(cls, context):
@@ -1013,6 +1039,8 @@ node_categories = [
     ])
 ]
 
+keyMap = None
+keyMapItems = []
 
 def register():
     bpy.utils.register_class(CrowdMasterTree)
@@ -1047,9 +1075,27 @@ def register():
 
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
+    
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        global keyMap
+        keyMap = kc.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
+
+        kmi = keyMap.keymap_items.new('node.cm_sim_mute', 'M', 'PRESS')
+        keyMapItems.append(kmi)
 
 
 def unregister():
+    global keyMap
+    if keyMap:
+        for kmi in keyMapItems:
+            try:
+                keyMap.keymap_items.remove(kmi)
+            except Exception:
+                pass
+    keyMapItems.clear()
+
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
 
     bpy.utils.unregister_class(CrowdMasterTree)
