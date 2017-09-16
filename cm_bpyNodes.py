@@ -1073,6 +1073,8 @@ def register():
     bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
+    bpy.utils.register_class(CrowdMasterMuteSimNodes)
+
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
     
@@ -1127,6 +1129,8 @@ def unregister():
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
+
+    bpy.utils.unregister_class(CrowdMasterMuteSimNodes)
 
 
 if __name__ == "__main__":
