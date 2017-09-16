@@ -616,6 +616,23 @@ class MapNode(LogicNode):
         node.settings["UpperOutput"] = self.UpperOutput
 
 
+class ClampNode(LogicNode):
+    """CrowdMaster Clamp node"""
+    bl_label = "Clamp"
+    bl_width_default = 200.0
+
+    Min = FloatProperty(name="Clamp Min", default=0.0)
+    Max = FloatProperty(name="Clamp Max", default=1.0)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "Min")
+        layout.prop(self, "Max")
+
+    def getSettings(self, node):
+        node.settings["Min"] = self.Min
+        node.settings["Max"] = self.Max
+
+
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
@@ -986,6 +1003,7 @@ node_categories = [
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("FilterNode"),
         NodeItem("MathNode"),
+        NodeItem("ClampNode"),
         NodeItem("SetTagNode"),
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
@@ -1015,6 +1033,7 @@ def register():
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
     bpy.utils.register_class(MapNode)
+    bpy.utils.register_class(ClampNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(PrintNode)
@@ -1051,6 +1070,7 @@ def unregister():
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
     bpy.utils.unregister_class(MapNode)
+    bpy.utils.unregister_class(ClampNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(PrintNode)

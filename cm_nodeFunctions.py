@@ -547,6 +547,16 @@ class LogicMAP(Neuron):
                     result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
         return result
 
+class LogicCLAMP(Neuron):
+    """Clamps the inputs to a specific range"""
+
+    def core(self, inps, settings):
+        result = {}
+        for into in inps:
+            for i in into:
+                result[i] = max(min(settings["Max"], into[i]), settings["Min"])
+        return result
+
 
 class LogicOUTPUT(Neuron):
     """Sets an agents output. (Has to be picked up in cm_agents.Agents)"""
@@ -673,6 +683,7 @@ logictypes = OrderedDict([
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
     ("MapNode", LogicMAP),
+    ("ClampNode", LogicCLAMP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
     ("PrintNode", LogicPRINT)
