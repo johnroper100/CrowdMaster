@@ -462,8 +462,9 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if into[i] == tagValue:
-                            result[i] = into[i]
+                        if tagValue != None:
+                            if into[i] == tagValue:
+                                result[i] = into[i]
                     else:
                         if into[i] == self.settings["Value"]:
                             result[i] = into[i]
@@ -471,8 +472,9 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if into[i] != tagValue:
-                            result[i] = into[i]
+                        if tagValue != None:
+                            if into[i] != tagValue:
+                                result[i] = into[i]
                     else:
                         if into[i] != self.settings["Value"]:
                             result[i] = into[i]
@@ -480,8 +482,9 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if into[i] <= tagValue:
-                            result[i] = into[i]
+                        if tagValue != None:
+                            if into[i] <= tagValue:
+                                result[i] = into[i]
                     else:
                         if into[i] <= self.settings["Value"]:
                             result[i] = into[i]
@@ -489,8 +492,9 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if into[i] > tagValue:
-                            result[i] = into[i]
+                        if tagValue != None:
+                            if into[i] > tagValue:
+                                result[i] = into[i]
                     else:
                         if into[i] > self.settings["Value"]:
                             result[i] = into[i]
