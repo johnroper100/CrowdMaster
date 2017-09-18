@@ -450,19 +450,18 @@ class LogicFILTER(Neuron):
             return result
 
         useTag = settings["Tag"]
+        tagValue = None
         if useTag:
             tagName = settings["TagName"]
             if tagName in self.brain.tags:
                 tagValue = self.brain.tags[tagName]
-            else:
-                tagValue = None
 
         # TODO what if multiple inputs have the same keys?
         if self.settings["Operation"] == "EQUAL":
             for into in inps:
                 for i in into:
                     if useTag:
-                        if tagValue != None:
+                        if tagValue is not None:
                             if into[i] == tagValue:
                                 result[i] = into[i]
                     else:
@@ -472,7 +471,7 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if tagValue != None:
+                        if tagValue is not None:
                             if into[i] != tagValue:
                                 result[i] = into[i]
                     else:
@@ -482,7 +481,7 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if tagValue != None:
+                        if tagValue is not None:
                             if into[i] <= tagValue:
                                 result[i] = into[i]
                     else:
@@ -492,7 +491,7 @@ class LogicFILTER(Neuron):
             for into in inps:
                 for i in into:
                     if useTag:
-                        if tagValue != None:
+                        if tagValue is not None:
                             if into[i] > tagValue:
                                 result[i] = into[i]
                     else:
