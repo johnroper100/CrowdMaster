@@ -1206,14 +1206,16 @@ agen_node_categories = [
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("GroundNodeType"),
         NodeItem("MeshPositionNodeType"),
-        NodeItem("ObstacleNodeType"),
-        NodeItem("OffsetNodeType"),
-        NodeItem("PathPositionNodeType"),
         NodeItem("RandomPositionNodeType", label="Random"),
+        NodeItem("VCOLPositionNodeType")
+    ]),
+    CrowdMasterAGenCategories("pmodifier", "Positioning Modifier", items=[
         NodeItem("TargetPositionNodeType", label="Target"),
-        NodeItem("VCOLPositionNodeType"),
+        NodeItem("PathPositionNodeType"),
+        NodeItem("OffsetNodeType"),
+        NodeItem("ObstacleNodeType"),
+        NodeItem("GroundNodeType")
     ]),
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType")
