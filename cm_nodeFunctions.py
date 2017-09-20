@@ -389,7 +389,7 @@ class LogicSTRONG(Neuron):
 
 
 class LogicWEAK(Neuron):
-    """Make 1's and 0's stronger"""
+    """Make 1's and 0's weaker"""
     # https://www.desmos.com/calculator/izfhogpchr
 
     def core(self, inps, settings):
@@ -551,6 +551,7 @@ class LogicMAP(Neuron):
                     result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
         return result
 
+
 class LogicCLAMP(Neuron):
     """Clamps the inputs to a specific range"""
 
@@ -652,22 +653,30 @@ class LogicPRINT(Neuron):
     def core(self, inps, settings):
         selected = [o.name for o in bpy.context.selected_objects]
         if self.brain.userid in selected:
-            for into in inps:
-                for i in into:
-                    if settings["show_current_frame"]:
-                        newframe = "NEWFRAME " + \
-                            str(bpy.context.scene.frame_current)
-                    else:
-                        newframe = ""
-                    if settings["save_to_file"]:
-                        with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
-                            message = newframe + "\n" + \
-                                settings["Label"] + " >> " + \
-                                str(i) + " " + str(into[i]) + "\n"
-                            output.write(message)
-                    else:
-                        logger.info("{}\n{} >> {} {}".format(
-                            newframe, settings["Label"], i, into[i]))
+            for i in self.inputs:
+                got = self.neurons[i].evaluate()
+                if got is not None:
+                    for key, val in got.items():
+                        if settings["Label"] != "":
+                            label = settings["Label"]
+                        else:
+                            label = self.neurons[i].bpyNode.label
+                        if label != "":
+                            label += " "
+
+                        if settings["show_current_frame"]:
+                            newframe = "NEWFRAME " + \
+                                str(bpy.context.scene.frame_current)
+                        else:
+                            newframe = ""
+                        if settings["save_to_file"]:
+                            with open(os.path.join(settings["output_filepath"], "CrowdMasterOutput.txt"), "a") as output:
+                                message = newframe + "\n" + label + ">> " + \
+                                    str(key) + " " + str(val) + "\n"
+                                output.write(message)
+                        else:
+                            logger.info("{}\n{}>> {} {}".format(
+                                newframe, label, key, val))
         return 0
 
 
