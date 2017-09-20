@@ -658,8 +658,10 @@ class LogicPRINT(Neuron):
                     for key, val in got.items():
                         if settings["Label"] != "":
                             label = settings["Label"]
-                        else:
+                        elif self.neurons[i].bpyNode.label != "":
                             label = self.neurons[i].bpyNode.label
+                        else:
+                            label = self.neurons[i].bpyNode.name
                         if label != "":
                             label += " "
 
