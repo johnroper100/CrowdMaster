@@ -1196,11 +1196,13 @@ agen_node_categories = [
         NodeItem("TemplateNodeType"),
         NodeItem("AddToGroupNodeType"),
         NodeItem("CombineNodeType"),
-        NodeItem("PointTowardsNodeType"),
-        NodeItem("RandomNodeType"),
         NodeItem("RandomMaterialNodeType"),
         NodeItem("SettagNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch")
+    ]),
+    CrowdMasterAGenCategories("tmodifier", "Template Modifier", items=[
+        NodeItem("PointTowardsNodeType"),
+        NodeItem("RandomNodeType")
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("FormationPositionNodeType", label="Formation"),
