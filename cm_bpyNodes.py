@@ -143,7 +143,7 @@ class NewInputNode(LogicNode):
     bl_width_default = 350.0
 
     InputSource = EnumProperty(name="Input Channel",
-                               items=[("AGENTINFO", "Agent Info", "Get information about other agents in the scene", 10),
+                               items=[("AGENTINFO", "Other Agent Info", "Get information about other agents in the scene", 10),
                                       ("CONSTANT", "Constant",
                                        "Get a single value that does not change per frame", 1),
                                       ("FLOCK", "Flock",
@@ -158,7 +158,7 @@ class NewInputNode(LogicNode):
                                        "Get information relating to path following", 6),
                                       ("SOUND", "Sound",
                                        "Get sound information from each agent", 7),
-                                      ("STATE", "State",
+                                      ("STATE", "Agent State",
                                        "Get state information from each agent", 8),
                                       ("WORLD", "World", "Get world information from the scene", 9)],
                                description="Which channel the input data should be pulled from",
