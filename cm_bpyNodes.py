@@ -918,8 +918,7 @@ class NoteNode(CrowdMasterNode):
             col = layout.column()
             col.prop(self, "text")
 
-            col = layout.column(align=True)
-            col.operator("node.sim_note_from_clipboard", icon="TEXT")
+            col = layout.column()
             col.operator("node.sim_note_clear", icon="X_VEC")
 
     def draw_buttons_ext(self, context, layout):
