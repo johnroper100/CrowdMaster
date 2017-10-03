@@ -1126,8 +1126,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
             col = layout.column()
             col.prop(self, "text")
 
-            col = layout.column(align=True)
-            col.operator("node.gen_note_from_clipboard", icon="TEXT")
+            col = layout.column()
             col.operator("node.gen_note_clear", icon="X_VEC")
 
     def draw_buttons_ext(self, context, layout):
