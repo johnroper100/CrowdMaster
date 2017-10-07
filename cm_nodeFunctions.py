@@ -46,7 +46,7 @@ class LogicNEWINPUT(Neuron):
     def core(self, inps, settings):
         channels = self.brain.sim.lvars
         if settings["InputSource"] == "CONSTANT":
-            return {"None": settings["Constant"]}
+            return {"": settings["Constant"]}
 
         elif settings["InputSource"] == "FLOCK":
             if settings["Flocking"] == "SEPARATE":
@@ -54,44 +54,44 @@ class LogicNEWINPUT(Neuron):
                     separateTx = channels["Flock"].separateTx(inps)
                     if separateTx is None:
                         return {}
-                    return {"None": separateTx}
+                    return {"": separateTx}
                 elif settings["TranslationAxis"] == "TY":
                     separateTy = channels["Flock"].separateTy(inps)
                     if separateTy is None:
                         return {}
-                    return {"None": separateTy}
+                    return {"": separateTy}
                 elif settings["TranslationAxis"] == "TZ":
                     separateTz = channels["Flock"].separateTz(inps)
                     if separateTz is None:
                         return {}
-                    return {"None": separateTz}
+                    return {"": separateTz}
             elif settings["Flocking"] == "COHERE":
                 if settings["TranslationAxis"] == "TX":
                     cohereTx = channels["Flock"].cohereTx(inps)
                     if cohereTx is None:
                         return {}
-                    return {"None": cohereTx}
+                    return {"": cohereTx}
                 elif settings["TranslationAxis"] == "TY":
                     cohereTy = channels["Flock"].cohereTy(inps)
                     if cohereTy is None:
                         return {}
-                    return {"None": cohereTy}
+                    return {"": cohereTy}
                 elif settings["TranslationAxis"] == "TZ":
                     cohereTz = channels["Flock"].cohereTz(inps)
                     if cohereTz is None:
                         return {}
-                    return {"None": cohereTz}
+                    return {"": cohereTz}
             else:  # ie. settings["Flocking"] == "ALIGN"
                 if settings["RotationAxis"] == "RZ":
                     alignRz = channels["Flock"].alignRz(inps)
                     if alignRz is None:
                         return {}
-                    return {"None": alignRz}
+                    return {"": alignRz}
                 elif settings["RotationAxis"] == "RX":
                     alignRx = channels["Flock"].alignRx(inps)
                     if alignRx is None:
                         return {}
-                    return {"None": alignRx}
+                    return {"": alignRx}
 
         elif settings["InputSource"] == "FORMATION":
             fChan = channels["Formation"].retrieve(settings["FormationGroup"])
@@ -102,45 +102,45 @@ class LogicNEWINPUT(Neuron):
                 rz = fChan.rz
                 if rz is None:
                     return {}
-                return {"None": rz}
+                return {"": rz}
             elif settings["FormationOptions"] == "RX":
                 rx = fChan.rx
                 if rx is None:
                     return {}
-                return {"None": rx}
+                return {"": rx}
             elif settings["FormationOptions"] == "DIST":
                 dist = fChan.dist
                 if dist is None:
                     return {}
-                return {"None": dist}
+                return {"": dist}
 
         elif settings["InputSource"] == "GROUND":
             if settings["GroundOptions"] == "DH":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
                 dh = gChan.dh()
-                return {"None": dh} if dh is not None else {}
+                return {"": dh} if dh is not None else {}
             elif settings["GroundOptions"] == "ARZ":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
-                return {"None": gChan.aheadRz(self.settings["GroundAheadOffset"])}
+                return {"": gChan.aheadRz(self.settings["GroundAheadOffset"])}
             elif settings["GroundOptions"] == "ARX":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
-                return {"None": gChan.aheadRx(self.settings["GroundAheadOffset"])}
+                return {"": gChan.aheadRx(self.settings["GroundAheadOffset"])}
 
         elif settings["InputSource"] == "NOISE":
             noise = channels["Noise"]
             if settings["NoiseOptions"] == "RANDOM":
-                return {"None": noise.random()}
+                return {"": noise.random()}
             elif settings["NoiseOptions"] == "AGENTRANDOM":
-                return {"None": noise.agentRandom(offset=hash(self))}
+                return {"": noise.agentRandom(offset=hash(self))}
             elif settings["NoiseOptions"] == "WAVE":
-                return {"None": noise.wave(self.settings["WaveOffset"],
+                return {"": noise.wave(self.settings["WaveOffset"],
                                            self.settings["WaveLength"])}
 
         elif settings["InputSource"] == "PATH":
             if settings["PathOptions"] == "RZ":
-                return {"None": channels["Path"].rz(settings["PathName"])}
+                return {"": channels["Path"].rz(settings["PathName"])}
             elif settings["PathOptions"] == "RX":
-                return {"None": channels["Path"].rx(settings["PathName"])}
+                return {"": channels["Path"].rx(settings["PathName"])}
             elif settings["PathOptions"] == "INLANE":
                 agents = set()
                 for into in inps:
@@ -188,15 +188,15 @@ class LogicNEWINPUT(Neuron):
         elif settings["InputSource"] == "STATE":
             state = channels["State"]
             if settings["StateOptions"] == "RADIUS":
-                return {"None": state.radius}
+                return {"": state.radius}
             elif settings["StateOptions"] == "SPEED":
-                return {"None": state.speed}
+                return {"": state.speed}
             elif settings["StateOptions"] == "GLOBALVELX":
-                return {"None": state.velocity.x}
+                return {"": state.velocity.x}
             elif settings["StateOptions"] == "GLOBALVELY":
-                return {"None": state.velocity.y}
+                return {"": state.velocity.y}
             elif settings["StateOptions"] == "GLOBALVELZ":
-                return {"None": state.velocity.z}
+                return {"": state.velocity.z}
             elif settings["StateOptions"] == "QUERYTAG":
                 return state.getTag(settings["StateTagName"])
 
@@ -205,15 +205,15 @@ class LogicNEWINPUT(Neuron):
             if settings["WorldOptions"] == "TARGET":
                 if settings["TargetOptions"] == "RZ":
                     tgt = world.target(settings["TargetObject"])
-                    return {"None": tgt.rz}
+                    return {"": tgt.rz}
                 elif settings["TargetOptions"] == "RX":
                     tgt = world.target(settings["TargetObject"])
-                    return {"None": tgt.rx}
+                    return {"": tgt.rx}
                 elif settings["TargetOptions"] == "ARRIVED":
                     tgt = world.target(settings["TargetObject"])
-                    return {"None": tgt.arrived}
+                    return {"": tgt.arrived}
             elif settings["WorldOptions"] == "TIME":
-                return {"None": channels["World"].time}
+                return {"": channels["World"].time}
             elif settings["WorldOptions"] == "EVENT":
                 return world.event(settings["EventName"], settings["EventOptions"])
 
@@ -324,7 +324,7 @@ class LogicAND(Neuron):
                         total *= v
                 else:  # Method == "MIN"
                     total = min(results.values()) if len(results) > 0 else 0
-                return {"None": total}
+                return {"": total}
             else:
                 return results
         else:
@@ -499,7 +499,7 @@ class LogicFILTER(Neuron):
                             result[i] = into[i]
         elif self.settings["Operation"] == "LEAST":
             leastVal = float("inf")
-            leastName = "None"
+            leastName = ""
             for into in inps:
                 for i in into:
                     if into[i] < leastVal:
@@ -508,7 +508,7 @@ class LogicFILTER(Neuron):
             result = {leastName: leastVal}
         elif self.settings["Operation"] == "MOST":
             mostVal = -float("inf")
-            mostName = "None"
+            mostName = ""
             for into in inps:
                 for i in into:
                     if into[i] > mostVal:
@@ -523,13 +523,13 @@ class LogicFILTER(Neuron):
                     total += into[i]
                     count += 1
             if count != 0:
-                result = {"None": total / count}
+                result = {"": total / count}
         elif self.settings["Operation"] == "SUM":
             total = 0
             for into in inps:
                 for i in into:
                     total += into[i]
-            result = {"None": total}
+            result = {"": total}
         return result
 
 
