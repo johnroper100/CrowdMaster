@@ -1241,6 +1241,19 @@ class TemplatePATH(Template):
                                             "_" + str(island)
             self.inputs["Template"].build(newBuildRequest)
 
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        pathEntry = bpy.context.scene.cm_paths.coll.get(
+            self.settings["pathName"])
+        obj = bpy.context.scene.objects[pathEntry.objectName]
+        if not obj.type == 'MESH':
+            return False
+
 
 class TemplateFORMATION(Template):
     """Place in a row"""

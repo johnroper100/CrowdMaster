@@ -860,7 +860,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
 class PathPositionNode(CrowdMasterAGenTreeNode):
     """The path positioning node"""
     bl_idname = 'PathPositionNodeType'
-    bl_label = 'Path'
+    bl_label = 'Path Positioning'
     bl_icon = 'SOUND'
     bl_width_default = 250.0
 
@@ -1207,11 +1207,11 @@ agen_node_categories = [
         NodeItem("FormationPositionNodeType", label="Formation"),
         NodeItem("MeshPositionNodeType"),
         NodeItem("RandomPositionNodeType", label="Random"),
-        NodeItem("VCOLPositionNodeType")
+        NodeItem("VCOLPositionNodeType"),
+        NodeItem("PathPositionNodeType"),
+        NodeItem("TargetPositionNodeType"),
     ]),
     CrowdMasterAGenCategories("pmodifier", "Positioning Modifier", items=[
-        NodeItem("TargetPositionNodeType", label="Target"),
-        NodeItem("PathPositionNodeType"),
         NodeItem("OffsetNodeType"),
         NodeItem("ObstacleNodeType"),
         NodeItem("GroundNodeType")
