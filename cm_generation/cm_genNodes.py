@@ -714,7 +714,7 @@ class RandomPositionNode(CrowdMasterAGenTreeNode):
 class MeshPositionNode(CrowdMasterAGenTreeNode):
     """The mesh positioning node"""
     bl_idname = 'MeshPositionNodeType'
-    bl_label = 'Mesh'
+    bl_label = 'Mesh Positioning'
     bl_icon = 'SOUND'
     bl_width_default = 250.0
 
@@ -1281,9 +1281,14 @@ agen_node_categories = [
         NodeItem("MeshPositionNodeType"),
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("VCOLPositionNodeType"),
+<<<<<<< HEAD
         NodeItem("VGroupPositionNodeType"),
         NodeItem("PathPositionNodeType"),
         NodeItem("TargetPositionNodeType"),
+=======
+        NodeItem("PathPositionNodeType", label="Path"),
+        NodeItem("TargetPositionNodeType", label="Target"),
+>>>>>>> origin/develop
     ]),
     CrowdMasterAGenCategories("pmodifier", "Positioning Modifier", items=[
         NodeItem("OffsetNodeType"),
