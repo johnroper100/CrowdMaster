@@ -86,16 +86,13 @@ class Simulation:
                     self.syncManager.actionPair(s, t)
                     self.syncManager.actionPair(t, s)
 
-    def newagent(self, name, brain, rigOverwrite, constrainBone, initialTags,
-                 modifyBones, freezeAnimation, geoGroup):
+    def newagent(self, agent, brain, freezeAnimation):
         """Set up an agent"""
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
-            ag = Agent(name, nGps[brain], self, rigOverwrite, constrainBone,
-                       tags=initialTags, modifyBones=modifyBones,
-                       freezeAnimation=freezeAnimation, geoGroup=geoGroup)
-            self.agents[name] = ag
+            ag = Agent(agent, nGps[brain], self, freezeAnimation=freezeAnimation)
+            self.agents[agent.name] = ag
         else:
             logger.debug("No such brain type: {}".format(brain))
 
@@ -103,9 +100,7 @@ class Simulation:
         """Set up all the agents at the beginning of the simulation"""
         for ty in group.agentTypes:
             for ag in ty.agents:
-                self.newagent(ag.name, ty.name, ag.rigOverwrite,
-                              ag.constrainBone, ag.initialTags,
-                              ag.modifyBones, group.freezeAnimation, ag.geoGroup)
+                self.newagent(ag, ty.name, group.freezeAnimation)
 
     def step(self, scene):
         """Called when the next frame is moved to"""

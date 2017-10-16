@@ -42,14 +42,23 @@ class SCENE_PT_CrowdMaster_SimTools_Pie(Menu):
         pie.operator("scene.cm_place_deferred_geo", icon="EDITMODE_HLT")
 
 
+addon_keymaps = []
+
+
 def register():
     bpy.utils.register_class(SCENE_PT_CrowdMaster_SimTools_Pie)
 
     wm = bpy.context.window_manager
-    km = wm.keyconfigs.addon.keymaps.new(name="Window")
-    kmi = km.keymap_items.new("wm.call_menu_pie", "M", "PRESS", shift=True,
-                              alt=True).properties.name = "SCENE_PT_CrowdMaster_SimTools_Pie"
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = wm.keyconfigs.addon.keymaps.new(name='Window')
+        kmi = km.keymap_items.new("wm.call_menu_pie", "M", "PRESS", shift=True, alt=True)
+        kmi.properties.name = "SCENE_PT_CrowdMaster_SimTools_Pie"
+        addon_keymaps.append((km, kmi))
 
 
 def unregister():
+    for km, kmi in addon_keymaps:
+        km.keymap_items.remove(kmi)
+    addon_keymaps.clear()
     bpy.utils.unregister_class(SCENE_PT_CrowdMaster_SimTools_Pie)

@@ -33,16 +33,15 @@ logger = logging.getLogger("CrowdMaster")
 class Agent:
     """Represents each of the agents in the scene."""
 
-    def __init__(self, blenderid, nodeGroup, sim, rigOverwrite, constrainBone,
-                 tags=None, modifyBones=None, freezeAnimation=False, geoGroup=None):
+    def __init__(self, ag, nodeGroup, sim, freezeAnimation=False):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if preferences.show_debug_options:
             t = time.time()
-        self.id = blenderid
-        self.brain = compileBrain(nodeGroup, sim, blenderid, freezeAnimation)
+        self.id = ag.name
+        self.brain = compileBrain(nodeGroup, sim, self.id, freezeAnimation)
         self.sim = sim
         self.external = {"id": self.id, "tags": {
-            t.name: t.value for t in tags}}
+            t.name: t.value for t in ag.initialTags}}
         """self.external modified by the agent and then coppied to self.access
         at the end of the frame so that the updated values can be accessed by
         other agents"""
@@ -50,13 +49,13 @@ class Agent:
 
         self.freezeAnimation = freezeAnimation
 
-        self.geoGroup = geoGroup
+        self.geoGroup = ag.geoGroup
 
-        self.rigOverwrite = rigOverwrite
-        self.constrainBone = constrainBone
+        self.rigOverwrite = ag.rigOverwrite
+        self.constrainBone = ag.constrainBone
         self.modifyBones = {}
-        if modifyBones is not None:
-            for m in modifyBones:
+        if ag.modifyBones is not None:
+            for m in ag.modifyBones:
                 if m.name not in self.modifyBones:
                     self.modifyBones[m.name] = {}
                 self.modifyBones[m.name][m.attribute] = m.tag
@@ -64,37 +63,37 @@ class Agent:
         objs = bpy.data.objects
 
         """Set the dimensions of this object"""
-        self.dimensions = objs[blenderid].dimensions
+        self.dimensions = objs[self.id].dimensions
         self.radius = max(self.dimensions) / 2
 
         """ar - absolute rot, r - change rot by, rs - rot speed"""
-        self.arx = objs[blenderid].rotation_euler[0]
+        self.arx = objs[self.id].rotation_euler[0]
         self.rx = 0
         self.rsx = 0
         self.arxKey = True  # True if a keyframe was set last frame
 
-        self.ary = objs[blenderid].rotation_euler[1]
+        self.ary = objs[self.id].rotation_euler[1]
         self.ry = 0
         self.rsy = 0
         self.aryKey = True  # True if a keyframe was set last frame
 
-        self.arz = objs[blenderid].rotation_euler[2]
+        self.arz = objs[self.id].rotation_euler[2]
         self.rz = 0
         self.rsz = 0
         self.arzKey = True  # True if a keyframe was set last frame
 
         """ap - absolute pos, p - change pos by, s - speed"""
-        self.apx = objs[blenderid].location[0]
+        self.apx = objs[self.id].location[0]
         self.px = 0
         self.sx = 0
         self.apxKey = True  # True if a keyframe was set last frame
 
-        self.apy = objs[blenderid].location[1]
+        self.apy = objs[self.id].location[1]
         self.py = 0
         self.sy = 0
         self.apyKey = True  # True if a keyframe was set last frame
 
-        self.apz = objs[blenderid].location[2]
+        self.apz = objs[self.id].location[2]
         self.pz = 0
         self.sz = 0
         self.apzKey = True  # True if a keyframe was set last frame
@@ -106,9 +105,9 @@ class Agent:
 
         """Clear out the nla"""
         if not freezeAnimation:
-            objs[blenderid].animation_data_clear()
-            objs[blenderid].keyframe_insert(data_path="location", frame=1)
-            objs[blenderid].keyframe_insert(
+            objs[self.id].animation_data_clear()
+            objs[self.id].keyframe_insert(data_path="location", frame=1)
+            objs[self.id].keyframe_insert(
                 data_path="rotation_euler", frame=1)
 
         # Keyframe everything so agent return to the same position.
@@ -132,6 +131,15 @@ class Agent:
                     obj.keyframe_insert("rotation_axis_angle")
                 else:
                     obj.keyframe_insert("rotation_euler")
+
+                action = obj.animation_data.action
+                if action is not None:
+                    track = obj.animation_data.nla_tracks.new()
+                    st = track.strips.new(action.name,
+                                          action.frame_range[0], action)
+                    obj.animation_data.action = None
+                    st.extrapolation = 'NOTHING'
+                    st.blend_out = 1
         else:
             # ie. auto generated agent
             for obj in bpy.data.groups[self.geoGroup].objects:
@@ -151,6 +159,15 @@ class Agent:
                     obj.keyframe_insert("rotation_axis_angle")
                 else:
                     obj.keyframe_insert("rotation_euler")
+
+                action = obj.animation_data.action
+                if action is not None:
+                    track = obj.animation_data.nla_tracks.new()
+                    st = track.strips.new(action.name,
+                                          action.frame_range[0], action)
+                    obj.animation_data.action = None
+                    st.extrapolation = 'NOTHING'
+                    st.blend_out = 1
 
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.agent["init"] += time.time() - t
