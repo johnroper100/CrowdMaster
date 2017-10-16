@@ -66,6 +66,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             if not tmpt.check():
                 current.use_custom_color = True
                 current.color = (255, 0, 0)
+                self.report({'ERROR'}, "Generation stopped! Red colored nodes have errors that need to be fixed before continuing.")
                 return False, None
             if len(current.outputs[0].links) > 1:
                 cache[self.name] = tmpt
@@ -74,6 +75,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
         else:
             current.use_custom_color = True
             current.color = (255, 0, 0)
+            self.report({'ERROR'}, "Generation stopped! Red colored nodes have errors that need to be fixed before continuing.")
             return False, None
 
     def execute(self, context):
