@@ -775,7 +775,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
 
     paintMode = EnumProperty(name="Paint Mode", description="Decide how the node acts", items=[
         ('place', "Place", 'Place agents based on the vertex colors'),
-        ('edit', "Edit", 'Edit the positions inputter from other nodes')])
+        ('edit', "Edit", 'Edit the positions inputted from other nodes')])
 
     guideMesh = StringProperty(name="Guide Mesh",
                                description="The mesh to scatter points over")
@@ -848,6 +848,79 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
         return {"paintMode": self.paintMode,
                 "vcols": self.vcols,
                 "vcolor": self.vcolor,
+                "guideMesh": self.guideMesh,
+                "invert": self.invert,
+                "noToPlace": self.noToPlace,
+                "overwritePosition": self.overwritePosition,
+                "relax": self.relax,
+                "relaxIterations": self.relaxIterations,
+                "relaxRadius": self.relaxRadius}
+
+
+class VGroupPositionNode(CrowdMasterAGenTreeNode):
+    """The vertex group positioning node"""
+    bl_idname = 'VGroupPositionNodeType'
+    bl_label = 'Vertex Group'
+    bl_icon = 'SOUND'
+    bl_width_default = 260.0
+
+    guideMesh = StringProperty(name="Guide Mesh",
+                               description="The mesh to scatter points over")
+
+    vgroup = StringProperty(name="Vertex Group",
+                            description="The name of the vertex group to use.")
+
+    invert = BoolProperty(name="Invert",
+                          description="Place agents outside of the painted area",
+                          default=False)
+
+    noToPlace = IntProperty(name="Number of Agents",
+                            description="The number of agents to place",
+                            default=1, min=1)
+
+    overwritePosition = BoolProperty(name="Overwrite position",
+                                     description="Should this node use the global position of the vertices or the position of the vertices relative to the origin",
+                                     default=False)
+
+    relax = BoolProperty(name="Relax",
+                         description="Relax the points to avoid overlap",
+                         default=True)
+
+    relaxIterations = IntProperty(name="Relax Iterations",
+                                  description="Number of relax iterations to use",
+                                  default=1, min=1, max=10)
+
+    relaxRadius = FloatProperty(name="Relax Radius",
+                                description="Maximum radius for relax interactions",
+                                default=1, min=0)
+
+    def init(self, context):
+        self.inputs.new('TemplateSocketType', "Template")
+        self.inputs[0].link_limit = 1
+
+        self.outputs.new('TemplateSocketType', "Template")
+
+    def draw_buttons(self, context, layout):
+        row = layout.row(align=True)
+        row.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        if self.invert:
+            row.prop(self, "invert", icon="STICKY_UVS_VERT", icon_only=True)
+        else:
+            row.prop(self, "invert", icon="STICKY_UVS_LOC", icon_only=True)
+
+        row = layout.row()
+        row.prop(self, "vgroup")
+
+        layout.prop(self, "noToPlace")
+        layout.prop(self, "overwritePosition")
+
+        layout.prop(self, "relax")
+        if self.relax:
+            layout.prop(self, "relaxIterations")
+            layout.prop(self, "relaxRadius")
+
+    def getSettings(self):
+        return {"vgroup": self.vgroup,
                 "guideMesh": self.guideMesh,
                 "invert": self.invert,
                 "noToPlace": self.noToPlace,
@@ -1205,9 +1278,12 @@ agen_node_categories = [
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("MeshPositionNodeType"),
+        NodeItem("MeshPositionNodeType", label="Mesh"),
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("VCOLPositionNodeType"),
+        NodeItem("VGroupPositionNodeType"),
+        NodeItem("PathPositionNodeType"),
+        NodeItem("TargetPositionNodeType"),
         NodeItem("PathPositionNodeType", label="Path"),
         NodeItem("TargetPositionNodeType", label="Target"),
     ]),
@@ -1256,6 +1332,7 @@ def register():
     bpy.utils.register_class(RandomPositionNode)
     bpy.utils.register_class(MeshPositionNode)
     bpy.utils.register_class(VCOLPositionNode)
+    bpy.utils.register_class(VGroupPositionNode)
     bpy.utils.register_class(PathPositionNode)
     bpy.utils.register_class(FormationPositionNode)
     bpy.utils.register_class(TargetPositionNode)
@@ -1302,6 +1379,7 @@ def unregister():
     bpy.utils.unregister_class(RandomPositionNode)
     bpy.utils.unregister_class(MeshPositionNode)
     bpy.utils.unregister_class(VCOLPositionNode)
+    bpy.utils.unregister_class(VGroupPositionNode)
     bpy.utils.unregister_class(PathPositionNode)
     bpy.utils.unregister_class(FormationPositionNode)
     bpy.utils.unregister_class(TargetPositionNode)
