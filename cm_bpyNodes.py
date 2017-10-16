@@ -148,7 +148,7 @@ class NewInputNode(LogicNode):
     bl_width_default = 350.0
 
     InputSource = EnumProperty(name="Input Channel",
-                               items=[("AGENTINFO", "Agent Info", "Get information about other agents in the scene", 10),
+                               items=[("AGENTINFO", "Other Agent Info", "Get information about other agents in the scene", 10),
                                       ("CONSTANT", "Constant",
                                        "Get a single value that does not change per frame", 1),
                                       ("FLOCK", "Flock",
@@ -163,7 +163,7 @@ class NewInputNode(LogicNode):
                                        "Get information relating to path following", 6),
                                       ("SOUND", "Sound",
                                        "Get sound information from each agent", 7),
-                                      ("STATE", "State",
+                                      ("STATE", "Agent State",
                                        "Get state information from each agent", 8),
                                       ("WORLD", "World", "Get world information from the scene", 9)],
                                description="Which channel the input data should be pulled from",
@@ -621,6 +621,23 @@ class MapNode(LogicNode):
         node.settings["UpperOutput"] = self.UpperOutput
 
 
+class ClampNode(LogicNode):
+    """CrowdMaster Clamp node"""
+    bl_label = "Clamp"
+    bl_width_default = 200.0
+
+    Min = FloatProperty(name="Clamp Min", default=0.0)
+    Max = FloatProperty(name="Clamp Max", default=1.0)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "Min")
+        layout.prop(self, "Max")
+
+    def getSettings(self, node):
+        node.settings["Min"] = self.Min
+        node.settings["Max"] = self.Max
+
+
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
@@ -900,20 +917,19 @@ class NoteNode(CrowdMasterNode):
                 if l:
                     col.label(text=l)
             col = layout.column()
-            col.operator("node.sim_note_clear", icon="X_VEC")
+            col.operator("node.sim_note_clear", icon="X")
 
         else:
             col = layout.column()
             col.prop(self, "text")
 
-            col = layout.column(align=True)
-            col.operator("node.sim_note_from_clipboard", icon="TEXT")
-            col.operator("node.sim_note_clear", icon="X_VEC")
+            col = layout.column()
+            col.operator("node.sim_note_clear", icon="X")
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "text", text="Text")
         layout.operator("node.sim_note_from_clipboard", icon="TEXT")
-        layout.operator("node.sim_note_clear", icon="X_VEC")
+        layout.operator("node.sim_note_clear", icon="X")
 
     def clear(self):
         self.text = ""
@@ -953,6 +969,32 @@ class SimNoteClear(Operator):
     def execute(self, context):
         node = context.node
         node.clear()
+        return {'FINISHED'}
+
+
+class CrowdMasterMuteSimNodes(Operator):
+    """Mutes the selected simulation nodes"""
+    bl_idname = "node.cm_sim_mute"
+    bl_label = "Mute the Selected Simulation Nodes"
+
+    @classmethod
+    def poll(cls, context):
+        tree_type = context.space_data.tree_type
+        if tree_type == 'CrowdMasterTreeType':
+            return True
+
+    def execute(self, context):
+
+        ng = context.space_data.edit_tree
+        nodes = [n for n in ng.nodes if n.select]
+
+        if not nodes:
+            self.report({"ERROR_INVALID_INPUT"}, "No nodes selected")
+            return {'CANCELLED'}
+
+        for node in nodes:
+            node.mute = not node.mute
+            
         return {'FINISHED'}
 
 
@@ -1012,6 +1054,7 @@ node_categories = [
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("FilterNode"),
         NodeItem("MathNode"),
+        NodeItem("ClampNode"),
         NodeItem("SetTagNode"),
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
@@ -1022,6 +1065,8 @@ node_categories = [
     MyNodeCategory("GROUP", "Group", items=groupCategory)
 ]
 
+keyMap = None
+keyMapItems = []
 
 def register():
     bpy.utils.register_class(CrowdMasterTree)
@@ -1042,6 +1087,7 @@ def register():
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
     bpy.utils.register_class(MapNode)
+    bpy.utils.register_class(ClampNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(PrintNode)
@@ -1053,11 +1099,31 @@ def register():
     bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
+    bpy.utils.register_class(CrowdMasterMuteSimNodes)
+
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
+    
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        global keyMap
+        keyMap = kc.keymaps.new(name='Node Editor', space_type='NODE_EDITOR')
+
+        kmi = keyMap.keymap_items.new('node.cm_sim_mute', 'M', 'PRESS')
+        keyMapItems.append(kmi)
 
 
 def unregister():
+    global keyMap
+    if keyMap:
+        for kmi in keyMapItems:
+            try:
+                keyMap.keymap_items.remove(kmi)
+            except Exception:
+                pass
+    keyMapItems.clear()
+
     nodeitems_utils.unregister_node_categories("CrowdMaster_NODES")
 
     bpy.utils.unregister_class(CrowdMasterTree)
@@ -1078,6 +1144,7 @@ def unregister():
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
     bpy.utils.unregister_class(MapNode)
+    bpy.utils.unregister_class(ClampNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(PrintNode)
@@ -1088,6 +1155,8 @@ def unregister():
     bpy.utils.unregister_class(NoteNode)
     bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
+
+    bpy.utils.unregister_class(CrowdMasterMuteSimNodes)
 
 
 if __name__ == "__main__":
