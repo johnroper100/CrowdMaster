@@ -88,14 +88,16 @@ class Channel:
             point = (inverseTransform * s.location.to_4d()).to_3d()
             direc = Vector((0, 0, 1))
             direc.rotate(inverseTransform.to_euler())
-            calcd = self.groundTrees[gnd.name].ray_cast(point,
-                                                        tuple(-x for x in direc))
+
+            calcd = self.groundTrees[gnd.name].ray_cast(
+                point, tuple(-x for x in direc))
             if calcd[0]:
                 loc, norm, ind, dist = calcd
                 loc = gnd.matrix_world * loc
                 norm = gnd.matrix_world * norm
                 dist = (s.location - loc).length
-                results.append((loc, norm, ind, dist))
+                results.append((loc, norm, ind, -dist))
+
             calcd = self.groundTrees[gnd.name].ray_cast(
                 point, tuple(x for x in direc))
             if calcd[0]:
@@ -103,7 +105,7 @@ class Channel:
                 loc = gnd.matrix_world * loc
                 norm = gnd.matrix_world * norm
                 dist = (s.location - loc).length
-                results.append((loc, norm, ind, -dist))
+                results.append((loc, norm, ind, dist))
 
         if len(results) > 0:
             loc, norm, ind, dist = min(results, key=lambda x: abs(x[3]))

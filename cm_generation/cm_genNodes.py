@@ -933,7 +933,7 @@ class VGroupPositionNode(CrowdMasterAGenTreeNode):
 class PathPositionNode(CrowdMasterAGenTreeNode):
     """The path positioning node"""
     bl_idname = 'PathPositionNodeType'
-    bl_label = 'Path'
+    bl_label = 'Path Positioning'
     bl_icon = 'SOUND'
     bl_width_default = 250.0
 
@@ -1193,20 +1193,19 @@ class NoteNode(CrowdMasterAGenTreeNode):
                 if l:
                     col.label(text=l)
             col = layout.column()
-            col.operator("node.gen_note_clear", icon="X_VEC")
+            col.operator("node.gen_note_clear", icon="X")
 
         else:
             col = layout.column()
             col.prop(self, "text")
 
-            col = layout.column(align=True)
-            col.operator("node.gen_note_from_clipboard", icon="TEXT")
-            col.operator("node.gen_note_clear", icon="X_VEC")
+            col = layout.column()
+            col.operator("node.gen_note_clear", icon="X")
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "text", text="Text")
         layout.operator("node.gen_note_from_clipboard", icon="TEXT")
-        layout.operator("node.gen_note_clear", icon="X_VEC")
+        layout.operator("node.gen_note_clear", icon="X")
 
     def clear(self):
         self.text = ""
@@ -1269,23 +1268,27 @@ agen_node_categories = [
         NodeItem("TemplateNodeType"),
         NodeItem("AddToGroupNodeType"),
         NodeItem("CombineNodeType"),
-        NodeItem("PointTowardsNodeType"),
-        NodeItem("RandomNodeType"),
         NodeItem("RandomMaterialNodeType"),
         NodeItem("SettagNodeType"),
         NodeItem("TemplateSwitchNodeType", label="Switch")
     ]),
+    CrowdMasterAGenCategories("tmodifier", "Template Modifier", items=[
+        NodeItem("PointTowardsNodeType"),
+        NodeItem("RandomNodeType")
+    ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("GroundNodeType"),
         NodeItem("MeshPositionNodeType"),
-        NodeItem("ObstacleNodeType"),
-        NodeItem("OffsetNodeType"),
-        NodeItem("PathPositionNodeType"),
         NodeItem("RandomPositionNodeType", label="Random"),
-        NodeItem("TargetPositionNodeType", label="Target"),
         NodeItem("VCOLPositionNodeType"),
         NodeItem("VGroupPositionNodeType"),
+        NodeItem("PathPositionNodeType"),
+        NodeItem("TargetPositionNodeType"),
+    ]),
+    CrowdMasterAGenCategories("pmodifier", "Positioning Modifier", items=[
+        NodeItem("OffsetNodeType"),
+        NodeItem("ObstacleNodeType"),
+        NodeItem("GroundNodeType")
     ]),
     CrowdMasterAGenCategories("output", "Output", items=[
         NodeItem("GenerateNodeType")

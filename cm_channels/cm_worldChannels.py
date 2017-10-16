@@ -91,15 +91,15 @@ class World(Mc):
                                     result = True
                 if result:
                     if eventType == "control":
-                        return {"None": 1}
+                        return {"": 1}
                     elif eventType == "duration":
                         duration = e.timeMax - e.timeMin
-                        return {"None": duration}
+                        return {"": duration}
                     elif eventType == "elapsed":
                         elapsed = bpy.context.scene.frame_current - e.timeMin
-                        return {"None": elapsed}
+                        return {"": elapsed}
 
-        return {"None": 0}
+        return {"": 0}
 
 
 class Channel:

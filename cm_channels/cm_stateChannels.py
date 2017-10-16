@@ -64,5 +64,5 @@ class State(Mc):
         name = self.userid
         if name in self.sim.agents:
             if tag in self.sim.agents[name].access["tags"]:
-                return {"None": self.sim.agents[name].access["tags"][tag]}
+                return {"": self.sim.agents[name].access["tags"][tag]}
         return {}

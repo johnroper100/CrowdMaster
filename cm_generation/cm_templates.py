@@ -266,7 +266,10 @@ class GeoTemplateGROUP(GeoTemplate):
         return GeoReturn(topObj)
 
     def check(self):
-        return self.settings["inputGroup"] in bpy.data.groups
+        if self.settings["inputGroup"] in bpy.data.groups:
+            if len(bpy.data.groups[self.settings["inputGroup"]].objects) != 0:
+                return True
+        return False
 
 
 class GeoTemplateLINKGROUPNODE(GeoTemplate):
@@ -1350,6 +1353,19 @@ class TemplatePATH(Template):
                 newBuildRequest.cm_group += "_" + self.settings["nodeName"] + \
                                             "_" + str(island)
             self.inputs["Template"].build(newBuildRequest)
+
+    def check(self):
+        if "Template" not in self.inputs:
+            return False
+        if not isinstance(self.inputs["Template"], Template):
+            return False
+        if isinstance(self.inputs["Template"], GeoTemplate):
+            return False
+        pathEntry = bpy.context.scene.cm_paths.coll.get(
+            self.settings["pathName"])
+        obj = bpy.context.scene.objects[pathEntry.objectName]
+        if not obj.type == 'MESH':
+            return False
 
 
 class TemplateFORMATION(Template):

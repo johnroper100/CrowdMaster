@@ -81,7 +81,7 @@ class Neuron():
             if output is None:
                 output = {}
             elif not (isinstance(output, dict) or output is None):
-                output = {"None": output}
+                output = {"": output}
         else:
             output = None
         self.result = output
