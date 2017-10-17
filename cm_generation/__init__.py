@@ -83,7 +83,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             bpy.ops.object.mode_set(mode='OBJECT')
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
-        preferences = context.user_preferences.addons["CrowdMaster"].preferences
+        preferences = context.user_preferences.addons[__package__].preferences
 
         cache = {}
         genSpaces = {}
