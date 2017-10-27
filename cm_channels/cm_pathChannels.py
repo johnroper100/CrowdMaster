@@ -288,7 +288,7 @@ class Path(Mc):
 
             index = nextIndex
             if nextVert is None:
-                logger.info("no next {}".format(index))
+                logger.info("No next {}".format(index))
             nextIndex = nextVert.index
 
     def alignToPath(self, pathEntry, point, nDirec):
