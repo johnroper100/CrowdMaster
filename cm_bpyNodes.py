@@ -51,7 +51,7 @@ class DefaultSocket(NodeSocket):
     randomInputValue = BoolProperty(default=False)
 
     def draw(self, context, layout, node, text):
-        preferences = context.user_preferences.addons["CrowdMaster"].preferences
+        preferences = context.user_preferences.addons[__package__].preferences
         if not self.is_output and isinstance(node, StateNode):
             row = layout.row(align=True)
             if node.syncState:
@@ -836,7 +836,7 @@ class ActionState(StateNode):
         item.randomActionFromGroup = self.randomActionFromGroup
 
     def draw_buttons(self, context, layout):
-        preferences = context.user_preferences.addons["CrowdMaster"].preferences
+        preferences = context.user_preferences.addons[__package__].preferences
         if self.actionName == "":
             layout.prop(self, "stateLength")
         layout.prop(self, "cycleState")

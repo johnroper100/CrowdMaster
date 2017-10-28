@@ -22,7 +22,7 @@ import bpy
 from .cm_brainClasses import Brain
 from .cm_nodeFunctions import logictypes, statetypes
 
-preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+preferences = bpy.context.user_preferences.addons[__package__].preferences
 
 
 def getInputs(inp):
@@ -62,7 +62,7 @@ def getOutputs(out):
 def compileBrain(nodeGroup, sim, userid, freezeAnimation):
     """Compile the brain that defines how and agent moves and is animated"""
     result = Brain(sim, userid, freezeAnimation)
-    preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+    preferences = bpy.context.user_preferences.addons[__package__].preferences
     """create the connections from the node"""
     for node in nodeGroup.nodes:
         if node.bl_idname in logictypes:

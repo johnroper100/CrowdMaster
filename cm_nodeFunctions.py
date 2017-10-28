@@ -232,7 +232,7 @@ class LogicGRAPH(Neuron):
     """Return value 0 to 1 mapping from graph"""
 
     def core(self, inps, settings):
-        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
 
         def linear(value):
             lz = settings["LowerZero"]
@@ -566,7 +566,7 @@ class LogicOUTPUT(Neuron):
     """Sets an agents output. (Has to be picked up in cm_agents.Agents)"""
 
     def core(self, inps, settings):
-        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+        preferences = bpy.context.user_preferences.addons[__package__].preferences
         val = 0
         if settings["MultiInputType"] == "AVERAGE":
             count = 0
