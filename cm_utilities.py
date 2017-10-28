@@ -39,7 +39,7 @@ class Crowdmaster_place_deferred_geo(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        preferences = context.user_preferences.addons[__package__].preferences
+        preferences = context.user_preferences.addons["CrowdMaster"].preferences
 
         groups = bpy.data.groups
         objects = context.scene.objects

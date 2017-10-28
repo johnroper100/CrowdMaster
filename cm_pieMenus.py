@@ -28,7 +28,7 @@ class SCENE_PT_CrowdMaster_SimTools_Pie(Menu):
 
     def draw(self, context):
         layout = self.layout
-        preferences = context.user_preferences.addons[__package__].preferences
+        preferences = context.user_preferences.addons["CrowdMaster"].preferences
 
         pie = layout.menu_pie()
         if preferences.use_custom_icons:

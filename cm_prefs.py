@@ -43,7 +43,7 @@ class CMSavePrefs(Operator):
 
 
 def updateLogger(self, context):
-    preferences = context.user_preferences.addons[__package__].preferences
+    preferences = context.user_preferences.addons["CrowdMaster"].preferences
     if preferences.show_debug_options:
         logging.basicConfig(level=logging.DEBUG, format='%(message)s')
     else:
@@ -51,7 +51,7 @@ def updateLogger(self, context):
 
 
 class CMPreferences(AddonPreferences):
-    bl_idname = __package__
+    bl_idname = "CrowdMaster"
     scriptdir = bpy.path.abspath(os.path.dirname(__file__))
 
     auto_check_update = BoolProperty(
@@ -133,7 +133,7 @@ class CMPreferences(AddonPreferences):
 
     def draw(self, context):
         layout = self.layout
-        preferences = context.user_preferences.addons[__package__].preferences
+        preferences = context.user_preferences.addons["CrowdMaster"].preferences
 
         row = layout.row()
         row.prop(preferences, "prefs_tab", expand=True)
@@ -210,7 +210,7 @@ class CMPreferences(AddonPreferences):
 
 
 def draw_cmweb_item(self, context):
-    preferences = context.user_preferences.addons[__package__].preferences
+    preferences = context.user_preferences.addons["CrowdMaster"].preferences
     self.layout.separator()
     if preferences.use_custom_icons:
         self.layout.operator("wm.url_open", text="CrowdMaster Website", icon_value=cicon(

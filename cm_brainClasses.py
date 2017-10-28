@@ -46,7 +46,7 @@ class Neuron():
 
     def evaluate(self):
         """Called by any neurons that take this neuron as an input"""
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
         if preferences.show_debug_options:
             t = time.time()
         if self.result:
@@ -129,7 +129,7 @@ class Neuron():
 
     def highLight(self, frame):
         """Colour the nodes in the interface to reflect the output"""
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
         if preferences.use_node_color:
             hue, sat, val = self.resultLog[frame]
             self.bpyNode.use_custom_color = True
@@ -258,7 +258,7 @@ class State:
         self.finalValueCalcd = False
 
     def highLight(self, frame):
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
         if preferences.use_node_color:
             if frame in self.resultLog:
                 hue, sat, val = self.resultLog[frame]
@@ -305,7 +305,7 @@ class Brain():
 
     def execute(self):
         """Called for each time the agents needs to evaluate"""
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
+        preferences = bpy.context.user_preferences.addons["CrowdMaster"].preferences
 
         actv = bpy.context.active_object
         self.isActiveSelection = actv is not None and actv.name == self.userid
