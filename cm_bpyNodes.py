@@ -863,11 +863,6 @@ TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
 
-def get_lines(text_file):
-    for line in text_file.lines:
-        yield line.body
-
-
 class NoteNode(CrowdMasterNode):
     """For keeping the graph well organised"""
     bl_idname = 'LogicNoteNode'
@@ -876,19 +871,11 @@ class NoteNode(CrowdMasterNode):
     text = StringProperty(
         name='Note Text', description="Text to show, if set will overide file")
 
-    text_file = StringProperty(description="Textfile to show")
-
     def format_text(self):
         global TW
         out = []
         if self.text:
             lines = self.text.splitlines()
-        elif self.text_file:
-            text_file = bpy.data.texts.get(self.text_file)
-            if text_file:
-                lines = get_lines(text_file)
-            else:
-                return []
         else:
             return []
         width = self.width
@@ -904,7 +891,7 @@ class NoteNode(CrowdMasterNode):
         self.use_custom_color = True
 
     def draw_buttons(self, context, layout):
-        has_text = self.text or self.text_file
+        has_text = self.text
         if has_text:
             col = layout.column(align=True)
             text_lines = self.format_text()
@@ -928,7 +915,6 @@ class NoteNode(CrowdMasterNode):
 
     def clear(self):
         self.text = ""
-        self.text_file = ""
 
     def to_text(self):
         text_name = "Note Text"
@@ -989,7 +975,7 @@ class CrowdMasterMuteSimNodes(Operator):
 
         for node in nodes:
             node.mute = not node.mute
-            
+
         return {'FINISHED'}
 
 
@@ -1041,6 +1027,7 @@ node_categories = [
 keyMap = None
 keyMapItems = []
 
+
 def register():
     bpy.utils.register_class(CrowdMasterTree)
     bpy.utils.register_class(DefaultSocket)
@@ -1076,7 +1063,7 @@ def register():
 
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
-    
+
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
     if kc:

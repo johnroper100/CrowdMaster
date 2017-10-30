@@ -21,7 +21,6 @@ import logging
 import math
 import os
 import random
-import re
 import time
 from collections import OrderedDict
 from math import radians
@@ -177,6 +176,7 @@ class GeoTemplateOBJECT(GeoTemplate):
         objects = bpy.context.scene.objects
         if (nobject in objects) and (objects[nobject].type == 'MESH'):
             return self.settings["inputObject"] in bpy.context.scene.objects
+        logger.debug("The chosen object must exist and be of type MESH.")
         return False
 
 
@@ -269,6 +269,7 @@ class GeoTemplateGROUP(GeoTemplate):
         if self.settings["inputGroup"] in bpy.data.groups:
             if len(bpy.data.groups[self.settings["inputGroup"]].objects) != 0:
                 return True
+        logger.debug("The chosen group must exist and have 1 or more objects.")
         return False
 
 
@@ -313,7 +314,10 @@ class GeoTemplateLINKGROUPNODE(GeoTemplate):
 
     def check(self):
         # TODO check if file exists
-        return self.settings["duplicatesDirectory"] != ""
+        if self.settings["duplicatesDirectory"] == "":
+            logger.debug("The Duplicates Directory must not be empty.")
+            return False
+        return True
 
     def duplicateProxyLink(self, dupDir, sourceBlend, sourceGroup, sourceRig,
                            additionalGroup):
@@ -450,12 +454,16 @@ class GeoTemplateCONSTRAINBONE(GeoTemplate):
 
     def check(self):
         if "Parent Group" not in self.inputs:
+            logger.debug("There must be a Parent Group input.")
             return False
         if "Child Object" not in self.inputs:
+            logger.debug("There must be a Child Object input.")
             return False
         if not isinstance(self.inputs["Parent Group"], GeoTemplate):
+            logger.debug("The Parent Group input is not a GeoTemplate type.")
             return False
         if not isinstance(self.inputs["Child Object"], GeoTemplate):
+            logger.debug("The Child Object input is not a GeoTemplate type.")
             return False
         # TODO check that object is in parent group
         return True
@@ -477,8 +485,10 @@ class GeoTemplateMODIFYBONE(GeoTemplate):
 
     def check(self):
         if "Objects" not in self.inputs:
+            logger.debug("There must be an Objects input.")
             return False
         if not isinstance(self.inputs["Objects"], GeoTemplate):
+            logger.debug("The Objects input is not a GeoTemplate type.")
             return False
         return True
 
@@ -494,12 +504,16 @@ class GeoTemplateSWITCH(GeoTemplate):
 
     def check(self):
         if "Object 1" not in self.inputs:
+            logger.debug("There must be an Object 1 input.")
             return False
         if "Object 2" not in self.inputs:
+            logger.debug("There must be an Object 2 input.")
             return False
         if not isinstance(self.inputs["Object 1"], GeoTemplate):
+            logger.debug("The Object 1 input is not a GeoTemplate type.")
             return False
         if not isinstance(self.inputs["Object 2"], GeoTemplate):
+            logger.debug("The Object 2 input is not a GeoTemplate type.")
             return False
         return True
 
@@ -542,12 +556,16 @@ class GeoTemplatePARENT(GeoTemplate):
 
     def check(self):
         if "Parent Group" not in self.inputs:
+            logger.debug("There must be a Parent Group input.")
             return False
         if "Child Object" not in self.inputs:
+            logger.debug("There must be a Child Object input.")
             return False
         if not isinstance(self.inputs["Parent Group"], GeoTemplate):
+            logger.debug("The Parent Group input is not a GeoTemplate type.")
             return False
         if not isinstance(self.inputs["Child Object"], GeoTemplate):
+            logger.debug("The Child Object input is not a GeoTemplate type.")
             return False
         # TODO check that object is in parent group
         return True
@@ -584,12 +602,17 @@ class TemplateADDTOGROUP(Template):
 
     def check(self):
         if "Template" not in self.inputs:
+            logger.debug("There must be a Template input.")
             return False
         if not isinstance(self.inputs["Template"], Template):
+            logger.debug("The Template input is not a Template type.")
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
+            logger.debug(
+                "The Teplate input must be a Template, not GeoTemplate type.")
             return False
         if self.settings["groupName"].strip() == "":
+            logger.debug("The Group Name must not be empty.")
             return False
         return True
 
@@ -614,10 +637,14 @@ class TemplateRANDOMMATERIAL(Template):
 
     def check(self):
         if "Template" not in self.inputs:
+            logger.debug("There must be a Template input.")
             return False
         if not isinstance(self.inputs["Template"], Template):
+            logger.debug("The Template input is not a Template type.")
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
+            logger.debug(
+                "The Teplate input must be a Template, not GeoTemplate type.")
             return False
         return True
 
@@ -690,8 +717,10 @@ class TemplateAGENT(Template):
 
     def check(self):
         if "Objects" not in self.inputs:
+            logger.debug("There must be an Objects input.")
             return False
         if not isinstance(self.inputs["Objects"], GeoTemplate):
+            logger.debug("The Objects input is not a GeoTemplate type.")
             return False
         return True
 
@@ -707,16 +736,24 @@ class TemplateSWITCH(Template):
 
     def check(self):
         if "Template 1" not in self.inputs:
+            logger.debug("There must be a Template 2 input.")
             return False
         if "Template 2" not in self.inputs:
+            logger.debug("There must be a Template 2 input.")
             return False
         if not isinstance(self.inputs["Template 1"], Template):
+            logger.debug("The Template 1 input is not a Template type.")
             return False
         if isinstance(self.inputs["Template 1"], GeoTemplate):
+            logger.debug(
+                "The Teplate 1 input must be a Template, not GeoTemplate type.")
             return False
         if not isinstance(self.inputs["Template 2"], Template):
+            logger.debug("The Template 2 input is not a Template type.")
             return False
         if isinstance(self.inputs["Template 2"], GeoTemplate):
+            logger.debug(
+                "The Teplate 2 input must be a Template, not GeoTemplate type.")
             return False
         return True
 
@@ -749,13 +786,17 @@ class TemplateOFFSET(Template):
 
     def check(self):
         if "Template" not in self.inputs:
+            logger.debug("There must be a Template input.")
             return False
         if not isinstance(self.inputs["Template"], Template):
+            logger.debug("The Template input is not a Template type.")
             return False
         if isinstance(self.inputs["Template"], GeoTemplate):
+            logger.debug("The Teplate input must be a Template, not GeoTemplate type.")
             return False
         ref = self.settings["referenceObject"]
         if ref != "" and ref not in bpy.context.scene.objects:
+            logger.debug("The Reference object must exist.")
             return False
         return True
 
