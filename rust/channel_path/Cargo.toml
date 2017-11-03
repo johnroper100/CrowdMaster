@@ -1,13 +1,17 @@
 [package]
-name = "channel_sound"
+name = "channel_path"
 version = "0.1.0"
 authors = ["Peter-Noble <peter@noblesque.org.uk>", "John Roper <john@jmroper.com>"]
 
 [lib]
-name = "channel_sound"
+name = "channel_path"
 crate-type = ["cdylib"]
 
 [dependencies.cpython]
 version = "*"
 features = ["extension-module"]
 
+[dependencies]
+nalgebra = "*"
+spade = "*"
+lazy_static = "*"
