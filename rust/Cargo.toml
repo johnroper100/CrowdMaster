@@ -2,6 +2,7 @@
 crate-type = ["cdylib"]
 members = [
      "channel_world",
-     "channel_sound"
+     "channel_sound",
+     "cm_gen"
 ]
 

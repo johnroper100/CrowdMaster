@@ -35,6 +35,8 @@ from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
 
+from cm_gen import template_random_positioning
+
 logger = logging.getLogger("CrowdMaster")
 
 BVHTree = mathutils.bvhtree.BVHTree
@@ -890,6 +892,7 @@ class TemplateRANDOMPOSITIONING(Template):
     def build(self, buildRequest):
         t = time.time()
         positions = []
+        template_random_positioning(self.settings["locationType"], self.settings["MaxX"], self.settings["MaxY"], self.settings["noToPlace"], self.settings["radius"], self.settings["relax"], self.settings["relaxIterations"], self.settings["relaxRadius"], self.settings["direc"], self.settings["angle"])
         for a in range(self.settings["noToPlace"]):
             if self.settings["locationType"] == "radius":
                 angle = random.uniform(-math.pi, math.pi)

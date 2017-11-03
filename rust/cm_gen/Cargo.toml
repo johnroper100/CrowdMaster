@@ -1,0 +1,15 @@
+[package]
+name = "cm_gen"
+version = "0.1.0"
+authors = ["John Roper <john@jmroper.com>", "Peter-Noble <peter@noblesque.org.uk>"]
+
+[lib]
+name = "cm_gen"
+crate-type = ["cdylib"]
+
+[dependencies.cpython]
+version = "*"
+features = ["extension-module"]
+
+[dependencies]
+
