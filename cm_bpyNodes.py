@@ -459,20 +459,31 @@ class MathNode(LogicNode):
                               "Subtract the two numbers from each other"),
                              ("mul", "Multiply", "Multiply the two numbers"),
                              ("div", "Divide", "Divide the two numbers"),
-                             ("set", "Set To", "Set all inputs to this number")],
+                             ("set", "Set To", "Set all inputs to this number"),
+                             ("clamp", "Clamp", "Clamp the input values to a specified range")],
                              default="mul",
                              description="which mathematical operation to use.")
 
     num1 = FloatProperty(name="Number 1", default=1.0,
-                         description="Input is added/subtracted/multiplied/divided to this number")
+                         description="Input is added/subtracted/multiplied/divided/set to this number")
+
+    ClampMin = FloatProperty(name="Clamp Min", default=0.0)
+    ClampMax = FloatProperty(name="Clamp Max", default=1.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation")
-        layout.prop(self, "num1")
+
+        if self.operation == "clamp":
+            layout.prop(self, "ClampMin")
+            layout.prop(self, "ClampMax")
+        else:
+            layout.prop(self, "num1")
 
     def getSettings(self, node):
         node.settings["operation"] = self.operation
         node.settings["num1"] = self.num1
+        node.settings["ClampMin"] = self.ClampMin
+        node.settings["ClampMax"] = self.ClampMax
 
 
 class AndNode(LogicNode):
@@ -581,22 +592,6 @@ class FilterNode(LogicNode):
         node.settings["Tag"] = self.Tag
         node.settings["TagName"] = self.TagName
         node.settings["Value"] = self.Value
-
-class ClampNode(LogicNode):
-    """CrowdMaster Clamp node"""
-    bl_label = "Clamp"
-    bl_width_default = 200.0
-
-    Min = FloatProperty(name="Clamp Min", default=0.0)
-    Max = FloatProperty(name="Clamp Max", default=1.0)
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "Min")
-        layout.prop(self, "Max")
-
-    def getSettings(self, node):
-        node.settings["Min"] = self.Min
-        node.settings["Max"] = self.Max
 
 
 class OutputNode(LogicNode):
@@ -974,7 +969,6 @@ node_categories = [
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("FilterNode"),
         NodeItem("MathNode"),
-        NodeItem("ClampNode"),
         NodeItem("SetTagNode"),
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
@@ -1004,7 +998,6 @@ def register():
     bpy.utils.register_class(NotNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
-    bpy.utils.register_class(ClampNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(PrintNode)
@@ -1058,7 +1051,6 @@ def unregister():
     bpy.utils.unregister_class(NotNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
-    bpy.utils.unregister_class(ClampNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(PrintNode)

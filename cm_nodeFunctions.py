@@ -293,6 +293,8 @@ class LogicMATH(Neuron):
                     result[i] = into[i] / settings["num1"]
                 elif settings["operation"] == "set":
                     result[i] = settings["num1"]
+                elif settings["operation"] == "clamp":
+                    result[i] = max(min(settings["ClampMax"], into[i]), settings["ClampMin"])
         return result
 
 
@@ -509,17 +511,6 @@ class LogicFILTER(Neuron):
         return result
 
 
-class LogicCLAMP(Neuron):
-    """Clamps the inputs to a specific range"""
-
-    def core(self, inps, settings):
-        result = {}
-        for into in inps:
-            for i in into:
-                result[i] = max(min(settings["Max"], into[i]), settings["Min"])
-        return result
-
-
 class LogicOUTPUT(Neuron):
     """Sets an agents output. (Has to be picked up in cm_agents.Agents)"""
 
@@ -638,7 +629,6 @@ logictypes = OrderedDict([
     ("NotNode", LogicNOT),
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
-    ("ClampNode", LogicCLAMP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
     ("PrintNode", LogicPRINT)
