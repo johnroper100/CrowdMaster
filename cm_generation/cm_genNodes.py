@@ -1144,12 +1144,6 @@ class SettagNode(CrowdMasterAGenTreeNode):
 TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
-
-def get_lines(text_file):
-    for line in text_file.lines:
-        yield line.body
-
-
 class NoteNode(CrowdMasterAGenTreeNode):
     """For keeping the graph well organised"""
     bl_label = 'Note'
@@ -1157,19 +1151,11 @@ class NoteNode(CrowdMasterAGenTreeNode):
     text = StringProperty(
         name='Note Text', description="Text to show, if set will overide file")
 
-    text_file = StringProperty(description="Textfile to show")
-
     def format_text(self):
         global TW
         out = []
         if self.text:
             lines = self.text.splitlines()
-        elif self.text_file:
-            text_file = bpy.data.texts.get(self.text_file)
-            if text_file:
-                lines = get_lines(text_file)
-            else:
-                return []
         else:
             return []
         width = self.width
@@ -1185,7 +1171,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
         self.use_custom_color = True
 
     def draw_buttons(self, context, layout):
-        has_text = self.text or self.text_file
+        has_text = self.text
         if has_text:
             col = layout.column(align=True)
             text_lines = self.format_text()
@@ -1209,7 +1195,6 @@ class NoteNode(CrowdMasterAGenTreeNode):
 
     def clear(self):
         self.text = ""
-        self.text_file = ""
 
     def to_text(self):
         text_name = "Note Text"
@@ -1278,7 +1263,7 @@ agen_node_categories = [
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
         NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("MeshPositionNodeType"),
+        NodeItem("MeshPositionNodeType", label="Mesh"),
         NodeItem("RandomPositionNodeType", label="Random"),
         NodeItem("VCOLPositionNodeType"),
 <<<<<<< HEAD
