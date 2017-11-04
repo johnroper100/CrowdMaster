@@ -328,8 +328,6 @@ class LogicAND(Neuron):
                     total = min(results.values()) if len(results) > 0 else 0
                 return {"": total*settings["Weight"]}
             else:
-                for i in range(len(results)):
-                    results[i] *= settings["Weight"]
                 return results
         else:
             return {}
