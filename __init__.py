@@ -24,7 +24,7 @@ bl_info = {
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
     "description": "Crowd Simulation for the Masses",
-    "warning": "This is a development version of CrowdMaster, some things may not work as planned.",
+    "warning": "This is a development version of CrowdMaster, some things may appear, dissapear, and fail at random times.",
     "wiki_url": "http://crowdmaster.org/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
     "category": "Simulation"
