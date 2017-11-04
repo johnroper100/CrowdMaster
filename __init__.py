@@ -20,11 +20,11 @@
 bl_info = {
     "name": "CrowdMaster Rust",
     "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
-    "version": (1, 3, 2),
+    "version": (1, 3, 3),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
     "description": "Crowd Simulation for the Masses",
-    "warning": "",
+    "warning": "This is a development version of CrowdMaster, some things may not work as planned.",
     "wiki_url": "http://crowdmaster.org/docs/",
     "tracker_url": "https://github.com/johnroper100/CrowdMaster/issues",
     "category": "Simulation"
