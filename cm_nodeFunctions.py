@@ -539,20 +539,6 @@ class LogicOUTPUT(Neuron):
                 for i in into:
                     if abs(into[i]) > abs(out):
                         out = into[i]
-        elif settings["MultiInputType"] == "SIZEAVERAGE":
-            """Takes a weighed average of the inputs where smaller values have
-            less of an impact on the final result"""
-            Sm = 0
-            SmSquared = 0
-            for into in inps:
-                for i in into:
-                    logger.debug("Val: {}".format(into[i]))
-                    Sm += into[i]
-                    SmSquared += into[i] * abs(into[i])  # To retain sign
-            if Sm == 0:
-                out = 0
-            else:
-                out = SmSquared / Sm
         elif settings["MultiInputType"] == "SUM":
             out = 0
             for into in inps:
