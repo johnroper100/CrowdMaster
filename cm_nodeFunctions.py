@@ -376,30 +376,6 @@ class LogicNOT(Neuron):
         return result
 
 
-class LogicSTRONG(Neuron):
-    """Make 1's and 0's stronger"""
-    # https://www.desmos.com/calculator/izfhogpchr
-
-    def core(self, inps, settings):
-        results = {}
-        for into in inps:
-            for i in into:
-                results[i] = into[i]**2 * (-2 * into[i] + 3)
-        return results
-
-
-class LogicWEAK(Neuron):
-    """Make 1's and 0's weaker"""
-    # https://www.desmos.com/calculator/izfhogpchr
-
-    def core(self, inps, settings):
-        results = {}
-        for into in inps:
-            for i in into:
-                results[i] = 2 * into[i] - (into[i]**2 * (-2 * into[i] + 3))
-        return results
-
-
 class LogicSETTAG(Neuron):
     """If any of the inputs are above the Threshold level add or remove the
     Tag from the agents tags"""
@@ -530,24 +506,6 @@ class LogicFILTER(Neuron):
                 for i in into:
                     total += into[i]
             result = {"": total}
-        return result
-
-
-class LogicMAP(Neuron):
-    """Map the input from the input range to the output range
-    (extrapolates outside of input range)"""
-
-    def core(self, inps, settings):
-        result = {}
-        if settings["LowerInput"] != settings["UpperInput"]:
-            for into in inps:
-                for i in into:
-                    num = into[i]
-                    li = settings["LowerInput"]
-                    ui = settings["UpperInput"]
-                    lo = settings["LowerOutput"]
-                    uo = settings["UpperOutput"]
-                    result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
         return result
 
 
@@ -692,11 +650,8 @@ logictypes = OrderedDict([
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
     ("NotNode", LogicNOT),
-    ("StrongNode", LogicSTRONG),
-    ("WeakNode", LogicWEAK),
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
-    ("MapNode", LogicMAP),
     ("ClampNode", LogicCLAMP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),

@@ -522,16 +522,6 @@ class NotNode(LogicNode):
     bl_label = "Not"
 
 
-class StrongNode(LogicNode):
-    """CrowdMaster Strong node. Makes 1's and 0's stronger"""
-    bl_label = "Strong"
-
-
-class WeakNode(LogicNode):
-    """CrowdMaster Weak node. Relaxes 1's and 0's"""
-    bl_label = "Weak"
-
-
 class SetTagNode(LogicNode):
     """CrowdMaster Set Tag node"""
     bl_label = "Set Tag"
@@ -591,30 +581,6 @@ class FilterNode(LogicNode):
         node.settings["Tag"] = self.Tag
         node.settings["TagName"] = self.TagName
         node.settings["Value"] = self.Value
-
-
-class MapNode(LogicNode):
-    """CrowdMaster Map node"""
-    bl_label = "Map"
-    bl_width_default = 200.0
-
-    LowerInput = FloatProperty(name="Lower Input", default=0.0)
-    UpperInput = FloatProperty(name="Upper Input", default=1.0)
-    LowerOutput = FloatProperty(name="Lower Output", default=0.0)
-    UpperOutput = FloatProperty(name="Upper Output", default=2.0)
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "LowerInput")
-        layout.prop(self, "UpperInput")
-        layout.prop(self, "LowerOutput")
-        layout.prop(self, "UpperOutput")
-
-    def getSettings(self, node):
-        node.settings["LowerInput"] = self.LowerInput
-        node.settings["UpperInput"] = self.UpperInput
-        node.settings["LowerOutput"] = self.LowerOutput
-        node.settings["UpperOutput"] = self.UpperOutput
-
 
 class ClampNode(LogicNode):
     """CrowdMaster Clamp node"""
@@ -995,17 +961,12 @@ node_categories = [
     ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
-        NodeItem("MapNode"),
         NodeItem("PriorityNode")
     ]),
     MyNodeCategory("LOGIC", "Logic", items=[
         NodeItem("AndNode"),
         NodeItem("OrNode"),
         NodeItem("NotNode")
-    ]),
-    MyNodeCategory("STRENGTH", "Strength", items=[
-        NodeItem("StrongNode"),
-        NodeItem("WeakNode")
     ]),
     MyNodeCategory("STATE", "State", items=[
         NodeItem("ActionState"),
@@ -1042,11 +1003,8 @@ def register():
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
     bpy.utils.register_class(NotNode)
-    bpy.utils.register_class(StrongNode)
-    bpy.utils.register_class(WeakNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
-    bpy.utils.register_class(MapNode)
     bpy.utils.register_class(ClampNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
@@ -1099,11 +1057,8 @@ def unregister():
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
     bpy.utils.unregister_class(NotNode)
-    bpy.utils.unregister_class(StrongNode)
-    bpy.utils.unregister_class(WeakNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
-    bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(ClampNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
