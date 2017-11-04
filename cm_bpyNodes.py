@@ -495,9 +495,11 @@ class AndNode(LogicNode):
                                  ("MIN", "Min", "", 2)])
     SingleOutput = BoolProperty(name="Single Output", default=False)
     IncludeAll = BoolProperty(name="Include All", default=True)
+    Weight = FloatProperty("Weight", default=1.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Method", expand=True)
+        layout.prop(self, "Weight")
         layout.prop(self, "SingleOutput")
         layout.prop(self, "IncludeAll")
 
@@ -505,6 +507,7 @@ class AndNode(LogicNode):
         node.settings["Method"] = self.Method
         node.settings["SingleOutput"] = self.SingleOutput
         node.settings["IncludeAll"] = self.IncludeAll
+        node.settings["Weight"] = self.Weight
 
 
 class OrNode(LogicNode):
