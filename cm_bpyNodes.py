@@ -958,7 +958,8 @@ node_categories = [
     ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
-        NodeItem("PriorityNode")
+        NodeItem("PriorityNode"),
+        NodeItem("FilterNode")
     ]),
     MyNodeCategory("LOGIC", "Logic", items=[
         NodeItem("AndNode"),
@@ -970,7 +971,6 @@ node_categories = [
         NodeItem("StartState")
     ]),
     MyNodeCategory("OTHER", "Other", items=[
-        NodeItem("FilterNode"),
         NodeItem("MathNode"),
         NodeItem("SetTagNode"),
     ]),
