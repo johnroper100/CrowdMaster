@@ -328,8 +328,7 @@ class LogicAND(Neuron):
                     total = min(results.values()) if len(results) > 0 else 0
                 return {"": total*settings["Weight"]}
             else:
-                for i in results:
-                    results[i] *= settings["Weight"]
+                results.update((k, v*settings["Weight"]) for k, v in results.items())
                 return results
         else:
             return {}
@@ -353,7 +352,7 @@ class LogicOR(Neuron):
                     total = max(list(into.values()) + [total])
             if settings["Method"] == "MUL":
                 total = 1 - total
-            return total
+            return total*settings["Weight"]
         else:
             results = {}
             for into in inps:
@@ -365,7 +364,7 @@ class LogicOR(Neuron):
                             results[i] = min(1 - results[i], 1 - into[i])
                     else:
                         results[i] = (1 - into[i])
-            results.update((k, 1 - v) for k, v in results.items())
+            results.update((k, (1 - v)*settings["Weight"]) for k, v in results.items())
             return results
 
 
