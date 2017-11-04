@@ -527,16 +527,6 @@ class NotNode(LogicNode):
     bl_label = "Not"
 
 
-class StrongNode(LogicNode):
-    """CrowdMaster Strong node. Makes 1's and 0's stronger"""
-    bl_label = "Strong"
-
-
-class WeakNode(LogicNode):
-    """CrowdMaster Weak node. Relaxes 1's and 0's"""
-    bl_label = "Weak"
-
-
 class SetTagNode(LogicNode):
     """CrowdMaster Set Tag node"""
     bl_label = "Set Tag"
@@ -597,30 +587,6 @@ class FilterNode(LogicNode):
         node.settings["TagName"] = self.TagName
         node.settings["Value"] = self.Value
 
-
-class MapNode(LogicNode):
-    """CrowdMaster Map node"""
-    bl_label = "Map"
-    bl_width_default = 200.0
-
-    LowerInput = FloatProperty(name="Lower Input", default=0.0)
-    UpperInput = FloatProperty(name="Upper Input", default=1.0)
-    LowerOutput = FloatProperty(name="Lower Output", default=0.0)
-    UpperOutput = FloatProperty(name="Upper Output", default=2.0)
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, "LowerInput")
-        layout.prop(self, "UpperInput")
-        layout.prop(self, "LowerOutput")
-        layout.prop(self, "UpperOutput")
-
-    def getSettings(self, node):
-        node.settings["LowerInput"] = self.LowerInput
-        node.settings["UpperInput"] = self.UpperInput
-        node.settings["LowerOutput"] = self.LowerOutput
-        node.settings["UpperOutput"] = self.UpperOutput
-
-
 class ClampNode(LogicNode):
     """CrowdMaster Clamp node"""
     bl_label = "Clamp"
@@ -658,8 +624,7 @@ class OutputNode(LogicNode):
     MultiInputType = EnumProperty(name="Multi Input Type",
                                   items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
-                                         ("SIZEAVERAGE", "Size Average", "", 3),
-                                         ("SUM", "Sum", "", 4)
+                                         ("SUM", "Sum", "", 3)
                                          ])
 
     def draw_buttons(self, context, layout):
@@ -868,11 +833,6 @@ TEXT_WIDTH = 6
 TW = textwrap.TextWrapper()
 
 
-def get_lines(text_file):
-    for line in text_file.lines:
-        yield line.body
-
-
 class NoteNode(CrowdMasterNode):
     """For keeping the graph well organised"""
     bl_idname = 'LogicNoteNode'
@@ -881,19 +841,11 @@ class NoteNode(CrowdMasterNode):
     text = StringProperty(
         name='Note Text', description="Text to show, if set will overide file")
 
-    text_file = StringProperty(description="Textfile to show")
-
     def format_text(self):
         global TW
         out = []
         if self.text:
             lines = self.text.splitlines()
-        elif self.text_file:
-            text_file = bpy.data.texts.get(self.text_file)
-            if text_file:
-                lines = get_lines(text_file)
-            else:
-                return []
         else:
             return []
         width = self.width
@@ -909,7 +861,7 @@ class NoteNode(CrowdMasterNode):
         self.use_custom_color = True
 
     def draw_buttons(self, context, layout):
-        has_text = self.text or self.text_file
+        has_text = self.text
         if has_text:
             col = layout.column(align=True)
             text_lines = self.format_text()
@@ -933,7 +885,6 @@ class NoteNode(CrowdMasterNode):
 
     def clear(self):
         self.text = ""
-        self.text_file = ""
 
     def to_text(self):
         text_name = "Note Text"
@@ -994,7 +945,7 @@ class CrowdMasterMuteSimNodes(Operator):
 
         for node in nodes:
             node.mute = not node.mute
-            
+
         return {'FINISHED'}
 
 
@@ -1035,17 +986,12 @@ node_categories = [
     ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
-        NodeItem("MapNode"),
         NodeItem("PriorityNode")
     ]),
     MyNodeCategory("LOGIC", "Logic", items=[
         NodeItem("AndNode"),
         NodeItem("OrNode"),
         NodeItem("NotNode")
-    ]),
-    MyNodeCategory("STRENGTH", "Strength", items=[
-        NodeItem("StrongNode"),
-        NodeItem("WeakNode")
     ]),
     MyNodeCategory("STATE", "State", items=[
         NodeItem("ActionState"),
@@ -1068,6 +1014,7 @@ node_categories = [
 keyMap = None
 keyMapItems = []
 
+
 def register():
     bpy.utils.register_class(CrowdMasterTree)
     bpy.utils.register_class(DefaultSocket)
@@ -1082,11 +1029,8 @@ def register():
     bpy.utils.register_class(AndNode)
     bpy.utils.register_class(OrNode)
     bpy.utils.register_class(NotNode)
-    bpy.utils.register_class(StrongNode)
-    bpy.utils.register_class(WeakNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
-    bpy.utils.register_class(MapNode)
     bpy.utils.register_class(ClampNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
@@ -1103,7 +1047,7 @@ def register():
 
     nodeitems_utils.register_node_categories(
         "CrowdMaster_NODES", node_categories)
-    
+
     wm = bpy.context.window_manager
     kc = wm.keyconfigs.addon
     if kc:
@@ -1139,11 +1083,8 @@ def unregister():
     bpy.utils.unregister_class(AndNode)
     bpy.utils.unregister_class(OrNode)
     bpy.utils.unregister_class(NotNode)
-    bpy.utils.unregister_class(StrongNode)
-    bpy.utils.unregister_class(WeakNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
-    bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(ClampNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)

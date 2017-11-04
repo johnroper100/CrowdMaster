@@ -94,10 +94,7 @@ translations = {
         # simulation
         ("*", "Print"): "Impresión",
         ("*", "Graph"): "Gráfico",
-        ("*", "Map"): "Mapeado",
         ("*", "Logic"): "Lógica",
-        ("*", "Strong"): "Fuerte",
-        ("*", "Weak"): "Débil",
         # Node props
         # simulation
         ("*", "Agent Info"): "Información del Agente",

@@ -79,7 +79,7 @@ class SCENE_OT_agent_nodes_generate(Operator):
             return False, None
 
     def execute(self, context):
-        if bpy.context.active_object is not None:
+        if bpy.context.active_object is not None and bpy.context.active_object.hide is not True:
             bpy.ops.object.mode_set(mode='OBJECT')
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]

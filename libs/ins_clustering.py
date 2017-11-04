@@ -18,7 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import logging
-from random import choice, randrange
+from random import choice
 
 logger = logging.getLogger("CrowdMaster")
 

@@ -376,30 +376,6 @@ class LogicNOT(Neuron):
         return result
 
 
-class LogicSTRONG(Neuron):
-    """Make 1's and 0's stronger"""
-    # https://www.desmos.com/calculator/izfhogpchr
-
-    def core(self, inps, settings):
-        results = {}
-        for into in inps:
-            for i in into:
-                results[i] = into[i]**2 * (-2 * into[i] + 3)
-        return results
-
-
-class LogicWEAK(Neuron):
-    """Make 1's and 0's weaker"""
-    # https://www.desmos.com/calculator/izfhogpchr
-
-    def core(self, inps, settings):
-        results = {}
-        for into in inps:
-            for i in into:
-                results[i] = 2 * into[i] - (into[i]**2 * (-2 * into[i] + 3))
-        return results
-
-
 class LogicSETTAG(Neuron):
     """If any of the inputs are above the Threshold level add or remove the
     Tag from the agents tags"""
@@ -533,24 +509,6 @@ class LogicFILTER(Neuron):
         return result
 
 
-class LogicMAP(Neuron):
-    """Map the input from the input range to the output range
-    (extrapolates outside of input range)"""
-
-    def core(self, inps, settings):
-        result = {}
-        if settings["LowerInput"] != settings["UpperInput"]:
-            for into in inps:
-                for i in into:
-                    num = into[i]
-                    li = settings["LowerInput"]
-                    ui = settings["UpperInput"]
-                    lo = settings["LowerOutput"]
-                    uo = settings["UpperOutput"]
-                    result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
-        return result
-
-
 class LogicCLAMP(Neuron):
     """Clamps the inputs to a specific range"""
 
@@ -581,20 +539,6 @@ class LogicOUTPUT(Neuron):
                 for i in into:
                     if abs(into[i]) > abs(out):
                         out = into[i]
-        elif settings["MultiInputType"] == "SIZEAVERAGE":
-            """Takes a weighed average of the inputs where smaller values have
-            less of an impact on the final result"""
-            Sm = 0
-            SmSquared = 0
-            for into in inps:
-                for i in into:
-                    logger.debug("Val: {}".format(into[i]))
-                    Sm += into[i]
-                    SmSquared += into[i] * abs(into[i])  # To retain sign
-            if Sm == 0:
-                out = 0
-            else:
-                out = SmSquared / Sm
         elif settings["MultiInputType"] == "SUM":
             out = 0
             for into in inps:
@@ -692,11 +636,8 @@ logictypes = OrderedDict([
     ("AndNode", LogicAND),
     ("OrNode", LogicOR),
     ("NotNode", LogicNOT),
-    ("StrongNode", LogicSTRONG),
-    ("WeakNode", LogicWEAK),
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
-    ("MapNode", LogicMAP),
     ("ClampNode", LogicCLAMP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
