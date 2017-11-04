@@ -491,7 +491,7 @@ class AndNode(LogicNode):
     bl_label = "And"
 
     Method = EnumProperty(name="Method",
-                          items=[("MUL", "Mul", "", 1),
+                          items=[("MUL", "Prod", "", 1),
                                  ("MIN", "Min", "", 2)])
     SingleOutput = BoolProperty(name="Single Output", default=False)
     IncludeAll = BoolProperty(name="Include All", default=True)
@@ -512,7 +512,7 @@ class OrNode(LogicNode):
     bl_label = "Or"
 
     Method = EnumProperty(name="Method",
-                          items=[("MUL", "Mul", "", 1),
+                          items=[("MUL", "Prod", "", 1),
                                  ("MAX", "Max", "", 2)])
     SingleOutput = BoolProperty(name="Single Output", default=True)
     IncludeAll = BoolProperty(name="Include All", default=True)
