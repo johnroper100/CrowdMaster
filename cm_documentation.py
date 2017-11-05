@@ -51,9 +51,8 @@ documentation_mapping = (
      "simulation/toolbars/paths.html#switch-the-direction-of-the-selected-edges"),
     ("bpy.ops.view3d.draw_path_operator",
      "simulation/toolbars/paths.html#draw-directions"),
-    # nodes
-    ("bpy.ops.GraphNode",
-     "simulation/nodes/basic/graph.html"),
+    # TODO - nodes
+
     # PROPS
     # toolbar
     ("bpy.types.Scene.cm_sim_start_frame",
