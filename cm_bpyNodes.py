@@ -567,11 +567,11 @@ class FilterNode(LogicNode):
 
     Operation = EnumProperty(name="Operation",
                              items=[("EQUAL", "Equal", "", 1),
-                                    ("NOT EQUAL", "Not equal", "", 2),
-                                    ("LESS", "Less than", "", 3),
-                                    ("GREATER", "Greater than", "", 4),
-                                    ("LEAST", "Least only", "", 5),
-                                    ("MOST", "Most only", "", 6),
+                                    ("NOT EQUAL", "Not Equal", "", 2),
+                                    ("LESS", "Less Than", "", 3),
+                                    ("GREATER", "Greater Than", "", 4),
+                                    ("LEAST", "Least Only", "", 5),
+                                    ("MOST", "Most Only", "", 6),
                                     ("AVERAGE", "Average", "", 7),
                                     ("SUM", "Sum", "", 8)])
     Tag = BoolProperty(name="Tag", default=False)
