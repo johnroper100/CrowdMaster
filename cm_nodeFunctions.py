@@ -134,7 +134,7 @@ class LogicNEWINPUT(Neuron):
                 return {"": noise.agentRandom(offset=hash(self))}
             elif settings["NoiseOptions"] == "WAVE":
                 return {"": noise.wave(self.settings["WaveOffset"],
-                                           self.settings["WaveLength"])}
+                                       self.settings["WaveLength"])}
 
         elif settings["InputSource"] == "PATH":
             if settings["PathOptions"] == "RZ":
@@ -294,7 +294,8 @@ class LogicMATH(Neuron):
                 elif settings["operation"] == "set":
                     result[i] = settings["num1"]
                 elif settings["operation"] == "clamp":
-                    result[i] = max(min(settings["ClampMax"], into[i]), settings["ClampMin"])
+                    result[i] = max(
+                        min(settings["ClampMax"], into[i]), settings["ClampMin"])
         return result
 
 
@@ -326,9 +327,9 @@ class LogicAND(Neuron):
                         total *= v
                 else:  # Method == "MIN"
                     total = min(results.values()) if len(results) > 0 else 0
-                return {"": total*settings["Weight"]}
+                return {"": total}
             else:
-                results.update((k, v*settings["Weight"]) for k, v in results.items())
+                results.update((k, v) for k, v in results.items())
                 return results
         else:
             return {}
@@ -352,7 +353,7 @@ class LogicOR(Neuron):
                     total = max(list(into.values()) + [total])
             if settings["Method"] == "MUL":
                 total = 1 - total
-            return total*settings["Weight"]
+            return total
         else:
             results = {}
             for into in inps:
@@ -364,7 +365,7 @@ class LogicOR(Neuron):
                             results[i] = min(1 - results[i], 1 - into[i])
                     else:
                         results[i] = (1 - into[i])
-            results.update((k, (1 - v)*settings["Weight"]) for k, v in results.items())
+            results.update((k, 1 - v) for k, v in results.items())
             return results
 
 
