@@ -198,7 +198,7 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("WAVE", "Wave", "", 3)])
 
-    WaveLength = FloatProperty(name="Wavelength", default=24.0, min=0.0)
+    WaveLength = FloatProperty(name="Rate", default=24.0, min=0.0)
     WaveOffset = FloatProperty(name="Offset", default=0.0, min=0.0, max=1.0)
 
     PathName = StringProperty(name="Path Name")
