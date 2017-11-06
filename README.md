@@ -14,7 +14,7 @@ __If you are a python coder and want to help, send us an email [here](mailto:cro
 
 ### UI Commit Checklist
 
-After making UI changes, follow this checklist before you commit.
+After making UI changes, follow this checklist before you commit:
 
 1. Check/update doclinks
 2. Check/update translations
