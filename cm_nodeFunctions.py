@@ -558,6 +558,36 @@ class LogicOUTPUT(Neuron):
         outNm = settings["Output"]
         if outNm == "sk":
             self.brain.outvars["sk"][settings["SKName"]] = out
+        elif outNm == "tag":
+            empty = True
+            condition = False
+            total = 0
+            count = 0
+            for into in inps:
+                for i in into:
+                    empty = False
+                    if into[i] > settings["Threshold"]:
+                        condition = True
+                    total += into[i]
+                    count += 1
+            if not empty:
+                if settings["UseThreshold"]:
+                    if condition:
+                        if settings["Action"] == "ADD":
+                            self.brain.tags[settings["Tag"]] = 1
+                        else:
+                            if settings["Tag"] in self.brain.tags:
+                                del self.brain.tags[settings["Tag"]]
+                else:
+                    if settings["Action"] == "ADD":
+                        self.brain.tags[settings["Tag"]] = total
+                    else:
+                        if settings["Tag"] in self.brain.tags:
+                            del self.brain.tags[settings["Tag"]]
+            if settings["Tag"] in self.brain.tags:
+                return self.brain.tags[settings["Tag"]]
+            else:
+                return {}
         else:
             self.brain.outvars[settings["Output"]] = out
         return out

@@ -629,7 +629,8 @@ class OutputNode(LogicNode):
                                  ("px", "Position X", "", 4),
                                  ("py", "Position Y", "", 5),
                                  ("pz", "Position Z", "", 6),
-                                 ("sk", "Shape Key", "", 7)
+                                 ("sk", "Shape Key", "", 7),
+                                 ("tag", "Set Tag", "", 8)
                                  ],
                           default="py")
     SKName = StringProperty(name="Shape Key Name",
@@ -639,17 +640,36 @@ class OutputNode(LogicNode):
                                          ("MAX", "Max", "", 2),
                                          ("SUM", "Sum", "", 3)
                                          ])
+    
+    Tag = StringProperty(name="Tag", default="default")
+    UseThreshold = BoolProperty(name="Use Threshold", default=True)
+    Threshold = FloatProperty(name="Threshold", default=0.5)
+    Action = EnumProperty(name="Action",
+                          items=[("ADD", "Add", "", 1),
+                                 ("REMOVE", "Remove", "", 2)
+                                 ])
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Output")
         if self.Output == "sk":
             layout.prop(self, "SKName")
-        layout.prop(self, "MultiInputType")
+        elif self.Output == "tag":
+            layout.prop(self, "Tag")
+            layout.prop(self, "UseThreshold")
+            if self.UseThreshold:
+                layout.prop(self, "Threshold")
+            layout.prop(self, "Action")
+        if self.Output != "tag":
+            layout.prop(self, "MultiInputType")
 
     def getSettings(self, node):
         node.settings["SKName"] = self.SKName
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
+        node.settings["Tag"] = self.Tag
+        node.settings["UseThreshold"] = self.UseThreshold
+        node.settings["Threshold"] = self.Threshold
+        node.settings["Action"] = self.Action
 
 
 class PrintNode(LogicNode):
@@ -992,7 +1012,6 @@ node_categories = [
     ]),
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("MathNode"),
-        NodeItem("SetTagNode"),
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
