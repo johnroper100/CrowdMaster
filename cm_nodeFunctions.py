@@ -513,6 +513,24 @@ class LogicFILTER(Neuron):
         return result
 
 
+class LogicMAP(Neuron):
+    """Map the input from the input range to the output range
+    (extrapolates outside of input range)"""
+
+    def core(self, inps, settings):
+        result = {}
+        if settings["LowerInput"] != settings["UpperInput"]:
+            for into in inps:
+                for i in into:
+                    num = into[i]
+                    li = settings["LowerInput"]
+                    ui = settings["UpperInput"]
+                    lo = settings["LowerOutput"]
+                    uo = settings["UpperOutput"]
+                    result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
+        return result
+
+
 class LogicOUTPUT(Neuron):
     """Sets an agents output. (Has to be picked up in cm_agents.Agents)"""
 
@@ -631,6 +649,7 @@ logictypes = OrderedDict([
     ("NotNode", LogicNOT),
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
+    ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
     ("PrintNode", LogicPRINT)

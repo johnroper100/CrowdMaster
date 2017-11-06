@@ -594,6 +594,29 @@ class FilterNode(LogicNode):
         node.settings["Value"] = self.Value
 
 
+class MapNode(LogicNode):
+    """CrowdMaster Map node"""
+    bl_label = "Map"
+    bl_width_default = 200.0
+
+    LowerInput = FloatProperty(name="Lower Input", default=0.0)
+    UpperInput = FloatProperty(name="Upper Input", default=1.0)
+    LowerOutput = FloatProperty(name="Lower Output", default=0.0)
+    UpperOutput = FloatProperty(name="Upper Output", default=2.0)
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, "LowerInput")
+        layout.prop(self, "UpperInput")
+        layout.prop(self, "LowerOutput")
+        layout.prop(self, "UpperOutput")
+
+    def getSettings(self, node):
+        node.settings["LowerInput"] = self.LowerInput
+        node.settings["UpperInput"] = self.UpperInput
+        node.settings["LowerOutput"] = self.LowerOutput
+        node.settings["UpperOutput"] = self.UpperOutput
+
+
 class OutputNode(LogicNode):
     """CrowdMaster Output node"""
     bl_label = "Output"
@@ -998,6 +1021,7 @@ def register():
     bpy.utils.register_class(NotNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
+    bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(PrintNode)
@@ -1051,6 +1075,7 @@ def unregister():
     bpy.utils.unregister_class(NotNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
+    bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(PrintNode)
