@@ -640,7 +640,7 @@ class OutputNode(LogicNode):
                                          ("MAX", "Max", "", 2),
                                          ("SUM", "Sum", "", 3)
                                          ])
-    
+
     Tag = StringProperty(name="Tag", default="default")
     UseThreshold = BoolProperty(name="Use Threshold", default=True)
     Threshold = FloatProperty(name="Threshold", default=0.5)
