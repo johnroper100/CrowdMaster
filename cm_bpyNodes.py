@@ -1012,11 +1012,12 @@ node_categories = [
     ]),
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("MathNode"),
+        NodeItem("MapNode")
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
         NodeItem("LogicNoteNode"),
-        NodeItem("NodeReroute"),
+        NodeItem("NodeReroute")
     ])
 ]
 
