@@ -1076,7 +1076,7 @@ class NoteNode(CrowdMasterAGenTreeNode):
     bl_label = 'Note'
 
     text = StringProperty(
-        name='Note Text', description="Text to show, if set will overide file")
+        name='Note Text', description="Text to show in the node")
 
     def format_text(self):
         global TW
