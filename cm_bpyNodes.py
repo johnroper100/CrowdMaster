@@ -203,7 +203,7 @@ class NewInputNode(LogicNode):
                                        ("AGENTRANDOM", "Agent Random", "", 2),
                                        ("WAVE", "Wave", "", 3)])
 
-    WaveLength = FloatProperty(name="Wavelength", default=24.0, min=0.0)
+    WaveLength = FloatProperty(name="Rate", default=24.0, min=0.0)
     WaveOffset = FloatProperty(name="Offset", default=0.0, min=0.0, max=1.0)
 
     PathName = StringProperty(name="Path Name")
@@ -411,8 +411,8 @@ class GraphNode(LogicNode):
         name="Invert", description="Invert the output of the graph", default=False)
 
     CurveType = EnumProperty(name="Curve Type",
-                             items=[("RBF", "RBF", "", 1),
-                                    ("RANGE", "Range", "", 2)],
+                             items=[("RBF", "PI", "", 1),
+                                    ("RANGE", "Lambda", "", 2)],
                              description="Which curve function to use")
 
     LowerZero = FloatProperty(
@@ -464,20 +464,31 @@ class MathNode(LogicNode):
                               "Subtract the two numbers from each other"),
                              ("mul", "Multiply", "Multiply the two numbers"),
                              ("div", "Divide", "Divide the two numbers"),
-                             ("set", "Set To", "Set all inputs to this number")],
+                             ("set", "Set To", "Set all inputs to this number"),
+                             ("clamp", "Clamp", "Clamp the input values to a specified range")],
                              default="mul",
                              description="which mathematical operation to use.")
 
     num1 = FloatProperty(name="Number 1", default=1.0,
-                         description="Input is added/subtracted/multiplied/divided to this number")
+                         description="Input is added/subtracted/multiplied/divided/set to this number")
+
+    ClampMin = FloatProperty(name="Clamp Min", default=0.0)
+    ClampMax = FloatProperty(name="Clamp Max", default=1.0)
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "operation")
-        layout.prop(self, "num1")
+
+        if self.operation == "clamp":
+            layout.prop(self, "ClampMin")
+            layout.prop(self, "ClampMax")
+        else:
+            layout.prop(self, "num1")
 
     def getSettings(self, node):
         node.settings["operation"] = self.operation
         node.settings["num1"] = self.num1
+        node.settings["ClampMin"] = self.ClampMin
+        node.settings["ClampMax"] = self.ClampMax
 
 
 class AndNode(LogicNode):
@@ -485,7 +496,7 @@ class AndNode(LogicNode):
     bl_label = "And"
 
     Method = EnumProperty(name="Method",
-                          items=[("MUL", "Mul", "", 1),
+                          items=[("MUL", "Prod", "", 1),
                                  ("MIN", "Min", "", 2)])
     SingleOutput = BoolProperty(name="Single Output", default=False)
     IncludeAll = BoolProperty(name="Include All", default=True)
@@ -506,7 +517,7 @@ class OrNode(LogicNode):
     bl_label = "Or"
 
     Method = EnumProperty(name="Method",
-                          items=[("MUL", "Mul", "", 1),
+                          items=[("MUL", "Prod", "", 1),
                                  ("MAX", "Max", "", 2)])
     SingleOutput = BoolProperty(name="Single Output", default=True)
     IncludeAll = BoolProperty(name="Include All", default=True)
@@ -561,11 +572,11 @@ class FilterNode(LogicNode):
 
     Operation = EnumProperty(name="Operation",
                              items=[("EQUAL", "Equal", "", 1),
-                                    ("NOT EQUAL", "Not equal", "", 2),
-                                    ("LESS", "Less than", "", 3),
-                                    ("GREATER", "Greater than", "", 4),
-                                    ("LEAST", "Least only", "", 5),
-                                    ("MOST", "Most only", "", 6),
+                                    ("NOT EQUAL", "Not Equal", "", 2),
+                                    ("LESS", "Less Than", "", 3),
+                                    ("GREATER", "Greater Than", "", 4),
+                                    ("LEAST", "Least Only", "", 5),
+                                    ("MOST", "Most Only", "", 6),
                                     ("AVERAGE", "Average", "", 7),
                                     ("SUM", "Sum", "", 8)])
     Tag = BoolProperty(name="Tag", default=False)
@@ -587,21 +598,28 @@ class FilterNode(LogicNode):
         node.settings["TagName"] = self.TagName
         node.settings["Value"] = self.Value
 
-class ClampNode(LogicNode):
-    """CrowdMaster Clamp node"""
-    bl_label = "Clamp"
+
+class MapNode(LogicNode):
+    """CrowdMaster Map node"""
+    bl_label = "Map"
     bl_width_default = 200.0
 
-    Min = FloatProperty(name="Clamp Min", default=0.0)
-    Max = FloatProperty(name="Clamp Max", default=1.0)
+    LowerInput = FloatProperty(name="Lower Input", default=0.0)
+    UpperInput = FloatProperty(name="Upper Input", default=1.0)
+    LowerOutput = FloatProperty(name="Lower Output", default=0.0)
+    UpperOutput = FloatProperty(name="Upper Output", default=2.0)
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, "Min")
-        layout.prop(self, "Max")
+        layout.prop(self, "LowerInput")
+        layout.prop(self, "UpperInput")
+        layout.prop(self, "LowerOutput")
+        layout.prop(self, "UpperOutput")
 
     def getSettings(self, node):
-        node.settings["Min"] = self.Min
-        node.settings["Max"] = self.Max
+        node.settings["LowerInput"] = self.LowerInput
+        node.settings["UpperInput"] = self.UpperInput
+        node.settings["LowerOutput"] = self.LowerOutput
+        node.settings["UpperOutput"] = self.UpperOutput
 
 
 class OutputNode(LogicNode):
@@ -616,7 +634,8 @@ class OutputNode(LogicNode):
                                  ("px", "Position X", "", 4),
                                  ("py", "Position Y", "", 5),
                                  ("pz", "Position Z", "", 6),
-                                 ("sk", "Shape Key", "", 7)
+                                 ("sk", "Shape Key", "", 7),
+                                 ("tag", "Set Tag", "", 8)
                                  ],
                           default="py")
     SKName = StringProperty(name="Shape Key Name",
@@ -627,16 +646,35 @@ class OutputNode(LogicNode):
                                          ("SUM", "Sum", "", 3)
                                          ])
 
+    Tag = StringProperty(name="Tag", default="default")
+    UseThreshold = BoolProperty(name="Use Threshold", default=True)
+    Threshold = FloatProperty(name="Threshold", default=0.5)
+    Action = EnumProperty(name="Action",
+                          items=[("ADD", "Add", "", 1),
+                                 ("REMOVE", "Remove", "", 2)
+                                 ])
+
     def draw_buttons(self, context, layout):
         layout.prop(self, "Output")
         if self.Output == "sk":
             layout.prop(self, "SKName")
-        layout.prop(self, "MultiInputType")
+        elif self.Output == "tag":
+            layout.prop(self, "Tag")
+            layout.prop(self, "UseThreshold")
+            if self.UseThreshold:
+                layout.prop(self, "Threshold")
+            layout.prop(self, "Action")
+        if self.Output != "tag":
+            layout.prop(self, "MultiInputType")
 
     def getSettings(self, node):
         node.settings["SKName"] = self.SKName
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
+        node.settings["Tag"] = self.Tag
+        node.settings["UseThreshold"] = self.UseThreshold
+        node.settings["Threshold"] = self.Threshold
+        node.settings["Action"] = self.Action
 
 
 class PrintNode(LogicNode):
@@ -986,7 +1024,8 @@ node_categories = [
     ]),
     MyNodeCategory("BASIC", "Basic", items=[
         NodeItem("GraphNode"),
-        NodeItem("PriorityNode")
+        NodeItem("PriorityNode"),
+        NodeItem("FilterNode")
     ]),
     MyNodeCategory("LOGIC", "Logic", items=[
         NodeItem("AndNode"),
@@ -998,10 +1037,7 @@ node_categories = [
         NodeItem("StartState")
     ]),
     MyNodeCategory("OTHER", "Other", items=[
-        NodeItem("FilterNode"),
         NodeItem("MathNode"),
-        NodeItem("ClampNode"),
-        NodeItem("SetTagNode"),
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
@@ -1031,7 +1067,7 @@ def register():
     bpy.utils.register_class(NotNode)
     bpy.utils.register_class(SetTagNode)
     bpy.utils.register_class(FilterNode)
-    bpy.utils.register_class(ClampNode)
+    bpy.utils.register_class(MapNode)
     bpy.utils.register_class(OutputNode)
     bpy.utils.register_class(PriorityNode)
     bpy.utils.register_class(PrintNode)
@@ -1085,7 +1121,7 @@ def unregister():
     bpy.utils.unregister_class(NotNode)
     bpy.utils.unregister_class(SetTagNode)
     bpy.utils.unregister_class(FilterNode)
-    bpy.utils.unregister_class(ClampNode)
+    bpy.utils.unregister_class(MapNode)
     bpy.utils.unregister_class(OutputNode)
     bpy.utils.unregister_class(PriorityNode)
     bpy.utils.unregister_class(PrintNode)
