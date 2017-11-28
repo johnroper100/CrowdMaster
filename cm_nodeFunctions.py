@@ -134,7 +134,7 @@ class LogicNEWINPUT(Neuron):
                 return {"": noise.agentRandom(offset=hash(self))}
             elif settings["NoiseOptions"] == "WAVE":
                 return {"": noise.wave(self.settings["WaveOffset"],
-                                           self.settings["WaveLength"])}
+                                       self.settings["WaveLength"])}
 
         elif settings["InputSource"] == "PATH":
             if settings["PathOptions"] == "RZ":
@@ -277,7 +277,7 @@ class LogicGRAPH(Neuron):
 
 
 class LogicMATH(Neuron):
-    """returns the values added/subtracted/multiplied/divided together"""
+    """returns the values added/subtracted/multiplied/divided/set/clamped together"""
 
     def core(self, inps, settings):
         result = {}
@@ -293,6 +293,9 @@ class LogicMATH(Neuron):
                     result[i] = into[i] / settings["num1"]
                 elif settings["operation"] == "set":
                     result[i] = settings["num1"]
+                elif settings["operation"] == "clamp":
+                    result[i] = max(
+                        min(settings["ClampMax"], into[i]), settings["ClampMin"])
         return result
 
 
@@ -326,6 +329,7 @@ class LogicAND(Neuron):
                     total = min(results.values()) if len(results) > 0 else 0
                 return {"": total}
             else:
+                results.update((k, v) for k, v in results.items())
                 return results
         else:
             return {}
@@ -509,14 +513,21 @@ class LogicFILTER(Neuron):
         return result
 
 
-class LogicCLAMP(Neuron):
-    """Clamps the inputs to a specific range"""
+class LogicMAP(Neuron):
+    """Map the input from the input range to the output range
+    (extrapolates outside of input range)"""
 
     def core(self, inps, settings):
         result = {}
-        for into in inps:
-            for i in into:
-                result[i] = max(min(settings["Max"], into[i]), settings["Min"])
+        if settings["LowerInput"] != settings["UpperInput"]:
+            for into in inps:
+                for i in into:
+                    num = into[i]
+                    li = settings["LowerInput"]
+                    ui = settings["UpperInput"]
+                    lo = settings["LowerOutput"]
+                    uo = settings["UpperOutput"]
+                    result[i] = ((uo - lo) / (ui - li)) * (num - li) + lo
         return result
 
 
@@ -547,6 +558,36 @@ class LogicOUTPUT(Neuron):
         outNm = settings["Output"]
         if outNm == "sk":
             self.brain.outvars["sk"][settings["SKName"]] = out
+        elif outNm == "tag":
+            empty = True
+            condition = False
+            total = 0
+            count = 0
+            for into in inps:
+                for i in into:
+                    empty = False
+                    if into[i] > settings["Threshold"]:
+                        condition = True
+                    total += into[i]
+                    count += 1
+            if not empty:
+                if settings["UseThreshold"]:
+                    if condition:
+                        if settings["Action"] == "ADD":
+                            self.brain.tags[settings["Tag"]] = 1
+                        else:
+                            if settings["Tag"] in self.brain.tags:
+                                del self.brain.tags[settings["Tag"]]
+                else:
+                    if settings["Action"] == "ADD":
+                        self.brain.tags[settings["Tag"]] = total
+                    else:
+                        if settings["Tag"] in self.brain.tags:
+                            del self.brain.tags[settings["Tag"]]
+            if settings["Tag"] in self.brain.tags:
+                return self.brain.tags[settings["Tag"]]
+            else:
+                return {}
         else:
             self.brain.outvars[settings["Output"]] = out
         return out
@@ -638,7 +679,7 @@ logictypes = OrderedDict([
     ("NotNode", LogicNOT),
     ("SetTagNode", LogicSETTAG),
     ("FilterNode", LogicFILTER),
-    ("ClampNode", LogicCLAMP),
+    ("MapNode", LogicMAP),
     ("OutputNode", LogicOUTPUT),
     ("PriorityNode", LogicPRIORITY),
     ("PrintNode", LogicPRINT)

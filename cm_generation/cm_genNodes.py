@@ -769,7 +769,7 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
 class VCOLPositionNode(CrowdMasterAGenTreeNode):
     """The vertex colors positioning node"""
     bl_idname = 'VCOLPositionNodeType'
-    bl_label = 'Vertex Colors'
+    bl_label = 'Vertex Colors Positioning'
     bl_icon = 'SOUND'
     bl_width_default = 260.0
 
@@ -1189,12 +1189,12 @@ agen_node_categories = [
         NodeItem("RandomNodeType")
     ]),
     CrowdMasterAGenCategories("position", "Positioning", items=[
-        NodeItem("FormationPositionNodeType", label="Formation"),
-        NodeItem("MeshPositionNodeType", label="Mesh"),
-        NodeItem("RandomPositionNodeType", label="Random"),
+        NodeItem("FormationPositionNodeType"),
+        NodeItem("MeshPositionNodeType"),
+        NodeItem("RandomPositionNodeType"),
         NodeItem("VCOLPositionNodeType"),
-        NodeItem("PathPositionNodeType", label="Path"),
-        NodeItem("TargetPositionNodeType", label="Target"),
+        NodeItem("PathPositionNodeType"),
+        NodeItem("TargetPositionNodeType"),
     ]),
     CrowdMasterAGenCategories("pmodifier", "Positioning Modifier", items=[
         NodeItem("OffsetNodeType"),
