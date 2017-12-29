@@ -26,13 +26,13 @@ from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 bpy.types.Scene.cm_sim_start_frame = IntProperty(
     name="Simulation Start Frame",
-    default=1,
+    default=-1,
     min=-1,
     max=1048574
 )
 bpy.types.Scene.cm_sim_end_frame = IntProperty(
     name="Simulation End Frame",
-    default=250,
+    default=-1,
     min=-1,
     max=1048574
 )
