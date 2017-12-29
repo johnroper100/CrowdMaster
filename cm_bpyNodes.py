@@ -643,6 +643,7 @@ class OutputNode(LogicNode):
                                          ])
 
     Tag = StringProperty(name="Tag", default="default")
+    RNApath = StringProperty(name="RNA path", default="Enter data path...")
     UseThreshold = BoolProperty(name="Use Threshold", default=True)
     Threshold = FloatProperty(name="Threshold", default=0.5)
     Action = EnumProperty(name="Action",
@@ -654,6 +655,8 @@ class OutputNode(LogicNode):
         layout.prop(self, "Output")
         if self.Output == "sk":
             layout.prop(self, "SKName")
+        elif self.Output == "rna":
+            layout.prop(self, "RNApath")
         elif self.Output == "tag":
             layout.prop(self, "Tag")
             layout.prop(self, "UseThreshold")
