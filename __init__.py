@@ -88,7 +88,7 @@ class SCENE_OT_cm_groups_reset(Operator):
         context.scene.frame_set(context.scene.cm_sim_start_frame)
         bpy.ops.scene.cm_stop()
 
-        if bpy.context.active_object is not None:
+        if context.active_object is not None:
             bpy.ops.object.mode_set(mode='OBJECT')
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences

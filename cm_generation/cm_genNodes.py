@@ -748,7 +748,7 @@ class MeshPositionNode(CrowdMasterAGenTreeNode):
         self.outputs.new('TemplateSocketType', "Template")
 
     def draw_buttons(self, context, layout):
-        layout.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        layout.prop_search(self, "guideMesh", context.scene, "objects")
         layout.prop(self, "noToPlace")
         layout.prop(self, "overwritePosition")
 
@@ -825,7 +825,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
         layout.prop(self, "paintMode", expand=True)
 
         row = layout.row(align=True)
-        row.prop_search(self, "guideMesh", bpy.context.scene, "objects")
+        row.prop_search(self, "guideMesh", context.scene, "objects")
         if self.invert:
             row.prop(self, "invert", icon="STICKY_UVS_VERT", icon_only=True)
         else:
@@ -893,7 +893,7 @@ class PathPositionNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons(self, context, layout):
         layout.prop_search(
-            self, "pathName", bpy.context.scene.cm_paths, "coll")
+            self, "pathName", context.scene.cm_paths, "coll")
         layout.prop(self, "noToPlace")
 
         layout.prop(self, "relax")
@@ -1117,7 +1117,6 @@ class NoteNode(CrowdMasterAGenTreeNode):
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "text", text="Text")
-        layout.operator("node.gen_note_from_clipboard", icon="TEXT")
         layout.operator("node.gen_note_clear", icon="X")
 
     def clear(self):
@@ -1130,22 +1129,6 @@ class NoteNode(CrowdMasterAGenTreeNode):
             text = bpy.data.texts.new(text_name)
         text.clear()
         text.write(self.text)
-
-
-class GenNoteTextFromClipboard(Operator):
-    """Grab whatever text is in the clipboard"""
-    bl_idname = "node.gen_note_from_clipboard"
-    bl_label = "Grab Text From Clipboard"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        text = bpy.context.window_manager.clipboard
-        if not text:
-            self.report({"INFO"}, "No text selected")
-            return {'CANCELLED'}
-        node = context.node
-        node.text = text
-        return {'FINISHED'}
 
 
 class GenNoteClear(Operator):
@@ -1249,7 +1232,6 @@ def register():
     bpy.utils.register_class(SettagNode)
 
     bpy.utils.register_class(NoteNode)
-    bpy.utils.register_class(GenNoteTextFromClipboard)
     bpy.utils.register_class(GenNoteClear)
 
     nodeitems_utils.register_node_categories(
@@ -1295,7 +1277,6 @@ def unregister():
     bpy.utils.unregister_class(SettagNode)
 
     bpy.utils.unregister_class(NoteNode)
-    bpy.utils.unregister_class(GenNoteTextFromClipboard)
     bpy.utils.unregister_class(GenNoteClear)
 
 

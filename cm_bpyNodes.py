@@ -913,7 +913,6 @@ class NoteNode(CrowdMasterNode):
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "text", text="Text")
-        layout.operator("node.sim_note_from_clipboard", icon="TEXT")
         layout.operator("node.sim_note_clear", icon="X")
 
     def clear(self):
@@ -926,22 +925,6 @@ class NoteNode(CrowdMasterNode):
             text = bpy.data.texts.new(text_name)
         text.clear()
         text.write(self.text)
-
-
-class SimNoteTextFromClipboard(Operator):
-    """Grab whatever text is in the clipboard"""
-    bl_idname = "node.sim_note_from_clipboard"
-    bl_label = "Grab Text From Clipboard"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        text = bpy.context.window_manager.clipboard
-        if not text:
-            self.report({"INFO"}, "No text selected")
-            return {'CANCELLED'}
-        node = context.node
-        node.text = text
-        return {'FINISHED'}
 
 
 class SimNoteClear(Operator):
@@ -1050,7 +1033,6 @@ def register():
     bpy.utils.register_class(ActionState)
 
     bpy.utils.register_class(NoteNode)
-    bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
     bpy.utils.register_class(CrowdMasterMuteSimNodes)
@@ -1104,7 +1086,6 @@ def unregister():
     bpy.utils.unregister_class(ActionState)
 
     bpy.utils.unregister_class(NoteNode)
-    bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
 
     bpy.utils.unregister_class(CrowdMasterMuteSimNodes)
