@@ -74,7 +74,7 @@ py_module_initializer!(channel_world, initchannel_world, PyInit_channel_world, |
 
 fn event_set_time(time: i32) {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
 
     event_state.time = time;
 }
@@ -86,7 +86,7 @@ fn event_set_time_py(py: Python, time: i32) -> PyResult<PyObject> {
 
 fn event_time_create(event_name: String, lower: i32, upper: i32) {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
 
     let e: Event = Event::Time((lower, upper));
 
@@ -105,7 +105,7 @@ fn event_time_create_py(py: Python, event_name: String, lower: i32, upper: i32) 
 
 fn event_volume_create(event_name: String, object_name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
 
     let e: Event = Event::Volume(object_name.clone());
 
@@ -115,7 +115,7 @@ fn event_volume_create(event_name: String, object_name: String, loc: Vector3<f64
             event_state.event_groups.insert(event_name.clone(), event_group);
         }
 
-        let mut event_group = event_state.event_groups.get_mut(&event_name).unwrap();
+        let event_group = event_state.event_groups.get_mut(&event_name).unwrap();
         event_group.volume_map.insert(object_name.clone(), (Box::new(Cuboid3::new(scale)), Isometry3::new(loc, rot.scaled_axis())));
     }
 
@@ -144,7 +144,7 @@ fn event_volume_create_py(py: Python, event_name: String, object_name: String, p
 
 fn event_volume_update(event_name: String, object_name: String, loc: Vector3<f64>, rot: Rotation3<f64>, scale: Vector3<f64>) {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
 
     if let Some(event_group) = event_state.event_groups.get_mut(&event_name) {
         if let Some(x) = event_group.volume_map.get_mut(&object_name) {
@@ -175,7 +175,7 @@ fn event_volume_update_py(py: Python, event_name: String, object_name: String, p
 
 fn event_construct_bvt() {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
 
     for (_, event_group) in event_state.event_groups.iter_mut() {
         let mut ids_and_aabb: Vec<(String, bounding_volume::AABB<Point3<f64>>)> = vec!();
@@ -195,7 +195,7 @@ fn event_construct_bvt_py(py: Python) -> PyResult<PyObject> {
 
 fn event_query(event_name: String, point: Point3<f64>, output: EventOption) -> f64 {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
 
     if !event_state.event_groups.contains_key(&event_name) {
         return 0.0
@@ -271,7 +271,7 @@ fn event_query_py(py: Python, event_name: String, point_py: PyObject, output: St
 
 fn event_clear() {
     let mut opt = EVENTSTATE.lock().unwrap();
-    let mut event_state = opt.as_mut().unwrap();
+    let event_state = opt.as_mut().unwrap();
     event_state.event_groups.clear();
 }
 
