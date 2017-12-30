@@ -1,10 +1,10 @@
 #[macro_use] extern crate cpython;
 #[macro_use] extern crate lazy_static;
-#[macro_use] extern crate assert_approx_eq;
+#[cfg(test)]#[macro_use] extern crate assert_approx_eq;
 extern crate spade;
 extern crate cgmath;
 
-use cpython::{PyResult, Python, PyList, PyObject, PyString, PyFloat, ObjectProtocol, PythonObject};
+use cpython::{PyResult, Python, PyList, PyObject, PyString, PyFloat, ObjectProtocol, PythonObject, PyTuple};
 use spade::rtree::RTree;
 use spade::primitives::SimpleEdge;
 
@@ -80,8 +80,10 @@ lazy_static! {
 
 py_module_initializer!(channel_sound, initchannel_sound, PyInit_channel_sound, |py, m| {
     try!(m.add(py, "__doc__", "This is the CrowdMaster channel_path module (implemented in Rust)."));
-    try!(m.add(py, "add_path", py_fn!(py, add_path_py(py_obj_data: PyObject, py_path_name: PyString))));
+    try!(m.add(py, "add_path", py_fn!(py, add_path_py(py_obj_data: PyObject, py_path_name: PyString, py_radius: PyFloat))));
+    try!(m.add(py, "point_on_path", py_fn!(py, point_on_path_py(py_path_name: PyString, py_point: PyObject))));
     try!(m.add(py, "clear_state", py_fn!(py, clear_state_py())));
+    try!(m.add(py, "new_frame", py_fn!(py, new_frame_py())));
     try!(m.add(py, "rx", py_fn!(py, rx_py(py_path_name: PyString, py_agent_name: PyString, py_agent_location: PyObject, py_agent_rotation: PyObject, py_agent_speed: PyFloat))));
     try!(m.add(py, "rz", py_fn!(py, rz_py(py_path_name: PyString, py_agent_name: PyString, py_agent_location: PyObject, py_agent_rotation: PyObject, py_agent_speed: PyFloat))));
     Ok(())
@@ -98,8 +100,20 @@ fn clear_state() {
     path_state.clear();
 }
 
-fn add_path_py(py: Python, py_obj_data: PyObject, py_path_name: PyString) -> PyResult<PyObject> {
+fn new_frame_py(py: Python) -> PyResult<PyObject> {
+    new_frame();
+    Ok(py.None())
+}
+
+fn new_frame() {
+    let mut opt = PATHSTATE.lock().unwrap();
+    let path_state = opt.as_mut().unwrap();
+    path_state.new_frame();
+}
+
+fn add_path_py(py: Python, py_obj_data: PyObject, py_path_name: PyString, py_radius: PyFloat) -> PyResult<PyObject> {
     let path_name = py_path_name.to_string_lossy(py).to_string();
+    let path_radius = py_radius.value(py);
     let mut size: usize = 0;
     {
         let mut opt = PATHSTATE.lock().unwrap();
@@ -120,7 +134,7 @@ fn add_path_py(py: Python, py_obj_data: PyObject, py_path_name: PyString) -> PyR
         let y = py_co.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
         let z = py_co.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
         let index: usize = py_vert.getattr(py, "index").unwrap().extract(py).unwrap();
-        let vertex = Vertex::new(x, y, z, index + size);
+        let vertex = Vertex::new_radius(x, y, z, index + size, path_radius);
         vertices.push(vertex);
         next = py_vert_iter.next();
     }
@@ -156,6 +170,27 @@ fn add_path(vertices: Vec<Vertex>, edges: Vec<SimpleEdge<Vertex>>, path_name: St
     }
     for edge in edges {
         path.rtree.insert(edge);
+    }
+}
+
+fn point_on_path_py(py: Python, py_path_name: PyString, py_point: PyObject) -> PyResult<PyObject> {
+    let path_name = py_path_name.to_string_lossy(py).to_string();
+    let x = py_point.getattr(py, "x").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let y = py_point.getattr(py, "y").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    let z = py_point.getattr(py, "z").unwrap().cast_into::<PyFloat>(py).unwrap().value(py);
+    match point_on_path(path_name, Point3::new(x, y, z)) {
+        Some((point, vector)) => {
+            let point_result = py_point.call_method(py, "copy", cpython::NoArgs, None).unwrap();
+            let _ = point_result.setattr(py, "x", point.x);
+            let _ = point_result.setattr(py, "y", point.y);
+            let _ = point_result.setattr(py, "z", point.z);
+            let vector_result = py_point.call_method(py, "copy", cpython::NoArgs, None).unwrap();
+            let _ = vector_result.setattr(py, "x", vector.x);
+            let _ = vector_result.setattr(py, "y", vector.y);
+            let _ = vector_result.setattr(py, "z", vector.z);
+            Ok(PyTuple::new(py, &[point_result, vector_result]).into_object())
+        },
+        None => Ok(py.None()),
     }
 }
 
