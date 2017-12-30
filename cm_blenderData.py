@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -24,29 +24,17 @@ from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
 from bpy.types import Operator, Panel, PropertyGroup, UIList
 
 
-def updateStartFrame(self, context):
-    start = context.scene.cm_sim_start_frame
-    end = context.scene.cm_sim_end_frame
-    if start >= end:
-        start = end
-
-
-def updateEndFrame(self, context):
-    start = context.scene.cm_sim_start_frame
-    end = context.scene.cm_sim_end_frame
-    if end <= start:
-        end = start
-
-
 bpy.types.Scene.cm_sim_start_frame = IntProperty(
     name="Simulation Start Frame",
-    default=1,
-    update=updateStartFrame,
+    default=-1,
+    min=-1,
+    max=1048574
 )
 bpy.types.Scene.cm_sim_end_frame = IntProperty(
     name="Simulation End Frame",
-    default=250,
-    update=updateEndFrame,
+    default=-1,
+    min=-1,
+    max=1048574
 )
 
 

@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -130,13 +130,13 @@ class SCENE_PT_event(Panel):
     @classmethod
     def poll(self, context):
         try:
-            return bpy.context.space_data.tree_type == 'CrowdMasterTreeType', bpy.context.space_data.tree_type == 'CrowdMasterGenTreeType'
+            return context.space_data.tree_type == 'CrowdMasterTreeType', context.space_data.tree_type == 'CrowdMasterGenTreeType'
         except (AttributeError, KeyError, TypeError):
             return False
 
     def draw(self, context):
         layout = self.layout
-        sce = bpy.context.scene
+        sce = context.scene
 
         row = layout.row()
         row.template_list("SCENE_UL_event", "", sce.cm_events,

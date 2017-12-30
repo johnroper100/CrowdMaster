@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -872,7 +872,7 @@ class NoteNode(CrowdMasterNode):
     bl_label = 'Note'
 
     text = StringProperty(
-        name='Note Text', description="Text to show, if set will overide file")
+        name='Note Text', description="Text to show in the node")
 
     def format_text(self):
         global TW
@@ -913,7 +913,6 @@ class NoteNode(CrowdMasterNode):
 
     def draw_buttons_ext(self, context, layout):
         layout.prop(self, "text", text="Text")
-        layout.operator("node.sim_note_from_clipboard", icon="TEXT")
         layout.operator("node.sim_note_clear", icon="X")
 
     def clear(self):
@@ -926,22 +925,6 @@ class NoteNode(CrowdMasterNode):
             text = bpy.data.texts.new(text_name)
         text.clear()
         text.write(self.text)
-
-
-class SimNoteTextFromClipboard(Operator):
-    """Grab whatever text is in the clipboard"""
-    bl_idname = "node.sim_note_from_clipboard"
-    bl_label = "Grab Text From Clipboard"
-    bl_options = {'REGISTER', 'UNDO'}
-
-    def execute(self, context):
-        text = bpy.context.window_manager.clipboard
-        if not text:
-            self.report({"INFO"}, "No text selected")
-            return {'CANCELLED'}
-        node = context.node
-        node.text = text
-        return {'FINISHED'}
 
 
 class SimNoteClear(Operator):
@@ -1012,11 +995,12 @@ node_categories = [
     ]),
     MyNodeCategory("OTHER", "Other", items=[
         NodeItem("MathNode"),
+        NodeItem("MapNode")
     ]),
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
         NodeItem("LogicNoteNode"),
-        NodeItem("NodeReroute"),
+        NodeItem("NodeReroute")
     ])
 ]
 
@@ -1049,7 +1033,6 @@ def register():
     bpy.utils.register_class(ActionState)
 
     bpy.utils.register_class(NoteNode)
-    bpy.utils.register_class(SimNoteTextFromClipboard)
     bpy.utils.register_class(SimNoteClear)
 
     bpy.utils.register_class(CrowdMasterMuteSimNodes)
@@ -1103,7 +1086,6 @@ def unregister():
     bpy.utils.unregister_class(ActionState)
 
     bpy.utils.unregister_class(NoteNode)
-    bpy.utils.unregister_class(SimNoteTextFromClipboard)
     bpy.utils.unregister_class(SimNoteClear)
 
     bpy.utils.unregister_class(CrowdMasterMuteSimNodes)

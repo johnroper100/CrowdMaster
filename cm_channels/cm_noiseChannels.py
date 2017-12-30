@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -17,8 +17,8 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import random
 import math
+import random
 
 import bpy
 
@@ -54,6 +54,9 @@ class Noise(Mc):
         """Returns a sine wave based on the current frame
         https://www.desmos.com/calculator/gwpmwylgg0"""
         scene = bpy.context.scene
-        t = scene.frame_current - scene.cm_sim_start_frame
+        if scene.cm_sim_start_frame != -1:
+            t = scene.frame_current - scene.cm_sim_start_frame
+        else:
+            t = scene.frame_current - scene.frame_start
         x = (t + offset * wavelength)
         return math.sin((2 * math.pi * x) / wavelength)

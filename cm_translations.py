@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -160,7 +160,6 @@ translations = {
         ("*", "Tag Name"): "Nombre de Etiqueta",
         ("*", "Use Threshold"): "Usar Límite",
         ("*", "Note Text"): "Texto de nota",
-        ("Operator", "Grab Text From Clipboard"): "Agarrar Texto de ClipBoard",
         ("*", "Rotation Axis"): "Eje de Rotación",
         ("*", "Formation Options"): "Opciones de Formación",
         ("*", "Ground Ahead Offset"): "Encabezado de Desplazamiento",

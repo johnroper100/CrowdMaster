@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -85,10 +85,13 @@ class SCENE_OT_cm_groups_reset(Operator):
     groupName = StringProperty()
 
     def execute(self, context):
-        context.scene.frame_set(context.scene.cm_sim_start_frame)
+        if context.scene.cm_sim_start_frame != -1:
+            context.scene.frame_set(context.scene.cm_sim_start_frame)
+        else:
+            context.scene.frame_set(context.scene.frame_start)
         bpy.ops.scene.cm_stop()
 
-        if bpy.context.active_object is not None:
+        if context.active_object is not None:
             bpy.ops.object.mode_set(mode='OBJECT')
         scene = context.scene
         preferences = context.user_preferences.addons[__package__].preferences
@@ -268,7 +271,10 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_outline_selected = False
                     area.spaces[0].show_relationship_lines = False
 
-        scene.frame_current = scene.cm_sim_start_frame
+        if context.scene.cm_sim_start_frame != -1:
+            scene.frame_current = scene.cm_sim_start_frame
+        else:
+            scene.frame_current = scene.frame_start
 
         global sim
         if "sim" in globals():

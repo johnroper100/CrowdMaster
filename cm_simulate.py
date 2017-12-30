@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -37,7 +37,10 @@ class Simulation:
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         self.agents = {}
-        self.framelast = bpy.context.scene.cm_sim_start_frame
+        if bpy.context.scene.cm_sim_start_frame != -1:
+            self.framelast = bpy.context.scene.cm_sim_start_frame
+        else:
+            self.framelast = bpy.context.scene.frame_start
         self.compbrains = {}
         Noise = chan.Noise(self)
         Sound = chan.Sound(self)
@@ -91,7 +94,8 @@ class Simulation:
         nGps = bpy.data.node_groups
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         if brain in nGps and nGps[brain].bl_idname == "CrowdMasterTreeType":
-            ag = Agent(agent, nGps[brain], self, freezeAnimation=freezeAnimation)
+            ag = Agent(agent, nGps[brain], self,
+                       freezeAnimation=freezeAnimation)
             self.agents[agent.name] = ag
         else:
             logger.debug("No such brain type: {}".format(brain))
@@ -144,7 +148,11 @@ class Simulation:
 
     def frameChangeHandler(self, scene):
         """Given to Blender to call whenever the scene moves to a new frame"""
-        if bpy.context.scene.cm_sim_end_frame <= bpy.context.scene.frame_current:
+        if bpy.context.scene.cm_sim_end_frame != -1:
+            endFrame = bpy.context.scene.cm_sim_end_frame
+        else:
+            endFrame = bpy.context.scene.frame_end
+        if endFrame <= bpy.context.scene.frame_current:
             self.stopFrameHandler()
             bpy.ops.screen.animation_cancel(restore_frame=False)
         elif self.framelast + 1 == bpy.context.scene.frame_current:

@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -53,7 +53,7 @@ channelTimes = {}
 def timeChannel(classOverwrite=None):
     def createDecorator(func):
         def wrapped(self, *args, **kwargs):
-            prefs = bpy.context.user_preferences.addons["CrowdMaster"].preferences
+            prefs = bpy.context.user_preferences.addons[__package__.split(".", 1)[0]].preferences
             if prefs.show_debug_options and prefs.show_debug_timings:
                 t = time.time()
                 result = func(self, *args, **kwargs)

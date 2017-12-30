@@ -17,5 +17,5 @@ __If you are a python coder and want to help, send us an email [here](mailto:cro
 After making UI changes, follow this checklist before you commit:
 
 1. Check/update doclinks
-2. Check/update translations
+2. Check/update translations (For the part to be translated, put `"Spanish Here"`)
 3. Check/update documentation

@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
@@ -79,11 +79,11 @@ class SCENE_OT_agent_nodes_generate(Operator):
             return False, None
 
     def execute(self, context):
-        if bpy.context.active_object is not None and bpy.context.active_object.hide is not True:
+        if context.active_object is not None and context.active_object.hide is not True:
             bpy.ops.object.mode_set(mode='OBJECT')
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
-        preferences = context.user_preferences.addons["CrowdMaster"].preferences
+        preferences = context.user_preferences.addons[__package__.split(".", 1)[0]].preferences
 
         cache = {}
         genSpaces = {}
