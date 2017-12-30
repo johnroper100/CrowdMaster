@@ -12,6 +12,7 @@ version = "*"
 features = ["extension-module"]
 
 [dependencies]
-nalgebra = "*"
 spade = "*"
+cgmath = "*"
 lazy_static = "*"
+assert_approx_eq = "*"

@@ -35,7 +35,8 @@ from ..cm_channels import Path
 from ..libs.ins_octree import createOctreeFromBPYObjs
 from ..libs.ins_vector import Vector
 
-from cm_gen import template_random_positioning
+from . import cm_gen
+template_random_positioning = cm_gen.template_random_positioning
 
 logger = logging.getLogger("CrowdMaster")
 
