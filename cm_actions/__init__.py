@@ -1,4 +1,4 @@
-# Copyright 2017 CrowdMaster Developer Team
+# Copyright 2018 CrowdMaster Developer Team
 #
 # ##### BEGIN GPL LICENSE BLOCK ######
 # This file is part of CrowdMaster.
