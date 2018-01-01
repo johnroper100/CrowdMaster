@@ -208,8 +208,10 @@ class CrowdMasterGroupTree(NodeTree):
                             n += 1
                         newSocket = node.inputs.new(
                             socketType, "Output {}".format(n))
+                        newSocket.link_limit = 4095
                         self.links.new(fromSocket, newSocket)
-                        node.inputs.new("EmptySocketType", "")
+                        lastSocket = node.inputs.new("EmptySocketType", "")
+                        lastSocket.link_limit = 4095
                         changedConnected = True
 
                 if changedConnected:
@@ -241,9 +243,11 @@ class CrowdMasterGroupTree(NodeTree):
                     while count < len(self.groupOut):
                         socketName = self.groupOut[count].name
                         socketType = self.groupOut[count].socketType
-                        node.inputs.new(socketType, socketName)
+                        newSocket = node.inputs.new(socketType, socketName)
+                        newSocket.link_limit = 4095
                         count += 1
-                    node.inputs.new("EmptySocketType", "")
+                    lastSocket = node.inputs.new("EmptySocketType", "")
+                    lastSocket.link_limit = 4095
 
             if groupIONode:
                 for inputSocketName in inConnections:
@@ -660,7 +664,8 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
             while count < len(group.groupIn):
                 socketName = group.groupIn[count].name
                 socketType = group.groupIn[count].socketType
-                self.inputs.new(socketType, socketName)
+                newSocket = self.inputs.new(socketType, socketName)
+                newSocket.link_limit = 4095
                 count += 1
 
             # Outputs
@@ -723,7 +728,8 @@ class GroupOutputs(cm_bpyNodes.CrowdMasterNode):
 
     def init(self, context):
         # Output and self.inputs not a typo! Think about what this node is!
-        self.inputs.new('EmptySocketType', "Output 0")
+        newSocket = self.inputs.new('EmptySocketType', "Output 0")
+        newSocket.link_limit = 4095
 
     def getSettings(self, item):
         pass

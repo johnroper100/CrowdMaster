@@ -98,7 +98,6 @@ def compileNodeGroup(nodeGroup, prefix, brain):
             if not node.outputs["Output"].is_linked:
                 brain.outputs.append(nodeKey)
             brain.neurons[nodeKey] = item
-            print("key", nodeKey)
         elif node.bl_idname == "GroupNode":
             compileNodeGroup(bpy.data.node_groups[node.groupName], nodeKey,
                              brain)
