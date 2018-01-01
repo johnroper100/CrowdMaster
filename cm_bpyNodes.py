@@ -636,6 +636,8 @@ class OutputNode(LogicNode):
                           default="py")
     SKName = StringProperty(name="Shape Key Name",
                             description="The name of the shape key")
+    #RNAPath = StringProperty(name="RNA Path",
+    #                        description="The datapath to the item")
     MultiInputType = EnumProperty(name="Multi Input Type",
                                   items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
@@ -643,7 +645,7 @@ class OutputNode(LogicNode):
                                          ])
 
     Tag = StringProperty(name="Tag", default="default")
-    RNApath = StringProperty(name="RNA Path", default="Enter data path...")
+    RNAPath = StringProperty(name="RNA Path", default="Enter data path...")
     UseThreshold = BoolProperty(name="Use Threshold", default=True)
     Threshold = FloatProperty(name="Threshold", default=0.5)
     Action = EnumProperty(name="Action",
@@ -656,7 +658,7 @@ class OutputNode(LogicNode):
         if self.Output == "sk":
             layout.prop(self, "SKName")
         elif self.Output == "rna":
-            layout.prop(self, "RNApath")
+            layout.prop(self, "RNAPath")
         elif self.Output == "tag":
             layout.prop(self, "Tag")
             layout.prop(self, "UseThreshold")
@@ -668,6 +670,7 @@ class OutputNode(LogicNode):
 
     def getSettings(self, node):
         node.settings["SKName"] = self.SKName
+        node.settings["RNAPath"] = self.RNAPath
         node.settings["Output"] = self.Output
         node.settings["MultiInputType"] = self.MultiInputType
         node.settings["Tag"] = self.Tag
