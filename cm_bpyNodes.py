@@ -23,8 +23,9 @@ import textwrap
 import bpy
 import nodeitems_utils
 from bpy.props import (BoolProperty, EnumProperty, FloatProperty,
-                       FloatVectorProperty, IntProperty, StringProperty)
-from bpy.types import Node, NodeSocket, NodeTree, Operator
+                       FloatVectorProperty, IntProperty, StringProperty,
+                       CollectionProperty)
+from bpy.types import Node, NodeSocket, NodeTree, Operator, PropertyGroup
 from nodeitems_utils import NodeCategory, NodeItem
 
 from .cm_iconLoad import cicon
@@ -37,6 +38,9 @@ class CrowdMasterTree(NodeTree):
     bl_icon = 'OUTLINER_OB_ARMATURE'
 
     savedOnce = BoolProperty(default=False)
+
+    def update(self):
+        pass
 
 
 class DefaultSocket(NodeSocket):
@@ -117,7 +121,8 @@ class CrowdMasterNode(Node):
 
     @classmethod
     def poll(cls, ntree):
-        return ntree.bl_idname == 'CrowdMasterTreeType'
+        if ntree.bl_idname in {'CrowdMasterTreeType', 'CrowdMasterGroupTreeType'}:
+            return True
 
 
 class LogicNode(CrowdMasterNode):
@@ -971,6 +976,27 @@ class MyNodeCategory(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
 
+def groupCategory(context):
+    if context is None:
+        return
+    space = context.space_data
+    if not space:
+        return
+    ntree = space.edit_tree
+    if not ntree:
+        return
+
+    if ntree.bl_idname == "CrowdMasterGroupTreeType":
+        yield NodeItem("GroupInputs")
+        yield NodeItem("GroupOutputs")
+
+    yield NodeItem("GroupNode")
+
+    for group in context.blend_data.node_groups:
+        if group.bl_idname == "CrowdMasterGroupTreeType":
+            continue
+
+
 node_categories = [
     MyNodeCategory("INPUT", "Input", items=[
         NodeItem("NewInputNode")
@@ -1000,8 +1026,9 @@ node_categories = [
     MyNodeCategory("LAYOUT", "Layout", items=[
         NodeItem("NodeFrame"),
         NodeItem("LogicNoteNode"),
-        NodeItem("NodeReroute")
-    ])
+        NodeItem("NodeReroute"),
+    ]),
+    MyNodeCategory("GROUP", "Group", items=groupCategory)
 ]
 
 keyMap = None

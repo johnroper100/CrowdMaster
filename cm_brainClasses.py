@@ -33,7 +33,7 @@ logger = logging.getLogger("CrowdMaster")
 class Neuron():
     """The representation of the nodes. Not to be used on own"""
 
-    def __init__(self, brain, bpyNode):
+    def __init__(self, brain, bpyNode, nodeKey):
         self.brain = brain  # type: Brain
         self.neurons = self.brain.neurons  # type: List[Neuron]
         self.inputs = []  # type: List[str] - strings are names of neurons
@@ -43,6 +43,7 @@ class Neuron():
         self.bpyNode = bpyNode  # type: cm_bpyNodes.LogicNode
         self.settings = {}  # type: Dict[str, bpy.props.*]
         self.dependantOn = []  # type: List[str] - strings are names of neurons
+        self.nodeKey = nodeKey
 
     def evaluate(self):
         """Called by any neurons that take this neuron as an input"""
@@ -129,20 +130,18 @@ class Neuron():
 
     def highLight(self, frame):
         """Colour the nodes in the interface to reflect the output"""
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
-        if preferences.use_node_color:
-            hue, sat, val = self.resultLog[frame]
-            self.bpyNode.use_custom_color = True
-            c = mathutils.Color()
-            c.hsv = hue, sat, val
-            self.bpyNode.color = c
-            self.bpyNode.keyframe_insert("color")
+        hue, sat, val = self.resultLog[frame]
+        self.bpyNode.use_custom_color = True
+        c = mathutils.Color()
+        c.hsv = hue, sat, val
+        self.bpyNode.color = c
+        self.bpyNode.keyframe_insert("color")
 
 
 class State:
     """The basic element of the state machine. Abstract class"""
 
-    def __init__(self, brain, bpyNode, name):
+    def __init__(self, brain, bpyNode, name, nodeKey):
         """A lot of the fields are modified by the compileBrain function"""
         self.name = name
         self.brain = brain
@@ -160,6 +159,8 @@ class State:
 
         self.bpyNode = bpyNode
         self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}
+
+        self.nodeKey = nodeKey
 
     def query(self):
         """If this state is a valid next move return float > 0"""
@@ -258,19 +259,17 @@ class State:
         self.finalValueCalcd = False
 
     def highLight(self, frame):
-        preferences = bpy.context.user_preferences.addons[__package__].preferences
-        if preferences.use_node_color:
-            if frame in self.resultLog:
-                hue, sat, val = self.resultLog[frame]
-            else:
-                hue = 0.0
-                sat = 0.0
-                val = 1.0
-            self.bpyNode.use_custom_color = True
-            c = mathutils.Color()
-            c.hsv = hue, sat, val
-            self.bpyNode.color = c
-            self.bpyNode.keyframe_insert("color")
+        if frame in self.resultLog:
+            hue, sat, val = self.resultLog[frame]
+        else:
+            hue = 0.0
+            sat = 0.0
+            val = 1.0
+        self.bpyNode.use_custom_color = True
+        c = mathutils.Color()
+        c.hsv = hue, sat, val
+        self.bpyNode.color = c
+        self.bpyNode.keyframe_insert("color")
 
 
 class Brain():
@@ -353,4 +352,7 @@ class Brain():
     def hightLight(self, frame):
         """This will be called for the agent that is the active selection"""
         for n in self.neurons.values():
-            n.highLight(frame)
+            preferences = bpy.context.user_preferences.addons[__package__].preferences
+            if preferences.use_node_color:
+                if n.nodeKey[0] is None:
+                    n.highLight(frame)
