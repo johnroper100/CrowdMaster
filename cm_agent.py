@@ -296,14 +296,24 @@ class Agent:
 
         # RNA datapath output goes here
         for rnaNm in self.rnaPaths:
-            rnaValExists = hasattr(obj, rnaNm)
-            if rnaValExists:
-                rnaCurrentVal = hasattr(obj, rnaNm)
-                rnaNewVal = self.rnaPaths[rnaNm]
-                print("Object : "+str(obj)+" RNA Path : "+str(rnaNm)+" Node Value : "+str(rnaNewVal)+" Current value : "+ str(rnaCurrentVal))
-                setattr(obj, str(rnaNm), rnaNewVal)
+            rnaNewVal = self.rnaPaths[rnaNm]                
+            # print("Object : "+str(obj)+" RNA Path : "+str(rnaNm)+" Node Value : "+str(rnaNewVal)+" Current value : "+str(obj.path_resolve(rnaNm)))
+
+            if "." in rnaNm:
+                path_prop, path_attr = rnaNm.rpartition('.')[0::2]
+                prop = obj.path_resolve(path_prop)
+            else:
+                # single attribute such as name, location... etc
+                prop = obj        
+                path_attr = str(rnaNm)
+
+            if hasattr(prop, path_attr):
+                # check the input type (rnaNewVal) is valid for the property (to do)
+                setattr(prop, path_attr, rnaNewVal)
                 obj.keyframe_insert(data_path=str(rnaNm),
                                 frame=thisFrame)
+            # else:
+                # colour the node red - bad path! (to do)
         
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:
@@ -422,3 +432,5 @@ class Agent:
     def highLight(self):
         for n in self.brain.neurons.values():
             n.highLight(bpy.context.scene.frame_current)
+
+        
