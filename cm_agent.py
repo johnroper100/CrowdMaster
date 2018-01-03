@@ -297,21 +297,52 @@ class Agent:
         # RNA datapath output goes here
         for rnaNm in self.rnaPaths:
             rnaNewVal = self.rnaPaths[rnaNm]                
-            # print("Object : "+str(obj)+" RNA Path : "+str(rnaNm)+" Node Value : "+str(rnaNewVal)+" Current value : "+str(obj.path_resolve(rnaNm)))
+            #print("Object : "+str(obj)+" RNA Path : "+str(rnaNm)+" Node Value : "+str(rnaNewVal)+" Current value : "+str(obj.path_resolve(rnaNm)))
 
             if "." in rnaNm:
-                path_prop, path_attr = rnaNm.rpartition('.')[0::2]
-                prop = obj.path_resolve(path_prop)
+                propPath, propAttr = rnaNm.rpartition('.')[0::2]
+                objPath = obj.path_resolve(propPath)
             else:
                 # single attribute such as name, location... etc
-                prop = obj        
-                path_attr = str(rnaNm)
+                objPath = obj        
+                propAttr = str(rnaNm)
 
-            if hasattr(prop, path_attr):
-                # check the input type (rnaNewVal) is valid for the property (to do)
-                setattr(prop, path_attr, rnaNewVal)
-                obj.keyframe_insert(data_path=str(rnaNm),
-                                frame=thisFrame)
+            if hasattr(objPath, propAttr):
+                # check the input type (rnaNewVal) is valid for the property
+                # print("Newval type : "+str(type(rnaNewVal))+" Property type : "+str(type(getattr(objPath, propAttr))))
+
+                rnaNewVal_type = type(rnaNewVal)
+                propAttr_type = type(getattr(objPath, propAttr))
+                setNewVal = False
+                print("types: " + str(rnaNewVal_type) + ", " + str(propAttr_type))
+                                         
+                if propAttr_type == rnaNewVal_type:
+                    setNewVal = True
+                    print("Type the same")
+                elif propAttr_type == int:
+                    if rnaNewVal.is_integer():
+                        setNewVal = True
+                        print("float convert to int!")
+                    else:
+                        print("float is not whole number")
+                        # should also handle non-exact values e.g. 0.99 - rounding - to do
+                elif propAttr_type == bool:
+                    if rnaNewVal in [0.0, 1.0]:                                     
+                        setNewVal = True
+                        print("bool: float in list")
+                    else:
+                        print("bool: float NOT in list")
+                        # should handle range of values between 0.0 and 1.0 e.g. when value is 0.99 - to do
+                else:
+                    print("Cannot assign value!")
+                
+                if setNewVal: 
+                    setattr(objPath, propAttr, rnaNewVal)
+                    obj.keyframe_insert(data_path=str(rnaNm),
+                                        frame=thisFrame)
+                # else:
+                    # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
+                                    
             # else:
                 # colour the node red - bad path! (to do)
         
