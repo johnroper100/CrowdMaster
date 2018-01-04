@@ -314,11 +314,9 @@ class Agent:
                 rnaNewVal_type = type(rnaNewVal)
                 propAttr_type = type(getattr(objPath, propAttr))
                 setNewVal = False
-                print("types: " + str(rnaNewVal_type) + ", " + str(propAttr_type))
-                                         
+                                                         
                 if (propAttr_type == rnaNewVal_type):
                     setNewVal = True
-                    print("Type the same")
                 elif propAttr_type == int:
                     setNewVal = True
                     rnaNewVal = round(rnaNewVal)                  
@@ -326,18 +324,16 @@ class Agent:
                     if (rnaNewVal >= 0.0) and (rnaNewVal <= 1.0):                                     
                         setNewVal = True
                         rnaNewVal = round(rnaNewVal)
-                        print("bool: float in list")
-                    else:
-                        print("bool: float NOT in range")       
                 else:
-                    print("Cannot assign value!")
+                    pass
                     # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
 
                 if setNewVal: 
                     setattr(objPath, propAttr, rnaNewVal)
                     obj.keyframe_insert(data_path=str(rnaNm),
                                         frame=thisFrame)
-             # else:
+             else:
+                pass
                 # colour the node red - bad path! (to do)
         
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
