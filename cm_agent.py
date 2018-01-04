@@ -316,34 +316,28 @@ class Agent:
                 setNewVal = False
                 print("types: " + str(rnaNewVal_type) + ", " + str(propAttr_type))
                                          
-                if propAttr_type == rnaNewVal_type:
+                if (propAttr_type == rnaNewVal_type):
                     setNewVal = True
                     print("Type the same")
                 elif propAttr_type == int:
-                    if rnaNewVal.is_integer():
-                        setNewVal = True
-                        print("float convert to int!")
-                    else:
-                        print("float is not whole number")
-                        # should also handle non-exact values e.g. 0.99 - rounding - to do
+                    setNewVal = True
+                    rnaNewVal = round(rnaNewVal)                  
                 elif propAttr_type == bool:
-                    if rnaNewVal in [0.0, 1.0]:                                     
+                    if (rnaNewVal >= 0.0) and (rnaNewVal <= 1.0):                                     
                         setNewVal = True
+                        rnaNewVal = round(rnaNewVal)
                         print("bool: float in list")
                     else:
-                        print("bool: float NOT in list")
-                        # should handle range of values between 0.0 and 1.0 e.g. when value is 0.99 - to do
+                        print("bool: float NOT in range")       
                 else:
                     print("Cannot assign value!")
-                
+                    # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
+
                 if setNewVal: 
                     setattr(objPath, propAttr, rnaNewVal)
                     obj.keyframe_insert(data_path=str(rnaNm),
                                         frame=thisFrame)
-                # else:
-                    # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
-                                    
-            # else:
+             # else:
                 # colour the node red - bad path! (to do)
         
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
