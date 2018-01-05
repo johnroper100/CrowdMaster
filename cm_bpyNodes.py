@@ -650,7 +650,7 @@ class OutputNode(LogicNode):
                                          ])
 
     Tag = StringProperty(name="Tag", default="default")
-    RNAPath = StringProperty(name="RNA Path", default="Enter data path...")
+    RNAPath = StringProperty(name="RNA Path")
     UseThreshold = BoolProperty(name="Use Threshold", default=True)
     Threshold = FloatProperty(name="Threshold", default=0.5)
     Action = EnumProperty(name="Action",
