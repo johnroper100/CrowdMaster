@@ -299,7 +299,7 @@ class Brain():
 
     def reset(self):
         self.outvars = {"rx": 0, "ry": 0, "rz": 0,
-                        "px": 0, "py": 0, "pz": 0, "sk": {}}
+                        "px": 0, "py": 0, "pz": 0, "sk": {}, "rna": {}}
         self.tags = self.sim.agents[self.userid].access["tags"]
 
     def execute(self):

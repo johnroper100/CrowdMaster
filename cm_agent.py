@@ -103,6 +103,9 @@ class Agent:
         self.shapeKeys = {}
         self.lastShapeKeys = set()
 
+        self.rnaPaths = {}
+        self.lastRNAPath = set()
+        
         """Clear out the nla"""
         if not freezeAnimation:
             objs[self.id].animation_data_clear()
@@ -217,6 +220,8 @@ class Agent:
 
         self.shapeKeys = self.brain.outvars["sk"]
 
+        self.rnaPaths = self.brain.outvars["rna"]
+        
         self.external["tags"] = self.brain.tags
 
         move = mathutils.Vector((self.px + self.sx,
@@ -260,7 +265,7 @@ class Agent:
             for track in obj.animation_data.nla_tracks:
                 track.mute = False
 
-        """Set objects shape key value, rotation and location"""
+        """Set objects RNA data paths, shape key value, rotation and location"""
 
         lastFrame = bpy.context.scene.frame_current - 1
         thisFrame = bpy.context.scene.frame_current
@@ -289,6 +294,48 @@ class Agent:
                                 if skNm in self.lastShapeKeys:
                                     self.lastShapeKeys.remove(skNm)
 
+        # RNA datapath output goes here
+        for rnaNm in self.rnaPaths:
+            rnaNewVal = self.rnaPaths[rnaNm]                
+            #print("Object : "+str(obj)+" RNA Path : "+str(rnaNm)+" Node Value : "+str(rnaNewVal)+" Current value : "+str(obj.path_resolve(rnaNm)))
+
+            if "." in rnaNm:
+                propPath, propAttr = rnaNm.rpartition('.')[0::2]
+                objPath = obj.path_resolve(propPath)
+            else:
+                # single attribute such as name, location... etc
+                objPath = obj        
+                propAttr = str(rnaNm)
+
+            if hasattr(objPath, propAttr):
+                # check the input type (rnaNewVal) is valid for the property
+                # print("Newval type : "+str(type(rnaNewVal))+" Property type : "+str(type(getattr(objPath, propAttr))))
+
+                rnaNewVal_type = type(rnaNewVal)
+                propAttr_type = type(getattr(objPath, propAttr))
+                setNewVal = False
+                                                         
+                if (propAttr_type == rnaNewVal_type):
+                    setNewVal = True
+                elif propAttr_type == int:
+                    setNewVal = True
+                    rnaNewVal = round(rnaNewVal)                  
+                elif propAttr_type == bool:
+                    if (rnaNewVal >= 0.0) and (rnaNewVal <= 1.0):                                     
+                        setNewVal = True
+                        rnaNewVal = round(rnaNewVal)
+                else:
+                    pass
+                    # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
+
+                if setNewVal: 
+                    setattr(objPath, propAttr, rnaNewVal)
+                    obj.keyframe_insert(data_path=str(rnaNm),
+                                        frame=thisFrame)
+             else:
+                pass
+                # colour the node red - bad path! (to do)
+        
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:
                 obj.keyframe_insert(data_path="rotation_euler",
@@ -406,3 +453,5 @@ class Agent:
     def highLight(self):
         for n in self.brain.neurons.values():
             n.highLight(bpy.context.scene.frame_current)
+
+        
