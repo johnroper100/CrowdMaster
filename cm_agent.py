@@ -297,7 +297,6 @@ class Agent:
         # RNA datapath output goes here
         for rnaNm in self.rnaPaths:
             rnaNewVal = self.rnaPaths[rnaNm]                
-            #print("Object : "+str(obj)+" RNA Path : "+str(rnaNm)+" Node Value : "+str(rnaNewVal)+" Current value : "+str(obj.path_resolve(rnaNm)))
 
             if "." in rnaNm:
                 propPath, propAttr = rnaNm.rpartition('.')[0::2]
@@ -309,7 +308,6 @@ class Agent:
 
             if hasattr(objPath, propAttr):
                 # check the input type (rnaNewVal) is valid for the property
-                # print("Newval type : "+str(type(rnaNewVal))+" Property type : "+str(type(getattr(objPath, propAttr))))
 
                 rnaNewVal_type = type(rnaNewVal)
                 propAttr_type = type(getattr(objPath, propAttr))
@@ -332,8 +330,8 @@ class Agent:
                     setattr(objPath, propAttr, rnaNewVal)
                     obj.keyframe_insert(data_path=str(rnaNm),
                                         frame=thisFrame)
-             else:
-                pass
+             #else:
+                # pass
                 # colour the node red - bad path! (to do)
         
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
