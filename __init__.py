@@ -650,8 +650,8 @@ def unregister():
     cm_pieMenus.unregister()
 
     if "sim" in globals():
-        if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
-            bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
+        if sim.frameChangeHighlight in bpy.app.handlers.scene_update_post:
+            bpy.app.handlers.scene_update_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
     cm_translations.unregister()

@@ -193,13 +193,6 @@ class Agent:
                 logger.debug("ID: {} Tags: {} outvars: {}".format(
                     self.id, self.brain.tags, self.brain.outvars))
             # TODO show this in the UI
-        if preferences.show_debug_options:
-            t = time.time()
-        if objs[self.id] == bpy.context.active_object:
-            self.brain.hightLight(bpy.context.scene.frame_current)
-        if preferences.show_debug_options and preferences.show_debug_timings:
-            cm_timings.agent["highLight"] += time.time() - t
-            t = time.time()
 
         self.rx = self.brain.outvars["rx"] if self.brain.outvars["rx"] else 0
         self.ry = self.brain.outvars["ry"] if self.brain.outvars["ry"] else 0
@@ -451,5 +444,3 @@ class Agent:
     def highLight(self):
         for n in self.brain.neurons.values():
             n.highLight(bpy.context.scene.frame_current)
-
-        

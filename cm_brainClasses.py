@@ -30,7 +30,7 @@ from . import cm_timings
 logger = logging.getLogger("CrowdMaster")
 
 
-class Neuron():
+class Neuron:
     """The representation of the nodes. Not to be used on own"""
 
     def __init__(self, brain, bpyNode, nodeKey):
@@ -38,7 +38,7 @@ class Neuron():
         self.neurons = self.brain.neurons  # type: List[Neuron]
         self.inputs = []  # type: List[str] - strings are names of neurons
         self.result = None  # type: None | ImpulseContainer - Cache for current
-        self.resultLog = [(0, 0, 0), (0, 0, 0)]  # type: List[(int, int, int)]
+        self.resultLog = {brain.sim.startFrame: (0, 0, 0)}  # type: Dict[int, (int, int, int)]
         self.fillOutput = BoolProperty(default=True)
         self.bpyNode = bpyNode  # type: cm_bpyNodes.LogicNode
         self.settings = {}  # type: Dict[str, bpy.props.*]
@@ -120,22 +120,25 @@ class Neuron():
             val = 0.5
         if preferences.show_debug_options and preferences.show_debug_timings:
             cm_timings.neuron["sumColour"] += time.time() - t
-        self.resultLog[-1] = (hue, sat, val)
+        self.resultLog[self.brain.sim.frameLast] = (hue, sat, val)
 
         return output
 
     def newFrame(self):
         self.result = None
-        self.resultLog.append((0, 0, 0.5))
+        self.resultLog[self.brain.sim.frameLast] = (0, 0, 0.5)
 
     def highLight(self, frame):
         """Colour the nodes in the interface to reflect the output"""
-        hue, sat, val = self.resultLog[frame]
-        self.bpyNode.use_custom_color = True
-        c = mathutils.Color()
-        c.hsv = hue, sat, val
-        self.bpyNode.color = c
-        self.bpyNode.keyframe_insert("color")
+        if frame in self.resultLog:
+            hue, sat, val = self.resultLog[frame]
+            self.bpyNode.use_custom_color = True
+            c = mathutils.Color()
+            c.hsv = hue, sat, val
+            self.bpyNode.color = c
+            self.bpyNode.keyframe_insert("color")
+        else:
+            self.bpyNode.use_custom_color = False
 
 
 class State:
@@ -158,7 +161,7 @@ class State:
         self.currentFrame = 0
 
         self.bpyNode = bpyNode
-        self.resultLog = {0: (0, 0, 0), 1: (0, 0, 0)}
+        self.resultLog = {brain.sim.startFrame: (0, 0, 0)}
 
         self.nodeKey = nodeKey
 
@@ -227,7 +230,7 @@ class State:
             complete = self.currentFrame / self.length
             complete = 0.5 + complete / 2
         sceneFrame = bpy.context.scene.frame_current
-        self.resultLog[sceneFrame] = ((0.15, 0.4, complete))
+        self.resultLog[sceneFrame] = (0.15, 0.4, complete)
 
         if self.currentFrame < self.length - 1:
             return False, self.name
@@ -261,18 +264,16 @@ class State:
     def highLight(self, frame):
         if frame in self.resultLog:
             hue, sat, val = self.resultLog[frame]
+            self.bpyNode.use_custom_color = True
+            c = mathutils.Color()
+            c.hsv = hue, sat, val
+            self.bpyNode.color = c
+            self.bpyNode.keyframe_insert("color")
         else:
-            hue = 0.0
-            sat = 0.0
-            val = 1.0
-        self.bpyNode.use_custom_color = True
-        c = mathutils.Color()
-        c.hsv = hue, sat, val
-        self.bpyNode.color = c
-        self.bpyNode.keyframe_insert("color")
+            self.bpyNode.use_custom_color = False
 
 
-class Brain():
+class Brain:
     """An executable brain object. One created per agent"""
 
     def __init__(self, sim, userid, freezeAnimation):
@@ -309,7 +310,7 @@ class Brain():
         actv = bpy.context.active_object
         self.isActiveSelection = actv is not None and actv.name == self.userid
         self.reset()
-        randstate = hash(self.userid) + self.sim.framelast
+        randstate = hash(self.userid) + self.sim.frameLast
         random.seed(randstate)
 
         if preferences.show_debug_options:
