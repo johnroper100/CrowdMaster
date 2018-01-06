@@ -39,6 +39,7 @@ class Agent:
             t = time.time()
         self.id = ag.name
         self.brain = compileBrain(nodeGroup, sim, self.id, freezeAnimation)
+        self.nodeGroupName = nodeGroup.name
         self.sim = sim
         self.external = {"id": self.id, "tags": {
             t.name: t.value for t in ag.initialTags}}

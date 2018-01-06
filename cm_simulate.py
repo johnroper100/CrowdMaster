@@ -76,7 +76,13 @@ class Simulation:
 
         self.syncManager = syncManager()
 
-        self.lastUpdatedHighlight = (None, None)  # (active object, frame)
+        self.lastHighlightTree = None
+        self.lastHighlightFrame = None
+        self.lastHighlightActive = None
+        for nodeTree in bpy.data.node_groups:
+            if nodeTree.bl_idname == "CrowdMasterTreeType":
+                for node in nodeTree.nodes:
+                    node.use_custom_color = False
 
     def setupActions(self):
         """Set up the actions"""
@@ -165,18 +171,25 @@ class Simulation:
 
     def frameChangeHighlight(self, scene):
         """Not unregistered when simulation stopped"""
-        lastActive, lastFrame = self.lastUpdatedHighlight
+        lastTree = self.lastHighlightTree
+        lastActive = self.lastHighlightActive
+        lastFrame = self.lastHighlightFrame
         currentFrame = bpy.context.scene.frame_current
         if lastActive != bpy.context.active_object or lastFrame != currentFrame:
-            for nodeTree in bpy.data.node_groups:
-                if nodeTree.bl_idname == "CrowdMasterTreeType":
-                    for node in nodeTree.nodes:
-                        node.use_custom_color = False
             if self.startFrame <= currentFrame <= self.frameLast:
                 active = bpy.context.active_object
                 if active and active.name in self.agents:
-                    self.agents[bpy.context.active_object.name].highLight()
-            self.lastUpdatedHighlight = (bpy.context.active_object, currentFrame)
+                    agent = self.agents[bpy.context.active_object.name]
+                    if lastTree is not None:
+                        if lastTree != agent.nodeGroupName:
+                            for node in bpy.data.node_groups[lastTree].nodes:
+                                node.use_custom_color = False
+                            self.lastHighlightTree = agent.nodeGroupName
+                    else:
+                        self.lastHighlightTree = agent.nodeGroupName
+                    agent.highLight()
+            self.lastHighlightActive = bpy.context.active_object
+            self.lastHighlightFrame = currentFrame
 
     def startFrameHandler(self):
         """Add self.frameChangeHandler to the Blender event handlers"""
@@ -188,9 +201,16 @@ class Simulation:
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
-        if self.frameChangeHighlight not in bpy.app.handlers.scene_update_post:
-            bpy.app.handlers.scene_update_post.append(
-                self.frameChangeHighlight)
+        toRemove = []
+        for func in bpy.app.handlers.scene_update_post:
+            if isinstance(func.__self__, self.__class__):
+                if func.__name__ == "frameChangeHighlight":
+                    toRemove.append(func)
+        for rem in toRemove:
+            bpy.app.handlers.scene_update_post.remove(rem)
+        if preferences.use_node_color:
+            if self.frameChangeHighlight not in bpy.app.handlers.scene_update_post:
+                bpy.app.handlers.scene_update_post.append(self.frameChangeHighlight)
 
     def stopFrameHandler(self):
         """Remove self.frameChangeHandler from Blenders event handlers"""
