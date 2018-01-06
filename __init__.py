@@ -272,9 +272,9 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_relationship_lines = False
 
         if context.scene.cm_sim_start_frame != -1:
-            scene.frame_current = scene.cm_sim_start_frame
+            scene.frame_set(scene.cm_sim_start_frame)
         else:
-            scene.frame_current = scene.frame_start
+            scene.frame_set(scene.frame_start)
 
         global sim
         if "sim" in globals():
