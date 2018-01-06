@@ -33,7 +33,7 @@ class event_entry(PropertyGroup):
         ("Time", "Time", "Time"),
         ("Volume", "Volume", "Volume"),
         ("Time+Volume", "Time+Volume", "Time+Volume"))
-    )
+                           )
     volumeType = EnumProperty(name="Volume Type",
                               items=(("Object", "Object", "Object"),
                                      ("Group", "Group", "Group")),
@@ -79,7 +79,7 @@ class SCENE_OT_event_move(Operator):
     direction = EnumProperty(items=(
         ('UP', "Up", "Move up"),
         ('DOWN', "Down", "Move down"))
-    )
+                            )
 
     @classmethod
     def poll(cls, context):

@@ -94,7 +94,6 @@ class SCENE_OT_cm_groups_reset(Operator):
         if context.active_object is not None:
             bpy.ops.object.mode_set(mode='OBJECT')
         scene = context.scene
-        preferences = context.user_preferences.addons[__package__].preferences
 
         group = scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
@@ -199,7 +198,6 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
     def execute(self, context):
         scene = context.scene
-        preferences = context.user_preferences.addons[__package__].preferences
 
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}

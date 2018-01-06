@@ -459,13 +459,12 @@ class MathNode(LogicNode):
     bl_width_default = 225.0
 
     operation = EnumProperty(name="Operation", items=[
-                             ("add", "Add", "Add the two numbers together"),
-                             ("sub", "Subtract",
-                              "Subtract the two numbers from each other"),
-                             ("mul", "Multiply", "Multiply the two numbers"),
-                             ("div", "Divide", "Divide the two numbers"),
-                             ("set", "Set To", "Set all inputs to this number"),
-                             ("clamp", "Clamp", "Clamp the input values to a specified range")],
+        ("add", "Add", "Add the two numbers together"),
+        ("sub", "Subtract", "Subtract the two numbers from each other"),
+        ("mul", "Multiply", "Multiply the two numbers"),
+        ("div", "Divide", "Divide the two numbers"),
+        ("set", "Set To", "Set all inputs to this number"),
+        ("clamp", "Clamp", "Clamp the input values to a specified range")],
                              default="mul",
                              description="which mathematical operation to use.")
 
@@ -549,7 +548,7 @@ class SetTagNode(LogicNode):
     Action = EnumProperty(name="Action",
                           items=[("ADD", "Add", "", 1),
                                  ("REMOVE", "Remove", "", 2)
-                                 ])
+                                ])
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Tag")
@@ -637,7 +636,7 @@ class OutputNode(LogicNode):
                                  ("sk", "Shape Key", "", 7),
                                  ("tag", "Tag", "", 8),
                                  ("rna", "RNA Value", "", 9)
-                                 ],
+                                ],
                           default="py")
     SKName = StringProperty(name="Shape Key Name",
                             description="The name of the shape key")
@@ -647,7 +646,7 @@ class OutputNode(LogicNode):
                                   items=[("AVERAGE", "Average", "", 1),
                                          ("MAX", "Max", "", 2),
                                          ("SUM", "Sum", "", 3)
-                                         ])
+                                        ])
 
     Tag = StringProperty(name="Tag", default="default")
     RNAPath = StringProperty(name="RNA Path")
@@ -656,7 +655,7 @@ class OutputNode(LogicNode):
     Action = EnumProperty(name="Action",
                           items=[("ADD", "Add", "", 1),
                                  ("REMOVE", "Remove", "", 2)
-                                 ])
+                                ])
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "Output")

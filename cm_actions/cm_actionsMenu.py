@@ -87,7 +87,7 @@ class SCENE_OT_agent_move(Operator):
     direction = EnumProperty(items=(
         ('UP', "Up", "Move up"),
         ('DOWN', "Down", "Move down"))
-    )
+                            )
 
     @classmethod
     def poll(cls, context):
@@ -172,7 +172,7 @@ class SCENE_OT_action_pair_move(Operator):
     direction = EnumProperty(items=(
         ('UP', "Up", "Move up"),
         ('DOWN', "Down", "Move down"))
-    )
+                            )
 
     @classmethod
     def poll(cls, context):

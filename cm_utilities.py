@@ -17,13 +17,9 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import time
-
 import bpy
 from bpy.props import BoolProperty
 from bpy.types import Operator
-
-from .cm_iconLoad import cicon
 
 bpy.types.Scene.show_utilities = BoolProperty(
     name="Show or hide the utilities",
@@ -39,8 +35,6 @@ class Crowdmaster_place_deferred_geo(Operator):
     bl_options = {'REGISTER', 'UNDO'}
 
     def execute(self, context):
-        preferences = context.user_preferences.addons[__package__].preferences
-
         groups = bpy.data.groups
         objects = context.scene.objects
         for group in context.scene.cm_groups:

@@ -106,7 +106,7 @@ class Agent:
 
         self.rnaPaths = {}
         self.lastRNAPath = set()
-        
+
         """Clear out the nla"""
         if not freezeAnimation:
             objs[self.id].animation_data_clear()
@@ -215,7 +215,7 @@ class Agent:
         self.shapeKeys = self.brain.outvars["sk"]
 
         self.rnaPaths = self.brain.outvars["rna"]
-        
+
         self.external["tags"] = self.brain.tags
 
         move = mathutils.Vector((self.px + self.sx,
@@ -290,14 +290,14 @@ class Agent:
 
         # RNA datapath output goes here
         for rnaNm in self.rnaPaths:
-            rnaNewVal = self.rnaPaths[rnaNm]                
+            rnaNewVal = self.rnaPaths[rnaNm]
 
             if "." in rnaNm:
                 propPath, propAttr = rnaNm.rpartition('.')[0::2]
                 objPath = obj.path_resolve(propPath)
             else:
                 # single attribute such as name, location... etc
-                objPath = obj        
+                objPath = obj
                 propAttr = str(rnaNm)
 
             if hasattr(objPath, propAttr):
@@ -306,28 +306,28 @@ class Agent:
                 rnaNewVal_type = type(rnaNewVal)
                 propAttr_type = type(getattr(objPath, propAttr))
                 setNewVal = False
-                                                         
-                if (propAttr_type == rnaNewVal_type):
+
+                if propAttr_type == rnaNewVal_type:
                     setNewVal = True
                 elif propAttr_type == int:
                     setNewVal = True
-                    rnaNewVal = round(rnaNewVal)                  
+                    rnaNewVal = round(rnaNewVal)
                 elif propAttr_type == bool:
-                    if (rnaNewVal >= 0.0) and (rnaNewVal <= 1.0):                                     
+                    if (rnaNewVal >= 0.0) and (rnaNewVal <= 1.0):
                         setNewVal = True
                         rnaNewVal = round(rnaNewVal)
                 else:
                     pass
                     # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
 
-                if setNewVal: 
+                if setNewVal:
                     setattr(objPath, propAttr, rnaNewVal)
                     obj.keyframe_insert(data_path=str(rnaNm),
                                         frame=thisFrame)
              #else:
                 # pass
                 # colour the node red - bad path! (to do)
-        
+
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:
                 obj.keyframe_insert(data_path="rotation_euler",
