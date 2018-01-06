@@ -558,6 +558,8 @@ class LogicOUTPUT(Neuron):
         outNm = settings["Output"]
         if outNm == "sk":
             self.brain.outvars["sk"][settings["SKName"]] = out
+        elif outNm == "rna":
+            self.brain.outvars["rna"][settings["RNAPath"]] = out
         elif outNm == "tag":
             empty = True
             condition = False

@@ -199,7 +199,8 @@ class GeoTemplateGROUP(GeoTemplate):
         gp = [o for o in dat.groups[self.settings["inputGroup"]].objects]
         group_objects = [o.copy() for o in gp]
 
-        def zaxis(x): return x.location[2]
+        def zaxis(x):
+            return x.location[2]
 
         if deferGeo:
             for obj in dat.groups[self.settings["inputGroup"]].objects:

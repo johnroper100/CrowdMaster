@@ -94,7 +94,6 @@ class SCENE_OT_cm_groups_reset(Operator):
         if context.active_object is not None:
             bpy.ops.object.mode_set(mode='OBJECT')
         scene = context.scene
-        preferences = context.user_preferences.addons[__package__].preferences
 
         group = scene.cm_groups.get(self.groupName)
         for obj in bpy.context.selected_objects:
@@ -199,7 +198,6 @@ class SCENE_OT_cm_agent_add_selected(Operator):
 
     def execute(self, context):
         scene = context.scene
-        preferences = context.user_preferences.addons[__package__].preferences
 
         if self.groupName.strip() == "" or self.brainType.strip() == "":
             return {'CANCELLED'}
@@ -272,9 +270,9 @@ class SCENE_OT_cm_start(Operator):
                     area.spaces[0].show_relationship_lines = False
 
         if context.scene.cm_sim_start_frame != -1:
-            scene.frame_current = scene.cm_sim_start_frame
+            scene.frame_set(scene.cm_sim_start_frame)
         else:
-            scene.frame_current = scene.frame_start
+            scene.frame_set(scene.frame_start)
 
         global sim
         if "sim" in globals():
@@ -650,8 +648,8 @@ def unregister():
     cm_pieMenus.unregister()
 
     if "sim" in globals():
-        if sim.frameChangeHighlight in bpy.app.handlers.frame_change_post:
-            bpy.app.handlers.frame_change_post.remove(sim.frameChangeHighlight)
+        if sim.frameChangeHighlight in bpy.app.handlers.scene_update_post:
+            bpy.app.handlers.scene_update_post.remove(sim.frameChangeHighlight)
 
     cm_documentation.unregister()
     cm_translations.unregister()

@@ -39,6 +39,7 @@ class Agent:
             t = time.time()
         self.id = ag.name
         self.brain = compileBrain(nodeGroup, sim, self.id, freezeAnimation)
+        self.nodeGroupName = nodeGroup.name
         self.sim = sim
         self.external = {"id": self.id, "tags": {
             t.name: t.value for t in ag.initialTags}}
@@ -102,6 +103,9 @@ class Agent:
 
         self.shapeKeys = {}
         self.lastShapeKeys = set()
+
+        self.rnaPaths = {}
+        self.lastRNAPath = set()
 
         """Clear out the nla"""
         if not freezeAnimation:
@@ -190,13 +194,6 @@ class Agent:
                 logger.debug("ID: {} Tags: {} outvars: {}".format(
                     self.id, self.brain.tags, self.brain.outvars))
             # TODO show this in the UI
-        if preferences.show_debug_options:
-            t = time.time()
-        if objs[self.id] == bpy.context.active_object:
-            self.brain.hightLight(bpy.context.scene.frame_current)
-        if preferences.show_debug_options and preferences.show_debug_timings:
-            cm_timings.agent["highLight"] += time.time() - t
-            t = time.time()
 
         self.rx = self.brain.outvars["rx"] if self.brain.outvars["rx"] else 0
         self.ry = self.brain.outvars["ry"] if self.brain.outvars["ry"] else 0
@@ -216,6 +213,8 @@ class Agent:
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
 
         self.shapeKeys = self.brain.outvars["sk"]
+
+        self.rnaPaths = self.brain.outvars["rna"]
 
         self.external["tags"] = self.brain.tags
 
@@ -260,7 +259,7 @@ class Agent:
             for track in obj.animation_data.nla_tracks:
                 track.mute = False
 
-        """Set objects shape key value, rotation and location"""
+        """Set objects RNA data paths, shape key value, rotation and location"""
 
         lastFrame = bpy.context.scene.frame_current - 1
         thisFrame = bpy.context.scene.frame_current
@@ -288,6 +287,46 @@ class Agent:
                             else:
                                 if skNm in self.lastShapeKeys:
                                     self.lastShapeKeys.remove(skNm)
+
+        # RNA datapath output goes here
+        for rnaNm in self.rnaPaths:
+            rnaNewVal = self.rnaPaths[rnaNm]
+
+            if "." in rnaNm:
+                propPath, propAttr = rnaNm.rpartition('.')[0::2]
+                objPath = obj.path_resolve(propPath)
+            else:
+                # single attribute such as name, location... etc
+                objPath = obj
+                propAttr = str(rnaNm)
+
+            if hasattr(objPath, propAttr):
+                # check the input type (rnaNewVal) is valid for the property
+
+                rnaNewVal_type = type(rnaNewVal)
+                propAttr_type = type(getattr(objPath, propAttr))
+                setNewVal = False
+
+                if propAttr_type == rnaNewVal_type:
+                    setNewVal = True
+                elif propAttr_type == int:
+                    setNewVal = True
+                    rnaNewVal = round(rnaNewVal)
+                elif propAttr_type == bool:
+                    if (rnaNewVal >= 0.0) and (rnaNewVal <= 1.0):
+                        setNewVal = True
+                        rnaNewVal = round(rnaNewVal)
+                else:
+                    pass
+                    # colour the node red - bad value trying to be assigned (e.g. float to an object property)! (to do)
+
+                if setNewVal:
+                    setattr(objPath, propAttr, rnaNewVal)
+                    obj.keyframe_insert(data_path=str(rnaNm),
+                                        frame=thisFrame)
+             #else:
+                # pass
+                # colour the node red - bad path! (to do)
 
         if abs(self.arx - obj.rotation_euler[0]) > 0.000001:
             if not self.arxKey:

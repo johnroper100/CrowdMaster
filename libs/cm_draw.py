@@ -19,7 +19,6 @@
 
 import bgl
 import blf
-import bpy
 
 
 def drawLine3D(color, start, end, width=1):

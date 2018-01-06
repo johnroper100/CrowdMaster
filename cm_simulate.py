@@ -38,9 +38,15 @@ class Simulation:
         preferences = bpy.context.user_preferences.addons[__package__].preferences
         self.agents = {}
         if bpy.context.scene.cm_sim_start_frame != -1:
-            self.framelast = bpy.context.scene.cm_sim_start_frame
+            self.frameLast = bpy.context.scene.cm_sim_start_frame
+            self.startFrame = bpy.context.scene.cm_sim_start_frame
         else:
-            self.framelast = bpy.context.scene.frame_start
+            self.frameLast = bpy.context.scene.frame_start
+            self.startFrame = bpy.context.scene.frame_start
+        if bpy.context.scene.cm_sim_end_frame != -1:
+            self.endFrame = bpy.context.scene.cm_sim_end_frame
+        else:
+            self.endFrame = bpy.context.scene.frame_end
         self.compbrains = {}
         Noise = chan.Noise(self)
         Sound = chan.Sound(self)
@@ -69,6 +75,14 @@ class Simulation:
         self.actionGroups = {}
 
         self.syncManager = syncManager()
+
+        self.lastHighlightTree = None
+        self.lastHighlightFrame = None
+        self.lastHighlightActive = None
+        for nodeTree in bpy.data.node_groups:
+            if nodeTree.bl_idname == "CrowdMasterTreeType":
+                for node in nodeTree.nodes:
+                    node.use_custom_color = False
 
     def setupActions(self):
         """Set up the actions"""
@@ -148,23 +162,34 @@ class Simulation:
 
     def frameChangeHandler(self, scene):
         """Given to Blender to call whenever the scene moves to a new frame"""
-        if bpy.context.scene.cm_sim_end_frame != -1:
-            endFrame = bpy.context.scene.cm_sim_end_frame
-        else:
-            endFrame = bpy.context.scene.frame_end
-        if endFrame <= bpy.context.scene.frame_current:
+        if self.endFrame <= bpy.context.scene.frame_current:
             self.stopFrameHandler()
             bpy.ops.screen.animation_cancel(restore_frame=False)
-        elif self.framelast + 1 == bpy.context.scene.frame_current:
-            self.framelast = bpy.context.scene.frame_current
+        elif self.frameLast + 1 == bpy.context.scene.frame_current:
+            self.frameLast = bpy.context.scene.frame_current
             self.step(scene)
 
     def frameChangeHighlight(self, scene):
         """Not unregistered when simulation stopped"""
-        if self.framelast >= bpy.context.scene.frame_current:
-            active = bpy.context.active_object
-            if active and active in self.agents:
-                self.agents[bpy.context.active_object.name].highLight()
+        lastTree = self.lastHighlightTree
+        lastActive = self.lastHighlightActive
+        lastFrame = self.lastHighlightFrame
+        currentFrame = bpy.context.scene.frame_current
+        if lastActive != bpy.context.active_object or lastFrame != currentFrame:
+            if self.startFrame <= currentFrame <= self.frameLast:
+                active = bpy.context.active_object
+                if active and active.name in self.agents:
+                    agent = self.agents[bpy.context.active_object.name]
+                    if lastTree is not None:
+                        if lastTree != agent.nodeGroupName:
+                            for node in bpy.data.node_groups[lastTree].nodes:
+                                node.use_custom_color = False
+                            self.lastHighlightTree = agent.nodeGroupName
+                    else:
+                        self.lastHighlightTree = agent.nodeGroupName
+                    agent.highLight()
+            self.lastHighlightActive = bpy.context.active_object
+            self.lastHighlightFrame = currentFrame
 
     def startFrameHandler(self):
         """Add self.frameChangeHandler to the Blender event handlers"""
@@ -176,9 +201,16 @@ class Simulation:
         if self.frameChangeHandler in bpy.app.handlers.frame_change_pre:
             bpy.app.handlers.frame_change_pre.remove(self.frameChangeHandler)
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
-        if self.frameChangeHighlight not in bpy.app.handlers.frame_change_post:
-            bpy.app.handlers.frame_change_post.append(
-                self.frameChangeHighlight)
+        toRemove = []
+        for func in bpy.app.handlers.scene_update_post:
+            if hasattr(func, "__self__") and isinstance(func.__self__, self.__class__):
+                if func.__name__ == "frameChangeHighlight":
+                    toRemove.append(func)
+        for rem in toRemove:
+            bpy.app.handlers.scene_update_post.remove(rem)
+        if preferences.use_node_color:
+            if self.frameChangeHighlight not in bpy.app.handlers.scene_update_post:
+                bpy.app.handlers.scene_update_post.append(self.frameChangeHighlight)
 
     def stopFrameHandler(self):
         """Remove self.frameChangeHandler from Blenders event handlers"""

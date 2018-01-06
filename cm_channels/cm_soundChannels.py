@@ -256,7 +256,7 @@ class Channel:
             dist = distTmp - (agSim.radius + toSim.radius)
             dist = max(dist, 0)  # The distance can't be negative
 
-            """Check if they actually collide"""
+            # Check if they actually collide
             det = b**2 - 4 * a * c
             if det > 0:
                 t0 = (-b - det**0.5) / (2 * a)

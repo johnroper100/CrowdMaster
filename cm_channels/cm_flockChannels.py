@@ -19,7 +19,6 @@
 
 import math
 
-import bpy
 import mathutils
 from mathutils import Vector
 
