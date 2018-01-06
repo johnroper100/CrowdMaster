@@ -203,7 +203,7 @@ class Simulation:
         bpy.app.handlers.frame_change_pre.append(self.frameChangeHandler)
         toRemove = []
         for func in bpy.app.handlers.scene_update_post:
-            if isinstance(func.__self__, self.__class__):
+            if hasattr(func, "__self__") and isinstance(func.__self__, self.__class__):
                 if func.__name__ == "frameChangeHighlight":
                     toRemove.append(func)
         for rem in toRemove:
