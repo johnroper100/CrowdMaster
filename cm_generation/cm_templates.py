@@ -1071,10 +1071,10 @@ class TemplateVCOLPOSITIONING(Template):
             for loop_index in poly.loop_indices:
                 loop_vert_index = data.loops[loop_index].vertex_index
                 if not invert:
-                    if list(vcol_layer.data[loop_index].color) == list(self.settings["vcolor"]):
+                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         polys.append(poly)
                 else:
-                    if not list(vcol_layer.data[loop_index].color) == list(self.settings["vcolor"]):
+                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         polys.append(poly)
 
         wrld = guide.matrix_world
