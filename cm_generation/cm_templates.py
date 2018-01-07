@@ -1172,6 +1172,8 @@ class TemplateVCOLPOSITIONING(Template):
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
             return False
+        if self.settings["vcols"] == "":
+            return False
         if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
         if not isinstance(self.inputs["Template"], Template):
