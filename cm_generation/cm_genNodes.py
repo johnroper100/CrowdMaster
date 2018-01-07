@@ -771,7 +771,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     bl_idname = 'VCOLPositionNodeType'
     bl_label = 'Vertex Colors Positioning'
     bl_icon = 'SOUND'
-    bl_width_default = 260.0
+    bl_width_default = 270.0
 
     paintMode = EnumProperty(name="Paint Mode", description="Decide how the node acts", items=[
         ('place', "Place", 'Place agents based on the vertex colors'),
