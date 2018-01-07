@@ -780,9 +780,7 @@ class VCOLPositionNode(CrowdMasterAGenTreeNode):
     guideMesh = StringProperty(name="Guide Mesh",
                                description="The mesh to scatter points over")
 
-    vcols = IntProperty(name="VCols ID",
-                        description="The ID of the vertex colors slot to use",
-                        default=0, min=0)
+    vcols = StringProperty(name="VCols", description="The name of the vertex colors slot to use")
 
     vcolor = FloatVectorProperty(name="Color",
                                  description="The the color on which the agents shoud be placed",
