@@ -1067,15 +1067,20 @@ class TemplateVCOLPOSITIONING(Template):
 
         vcol_layer = data.vertex_colors[self.settings["vcols"]]
 
+        i = 0
         for poly in data.polygons:
-            for loop_index in poly.loop_indices:
-                loop_vert_index = data.loops[loop_index].vertex_index
+            for idx in poly.loop_indices:
                 if not invert:
-                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        polys.append(poly)
+                    if vcol_layer.data[i].color[0] == self.settings["vcolor"][0]:
+                        if vcol_layer.data[i].color[1] == self.settings["vcolor"][1]:
+                            if vcol_layer.data[i].color[2] == self.settings["vcolor"][2]:
+                                polys.append(poly)
                 else:
-                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        polys.append(poly)
+                    if not vcol_layer.data[i].color[0] == self.settings["vcolor"][0]:
+                        if not vcol_layer.data[i].color[1] == self.settings["vcolor"][1]:
+                            if not vcol_layer.data[i].color[2] == self.settings["vcolor"][2]:
+                                polys.append(poly)
+                i += 1
 
         wrld = guide.matrix_world
         if self.totalArea is None:
