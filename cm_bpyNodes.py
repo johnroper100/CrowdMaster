@@ -271,7 +271,7 @@ class NewInputNode(LogicNode):
                                     items=[("GETTAG", "Get Tag", "", 1),
                                            ("HEADRZ", "Heading Relative Z", "", 2),
                                            ("HEADRX", "Heading Relative X", "", 3)])
-    GetTagName = StringProperty(name="Get Tag Name")
+    GetTagName = StringProperty(name="Tag Name")
 
     def draw_buttons(self, context, layout):
         layout.prop(self, "InputSource", text="Input")
