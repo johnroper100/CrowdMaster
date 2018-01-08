@@ -176,8 +176,8 @@ class NewInputNode(LogicNode):
                                    ("ALIGN", "Align", "The rotation about the X and Z axes needed to align to the average heading of nearby agents", 2),
                                    ("COHERE", "Cohere", "The direction the agent needs to move to move towards the average position of neighbours", 3)])
     RotationAxis = EnumProperty(name="Rotation Axis",
-                                items=[("RZ", "rz", "Rotate on the z axis", 1),
-                                       ("RX", "rx", "Rotate on the x axis", 2)])
+                                items=[("RZ", "Rotation Z", "Rotate on the z axis", 1),
+                                       ("RX", "Rotation X", "Rotate on the x axis", 2)])
     TranslationAxis = EnumProperty(name="Translation Axis",
                                    items=[("TX", "Translation X", "Translate on the x axis", 1),
                                           ("TY", "Translation Y", "Translate on the y axis", 2),
