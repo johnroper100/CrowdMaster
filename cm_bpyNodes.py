@@ -179,9 +179,9 @@ class NewInputNode(LogicNode):
                                 items=[("RZ", "rz", "Rotate on the z axis", 1),
                                        ("RX", "rx", "Rotate on the x axis", 2)])
     TranslationAxis = EnumProperty(name="Translation Axis",
-                                   items=[("TX", "tx", "Translate on the x axis", 1),
-                                          ("TY", "ty", "Translate on the y axis", 2),
-                                          ("TZ", "tz", "Translate on the z axis", 3)])
+                                   items=[("TX", "Translation X", "Translate on the x axis", 1),
+                                          ("TY", "Translation Y", "Translate on the y axis", 2),
+                                          ("TZ", "Translation Z", "Translate on the z axis", 3)])
 
     FormationGroup = StringProperty(name="Formation Group")
     FormationOptions = EnumProperty(name="Formation Options",
