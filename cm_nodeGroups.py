@@ -17,14 +17,16 @@
 # along with CrowdMaster.  If not, see <http://www.gnu.org/licenses/>.
 # ##### END GPL LICENSE BLOCK #####
 
-import bpy
-from bpy.types import Node, NodeTree, Operator, NodeSocket, PropertyGroup
-from bpy.types import Panel, UIList
-from bpy.props import StringProperty, CollectionProperty, EnumProperty
-from bpy.props import IntProperty, BoolProperty
 import random
-from . import cm_bpyNodes
+
+import bpy
+from bpy.props import (BoolProperty, CollectionProperty, EnumProperty,
+                       IntProperty, StringProperty)
+from bpy.types import (Node, NodeSocket, NodeTree, Operator, Panel,
+                       PropertyGroup, UIList)
 from mathutils import Vector
+
+from . import cm_bpyNodes
 
 updatingGroupInSocket = False
 
@@ -606,8 +608,10 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
     bl_label = "Group"
     bl_width_default = 350.0
 
-    groupName = EnumProperty(name="Group Name", items=getCMGroups, update=updateGroupName)
-    editGroupName = StringProperty(name="Edit Name", update=updateEditGroupName)
+    groupName = EnumProperty(
+        name="Group Name", items=getCMGroups, update=updateGroupName)
+    editGroupName = StringProperty(
+        name="Edit Name", update=updateEditGroupName)
 
     @classmethod
     def poll(cls, ntree):
