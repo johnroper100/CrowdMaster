@@ -194,7 +194,7 @@ class NewInputNode(LogicNode):
                                  items=[("DH", "Height Difference", "", 1),
                                         ("ARZ", "Ahead Rotation Z", "", 2),
                                         ("ARX", "Ahead Rotation X", "", 3)])
-    GroundAheadOffset = FloatVectorProperty(name="Ground Ahead Offset",
+    GroundAheadOffset = FloatVectorProperty(name="Ahead Offset",
                                             description="Position relative to the agent to check the ground mesh",
                                             default=(0, 1, 0))
 
