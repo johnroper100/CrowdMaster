@@ -269,8 +269,8 @@ class NewInputNode(LogicNode):
 
     AgentInfoOptions = EnumProperty(name="Agent Info Options",
                                     items=[("GETTAG", "Get Tag", "", 1),
-                                           ("HEADRZ", "Heading rz", "", 2),
-                                           ("HEADRX", "Heading rx", "", 3)])
+                                           ("HEADRZ", "Heading Relative Z", "", 2),
+                                           ("HEADRX", "Heading Relative X", "", 3)])
     GetTagName = StringProperty(name="Get Tag Name")
 
     def draw_buttons(self, context, layout):
