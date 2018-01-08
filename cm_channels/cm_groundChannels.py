@@ -20,7 +20,7 @@
 import math
 
 import bpy
-from mathutils import *
+from mathutils import Vector, bvhtree
 
 from .cm_masterChannels import MasterChannel as Mc
 from .cm_masterChannels import timeChannel

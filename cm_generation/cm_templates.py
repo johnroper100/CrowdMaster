@@ -1068,19 +1068,23 @@ class TemplateVCOLPOSITIONING(Template):
         invert = self.settings["invert"]
         data = guide.data
         polys = []
-        mesh = data
 
-        vcol_layer = mesh.vertex_colors[self.settings["vcols"]]
+        vcol_layer = data.vertex_colors[self.settings["vcols"]]
 
-        for poly in mesh.polygons:
-            for loop_index in poly.loop_indices:
-                loop_vert_index = mesh.loops[loop_index].vertex_index
+        i = 0
+        for poly in data.polygons:
+            for idx in poly.loop_indices:
                 if not invert:
-                    if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        polys.append(poly)
+                    if vcol_layer.data[i].color[0] == self.settings["vcolor"][0]:
+                        if vcol_layer.data[i].color[1] == self.settings["vcolor"][1]:
+                            if vcol_layer.data[i].color[2] == self.settings["vcolor"][2]:
+                                polys.append(poly)
                 else:
-                    if not vcol_layer.data[loop_index].color == self.settings["vcolor"]:
-                        polys.append(poly)
+                    if not vcol_layer.data[i].color[0] == self.settings["vcolor"][0]:
+                        if not vcol_layer.data[i].color[1] == self.settings["vcolor"][1]:
+                            if not vcol_layer.data[i].color[2] == self.settings["vcolor"][2]:
+                                polys.append(poly)
+                i += 1
 
         wrld = guide.matrix_world
         if self.totalArea is None:
@@ -1153,13 +1157,13 @@ class TemplateVCOLPOSITIONING(Template):
 
             point = buildRequest.pos
             loc, norm, ind, dist = self.bvhtree.find_nearest(point)
-            poly = mesh.polygons[ind]
+            poly = data.polygons[ind]
 
             cm_timings.placement["TemplateVCOLPOSITIONING"] += time.time() - t
             cm_timings.placementNum["TemplateVCOLPOSITIONING"] += 1
 
             for loop_index in poly.loop_indices:
-                loop_vert_index = mesh.loops[loop_index].vertex_index
+                loop_vert_index = data.loops[loop_index].vertex_index
                 if not invert:
                     if vcol_layer.data[loop_index].color == self.settings["vcolor"]:
                         self.inputs["Template"].build(buildRequest)
@@ -1171,6 +1175,8 @@ class TemplateVCOLPOSITIONING(Template):
         if "Template" not in self.inputs:
             return False
         if self.settings["guideMesh"] not in bpy.context.scene.objects:
+            return False
+        if self.settings["vcols"] == "":
             return False
         if bpy.context.scene.objects[self.settings["guideMesh"]].type != 'MESH':
             return False
