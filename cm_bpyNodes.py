@@ -245,9 +245,9 @@ class NewInputNode(LogicNode):
     StateOptions = EnumProperty(name="State Options",
                                 items=[("RADIUS", "Radius", "", 1),
                                        ("SPEED", "Speed", "", 2),
-                                       ("GLOBALVELX", "Global Vel X", "", 3),
-                                       ("GLOBALVELY", "Global Vel Y", "", 4),
-                                       ("GLOBALVELZ", "Global Vel Z", "", 5),
+                                       ("GLOBALVELX", "Global Velocity X", "", 3),
+                                       ("GLOBALVELY", "Global Velocity Y", "", 4),
+                                       ("GLOBALVELZ", "Global Velocity Z", "", 5),
                                        ("QUERYTAG", "Query Tag", "", 6)])
     StateTagName = StringProperty(name="Tag Name")
 
