@@ -223,20 +223,20 @@ class NewInputNode(LogicNode):
                                        ("RX", "Rotation X", "", 2),
                                        ("DIST", "Distance", "", 3),
                                        ("CLOSE", "Close", "", 4),
-                                       ("DB", "DB", "", 5)])
+                                       ("DB", "Decibel", "", 5)])
     PredictionOptions = EnumProperty(name="Sound Prediction Options",
                                      items=[("RZ", "Rotation Z", "", 1),
                                             ("RX", "Rotation X", "", 2),
                                             ("DIST", "Distance", "", 3),
                                             ("CLOSE", "Close", "", 4),
-                                            ("DB", "DB", "", 5),
+                                            ("DB", "Decibel", "", 5),
                                             ("CERT", "Certainty", "", 6)])
     SteeringOptions = EnumProperty(name="Sound Steering Options",
                                    items=[("RZ", "Rotation Z", "", 1),
                                           ("RX", "Rotation X", "", 2),
                                           ("DIST", "Distance", "", 3),
                                           ("CLOSE", "Close", "", 4),
-                                          ("DB", "DB", "", 5),
+                                          ("DB", "Decibel", "", 5),
                                           ("CERT", "Certainty", "", 6),
                                           ("ACC", "Acceleration", "", 7),
                                           ("OVER", "Over", "", 8)])
@@ -269,8 +269,8 @@ class NewInputNode(LogicNode):
 
     AgentInfoOptions = EnumProperty(name="Agent Info Options",
                                     items=[("GETTAG", "Get Tag", "", 1),
-                                           ("HEADRZ", "Heading Relative Z", "", 2),
-                                           ("HEADRX", "Heading Relative X", "", 3)])
+                                           ("HEADRZ", "Heading Rotation Z", "", 2),
+                                           ("HEADRX", "Heading Rotation X", "", 3)])
     GetTagName = StringProperty(name="Tag Name")
 
     def draw_buttons(self, context, layout):
