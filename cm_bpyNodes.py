@@ -185,15 +185,15 @@ class NewInputNode(LogicNode):
 
     FormationGroup = StringProperty(name="Formation Group")
     FormationOptions = EnumProperty(name="Formation Options",
-                                    items=[("RZ", "rz", "", 1),
-                                           ("RX", "rx", "", 2),
-                                           ("DIST", "dist", "", 3)])
+                                    items=[("RZ", "Rotation Z", "", 1),
+                                           ("RX", "Rotation X", "", 2),
+                                           ("DIST", "Distance", "", 3)])
 
     GroundGroup = StringProperty(name="Ground Group")
     GroundOptions = EnumProperty(name="Ground Options",
-                                 items=[("DH", "dh", "", 1),
-                                        ("ARZ", "ahead rz", "", 2),
-                                        ("ARX", "ahead rx", "", 3)])
+                                 items=[("DH", "Height Difference", "", 1),
+                                        ("ARZ", "Ahead Rotation Z", "", 2),
+                                        ("ARX", "Ahead Rotation X", "", 3)])
     GroundAheadOffset = FloatVectorProperty(name="Ground Ahead Offset",
                                             description="Position relative to the agent to check the ground mesh",
                                             default=(0, 1, 0))
@@ -208,9 +208,9 @@ class NewInputNode(LogicNode):
 
     PathName = StringProperty(name="Path Name")
     PathOptions = EnumProperty(name="Path Options",
-                               items=[("RZ", "rz", "", 1),
-                                      ("RX", "rx", "", 2),
-                                      ("INLANE", "In lane", "", 3)])
+                               items=[("RZ", "Rotation Z", "", 1),
+                                      ("RX", "Rotation X", "", 2),
+                                      ("INLANE", "In Lane", "", 3)])
     PathLaneSearchDistance = FloatProperty(name="Search Distance", min=0)
 
     SoundFrequency = StringProperty(name="Sound Frequency")
@@ -219,27 +219,27 @@ class NewInputNode(LogicNode):
                                     ("PREDICTION", "Prediction", "", 2),
                                     ("STEERING", "Steering", "", 3)])
     SoundOptions = EnumProperty(name="Sound Options",
-                                items=[("RZ", "rz", "", 1),
-                                       ("RX", "rx", "", 2),
-                                       ("DIST", "dist", "", 3),
-                                       ("CLOSE", "close", "", 4),
-                                       ("DB", "db", "", 5)])
+                                items=[("RZ", "Rotation Z", "", 1),
+                                       ("RX", "Rotation X", "", 2),
+                                       ("DIST", "Distance", "", 3),
+                                       ("CLOSE", "Close", "", 4),
+                                       ("DB", "DB", "", 5)])
     PredictionOptions = EnumProperty(name="Sound Prediction Options",
-                                     items=[("RZ", "rz", "", 1),
-                                            ("RX", "rx", "", 2),
-                                            ("DIST", "dist", "", 3),
-                                            ("CLOSE", "close", "", 4),
-                                            ("DB", "db", "", 5),
-                                            ("CERT", "cert", "", 6)])
-    SteeringOptions = EnumProperty(name="Sound steering Options",
-                                   items=[("RZ", "rz", "", 1),
-                                          ("RX", "rx", "", 2),
-                                          ("DIST", "dist", "", 3),
-                                          ("CLOSE", "close", "", 4),
-                                          ("DB", "db", "", 5),
-                                          ("CERT", "cert", "", 6),
-                                          ("ACC", "acc", "", 7),
-                                          ("OVER", "over", "", 8)])
+                                     items=[("RZ", "Rotation Z", "", 1),
+                                            ("RX", "Rotation X", "", 2),
+                                            ("DIST", "Distance", "", 3),
+                                            ("CLOSE", "Close", "", 4),
+                                            ("DB", "DB", "", 5),
+                                            ("CERT", "Certainty", "", 6)])
+    SteeringOptions = EnumProperty(name="Sound Steering Options",
+                                   items=[("RZ", "Rotation Z", "", 1),
+                                          ("RX", "Rotation X", "", 2),
+                                          ("DIST", "Distance", "", 3),
+                                          ("CLOSE", "Close", "", 4),
+                                          ("DB", "DB", "", 5),
+                                          ("CERT", "Certainty", "", 6),
+                                          ("ACC", "Acceleration", "", 7),
+                                          ("OVER", "Over", "", 8)])
     MinusRadius = BoolProperty(name="Minus Radius", default=True)
 
     StateOptions = EnumProperty(name="State Options",
@@ -248,7 +248,7 @@ class NewInputNode(LogicNode):
                                        ("GLOBALVELX", "Global Vel X", "", 3),
                                        ("GLOBALVELY", "Global Vel Y", "", 4),
                                        ("GLOBALVELZ", "Global Vel Z", "", 5),
-                                       ("QUERYTAG", "Query tag", "", 6)])
+                                       ("QUERYTAG", "Query Tag", "", 6)])
     StateTagName = StringProperty(name="Tag Name")
 
     WorldOptions = EnumProperty(name="World Options",
@@ -257,8 +257,8 @@ class NewInputNode(LogicNode):
                                        ("EVENT", "Event", "", 3)])
     TargetObject = StringProperty(name="Target Object")
     TargetOptions = EnumProperty(name="Target Options",
-                                 items=[("RZ", "rz", "", 1),
-                                        ("RX", "rx", "", 2),
+                                 items=[("RZ", "Rotation Z", "", 1),
+                                        ("RX", "Rotation X", "", 2),
                                         ("ARRIVED", "Arrived", "", 3)])
     EventName = StringProperty(name="Event Name")
     EventOptions = EnumProperty(name="Event Options",
