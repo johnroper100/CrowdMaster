@@ -19,7 +19,7 @@
 
 bl_info = {
     "name": "CrowdMaster Rust",
-    "author": "Peter Noble, John Roper, Jake Dube, Patrick Crawford",
+    "author": "Peter Noble, John Roper, Andrew Buttery, Christian Campos Angulo, Patrick Crawford, Jake Dube",
     "version": (1, 3, 3),
     "blender": (2, 78, 0),
     "location": "Node Editor > CrowdMaster Node Trees",
