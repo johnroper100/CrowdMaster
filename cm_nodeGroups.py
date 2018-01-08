@@ -604,6 +604,7 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
     """CrowdMaster Group Node"""
     bl_idname = "GroupNode"
     bl_label = "Group"
+    bl_width_default = 350.0
 
     groupName = EnumProperty(name="Group Name", items=getCMGroups, update=updateGroupName)
     editGroupName = StringProperty(name="Edit Name", update=updateEditGroupName)
