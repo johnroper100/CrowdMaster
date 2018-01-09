@@ -1005,10 +1005,13 @@ def groupCategory(context):
     yield NodeItem("GroupNode")
 
     if len(context.blend_data.node_groups) > 0:
-        yield SeparatorItem()
+        separator = False
 
         for group in context.blend_data.node_groups:
             if group.bl_idname == "CrowdMasterGroupTreeType":
+                if not separator:
+                    separator = True
+                    yield SeparatorItem()
                 yield NodeItem("GroupNode", label=group.name,
                                settings={"groupName": repr(group.name)})
 
