@@ -463,6 +463,7 @@ class MathNode(LogicNode):
         ("sub", "Subtract", "Subtract the two numbers from each other"),
         ("mul", "Multiply", "Multiply the two numbers"),
         ("div", "Divide", "Divide the two numbers"),
+        ("mod", "Modulo", "Calculate the modulo of the two numbers"),        
         ("set", "Set To", "Set all inputs to this number"),
         ("clamp", "Clamp", "Clamp the input values to a specified range")],
                              default="mul",

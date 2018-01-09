@@ -121,3 +121,4 @@ sources/cm_compileBrain\.html
 \.idea/
 
 .vscode/*
+*.ffs_lock

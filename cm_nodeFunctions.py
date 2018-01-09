@@ -291,6 +291,8 @@ class LogicMATH(Neuron):
                     result[i] = into[i] * settings["num1"]
                 elif settings["operation"] == "div":
                     result[i] = into[i] / settings["num1"]
+                elif settings["operation"] == "mod":
+                    result[i] = into[i] % settings["num1"]                    
                 elif settings["operation"] == "set":
                     result[i] = settings["num1"]
                 elif settings["operation"] == "clamp":
