@@ -79,11 +79,14 @@ class SCENE_OT_agent_nodes_generate(Operator):
             return False, None
 
     def execute(self, context):
+        preferences = context.user_preferences.addons[__package__.split(".", 1)[0]].preferences
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.resetTimings()
+
         if context.active_object is not None and context.active_object.hide is not True:
             bpy.ops.object.mode_set(mode='OBJECT')
         ntree = bpy.data.node_groups[self.nodeTreeName]
         generateNode = ntree.nodes[self.nodeName]
-        preferences = context.user_preferences.addons[__package__.split(".", 1)[0]].preferences
 
         cache = {}
         genSpaces = {}

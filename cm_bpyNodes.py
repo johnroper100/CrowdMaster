@@ -982,6 +982,12 @@ class MyNodeCategory(NodeCategory):
         return context.space_data.tree_type == 'CrowdMasterTreeType'
 
 
+class SeparatorItem:
+    @staticmethod
+    def draw(item, col, context):
+        col.separator()
+
+
 def groupCategory(context):
     if context is None:
         return
@@ -998,9 +1004,16 @@ def groupCategory(context):
 
     yield NodeItem("GroupNode")
 
-    for group in context.blend_data.node_groups:
-        if group.bl_idname == "CrowdMasterGroupTreeType":
-            continue
+    if len(context.blend_data.node_groups) > 0:
+        separator = False
+
+        for group in context.blend_data.node_groups:
+            if group.bl_idname == "CrowdMasterGroupTreeType":
+                if not separator:
+                    separator = True
+                    yield SeparatorItem()
+                yield NodeItem("GroupNode", label=group.name,
+                               settings={"groupName": repr(group.name)})
 
 
 node_categories = [

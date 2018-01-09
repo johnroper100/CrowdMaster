@@ -56,6 +56,8 @@ placement = OrderedDict([
     ("cm_agent_add-modify_bones", 0)
 ])
 
+placement_copy = placement.copy()
+
 placementNum = OrderedDict([
     ("Construct", 0),
     ("Build", 0),
@@ -88,6 +90,8 @@ placementNum = OrderedDict([
     ("cm_agent_add-modify_bones", 0)
 ])
 
+placementNum_copy = placementNum.copy()
+
 agent = OrderedDict([
     ("init", 0),
     ("brainExecute", 0),
@@ -96,6 +100,8 @@ agent = OrderedDict([
     ("applyOutput", 0)
 ])
 
+agent_copy = agent.copy()
+
 brain = OrderedDict([
     ("setUser", 0),
     ("newFrame", 0),
@@ -103,16 +109,22 @@ brain = OrderedDict([
     ("evalState", 0)
 ])
 
+brain_copy = brain.copy()
+
 simulation = OrderedDict([
     ("total", 0),
     ("betweenFrames", 0),
     ("totalFrames", 0)
 ])
 
+simulation_copy = simulation.copy()
+
 neuron = OrderedDict([
     ("deps", 0),
     ("sumColour", 0)
 ])
+
+neuron_copy = neuron.copy()
 
 coreTimes = OrderedDict([
     ("LogicINPUT", 0),
@@ -127,8 +139,11 @@ coreTimes = OrderedDict([
     ("LogicOUTPUT", 0),
     ("LogicPRIORITY", 0),
     ("LogicEVENT", 0),
-    ("LogicPRINT", 0)
+    ("LogicPRINT", 0),
+    ("LogicMAP", 0)
 ])
+
+coreTimes_copy = coreTimes.copy()
 
 coreNumber = OrderedDict([
     ("LogicINPUT", 0),
@@ -143,8 +158,30 @@ coreNumber = OrderedDict([
     ("LogicOUTPUT", 0),
     ("LogicPRIORITY", 0),
     ("LogicEVENT", 0),
-    ("LogicPRINT", 0)
+    ("LogicPRINT", 0),
+    ("LogicMAP", 0)
 ])
+
+coreNumber_copy = coreTimes.copy()
+
+
+def resetTimings():
+    global placement
+    placement = placement_copy.copy()
+    global placementNum
+    placementNum = placementNum_copy.copy()
+    global agent
+    agent = agent_copy.copy()
+    global brain
+    brain = brain_copy.copy()
+    global simulation
+    simulation = simulation_copy.copy()
+    global neuron
+    neuron = neuron_copy.copy()
+    global coreTimes
+    coreTimes = coreTimes_copy.copy()
+    global coreNumber
+    coreNumber = coreNumber_copy.copy()
 
 
 def printTimings():

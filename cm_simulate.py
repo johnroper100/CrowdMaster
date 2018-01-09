@@ -36,6 +36,8 @@ class Simulation:
 
     def __init__(self):
         preferences = bpy.context.user_preferences.addons[__package__].preferences
+        if preferences.show_debug_options and preferences.show_debug_timings:
+            cm_timings.resetTimings()
         self.agents = {}
         if bpy.context.scene.cm_sim_start_frame != -1:
             self.frameLast = bpy.context.scene.cm_sim_start_frame

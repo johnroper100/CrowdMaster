@@ -619,7 +619,8 @@ class GroupNode(cm_bpyNodes.CrowdMasterNode):
             return True
 
     def init(self, context):
-        pass
+        if self.groupName in bpy.data.node_groups:
+            bpy.data.node_groups[self.groupName].use_fake_user = True
 
     @property
     def cm_groupTree(self):
