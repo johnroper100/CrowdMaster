@@ -90,7 +90,7 @@ def compileNodeGroup(nodeGroup, prefix, brain):
         if node.bl_idname in logictypes:
             item = logictypes[node.bl_idname](brain, node, nodeKey)
             node.getSettings(item)
-            if node.bl_idname == "PriorityNode":
+            if node.bl_idname == "PriorityNode" or "MathNode":
                 item.inputs = getMultiInputs(node.inputs, nodeKey)
             else:
                 item.inputs = getInputs(node.inputs["Input"], nodeKey)
