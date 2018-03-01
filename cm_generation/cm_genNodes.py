@@ -253,7 +253,7 @@ class GeoSwitchNode(CrowdMasterAGenTreeNode):
     bl_icon = 'SOUND'
 
     switchAmount = FloatProperty(
-        name="Amount", default=0.5, min=0.0, max=1.0, precision=0)
+        name="Amount", default=0.5, min=0.0, max=1.0, precision=1)
 
     def init(self, context):
         self.inputs.new('GeoSocketType', "Object 1")
