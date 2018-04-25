@@ -106,7 +106,7 @@ def compileNodeGroup(nodeGroup, prefix, brain):
             node.getSettings(item)
             item.outputs = getOutputs(node.outputs["To"], nodeKey)
             if node.bl_idname == "StartState":
-                brain.setStartState(node.name)
+                brain.setStartState(nodeKey)
             else:
                 item.valueInputs = getInputs(node.inputs["Value"], nodeKey)
                 item.inputs = getInputs(node.inputs["From"], nodeKey)
