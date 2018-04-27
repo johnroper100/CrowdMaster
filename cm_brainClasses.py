@@ -233,7 +233,7 @@ class State:
         self.resultLog[sceneFrame] = (0.15, 0.4, complete)
 
         if self.currentFrame < self.length - 1:
-            return False, self.name
+            return False, self.nodeKey
 
         # ==== Will stop here is this state hasn't reached its end ====
 
@@ -245,10 +245,10 @@ class State:
 
         # If the cycleState button is checked then add a contection back to
         #    this state again.
-        if self.cycleState and self.name not in self.outputs:
-            val = self.neurons[self.name].query()
+        if self.cycleState and self.nodeKey not in self.outputs:
+            val = self.neurons[self.nodeKey].query()
             if val is not None:
-                options.append((self.name, val))
+                options.append((self.nodeKey, val))
 
         if len(options) > 0:
             if len(options) == 1:

@@ -870,7 +870,7 @@ class StateAction(State):
 
             moveToInterupt = True
 
-            val = self.neurons[self.name].query()
+            val = self.neurons[self.nodeKey].query()
             if val is not None and val >= nextVal:
                 moveToInterupt = False
 
@@ -881,7 +881,7 @@ class StateAction(State):
         # ==== Will stop here if there is a valid sync or interupt state ====
 
         if self.currentFrame < self.length - 1:
-            return False, self.name
+            return False, self.nodeKey
 
         # ==== Will stop here is this state hasn't reached its end ====
 
@@ -894,9 +894,9 @@ class StateAction(State):
         # If the cycleState button is checked then add a connection back to
         #    this state again.
         if self.cycleState and self.name not in self.outputs:
-            val = self.neurons[self.name].query()
+            val = self.neurons[self.nodeKey].query()
             if val is not None and val > 0:
-                options.append((self.name, val))
+                options.append((self.nodeKey, val))
 
         if len(options) > 0:
             if len(options) == 1:
