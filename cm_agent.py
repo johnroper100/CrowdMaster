@@ -20,9 +20,11 @@
 import copy
 import logging
 import time
+import math
 
 import bpy
 import mathutils
+from mathutils import Vector
 
 from . import cm_timings
 from .cm_compileBrain import compileBrain
@@ -208,13 +210,29 @@ class Agent:
         self.ry = self.brain.outvars["ry"] if self.brain.outvars["ry"] else 0
         self.rz = self.brain.outvars["rz"] if self.brain.outvars["rz"] else 0
 
-        self.arx += self.rx + self.rsx
+        xaxis = Vector((1, 0, 0))
+        xaxis.rotate(rot)
+        yaxis = Vector((0, 1, 0))
+        yaxis.rotate(rot)
+        zaxis = Vector((0, 0, 1))
+        zaxis.rotate(rot)
+        
+        x_rot = rotation_matrix_about_axis(xaxis, self.rx)
+        y_rot = rotation_matrix_about_axis(yaxis, self.ry)
+        z_rot = rotation_matrix_about_axis(zaxis, self.rz)
+        
+        rot = rot.copy()
+        rot.rotate(x_rot)
+        rot.rotate(y_rot)
+        rot.rotate(z_rot)
+
+        self.arx = rot[0]
         self.rx = 0
 
-        self.ary += self.ry + self.rsy
+        self.ary = rot[1]
         self.ry = 0
 
-        self.arz += self.rz + self.rsz
+        self.arz = rot[2]
         self.rz = 0
 
         self.px = self.brain.outvars["px"] if self.brain.outvars["px"] else 0
@@ -497,3 +515,26 @@ class Agent:
     def highLight(self):
         for n in self.brain.neurons.values():
             n.highLight(bpy.context.scene.frame_current)
+
+            
+def rotation_matrix_about_axis(axis, angle):
+    """https://sites.google.com/site/glennmurray/Home/rotation-matrices-and-formulas/rotation-about-an-arbitrary-axis-in-3-dimensions"""
+    ct = math.cos(angle)
+    st = math.sin(angle)
+    
+    u, v, w = axis
+    l2 = u**2 + v**2 + w**2
+    l = math.sqrt(l2)
+
+    m = mathutils.Matrix()
+    m[0][0] = (u**2+(v**2+w**2)*ct)/l2
+    m[0][1] = (u*v*(1-ct) - w*l*st)/l2
+    m[0][2] = (u*w*(1-ct) + v*l*st)/l2
+    m[1][0] = (u*v*(1-ct)+w*l*st)/l2
+    m[1][1] = (v**2+(u**2+w**2)*ct)/l2
+    m[1][2] = (v*w*(1-ct)-u*l*st)/l2
+    m[2][0] = (u*w*(1-ct)-v*l*st)/l2
+    m[2][1] = (v*w*(1-ct)+u*l*st)/l2
+    m[2][2] = (w**2 + (u**2+v**2)*ct)/l2
+    
+    return m
