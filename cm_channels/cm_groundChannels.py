@@ -122,6 +122,30 @@ class Channel:
         if not self.calcd:
             self.calcground()
         return self.store["distance"]
+        
+    @timeChannel("Ground")
+    def ry(self):
+        ag = bpy.context.scene.objects[self.userid]
+        if not self.calcd:
+            self.calcground()
+        normal = self.store["normal"]
+        t = ag.rotation_euler.to_matrix()
+        t.invert()
+        relative = t * normal
+        changey = math.atan2(relative[0], relative[2]) / math.pi
+        return changey    
+            
+    @timeChannel("Ground")
+    def rx(self):
+        ag = bpy.context.scene.objects[self.userid]
+        if not self.calcd:
+            self.calcground()
+        normal = self.store["normal"]
+        t = ag.rotation_euler.to_matrix()
+        t.invert()
+        relative = t * normal
+        changex = math.atan2(relative[1], relative[2]) / math.pi
+        return changex
 
     def calcAhead(self, offset):
         s = bpy.context.scene.objects[self.userid]

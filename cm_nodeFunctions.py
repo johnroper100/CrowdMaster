@@ -125,7 +125,14 @@ class LogicNEWINPUT(Neuron):
             elif settings["GroundOptions"] == "ARX":
                 gChan = channels["Ground"].retrieve(settings["GroundGroup"])
                 return {"": gChan.aheadRx(self.settings["GroundAheadOffset"])}
-
+            elif settings["GroundOptions"] == "RX":
+                gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+                dh = gChan.rx()
+                return {"": dh} if dh is not None else {}
+            elif settings["GroundOptions"] == "RY":
+                gChan = channels["Ground"].retrieve(settings["GroundGroup"])
+                dh = gChan.ry()
+                return {"": dh} if dh is not None else {}
         elif settings["InputSource"] == "NOISE":
             noise = channels["Noise"]
             if settings["NoiseOptions"] == "RANDOM":

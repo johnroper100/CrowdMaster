@@ -193,7 +193,10 @@ class NewInputNode(LogicNode):
     GroundOptions = EnumProperty(name="Ground Options",
                                  items=[("DH", "Height Difference", "", 1),
                                         ("ARZ", "Ahead Rotation Z", "", 2),
-                                        ("ARX", "Ahead Rotation X", "", 3)])
+                                        ("ARX", "Ahead Rotation X", "", 3),
+                                        ("RX", "rx", "", 4),
+                                        ("RY", "ry", "", 5),
+                                        ])
     GroundAheadOffset = FloatVectorProperty(name="Ahead Offset",
                                             description="Position relative to the agent to check the ground mesh",
                                             default=(0, 1, 0))
