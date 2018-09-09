@@ -86,7 +86,7 @@ class Channel:
                 self.groundTrees[gnd.name] = BVHTree.FromObject(gnd, sce)
             inverseTransform = gnd.matrix_world.inverted()
             point = (inverseTransform * s.location.to_4d()).to_3d()
-            direc = Vector((0, 0, 1))
+            direc = s.rotation_euler.to_matrix() * Vector((0, 0, 1))
             direc.rotate(inverseTransform.to_euler())
 
             calcd = self.groundTrees[gnd.name].ray_cast(
