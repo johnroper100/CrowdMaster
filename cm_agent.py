@@ -99,6 +99,13 @@ class Agent:
         self.sz = 0
         self.apzKey = True  # True if a keyframe was set last frame
 
+        self.scalex = objs[blenderid].scale[0]
+        self.scaley = objs[blenderid].scale[1]
+        self.scalez = objs[blenderid].scale[2]
+        self.scalexKey = True
+        self.scaleyKey = True
+        self.scalezKey = True
+
         self.globalVelocity = mathutils.Vector([0, 0, 0])
 
         self.shapeKeys = {}
@@ -129,6 +136,7 @@ class Agent:
                         else:
                             bone.keyframe_insert("rotation_euler")
                 obj.keyframe_insert("location")
+                obj.keyframe_insert("scale")
                 if obj.rotation_mode == "QUATERNION":
                     obj.keyframe_insert("rotation_quaternion")
                 elif obj.rotation_mode == "AXIS_ANGLE":
@@ -157,6 +165,7 @@ class Agent:
                         else:
                             bone.keyframe_insert("rotation_euler")
                 obj.keyframe_insert("location")
+                obj.keyframe_insert("scale")
                 if obj.rotation_mode == "QUATERNION":
                     obj.keyframe_insert("rotation_quaternion")
                 elif obj.rotation_mode == "AXIS_ANGLE":
@@ -211,6 +220,10 @@ class Agent:
         self.px = self.brain.outvars["px"] if self.brain.outvars["px"] else 0
         self.py = self.brain.outvars["py"] if self.brain.outvars["py"] else 0
         self.pz = self.brain.outvars["pz"] if self.brain.outvars["pz"] else 0
+
+        self.scalex = self.brain.outvars["sx"] if self.brain.outvars["sx"] is not None else self.scalex
+        self.scaley = self.brain.outvars["sy"] if self.brain.outvars["sy"] is not None else self.scaley
+        self.scalez = self.brain.outvars["sz"] if self.brain.outvars["sz"] is not None else self.scalez
 
         self.shapeKeys = self.brain.outvars["sk"]
 
@@ -405,6 +418,45 @@ class Agent:
                                 frame=thisFrame)
         else:
             self.apzKey = False
+            
+        if abs(self.scalex - obj.scale[0]) > 0.000001:
+            if not self.scalexKey:
+                obj.keyframe_insert(data_path="scale",
+                                    index=0,
+                                    frame=lastFrame)
+                self.scalexKey = True
+            obj.scale[0] = self.scalex
+            obj.keyframe_insert(data_path="scale",
+                                index=0,
+                                frame=thisFrame)
+        else:
+            self.scalexKey = False
+            
+        if abs(self.scaley - obj.scale[1]) > 0.000001:
+            if not self.scaleyKey:
+                obj.keyframe_insert(data_path="scale",
+                                    index=1,
+                                    frame=lastFrame)
+                self.scaleyKey = True
+            obj.scale[1] = self.scaley
+            obj.keyframe_insert(data_path="scale",
+                                index=1,
+                                frame=thisFrame)
+        else:
+            self.scaleyKey = False
+            
+        if abs(self.scalez - obj.scale[2]) > 0.000001:
+            if not self.scalezKey:
+                obj.keyframe_insert(data_path="scale",
+                                    index=2,
+                                    frame=lastFrame)
+                self.scalezKey = True
+            obj.scale[2] = self.scalez
+            obj.keyframe_insert(data_path="scale",
+                                index=2,
+                                frame=thisFrame)
+        else:
+            self.scalezKey = False
 
         objs = bpy.context.scene.objects
 

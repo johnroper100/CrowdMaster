@@ -654,8 +654,11 @@ class OutputNode(LogicNode):
                                  ("py", "Position Y", "", 5),
                                  ("pz", "Position Z", "", 6),
                                  ("sk", "Shape Key", "", 7),
-                                 ("tag", "Tag", "", 8),
-                                 ("rna", "RNA Value", "", 9)
+                                 ("sx", "Scale X", "", 8),
+                                 ("sy", "Scale Y", "", 9),
+                                 ("sz", "Scale Z", "", 10),
+                                 ("tag", "Tag", "", 11),
+                                 ("rna", "RNA Value", "", 12)
                                 ],
                           default="py")
     SKName = StringProperty(name="Shape Key Name",
