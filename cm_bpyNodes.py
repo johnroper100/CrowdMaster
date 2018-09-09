@@ -414,8 +414,8 @@ class GraphNode(LogicNode):
         name="Invert", description="Invert the output of the graph", default=False)
 
     CurveType = EnumProperty(name="Curve Type",
-                             items=[("RBF", "PI", "", 1),
-                                    ("RANGE", "Lambda", "", 2)],
+                             items=[("RBF", "RBF", "", 1),
+                                    ("RANGE", "Range", "", 2)],
                              description="Which curve function to use")
 
     LowerZero = FloatProperty(
