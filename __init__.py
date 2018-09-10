@@ -266,8 +266,9 @@ class SCENE_OT_cm_start(Operator):
                 if area.type == 'VIEW_3D':
                     customOutline = area.spaces[0].show_outline_selected
                     customRLines = area.spaces[0].show_relationship_lines
-                    area.spaces[0].show_outline_selected = False
-                    area.spaces[0].show_relationship_lines = False
+                    if preferences.disable_outline_selected:
+                        area.spaces[0].show_outline_selected = False
+                        area.spaces[0].show_relationship_lines = False
 
         if context.scene.cm_sim_start_frame != -1:
             scene.frame_set(scene.cm_sim_start_frame)

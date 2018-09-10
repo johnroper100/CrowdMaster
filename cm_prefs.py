@@ -123,6 +123,12 @@ class CMPreferences(AddonPreferences):
         description="Choose whether or not to show the node info colors while simulating.",
         default=True,
     )
+    
+    disable_outline_selected = BoolProperty(
+        name="Disable outline selected",
+        description="Choose if selected object outlines are disabled during the simulation to increase speed.",
+        default=False,
+    )
 
     prefs_tab_items = [
         ("GEN", "General Settings", "General settings for the addon."),
@@ -159,6 +165,7 @@ class CMPreferences(AddonPreferences):
             else:
                 row.prop(preferences, 'show_debug_options',
                          icon='RECOVER_AUTO')
+            row.prop(preferences, 'disable_outline_selected', icon='PMARKER_SEL')
 
         if preferences.prefs_tab == "UPDATE":
             layout.row()
