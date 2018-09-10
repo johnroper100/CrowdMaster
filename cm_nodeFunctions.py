@@ -284,42 +284,27 @@ class LogicGRAPH(Neuron):
 
 
 class LogicMATH(Neuron):
-    """returns the values added/subtracted/multiplied/divided/set/modulo/clamped together"""
+    """returns the values added/subtracted/multiplied/divided/set/clamped together"""
 
     def core(self, inps, settings):
         result = {}
-        value1 = {}
-        value2 = {}
-
-        value1[''] = settings["num1"]
-        value2[''] = settings["num2"]
-        
-        if len(inps) == 1:
-            print("1 input - inps[0]: " + str(inps[0]))
-            value1 = inps[0]
-
-        if len(inps) == 2:
-            print("1 input - inps[0]: " + str(inps[0]))
-            print("2 inputs - inps[1]: " + str(inps[1]))
-            value1 = inps[0]
-            value2 = inps[1]
-
-        i = ''             
-        if settings["operation"] == "add":
-            result[i] = value1[''] + value2['']
-        elif settings["operation"] == "sub":
-            result[i] = value1[''] - value2['']
-        elif settings["operation"] == "mul":
-            result[i] = value1[''] * value2['']
-        elif settings["operation"] == "div":
-            result[i] = value1[''] / value2['']
-        elif settings["operation"] == "mod":
-            result[i] = value1[''] % value2['']                    
-        elif settings["operation"] == "set":
-            result[i] = value2['']
-        elif settings["operation"] == "clamp":
-            result[i] = max(min(settings["ClampMax"], value1['']), settings["ClampMin"])
-
+        for into in inps:
+            for i in into:
+                if settings["operation"] == "add":
+                    result[i] = into[i] + settings["num1"]
+                elif settings["operation"] == "sub":
+                    result[i] = into[i] - settings["num1"]
+                elif settings["operation"] == "mul":
+                    result[i] = into[i] * settings["num1"]
+                elif settings["operation"] == "div":
+                    result[i] = into[i] / settings["num1"]
+                elif settings["operation"] == "mod":
+                    result[i] = into[i] % settings["num1"]                    
+                elif settings["operation"] == "set":
+                    result[i] = settings["num1"]
+                elif settings["operation"] == "clamp":
+                    result[i] = max(
+                        min(settings["ClampMax"], into[i]), settings["ClampMin"])
         return result
 
 

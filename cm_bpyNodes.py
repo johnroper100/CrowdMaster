@@ -474,45 +474,26 @@ class MathNode(LogicNode):
 
     num1 = FloatProperty(name="Number 1", default=1.0,
                          description="Input is added/subtracted/multiplied/divided/set to this number")
-    num2 = FloatProperty(name="Number 2", default=1.0,
-                         description="Input is added/subtracted/multiplied/divided/set to this number")
 
     ClampMin = FloatProperty(name="Clamp Min", default=0.0)
     ClampMax = FloatProperty(name="Clamp Max", default=1.0)
 
-    def init(self, context):
-        self.inputs.new("DefaultSocketType", "Input 1")
-        self.inputs.new("DefaultSocketType", "Input 2")
-
-        self.outputs.new('DefaultSocketType', "Output")
-        self.outputs.new("DependanceSocketType", "Dependant")
-        
     def draw_buttons(self, context, layout):
-        inps = self.inputs
-        #print("Input length : " + str(len(inps)))
         layout.prop(self, "operation")
 
         if self.operation == "clamp":
             layout.prop(self, "ClampMin")
             layout.prop(self, "ClampMax")
-            if len(inps) == 2:
-                inps.remove(inps[1])
         else:
-            if len(inps) == 1:
-                self.inputs.new("DefaultSocketType", "Input 2")
-            if not inps[0].is_linked:
-                layout.prop(self, "num1")
-            if not inps[1].is_linked:
-                layout.prop(self, "num2")
+            layout.prop(self, "num1")
 
     def getSettings(self, node):
         node.settings["operation"] = self.operation
         node.settings["num1"] = self.num1
-        node.settings["num2"] = self.num2
         node.settings["ClampMin"] = self.ClampMin
         node.settings["ClampMax"] = self.ClampMax
 
-    
+
 class AndNode(LogicNode):
     """CrowdMaster and node"""
     bl_label = "And"
