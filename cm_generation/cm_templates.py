@@ -1067,9 +1067,9 @@ class TemplateVCOLPOSITIONING(Template):
 
         vcol_layer = data.vertex_colors[self.settings["vcols"]]
 
-        for poly in data.polygons:
+        for poly in mesh.polygons:
             for loop_index in poly.loop_indices:
-                loop_vert_index = data.loops[loop_index].vertex_index
+                loop_vert_index = mesh.loops[loop_index].vertex_index
                 diff = vcol_layer.data[loop_index].color - self.settings["vcolor"]
                 if not invert:
                     if abs(diff.r) < 0.01 and abs(diff.g) < 0.01 and abs(diff.b) < 0.01:

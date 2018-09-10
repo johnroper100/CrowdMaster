@@ -101,9 +101,9 @@ class Agent:
         self.sz = 0
         self.apzKey = True  # True if a keyframe was set last frame
 
-        self.scalex = objs[blenderid].scale[0]
-        self.scaley = objs[blenderid].scale[1]
-        self.scalez = objs[blenderid].scale[2]
+        self.scalex = objs[self.id].scale[0]
+        self.scaley = objs[self.id].scale[1]
+        self.scalez = objs[self.id].scale[2]
         self.scalexKey = True
         self.scaleyKey = True
         self.scalezKey = True
