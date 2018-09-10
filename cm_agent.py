@@ -286,7 +286,7 @@ class Agent:
 
         if obj.animation_data:
             obj.animation_data.action_extrapolation = 'HOLD_FORWARD'
-            obj.animation_data.action_blend_type = 'ADD'
+            obj.animation_data.action_blend_type = 'REPLACE'
             for track in obj.animation_data.nla_tracks:
                 track.mute = False
 
